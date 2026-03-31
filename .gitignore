@@ -6,7 +6,7 @@ __pycache__/
 # Jupyter
 .ipynb_checkpoints/
 
-# LaTeX temporários
+# LaTeX temporarios
 *.aux
 *.log
 *.out
@@ -24,10 +24,21 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# Pastas que NÃO queremos subir
+# Pastas que NAO queremos subir
 Backup/
 outputs/
 Overleaf/
 dissertacao_bitcoin_vrp_ml/
 figuras/
 .sixth/
+
+# Dados grandes
+binance_raw/
+btc_raw/
+
+# Dados intermediarios
+data/
+code/data/
+
+# Modelos ML
+*.joblib
