@@ -1,0 +1,81 @@
+\chapter{Apêndice C — Estrutura de Pastas e Reprodutibilidade}
+\label{apendiceC}
+
+Este apêndice descreve a organização lógica dos arquivos utilizados na
+dissertação, bem como os princípios adotados para garantir reprodutibilidade
+empírica, transparência metodológica e rastreabilidade dos resultados
+apresentados nos capítulos principais.
+
+\section{Estrutura de diretórios}
+
+Os arquivos do projeto foram organizados de forma modular, separando dados,
+scripts, tabelas e figuras. A estrutura geral segue o padrão abaixo:
+
+\begin{verbatim}
+project_root/
+│
+├── data/
+│   ├── raw/                # Dados brutos (preços, IV, DVOL, etc.)
+│   ├── processed/          # Dados tratados e alinhados
+│
+├── notebooks/
+│   ├── dvol_pipeline.ipynb # Construção da IV e BVRP
+│   ├── rv_calculation.ipynb
+│   ├── ml_models.ipynb
+│
+├── scripts/
+│   ├── utils_vol.py        # Funções auxiliares (RV, defasagens)
+│   ├── ml_pipeline.py
+│
+├── tables/
+│   ├── tab_ols_*.tex
+│   ├── tab7/
+│   ├── tab8/
+│
+├── figs/
+│   ├── cap6/
+│   ├── cap7/
+│   ├── cap8/
+│
+├── chapters/
+│   ├── cap1_introducao.tex
+│   ├── cap2_referencial.tex
+│   ├── ...
+│
+└── main.tex
+\end{verbatim}
+
+Essa organização permite separar claramente:
+(i) dados brutos e tratados;
+(ii) rotinas computacionais;
+(iii) resultados finais utilizados no documento.
+
+\section{Reprodutibilidade empírica}
+
+Todos os resultados empíricos apresentados na dissertação são gerados a partir
+de scripts determinísticos, com controle explícito de sementes aleatórias
+(\textit{random seeds}) nos modelos de aprendizado de máquina, quando aplicável.
+As figuras e tabelas reportadas no texto principal são exportadas diretamente
+dos \textit{notebooks} e scripts Python para arquivos \texttt{.png} e
+\texttt{.tex}, evitando intervenções manuais.
+
+As estimações seguem rigorosamente a ordenação temporal das informações,
+assegurando ausência de \textit{look-ahead bias} e consistência fora da amostra,
+conforme discutido nos Capítulos~\ref{chap:metodologia},
+\ref{chap:cap6_ml} e \ref{chap:ml_bvrp}.
+
+\section{Disponibilidade do código}
+
+O código completo utilizado na dissertação encontra-se organizado e documentado
+pelo autor. Por razões de licenciamento de dados e uso de fontes proprietárias
+(plataformas de derivativos de criptoativos), os dados brutos e parte dos scripts
+não são disponibilizados publicamente. No entanto, todas as etapas metodológicas,
+definições de variáveis e especificações empíricas são descritas de forma
+detalhada no texto e nos apêndices, permitindo replicação conceitual e
+implementação independente por terceiros.
+
+\section{Resumo}
+
+Este apêndice documenta a estrutura computacional subjacente à dissertação,
+reforçando o compromisso com boas práticas de pesquisa empírica, organização de
+projetos quantitativos e reprodutibilidade dos resultados.

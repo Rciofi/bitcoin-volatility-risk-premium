@@ -1,0 +1,61 @@
+\documentclass[12pt,oneside]{report}
+
+\input{preamble}
+
+\begin{document}
+
+\include{capa}
+\include{folha_rosto}
+\include{folha_aprovacao}
+\include{epigrafe}
+
+% ===========================
+% SEÇÕES PRÉ-TEXTUAIS FALTANTES
+% ===========================
+\include{agradecimentos}
+\include{resumo}
+\include{abstract}
+
+% ===========================
+% SUMÁRIO E LISTAS
+% ===========================
+\tableofcontents
+\listoffigures
+\listoftables
+% ===========================
+% PARTE TEXTUAL
+% ===========================
+%\setcounter{chapter}{3}
+\include{chapters/cap1_introducao}
+\include{chapters/cap2_referencial}
+\include{chapters/cap3_dados}
+\include{chapters/cap4_metodologia}
+\include{chapters/cap5_resultados_ols}
+\include{chapters/cap6_ml}
+\include{chapters/cap7_estrategias}
+\include{chapters/Cap8_ML_BVRP}
+
+\include{chapters/Nota_metodologica}
+
+
+% ===========================
+% APÊNDICES
+% ===========================
+\appendix
+\include{chapters/apendiceA_variaveis}
+\include{chapters/apendiceB_scripts}
+\include{chapters/apendiceC_Estrutura de Pasta e Reprodutibilidade}
+
+% ===========================
+% BIBLIOGRAFIA
+% ===========================
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Referências}
+
+\nocite{*} % opcional
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}
+

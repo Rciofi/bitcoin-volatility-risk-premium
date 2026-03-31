@@ -1,0 +1,155 @@
+\chapter{Apêndice A — Construção das Variáveis de Volatilidade}
+\label{apendiceA}
+
+Este apêndice apresenta a formulação das variáveis utilizadas ao longo da
+dissertação: retornos logarítmicos, volatilidade realizada (RV), volatilidade
+implícita (IV), prêmio de risco de volatilidade do Bitcoin (BVRP) e retornos
+futuros. As expressões seguem práticas padrão em finanças quantitativas, com
+adaptações relevantes ao mercado de criptoativos (negociação contínua 24/7).
+
+\section{Retornos logarítmicos}
+
+Dado o preço diário do Bitcoin $P_t$, define-se o retorno logarítmico como:
+\[
+r_t = \ln\left(\frac{P_t}{P_{t-1}}\right).
+\]
+O uso de retornos logarítmicos é conveniente por (i) permitir aditividade no
+tempo e (ii) apresentar boa compatibilidade com modelos contínuos de preços.
+
+Esses retornos são utilizados tanto na construção da volatilidade realizada
+quanto na definição de retornos futuros em diferentes horizontes.
+
+\section{Volatilidade Realizada (RV)}
+
+A volatilidade realizada anualizada, construída a partir de retornos diários em
+um horizonte de $h$ dias, é definida por:
+\[
+RV_{h,t} = \sqrt{\frac{365}{h}\sum_{i=1}^{h} r_{t-i+1}^{2}},
+\]
+em que o fator 365 anualiza a medida, considerando que o mercado de criptoativos
+opera continuamente (24/7).
+
+Ao longo da dissertação, utiliza-se majoritariamente $h=30$, de modo que:
+\[
+RV_{30,t} = \sqrt{\frac{365}{30}\sum_{i=1}^{30} r_{t-i+1}^{2}}.
+\]
+
+\subsection{Observação sobre alinhamento temporal}
+
+A definição acima corresponde ao estimador \textit{backward-looking}, isto é,
+calculado com retornos observados no passado (janela móvel encerrando em $t$).
+Essa construção é adequada para análises empíricas e preditivas quando se deseja
+utilizar apenas informação disponível até $t$. Em contextos de precificação, é
+comum comparar IV em $t$ com uma RV \textit{ex-post} (realizada ao longo do
+período futuro). Quando pertinente, a dissertação deixa explícito o alinhamento
+adotado em cada exercício empírico.
+
+\subsection{Estimadores alternativos de RV}
+
+A literatura apresenta estimadores mais robustos para RV, sobretudo quando há
+informação intradiária e/ou preocupação com ruído de microestrutura. Exemplos incluem:
+\begin{itemize}
+    \item \textbf{Parkinson} (baseado em máximos e mínimos intradiários);
+    \item \textbf{Garman--Klass} (usa abertura, máximo, mínimo e fechamento);
+    \item \textbf{Rogers--Satchell} (robusto a \textit{drift});
+    \item \textbf{MedRV} (baseado em estatísticas medianas, resistente a ruído).
+\end{itemize}
+
+Apesar dessas alternativas, adota-se a versão clássica baseada em retornos diários
+por sua simplicidade, transparência e consistência com a disponibilidade de dados
+e com o horizonte de 30 dias utilizado na volatilidade implícita.
+
+\section{Volatilidade Implícita (IV)}
+
+A volatilidade implícita a 30 dias ($IV_{30,t}$) é obtida de duas formas:
+
+\begin{enumerate}
+    \item diretamente do índice DVOL da Deribit, utilizado como proxy da volatilidade
+    implícita de curto prazo;
+    \item quando necessário, via interpolação linear no tempo entre vencimentos adjacentes.
+\end{enumerate}
+
+Seja $T_1$ e $T_2$ (em dias) dois vencimentos observáveis tais que $T_1 < 30 < T_2$.
+Define-se então:
+\[
+IV_{30,t} = w \cdot IV_{T_1,t} + (1-w)\cdot IV_{T_2,t},
+\]
+com peso:
+\[
+w = \frac{T_2 - 30}{T_2 - T_1}.
+\]
+
+Esse procedimento é análogo à interpolação de maturidade utilizada em índices de
+volatilidade de mercado, como no caso do VIX.
+
+\section{Prêmio de Risco de Volatilidade (BVRP)}
+
+O Prêmio de Risco de Volatilidade do Bitcoin (BVRP), variável central da dissertação,
+é definido como:
+\[
+BVRP_t = IV_{30,t} - RV_{30,t}.
+\]
+
+Em termos econômicos, $BVRP_t$ mede o diferencial entre a incerteza precificada
+no mercado de opções (via IV) e a volatilidade efetivamente observada no mercado
+à vista (via RV, construída em janela móvel). Valores positivos indicam que a
+volatilidade implícita está acima da volatilidade realizada, consistente com a
+interpretação de um prêmio associado à demanda por proteção. Valores negativos
+podem ocorrer em episódios de choques, liquidações e movimentos abruptos em que
+a volatilidade realizada supera a implícita.
+
+\begin{itemize}
+    \item \textbf{BVRP positivo:} IV $>$ RV, típico de mercados com demanda por proteção e/ou
+    aversão ao risco elevada;
+    \item \textbf{BVRP negativo:} RV $>$ IV, típico de episódios de surpresa (choques exógenos,
+    liquidações em cascata, \textit{jumps});
+    \item \textbf{Alta magnitude:} indica períodos de forte assimetria entre volatilidade
+    precificada e observada, frequentemente associados a mudanças de regime.
+\end{itemize}
+
+\section{Retornos futuros}
+
+Os retornos futuros utilizados para avaliação preditiva são definidos como retornos
+logarítmicos acumulados no horizonte $h$:
+\[
+ret\_fut\_h(t) = \ln(P_{t+h}) - \ln(P_t).
+\]
+
+Em particular, são utilizados:
+\[
+ret\_fut\_1(t) = \ln(P_{t+1}) - \ln(P_t), \qquad
+ret\_fut\_5(t) = \ln(P_{t+5}) - \ln(P_t), \qquad
+ret\_fut\_20(t) = \ln(P_{t+20}) - \ln(P_t).
+\]
+
+Os horizontes escolhidos capturam:
+\begin{itemize}
+    \item \textbf{1 dia}: resposta de curtíssimo prazo e influência de ruído;
+    \item \textbf{5 dias}: dinâmica semanal frequentemente analisada em criptoativos;
+    \item \textbf{20 dias}: horizonte aproximadamente mensal, com maior suavização de ruído.
+\end{itemize}
+
+\section{Defasagem das variáveis e prevenção de \textit{look-ahead bias}}
+
+Para assegurar validade empírica e evitar \textit{look-ahead bias}, a modelagem
+preditiva utiliza apenas informação disponível até o instante de decisão. Em
+particular, variáveis explicativas observadas no instante $t$ são, quando necessário,
+defasadas de modo que:
+\[
+X_t = X^{\text{observado}}_{t-1},
+\]
+o que garante que:
+\begin{itemize}
+    \item preditores não utilizem informações do mesmo dia do alvo quando isso implicar
+    vazamento temporal;
+    \item previsões sejam realizadas apenas com informações disponíveis à época;
+    \item a avaliação fora da amostra seja genuína e reprodutível.
+\end{itemize}
+
+\section{Resumo}
+
+Este apêndice consolidou a formulação matemática das variáveis centrais da dissertação
+--- retornos, $RV_{30,t}$, $IV_{30,t}$, $BVRP_t$ e retornos futuros ---
+assegurando precisão e alinhamento com práticas usuais na literatura de volatilidade
+e prêmio de risco. Essas definições fundamentam a construção dos \textit{datasets},
+as análises econométricas e os exercícios preditivos discutidos nos capítulos principais.

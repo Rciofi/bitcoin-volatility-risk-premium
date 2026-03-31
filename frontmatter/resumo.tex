@@ -1,0 +1,33 @@
+\chapter*{Resumo}
+\addcontentsline{toc}{chapter}{Resumo}
+
+Esta dissertação investiga de forma abrangente o \textit{Bitcoin Volatility Risk Premium} (BVRP),
+definido como a diferença entre a volatilidade implícita e a volatilidade realizada, com o objetivo
+de caracterizar suas propriedades estatísticas, identificar regimes de comportamento e avaliar seu
+potencial preditivo para retornos futuros do Bitcoin. A volatilidade implícita a 30 dias (IV30D)
+é obtida por meio do índice DVOL (Deribit Volatility Index), enquanto a volatilidade realizada
+(RV30D) é construída a partir de retornos logarítmicos diários do mercado à vista.
+
+Os resultados empíricos demonstram que o BVRP apresenta média positiva ao longo do período,
+evidenciando a existência de um prêmio de proteção sistemático no mercado de opções de Bitcoin,
+em linha com a literatura tradicional de \textit{volatility risk premium}. A distribuição do BVRP
+mostra assimetria negativa acentuada e caudas pesadas, características associadas a episódios de
+estresse, liquidações em cascata e choques idiossincráticos que elevam abruptamente a volatilidade
+realizada. A análise temporal revela regimes distintos — complacência, transição e estresse —
+refletindo mudanças estruturais no equilíbrio entre volatilidade implícita e realizada.
+
+A relação entre o BVRP e retornos futuros do Bitcoin é moderada, porém crescente em horizontes
+mais longos, especialmente em janelas de 20 dias. Para investigar essa dinâmica, implementaram-se
+modelos não lineares de aprendizado de máquina (Random Forest e XGBoost), os quais indicam que
+variáveis de volatilidade — particularmente RV30D e o próprio BVRP — carregam informação
+incremental relevante para previsão de retornos, embora o poder preditivo permaneça limitado
+dada a elevada complexidade e o ruído estrutural do mercado cripto.
+
+As evidências sugerem que o BVRP é mais eficaz como indicador de regime do que como sinal
+direcional isolado, podendo ser integrado a modelos quantitativos híbridos, filtros de risco
+e estratégias de volatilidade. Em conjunto, os achados reforçam a utilidade do BVRP como
+ferramenta complementar de análise e gestão, ao mesmo tempo em que destacam suas limitações
+em um ambiente marcado por eventos extremos e alta incerteza.
+
+\textbf{Palavras-chave:} Bitcoin; volatilidade implícita; volatilidade realizada; prêmio de risco
+de volatilidade; DVOL; Deribit; aprendizado de máquina.

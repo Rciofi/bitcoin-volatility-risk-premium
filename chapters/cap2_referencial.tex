@@ -1,0 +1,295 @@
+\chapter{Referencial Teórico}
+\label{chap:referencial}
+
+Este capítulo apresenta o conjunto de conceitos fundamentais necessários para
+compreender a análise conduzida nesta dissertação. São discutidos: (i) a
+formação da volatilidade implícita em mercados de opções; (ii) a mensuração da
+volatilidade realizada; (iii) a definição, interpretações e propriedades do
+\textit{Volatility Risk Premium} (VRP); (iv) peculiaridades do mercado de opções
+de Bitcoin; e (v) abordagens de aprendizado de máquina aplicadas à previsão de
+retornos e à modelagem de volatilidade.
+
+\section{Volatilidade implícita}
+
+A volatilidade implícita (\textit{Implied Volatility}, IV) representa a
+expectativa de mercado sobre a variabilidade futura do preço do ativo
+subjacente, inferida a partir dos preços das opções pela inversão de modelos de
+precificação, como o modelo de Black--Scholes. Em vez de assumir uma volatilidade futura fixa, o mercado revela,
+por meio dos preços de opções, a volatilidade que equilibra oferta e demanda por
+proteção.
+
+Diferentemente da volatilidade histórica, a volatilidade implícita não é uma
+estimativa estatística no sentido clássico. Ela pode ser interpretada como um
+\textit{preço} de risco associado à distribuição risco-neutra (\textit{risk-neutral})
+dos retornos, refletindo não apenas a expectativa sobre a variância futura, mas
+também prêmios por assimetria, curtose e risco de cauda. Assim, a IV é
+influenciada por fatores como:
+
+\begin{itemize}
+    \item \textbf{demanda por proteção}: investidores adquirindo opções de venda
+          (\textit{puts}) tendem a elevar a IV, especialmente em \textit{strikes}
+          fora do dinheiro;
+    \item \textbf{estrutura de \textit{skew}/\textit{smile}}: assimetrias de
+          oferta e demanda entre diferentes \textit{strikes} e vencimentos;
+    \item \textbf{eventos esperados}: anúncios regulatórios, atualizações de rede,
+          vencimentos relevantes e mudanças de regime percebidas;
+    \item \textbf{condições de liquidez}: \textit{bid--ask spreads}, profundidade
+          do livro de ofertas e variações intradiárias de fluxo.
+\end{itemize}
+
+Em mercados tradicionais, a superfície de volatilidade apresenta padrões
+estilizados bem documentados, como \textit{smile} e \textit{skew}, associados a
+distribuições assimétricas e a risco de cauda. No caso do Bitcoin, a curva de
+volatilidade implícita tende a apresentar inclinação mais acentuada e maior
+sensibilidade a fluxos de curto prazo, refletindo a elevada incerteza do ativo,
+a negociação contínua e a menor maturidade relativa do mercado, em linha com a
+literatura sobre superfícies de volatilidade \citep{gatheral2011volsurface,
+bakshi2003dynamicsIV}.
+
+\section{Volatilidade realizada}
+
+A volatilidade realizada (\textit{Realized Volatility}, RV) é uma medida
+\textit{ex post} da variabilidade dos retornos observados de um ativo ao longo
+do tempo, construída sob a medida histórica (física). Trata-se de um estimador
+não paramétrico da volatilidade, amplamente utilizado na literatura empírica,
+e constitui um insumo fundamental para a comparação com a volatilidade implícita.
+
+Neste trabalho, a volatilidade realizada é calculada a partir de retornos
+logarítmicos diários, considerando uma janela móvel de \(h\) dias, conforme:
+
+\[
+RV_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2 },
+\]
+
+onde \(r_{t-j} = \ln\left(\frac{P_{t-j}}{P_{t-j-1}}\right)\) representa o retorno
+logarítmico diário do ativo, e o fator de anualização por 365 dias reflete a
+negociação contínua do mercado de Bitcoin.
+
+Alternativamente, pode-se definir a variância realizada como:
+
+\[
+\mathrm{VarRV}_t^{(h)} = \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2,
+\]
+
+sendo a volatilidade realizada a raiz quadrada dessa quantidade.
+
+Embora a volatilidade realizada seja usualmente construída a partir de retornos
+logarítmicos simples, pode-se alternativamente considerar retornos em excesso
+em relação à taxa livre de risco, definidos como:
+
+\[
+r_t^e = r_t - r_{f,t},
+\]
+
+onde \(r_{f,t}\) representa a taxa livre de risco no período \(t\).
+
+Nesse caso, a volatilidade realizada pode ser definida como:
+
+\[
+RV_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} \left( r_{t-j} - r_{f,t-j} \right)^2 }.
+\]
+
+No entanto, para frequências diárias e, em particular, no contexto de criptoativos,
+a diferença empírica entre utilizar retornos simples ou em excesso tende a ser
+negligenciável. Por essa razão, a literatura usualmente adota retornos não ajustados,
+abordagem também seguida neste trabalho.
+
+Embora a RV possa ser estimada com dados intradiários, aumentando a precisão
+(\textit{high-frequency realized volatility}), nesta dissertação utiliza-se a
+versão baseada em dados diários, consistente com a disponibilidade de dados do
+mercado à vista e com as séries derivadas do ecossistema da Deribit, incluindo
+o índice DVOL.
+
+A literatura clássica de volatilidade realizada, especialmente os trabalhos de
+\citet{andersen2003realized} e \citet{corsi2009har}, estabelece a base teórica
+para a construção de estimadores robustos de volatilidade, além de documentar a
+presença de persistência temporal e estrutura de memória longa na dinâmica da
+volatilidade, fenômenos também observados em criptoativos.
+\section{Volatility Risk Premium (VRP)}
+
+O \textit{Volatility Risk Premium} (VRP) pode ser interpretado como a
+compensação exigida pelos investidores para assumir risco de volatilidade. Em
+termos empíricos, é comum aproximar o VRP pela diferença entre uma medida de
+volatilidade implícita e uma medida de volatilidade realizada no mesmo horizonte:
+
+\[
+VRP_t = IV_{30,t} - RV_{30,t},
+\]
+
+onde:
+
+\begin{itemize}
+    \item $IV_{30,t}$ é a volatilidade implícita a 30 dias (annualizada);
+    \item $RV_{30,t}$ é a volatilidade realizada a 30 dias.
+\end{itemize}
+
+Um VRP positivo indica que agentes de mercado estão dispostos a pagar um prêmio
+pela volatilidade implícita acima da volatilidade que efetivamente se realiza,
+sendo usualmente interpretado como um \textit{prêmio de proteção}. Em mercados
+tradicionais, como o S\&P 500, a evidência empírica sugere que o VRP apresenta
+comportamento sistematicamente positivo, associado à demanda por proteção contra
+quedas abruptas e contra choques de volatilidade \citep{bollerslev2011VRP,
+pan2006jumpRisk, bali2009volatilitypremium}.
+
+Do ponto de vista teórico, a distinção entre medida risco-neutra (associada a
+preços de opções) e medida histórica (associada a retornos observados) implica
+que a diferença IV--RV incorpora, além de expectativas de variância, componentes
+relacionados a risco de cauda e a preferências por proteção. Dessa forma, o VRP
+tem papel relevante tanto na precificação de ativos quanto em aplicações
+empíricas de previsão.
+
+No Bitcoin, entretanto, o VRP tende a ser mais instável. Entre os fatores
+frequentemente associados a essa instabilidade, destacam-se:
+
+\begin{enumerate}
+    \item volatilidade realizada mais elevada, com episódios intermitentes de
+          grande magnitude;
+    \item eventos idiossincráticos e choques de liquidez, com impacto rápido na
+          volatilidade;
+    \item estrutura de mercado ainda em consolidação, com participação
+          institucional relativamente menor e maior relevância de agentes
+          alavancados.
+\end{enumerate}
+
+Esses elementos contribuem para maior dispersão do VRP e para ocorrência mais
+frequente de períodos de VRP negativo, particularmente em janelas de realização
+excepcionalmente elevada da volatilidade.
+
+\section{Mercado de opções de Bitcoin}
+
+O mercado de opções de Bitcoin é amplamente dominado pela Deribit, que oferece
+liquidez superior às demais plataformas. Suas principais características incluem:
+
+\begin{itemize}
+    \item \textbf{negociação 24/7}: ausência de janelas de fechamento reduz o
+          acúmulo de eventos fora do pregão, mas aumenta a relevância de efeitos
+          intradiários de liquidez;
+    \item \textbf{liquidez concentrada}: maior profundidade em opções
+          \textit{at-the-money} e vencimentos curtos (7--30 dias), o que influencia
+          a formação de IV em horizontes próximos;
+    \item \textbf{efeito de liquidações automáticas}: posições alavancadas podem
+          gerar movimentos bruscos e amplificar a volatilidade;
+    \item \textbf{índice DVOL}: medida padronizada de volatilidade implícita
+          calculada a partir de opções da Deribit.
+\end{itemize}
+
+A formação da IV no Bitcoin é sensível a fatores microestruturais, tais como:
+
+\begin{itemize}
+    \item tamanho mínimo de lote e restrições operacionais;
+    \item \textit{bid--ask spreads} mais amplos em horários de menor profundidade;
+    \item heterogeneidade de \textit{market makers} por região e perfil de risco;
+    \item eventos associados ao \textit{funding} de futuros perpétuos, que afetam
+          posicionamento e demanda por \textit{hedge}.
+\end{itemize}
+
+Essas características tornam o BVRP um objeto empírico mais rico, porém mais
+volátil, do que em mercados tradicionais. A sensibilidade da volatilidade
+implícita à microestrutura está alinhada com estudos sobre superfícies de
+volatilidade e dinâmica de \textit{implied vol} \citep{gatheral2011volsurface,
+bakshi2003dynamicsIV}, que destacam como liquidez, assimetria de fluxos e
+microestrutura afetam a formação da curva de IV, especialmente em mercados menos
+maduros ou mais fragmentados.
+
+\section{Regimes de volatilidade}
+
+Modelos de regimes buscam capturar mudanças estruturais no comportamento da
+volatilidade e do VRP. Em mercados de criptoativos, essas transições tendem a ser
+mais frequentes, refletindo a ocorrência de choques e mudanças rápidas no
+sentimento de mercado. Regimes típicos incluem:
+
+\begin{enumerate}
+    \item \textbf{regime de baixa volatilidade}: períodos de lateralização do
+          preço e menor demanda por proteção;
+    \item \textbf{regime de alta volatilidade}: movimentos abruptos, liquidações
+          em cascata e aumento expressivo do custo de \textit{hedge};
+    \item \textbf{regime de transição}: aumento gradual da incerteza, com elevação
+          progressiva de IV e RV.
+\end{enumerate}
+
+Mesmo sem a implementação explícita de modelos de mudança de regime, como
+\textit{Markov Switching}, a inspeção gráfica e análises por quantis do BVRP
+frequentemente revelam padrões compatíveis com tais regimes, motivando o uso de
+estratégias condicionais e especificações empíricas que permitam relações
+não lineares.
+
+\section{Aprendizado de máquina em finanças}
+
+Modelos de \textit{machine learning} têm se tornado ferramentas cada vez mais
+comuns na pesquisa empírica em finanças, especialmente em aplicações de previsão
+de retornos e volatilidade. Em contextos com múltiplas variáveis explicativas,
+possíveis não linearidades e interações complexas, métodos flexíveis podem
+superar especificações lineares tradicionais. Trabalhos como \citet{Gu2020EmpiricalML}
+mostram que modelos baseados em árvores, redes neurais e técnicas de regularização
+são capazes de capturar relações não lineares e de alta dimensão entre
+características (\textit{features}) e retornos de ativos.
+
+Nesta dissertação, modelos de árvore são utilizados por três razões principais:
+(i) capacidade de capturar não linearidades e efeitos de interação; (ii)
+robustez a distribuições com caudas pesadas e presença de outliers; e (iii)
+possibilidade de avaliar importância relativa de preditores, como o BVRP, em um
+ambiente multivariado.
+
+\subsection{Random Forest}
+
+O Random Forest é um método de \textit{bagging} que cria múltiplas árvores de
+decisão \citep{breiman2001randomforest}, cada uma treinada em uma amostra
+\textit{bootstrap} dos dados. Trata-se de um dos algoritmos mais consagrados da
+literatura de aprendizado de máquina, amplamente utilizado em aplicações
+financeiras devido à sua capacidade de capturar relações não lineares e
+interações complexas entre variáveis.
+
+Árvores agregadas em estrutura de \textit{bagging} apresentam vantagens como:
+
+\begin{itemize}
+    \item captura de não linearidades;
+    \item robustez a outliers e ruído;
+    \item bom desempenho mesmo quando relações lineares são fracas.
+\end{itemize}
+
+Além disso, a aleatorização de subconjuntos de variáveis em cada divisão reduz a
+correlação entre árvores e tende a melhorar a generalização fora da amostra.
+
+\subsection{XGBoost}
+
+O XGBoost é um dos algoritmos mais influentes de \textit{gradient boosting} em
+árvores de decisão, projetado para combinar alto desempenho preditivo com
+eficiência computacional e regularização explícita. O modelo foi introduzido por
+\citet{chen2016xgboost}, que demonstram como técnicas de otimização, paralelização
+e controle de \textit{overfitting} permitem ao XGBoost superar implementações
+tradicionais de \textit{boosting} em uma ampla variedade de tarefas.
+
+Diferentemente do Random Forest, que utiliza \textit{bagging}, o XGBoost constrói
+árvores sequencialmente, de modo que cada nova árvore busca corrigir erros
+residuais das anteriores. Isso resulta em maior sensibilidade a padrões sutis e
+não lineares, além de permitir ajuste fino do viés e da variância por meio de
+hiperparâmetros como profundidade máxima, taxa de aprendizado e termos de
+regularização.
+
+Entre as principais características do XGBoost, destacam-se:
+
+\begin{itemize}
+    \item alta capacidade de capturar interações complexas entre variáveis;
+    \item inclusão de regularização (L1 e L2) para redução de \textit{overfitting};
+    \item possibilidade de ajustar taxa de aprendizado (\textit{learning rate});
+    \item desempenho superior em relação a modelos de árvore tradicionais em
+          diversas aplicações;
+    \item implementação eficiente, adequada a bases de dados extensas.
+\end{itemize}
+
+Ambos os modelos são aplicados nesta dissertação para avaliar se o BVRP contém
+informação incremental relevante na previsão de retornos do Bitcoin em múltiplos
+horizontes temporais.
+
+\section{Síntese do capítulo}
+
+Este capítulo apresentou os conceitos fundamentais que sustentam a investigação
+sobre o prêmio de risco de volatilidade no Bitcoin. Foram revisados elementos
+teóricos da volatilidade implícita e realizada, o cálculo e a interpretação do
+VRP, aspectos microestruturais específicos do mercado de opções de Bitcoin e a
+motivação para o uso de modelos de aprendizado de máquina na previsão de
+retornos.
+
+Esses elementos formam a base conceitual para a metodologia apresentada no
+Capítulo~\ref{chap:metodologia}, no qual são detalhados os dados, o processo de
+construção das variáveis e os modelos empíricos utilizados.

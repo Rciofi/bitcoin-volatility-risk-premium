@@ -1,0 +1,35 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This dissertation provides a comprehensive investigation of the \textit{Bitcoin
+Volatility Risk Premium} (BVRP), defined as the difference between implied and
+realized volatility. The objective is to characterize its statistical
+properties, identify volatility regimes, and evaluate its predictive ability
+for future Bitcoin returns. The 30-day implied volatility (IV30D) is obtained
+from the Deribit Volatility Index (DVOL), while realized volatility (RV30D) is
+constructed using daily log returns of Bitcoin spot prices.
+
+Empirical evidence shows that the BVRP is positive on average, indicating a
+persistent protection premium in the Bitcoin options market, consistent with
+the broader volatility risk premium literature. The distribution of the BVRP
+exhibits marked negative skewness and heavy tails, reflecting stress episodes
+driven by sharp spikes in realized volatility. The time-series dynamics reveal
+distinct regimes—including complacency, transition, and stress—highlighting the
+structural sensitivity of Bitcoin volatility to market shocks.
+
+The relationship between the BVRP and future returns is moderate but becomes
+more pronounced at longer horizons, particularly at 20 days. To further assess
+this predictive structure, nonlinear machine learning models (Random Forest and
+XGBoost) are implemented. The results indicate that volatility-related
+variables—especially RV30D and the BVRP itself—carry incremental information
+about future returns, although the overall predictive power remains moderate due
+to the inherently noisy nature of cryptocurrency markets.
+
+The findings suggest that the BVRP is more effective as a regime indicator than
+as an isolated trading signal, offering value when integrated into hybrid
+quantitative models, risk filters, and volatility-based strategies. While not a
+standalone predictor, the BVRP contributes meaningfully to the characterization
+of market conditions and to frameworks for tactical decision-making.
+
+\textbf{Keywords:} Bitcoin; implied volatility; realized volatility; volatility
+risk premium; machine learning; DVOL; Deribit.

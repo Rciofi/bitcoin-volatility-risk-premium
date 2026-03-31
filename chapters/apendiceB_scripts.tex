@@ -1,0 +1,179 @@
+\chapter{Apêndice B — Scripts Python Utilizados}
+\label{apendiceB}
+
+Este apêndice apresenta trechos representativos dos scripts Python utilizados na
+construção do conjunto de dados, no cálculo do Prêmio de Risco de Volatilidade do
+Bitcoin (BVRP) e na implementação dos modelos de aprendizado de máquina empregados
+na dissertação. O objetivo não é reproduzir integralmente todo o \textit{pipeline}
+computacional, mas documentar de forma transparente os principais procedimentos
+empíricos discutidos nos capítulos anteriores.
+
+Os códigos foram organizados em blocos temáticos, refletindo as etapas centrais
+da metodologia: (i) construção das variáveis de volatilidade; (ii) definição dos
+retornos futuros; (iii) cálculo do BVRP; e (iv) estimação de modelos preditivos.
+A implementação faz uso de bibliotecas amplamente consolidadas em finanças
+quantitativas, econometria e \textit{machine learning}, em linha com a literatura
+sobre volatilidade realizada e modelos preditivos
+\citep{andersen2003realized, corsi2009har, breiman2001randomforest, chen2016xgboost, Gu2020EmpiricalML}.
+
+\section{Importação de bibliotecas}
+
+Os scripts utilizam bibliotecas padrão para manipulação de dados, modelagem
+estatística e visualização gráfica:
+
+\begin{verbatim}
+import pandas as pd
+import numpy as np
+
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import matplotlib.pyplot as plt
+\end{verbatim}
+
+\section{Cálculo da volatilidade realizada (RV30)}
+
+A função a seguir calcula a volatilidade realizada em janela móvel de 30 dias,
+anualizada para 365 dias de negociação, consistente com a operação contínua
+(24/7) do mercado de criptoativos:
+
+\begin{verbatim}
+def calc_rv30(returns):
+    rv = np.sqrt(
+        365 * returns.rolling(30)
+                     .apply(lambda x: np.sum(x**2))
+    )
+    return rv
+\end{verbatim}
+
+Essa implementação corresponde à definição formal apresentada no Apêndice A e é
+utilizada ao longo da análise empírica.
+
+\section{Construção dos retornos futuros}
+
+Os retornos futuros são definidos como retornos acumulados em horizontes de 1, 5
+e 20 dias, com defasagem apropriada para evitar \textit{look-ahead bias}:
+
+\begin{verbatim}
+df["ret_fut_1d"]  = df["close"].pct_change().shift(-1)
+df["ret_fut_5d"]  = df["close"].pct_change(5).shift(-5)
+df["ret_fut_20d"] = df["close"].pct_change(20).shift(-20)
+\end{verbatim}
+
+Essas variáveis são utilizadas tanto na análise econométrica quanto nos exercícios
+preditivos discutidos nos Capítulos~\ref{chap:resultados_ols},
+\ref{chap:cap6_ml} e \ref{chap:ml_bvrp}.
+
+\section{Cálculo do Prêmio de Risco de Volatilidade (BVRP)}
+
+O prêmio de risco de volatilidade é construído como a diferença entre a
+volatilidade implícita de 30 dias e a volatilidade realizada correspondente:
+
+\begin{verbatim}
+df["BVRP"] = df["IV30D"] - df["RV30D"]
+\end{verbatim}
+
+Essa variável constitui o principal objeto de interesse empírico da dissertação.
+
+\section{Tratamento e limpeza dos dados}
+
+Antes da estimação dos modelos, são removidas observações com valores ausentes ou
+infinitos, assegurando consistência numérica e alinhamento temporal das séries:
+
+\begin{verbatim}
+df = df.dropna()
+df = df.replace([np.inf, -np.inf], np.nan).dropna()
+\end{verbatim}
+
+\section{Modelo Random Forest}
+
+A seguir apresenta-se um exemplo de estimação de um modelo Random Forest,
+utilizado para avaliar relações não lineares entre o BVRP, variáveis de
+volatilidade e retornos futuros:
+
+\begin{verbatim}
+features = ["BVRP", "IV30D", "RV30D",
+            "RV7D", "RV14D",
+            "ret_lag1", "ret_lag3", "ret_lag5"]
+
+X = df[features]
+y = df["ret_fut_5d"]
+
+rf = RandomForestRegressor(
+    n_estimators=500,
+    max_depth=None,
+    random_state=42
+)
+
+rf.fit(X, y)
+pred_rf = rf.predict(X)
+\end{verbatim}
+
+Esse tipo de modelo é explorado nos capítulos de análise preditiva como uma
+alternativa flexível aos modelos lineares tradicionais.
+
+\section{Modelo XGBoost}
+
+Também são considerados modelos baseados em \textit{gradient boosting}, como o
+XGBoost, que permitem capturar padrões residuais e interações mais complexas:
+
+\begin{verbatim}
+xgb = XGBRegressor(
+    n_estimators=300,
+    eta=0.05,
+    max_depth=4,
+    reg_lambda=1.0,
+    random_state=42
+)
+
+xgb.fit(X, y)
+pred_xgb = xgb.predict(X)
+\end{verbatim}
+
+A escolha de hiperparâmetros é feita com base em validação temporal, conforme
+descrito nos capítulos empíricos.
+
+\section{Métricas de desempenho}
+
+O desempenho preditivo dos modelos é avaliado por métricas usuais na literatura:
+
+\begin{verbatim}
+rmse = np.sqrt(mean_squared_error(y, pred_xgb))
+mae  = mean_absolute_error(y, pred_xgb)
+corr = np.corrcoef(y, pred_xgb)[0, 1]
+\end{verbatim}
+
+Essas métricas são reportadas e discutidas no Capítulo~\ref{chap:cap6_ml}.
+
+\section{Visualização: valores reais versus previstos}
+
+Para fins ilustrativos, utiliza-se o gráfico de valores reais versus previstos:
+
+\begin{verbatim}
+plt.figure(figsize=(12,6))
+plt.plot(y, label="Real")
+plt.plot(pred_rf, label="Predito (Random Forest)")
+plt.legend()
+plt.show()
+\end{verbatim}
+
+Esse tipo de visualização auxilia na análise qualitativa da capacidade de
+ajuste dos modelos.
+
+\section{Resumo}
+
+Os trechos de código apresentados neste apêndice documentam os principais passos
+computacionais da dissertação, permitindo replicar:
+
+\begin{itemize}
+    \item o cálculo da volatilidade realizada (RV30);
+    \item a manipulação da volatilidade implícita (IV30D);
+    \item a construção do Prêmio de Risco de Volatilidade (BVRP);
+    \item a definição de retornos futuros em múltiplos horizontes;
+    \item a estimação de modelos Random Forest e XGBoost;
+    \item a avaliação e visualização do desempenho preditivo.
+\end{itemize}
+
+Os scripts podem ser facilmente estendidos para novos horizontes, variáveis
+explicativas e algoritmos, servindo como base para futuras extensões da pesquisa.

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../merge_binance_csvs.py"
+		},
+		{
+			"path": "../requirements.txt"
+		}
+	]
+}

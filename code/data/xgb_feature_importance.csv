@@ -1,0 +1,15 @@
+feature,importance
+month,0.13628392
+rv_30d,0.09499425
+vrp_regime_num,0.08491826
+iv_30d,0.08193362
+d_iv_1d,0.07939801
+ret_lag_5,0.078564815
+ret_lag_20,0.06991331
+vrp_30d,0.06667407
+d_vrp_1d,0.058827363
+ret_lag_1,0.054951392
+ret,0.052905392
+is_month_end,0.05168703
+weekday,0.049007766
+is_month_start,0.039940707

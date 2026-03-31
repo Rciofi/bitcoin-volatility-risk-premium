@@ -1,0 +1,218 @@
+\chapter{Introdução}
+\label{chap:introducao}
+
+O mercado de criptoativos consolidou-se, ao longo da última década, como uma
+das classes de ativos mais dinâmicas e inovadoras do sistema financeiro
+global. Entre esses ativos, o Bitcoin ocupa posição central em termos de
+capitalização, liquidez e profundidade de mercado, atuando como ativo de
+\textit{benchmark} para o desenvolvimento de derivativos, índices e estratégias
+quantitativas.
+
+Desde a proposta original de \citet{nakamoto2008bitcoin}, o Bitcoin evoluiu de
+um experimento de moeda digital descentralizada para um ativo financeiro com um
+ecossistema robusto de derivativos, destacando-se a negociação de contratos
+futuros e de opções listadas em plataformas especializadas, como a Deribit. A
+expansão desse mercado tornou possível observar, em alta frequência, a formação
+das expectativas de volatilidade por parte de investidores institucionais e
+\textit{market makers}. A volatilidade implícita extraída dos preços de opções
+sintetiza tanto a visão agregada do mercado sobre a incerteza futura quanto a
+demanda por proteção contra movimentos adversos do preço do ativo subjacente.
+
+Nesse contexto, o \textit{Volatility Risk Premium} (VRP) --- usualmente definido
+como a diferença entre a volatilidade implícita e a volatilidade realizada
+observada ex post --- assume papel fundamental na precificação de risco. Em
+mercados tradicionais, como ações e índices, a evidência empírica documenta que
+o VRP tende a ser sistematicamente positivo, refletindo o prêmio pago por agentes
+dispostos a adquirir proteção contra quedas abruptas de preços e contra choques
+súbitos de volatilidade \citep{bollerslev2011VRP, bali2009volatilitypremium,
+pan2006jumpRisk}. Além disso, diversos estudos apontam que o VRP carrega
+informação relevante para a previsão de retornos, a identificação de regimes de
+mercado e a avaliação de condições de estresse financeiro.
+
+Apesar da rápida evolução do mercado de derivativos de criptoativos, a dinâmica
+do VRP em Bitcoin permanece relativamente pouco investigada na literatura
+acadêmica. Pesquisas recentes começam a documentar a existência de um
+\textit{volatility risk premium} positivo também nesse ambiente, ainda que com
+características distintas das observadas em mercados mais maduros
+\citep{hoang2023cryptoVRP}. Em particular, a elevada volatilidade intrínseca do
+ativo, a negociação contínua e a presença recorrente de choques idiossincráticos
+podem gerar maior instabilidade temporal e eventuais episódios de compressão ou
+inversão do prêmio. Esta dissertação busca contribuir para esse campo ao oferecer
+uma análise quantitativa abrangente do \textit{Bitcoin Volatility Risk Premium}
+(BVRP), explorando suas propriedades estatísticas, sua variação sob diferentes
+regimes de mercado e sua capacidade preditiva para retornos futuros por meio de
+modelos modernos de aprendizado de máquina.
+
+\section{Contextualização e motivação}
+
+O mercado de opções de Bitcoin apresentou crescimento expressivo a partir de
+2020, impulsionado pela maior participação institucional e pelo avanço da
+infraestrutura de negociação. Dentre as plataformas existentes, a Deribit
+consolidou-se como a principal bolsa de opções de Bitcoin em termos de volume e
+\textit{open interest}, tornando-se referência para a construção de curvas de
+volatilidade implícita e de índices derivados amplamente utilizados por
+participantes de mercado.
+
+A combinação entre elevada volatilidade intrínseca, negociação contínua (24/7) e
+uma estrutura de liquidez ainda em consolidação torna o mercado de Bitcoin
+particularmente propício ao estudo do VRP. Em princípio, espera-se que o prêmio
+de risco de volatilidade seja mais elevado nesse ambiente, tanto pela maior
+incerteza fundamental associada ao ativo quanto pela presença recorrente de
+eventos idiossincráticos, como mudanças regulatórias, \textit{hacks},
+liquidações de posições alavancadas e choques de liquidez em bolsas específicas.
+
+Do ponto de vista da gestão de risco e da construção de estratégias
+quantitativas, compreender a dinâmica do BVRP é relevante por, ao menos, três
+razões principais:
+
+\begin{enumerate}
+    \item permite avaliar se o mercado precifica volatilidade de forma
+    sistematicamente elevada, abrindo espaço para estratégias vendidas em
+    volatilidade;
+    
+    \item fornece uma medida sintética da percepção de risco que pode ser
+    incorporada em modelos de previsão de retornos e de \textit{asset
+    allocation};
+
+    \item auxilia na identificação de regimes de estresse em que o custo de
+    proteção se torna especialmente elevado, contribuindo para decisões
+    táticas e para o desenho de políticas eficazes de \textit{hedge}.
+\end{enumerate}
+
+\section{Problema de pesquisa}
+
+À luz dessa contextualização, o problema de pesquisa que orienta esta
+dissertação pode ser formulado nos seguintes termos:
+
+\begin{quote}
+    \textit{Quais são as principais propriedades estatísticas e dinâmicas do
+    prêmio de risco de volatilidade em Bitcoin (BVRP) e em que medida essa
+    variável contém informação útil para a previsão de retornos futuros do
+    próprio Bitcoin em diferentes horizontes de tempo?}
+\end{quote}
+
+Essa questão desdobra-se em outras perguntas específicas, tais como:
+
+\begin{itemize}
+    \item O BVRP apresenta comportamento sistematicamente positivo ao longo da
+          amostra analisada?
+    \item Existem regimes bem definidos de alto e baixo BVRP associados a
+          diferentes fases do ciclo de mercado?
+    \item Em quais horizontes de tempo o BVRP parece apresentar maior poder
+          preditivo para retornos do Bitcoin?
+    \item Modelos de aprendizado de máquina conseguem explorar informações do
+          BVRP, em conjunto com variáveis de estado de mercado, para melhorar a
+          previsão de retornos em relação a abordagens lineares simples?
+\end{itemize}
+
+\section{Objetivos}
+
+\subsection{Objetivo geral}
+
+O objetivo geral desta dissertação é analisar, de forma quantitativa e
+abrangente, o \textit{Bitcoin Volatility Risk Premium} (BVRP) e investigar sua
+capacidade preditiva para retornos futuros do Bitcoin em horizontes de curto e
+médio prazo, com ênfase na combinação entre métricas de volatilidade e modelos de
+aprendizado de máquina.
+
+\subsection{Objetivos específicos}
+
+De forma mais detalhada, buscam-se os seguintes objetivos específicos:
+
+\begin{enumerate}
+    \item Construir uma série temporal consistente de volatilidade implícita a
+          30 dias (IV30D) a partir de dados de opções de Bitcoin listadas na
+          Deribit, bem como da volatilidade realizada a 30 dias (RV30D) a partir
+          de retornos do mercado à vista.
+    \item Estimar e analisar o BVRP (IV30D -- RV30D), caracterizando suas
+          propriedades estatísticas e sua dinâmica temporal, com destaque para
+          períodos de estresse de mercado.
+    \item Investigar a relação entre o BVRP e retornos futuros do Bitcoin em
+          diferentes horizontes temporais, por meio de análises gráficas,
+          correlações e regressões lineares.
+   \item Implementar modelos de aprendizado de máquina, em particular Random Forest e XGBoost, com o objetivo de capturar potenciais não linearidades, interações complexas e efeitos de regime presentes na dinâmica do Prêmio de Risco de Volatilidade (BVRP). Busca-se avaliar se essas abordagens, ao incorporarem o BVRP e variáveis de estado de mercado, são capazes de gerar ganhos preditivos fora da amostra em relação a modelos lineares de referência, tradicionalmente utilizados na literatura.
+    \item Discutir as implicações dos resultados para estratégias quantitativas,
+          ressaltando oportunidades e riscos associados a operações que exploram
+          o BVRP no mercado de opções de Bitcoin.
+\end{enumerate}
+
+\section{Hipóteses de trabalho}
+
+Com base na literatura e na evidência preliminar, formulam-se as seguintes
+hipóteses de trabalho:
+
+\begin{description}
+    \item[H1:] O BVRP é, em média, positivo ao longo da amostra analisada,
+               refletindo um prêmio de proteção pago no mercado de opções de
+               Bitcoin.
+    \item[H2:] O BVRP apresenta regimes distintos de alto e baixo prêmio,
+               associados a diferentes fases do ciclo de mercado e a episódios
+               de aumento de incerteza.
+    \item[H3:] O BVRP possui capacidade preditiva para retornos futuros do
+               Bitcoin, especialmente em horizontes de médio prazo, ainda que o
+               poder explicativo marginal seja moderado.
+    \item[H4:] Modelos de aprendizado de máquina que incorporam o BVRP e
+               variáveis de estado de mercado produzem previsões de retorno fora
+               da amostra superiores às de regressões lineares que utilizam
+               apenas variáveis tradicionais.
+\end{description}
+
+\section{Contribuições esperadas}
+
+As contribuições deste trabalho podem ser agrupadas em três dimensões:
+
+\begin{enumerate}
+    \item \textbf{Contribuição empírica}: construção e análise detalhada de uma
+          série de BVRP para Bitcoin em horizonte de 30 dias, utilizando dados de
+          mercado de opções de alta liquidez e incorporando procedimentos de
+          tratamento de dados específicos para o contexto de criptoativos.
+    \item \textbf{Contribuição metodológica}: aplicação de modelos de aprendizado
+          de máquina a um conjunto de variáveis que combina BVRP, medidas de
+          volatilidade implícita e realizada e variáveis de estado de mercado,
+          avaliando a utilidade incremental do BVRP em relação a abordagens
+          lineares.
+    \item \textbf{Contribuição aplicada}: discussão de implicações práticas para
+          estratégias quantitativas e para a gestão de risco no mercado de
+          opções de Bitcoin, incluindo limitações, riscos de cauda e desafios de
+          implementação operacional.
+\end{enumerate}
+
+\section{Estrutura da dissertação}
+
+Além deste capítulo introdutório, a dissertação está organizada da seguinte forma:
+
+\begin{itemize}
+    \item O Capítulo 2 apresenta o referencial teórico que fundamenta o estudo,
+          discutindo conceitos de volatilidade implícita e realizada, prêmio de
+          risco de volatilidade, especificidades do mercado de opções de
+          criptoativos e aplicações recentes de modelos de aprendizado de
+          máquina em finanças.
+
+    \item O Capítulo 3 descreve a metodologia adotada, incluindo as fontes de
+          dados utilizadas, os procedimentos de construção das variáveis de
+          interesse, a estimação do prêmio de risco de volatilidade do Bitcoin
+          (BVRP) e a especificação dos modelos empíricos considerados.
+
+    \item O Capítulo 4 apresenta análises descritivas e evidências empíricas
+          iniciais sobre o comportamento do BVRP, bem como sua relação preliminar
+          com retornos futuros do Bitcoin.
+
+    \item O Capítulo 5 aprofunda a análise empírica do BVRP, examinando suas
+          propriedades estatísticas, distribuição, regimes de volatilidade e
+          relações com retornos em diferentes horizontes temporais.
+
+    \item O Capítulo 6 discute os resultados obtidos a partir da aplicação de
+          modelos de aprendizado de máquina na previsão de retornos do Bitcoin,
+          com ênfase no papel do BVRP e de variáveis de estado de mercado como
+          preditores.
+
+    \item O Capítulo 7 integra os resultados empíricos apresentados anteriormente
+          e discute suas implicações para a construção de estratégias
+          quantitativas e para a gestão de risco no mercado de derivativos de
+          Bitcoin.
+
+ \item Por fim, o Capítulo 8 de conclusão sintetiza as principais evidências
+      encontradas ao longo do trabalho, discute suas limitações e aponta
+      possíveis extensões para pesquisas futuras.
+      
+\end{itemize}
