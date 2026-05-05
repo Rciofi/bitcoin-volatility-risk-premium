@@ -1,179 +1,264 @@
-\chapter{Apêndice B — Scripts Python Utilizados}
+\chapter{Apêndice B --- Scripts Python Utilizados}
 \label{apendiceB}
 
 Este apêndice apresenta trechos representativos dos scripts Python utilizados na
 construção do conjunto de dados, no cálculo do Prêmio de Risco de Volatilidade do
-Bitcoin (BVRP) e na implementação dos modelos de aprendizado de máquina empregados
-na dissertação. O objetivo não é reproduzir integralmente todo o \textit{pipeline}
-computacional, mas documentar de forma transparente os principais procedimentos
-empíricos discutidos nos capítulos anteriores.
+Bitcoin (BVRP) e na implementação dos modelos empíricos empregados na dissertação.
+O objetivo não é reproduzir integralmente todo o \textit{pipeline} computacional,
+mas documentar de forma transparente os principais procedimentos discutidos nos
+capítulos anteriores.
 
-Os códigos foram organizados em blocos temáticos, refletindo as etapas centrais
-da metodologia: (i) construção das variáveis de volatilidade; (ii) definição dos
-retornos futuros; (iii) cálculo do BVRP; e (iv) estimação de modelos preditivos.
-A implementação faz uso de bibliotecas amplamente consolidadas em finanças
-quantitativas, econometria e \textit{machine learning}, em linha com a literatura
-sobre volatilidade realizada e modelos preditivos
-\citep{andersen2003realized, corsi2009har, breiman2001randomforest, chen2016xgboost, Gu2020EmpiricalML}.
+Os códigos foram organizados em blocos temáticos: (i) importação de bibliotecas;
+(ii) construção das variáveis de volatilidade; (iii) retornos futuros; (iv) BVRP;
+(v) classificação de regimes; (vi) regressão OLS com erros-padrão de Newey--West;
+e (vii) estimação dos quatro modelos de aprendizado de máquina com avaliação fora
+da amostra. A implementação usa bibliotecas consolidadas em finanças quantitativas e
+\textit{machine learning} \citep{andersen2003realized, corsi2009har,
+breiman2001randomforest, friedman2001gradientboosting, Gu2020EmpiricalML}.
 
 \section{Importação de bibliotecas}
-
-Os scripts utilizam bibliotecas padrão para manipulação de dados, modelagem
-estatística e visualização gráfica:
 
 \begin{verbatim}
 import pandas as pd
 import numpy as np
+import statsmodels.api as sm
+from scipy import stats
 
-from sklearn.ensemble import RandomForestRegressor
-from xgboost import XGBRegressor
+from sklearn.linear_model import Lasso, Ridge
+from sklearn.ensemble import (RandomForestRegressor,
+                               GradientBoostingRegressor)
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 \end{verbatim}
 
 \section{Cálculo da volatilidade realizada (RV30)}
 
-A função a seguir calcula a volatilidade realizada em janela móvel de 30 dias,
-anualizada para 365 dias de negociação, consistente com a operação contínua
-(24/7) do mercado de criptoativos:
+A volatilidade realizada é calculada em janela móvel de 30 dias e anualizada por
+365 dias, refletindo a operação contínua (24/7) do mercado de criptoativos:
 
 \begin{verbatim}
-def calc_rv30(returns):
+def calc_rv30(log_returns):
+    """Volatilidade realizada anualizada em janela de 30 dias."""
     rv = np.sqrt(
-        365 * returns.rolling(30)
-                     .apply(lambda x: np.sum(x**2))
+        365 / 30 * log_returns.rolling(30)
+                               .apply(lambda x: np.sum(x**2))
     )
     return rv
-\end{verbatim}
 
-Essa implementação corresponde à definição formal apresentada no Apêndice A e é
-utilizada ao longo da análise empírica.
+df["log_ret"] = np.log(df["close"] / df["close"].shift(1))
+df["rv_30d"]  = calc_rv30(df["log_ret"])
+\end{verbatim}
 
 \section{Construção dos retornos futuros}
 
-Os retornos futuros são definidos como retornos acumulados em horizontes de 1, 5
-e 20 dias, com defasagem apropriada para evitar \textit{look-ahead bias}:
+Os retornos futuros são retornos logarítmicos acumulados em cinco horizontes,
+com defasagem negativa para evitar \textit{look-ahead bias}:
 
 \begin{verbatim}
-df["ret_fut_1d"]  = df["close"].pct_change().shift(-1)
-df["ret_fut_5d"]  = df["close"].pct_change(5).shift(-5)
-df["ret_fut_20d"] = df["close"].pct_change(20).shift(-20)
+for h in [1, 5, 10, 20, 30]:
+    df[f"ret_fut_{h}d"] = np.log(
+        df["close"].shift(-h) / df["close"]
+    )
 \end{verbatim}
 
-Essas variáveis são utilizadas tanto na análise econométrica quanto nos exercícios
-preditivos discutidos nos Capítulos~\ref{chap:resultados_ols},
-\ref{chap:cap6_ml} e \ref{chap:ml_bvrp}.
+As variáveis resultantes ($h \in \{1, 5, 10, 20, 30\}$ dias) são utilizadas
+nas análises econométricas e preditivas dos
+Capítulos~\ref{chap:resultados_ols}, \ref{chap:cap6_ml},
+\ref{chap:ml_bvrp} e \ref{chap:regimes}.
 
-\section{Cálculo do Prêmio de Risco de Volatilidade (BVRP)}
+\section{Cálculo do BVRP}
 
-O prêmio de risco de volatilidade é construído como a diferença entre a
-volatilidade implícita de 30 dias e a volatilidade realizada correspondente:
+O prêmio de risco de volatilidade é a diferença entre volatilidade implícita e
+realizada, ambas anualizadas em base de 30 dias:
 
 \begin{verbatim}
-df["BVRP"] = df["IV30D"] - df["RV30D"]
+df["vrp_30d"] = df["iv_30d"] - df["rv_30d"]
 \end{verbatim}
 
-Essa variável constitui o principal objeto de interesse empírico da dissertação.
+\section{Classificação de regimes de volatilidade}
 
-\section{Tratamento e limpeza dos dados}
-
-Antes da estimação dos modelos, são removidas observações com valores ausentes ou
-infinitos, assegurando consistência numérica e alinhamento temporal das séries:
+Os regimes são definidos pelos percentis 25 e 75 da \texttt{rv\_30d},
+calculados sobre a amostra completa:
 
 \begin{verbatim}
-df = df.dropna()
-df = df.replace([np.inf, -np.inf], np.nan).dropna()
+q25 = df["rv_30d"].quantile(0.25)   # 38,8% na amostra
+q75 = df["rv_30d"].quantile(0.75)   # 65,9% na amostra
+
+df["regime"] = "media"
+df.loc[df["rv_30d"] <= q25, "regime"] = "baixa"
+df.loc[df["rv_30d"] >= q75, "regime"] = "alta"
+
+# Indicadora binária usada nas regressões condicionais
+df["dummy_alta"] = (df["regime"] == "alta").astype(int)
 \end{verbatim}
 
-\section{Modelo Random Forest}
+\section{Regressão OLS com erros-padrão de Newey--West}
 
-A seguir apresenta-se um exemplo de estimação de um modelo Random Forest,
-utilizado para avaliar relações não lineares entre o BVRP, variáveis de
-volatilidade e retornos futuros:
+As regressões do Capítulo~\ref{chap:resultados_ols} são estimadas com
+\texttt{statsmodels}, usando erros-padrão HAC com $h$ defasagens para corrigir
+autocorrelação induzida pela sobreposição das janelas de retorno:
 
 \begin{verbatim}
-features = ["BVRP", "IV30D", "RV30D",
-            "RV7D", "RV14D",
-            "ret_lag1", "ret_lag3", "ret_lag5"]
+def reg_nw(df, target_col, horizon):
+    """OLS com erros-padrão Newey-West (h defasagens)."""
+    X = sm.add_constant(df["vrp_30d"])
+    y = df[target_col]
+    valid = X.join(y).dropna()
+    model = sm.OLS(valid[y.name], valid[X.columns])
+    return model.fit(cov_type="HAC",
+                     cov_kwds={"maxlags": horizon})
 
-X = df[features]
-y = df["ret_fut_5d"]
+for h in [1, 5, 10, 20, 30]:
+    res = reg_nw(df, f"ret_fut_{h}d", h)
+    print(f"h={h:2d}d  beta={res.params[1]:.4f}  "
+          f"t={res.tvalues[1]:.3f}  R2={res.rsquared:.4f}")
+\end{verbatim}
 
+Para as regressões condicionais do Capítulo~\ref{chap:regimes}, adiciona-se a
+dummy de regime e o termo de interação:
+
+\begin{verbatim}
+def reg_condicional(df, h):
+    df2 = df.copy()
+    df2["bvrp_x_alta"] = df2["vrp_30d"] * df2["dummy_alta"]
+    X = sm.add_constant(
+        df2[["vrp_30d", "dummy_alta", "bvrp_x_alta"]]
+    )
+    y = df2[f"ret_fut_{h}d"]
+    valid = X.join(y).dropna()
+    model = sm.OLS(valid[y.name], valid[X.columns])
+    return model.fit(cov_type="HAC",
+                     cov_kwds={"maxlags": h})
+\end{verbatim}
+
+\section{Modelos de aprendizado de máquina}
+
+\subsection{Preparação e divisão da amostra}
+
+Os quatro modelos são estimados com divisão temporal 70\,\%/30\,\% (treino/teste),
+preservando a ordem cronológica. A variável-alvo é o nível do BVRP
+(\texttt{vrp\_30d}):
+
+\begin{verbatim}
+FEATURES = [
+    "ret", "ret_lag_1", "ret_lag_5", "ret_lag_20",
+    "d_iv_1d", "d_vrp_1d", "vrp_regime_num",
+    "month", "weekday",
+]
+TARGET = "vrp_30d"
+
+data  = df[FEATURES + [TARGET]].dropna()
+split = int(0.7 * len(data))
+
+X_train = data[FEATURES].iloc[:split]
+X_test  = data[FEATURES].iloc[split:]
+y_train = data[TARGET].iloc[:split]
+y_test  = data[TARGET].iloc[split:]
+\end{verbatim}
+
+\subsection{LASSO e Ridge}
+
+Os modelos lineares regularizados requerem padronização dos preditores:
+
+\begin{verbatim}
+scaler = StandardScaler()
+Xtr_s  = scaler.fit_transform(X_train)
+Xte_s  = scaler.transform(X_test)
+
+lasso = Lasso(alpha=0.01, max_iter=5000).fit(Xtr_s, y_train)
+ridge = Ridge(alpha=1.0).fit(Xtr_s, y_train)
+
+pred_lasso = lasso.predict(Xte_s)
+pred_ridge = ridge.predict(Xte_s)
+\end{verbatim}
+
+\subsection{Random Forest e Gradient Boosting}
+
+Os modelos baseados em árvores operam diretamente sobre as variáveis não
+padronizadas:
+
+\begin{verbatim}
 rf = RandomForestRegressor(
-    n_estimators=500,
-    max_depth=None,
-    random_state=42
-)
-
-rf.fit(X, y)
-pred_rf = rf.predict(X)
-\end{verbatim}
-
-Esse tipo de modelo é explorado nos capítulos de análise preditiva como uma
-alternativa flexível aos modelos lineares tradicionais.
-
-\section{Modelo XGBoost}
-
-Também são considerados modelos baseados em \textit{gradient boosting}, como o
-XGBoost, que permitem capturar padrões residuais e interações mais complexas:
-
-\begin{verbatim}
-xgb = XGBRegressor(
     n_estimators=300,
-    eta=0.05,
+    max_depth=None,
+    random_state=42,
+).fit(X_train, y_train)
+
+gb = GradientBoostingRegressor(
+    n_estimators=300,
+    learning_rate=0.05,
     max_depth=4,
-    reg_lambda=1.0,
-    random_state=42
-)
+    random_state=42,
+).fit(X_train, y_train)
 
-xgb.fit(X, y)
-pred_xgb = xgb.predict(X)
+pred_rf = rf.predict(X_test)
+pred_gb = gb.predict(X_test)
 \end{verbatim}
 
-A escolha de hiperparâmetros é feita com base em validação temporal, conforme
-descrito nos capítulos empíricos.
+\subsection{Avaliação fora da amostra}
 
-\section{Métricas de desempenho}
-
-O desempenho preditivo dos modelos é avaliado por métricas usuais na literatura:
+O desempenho é comparado pelo $R^2$ fora da amostra e pela raiz do erro
+quadrático médio (RMSE), tomando a média histórica do período de treino como
+\textit{benchmark}:
 
 \begin{verbatim}
-rmse = np.sqrt(mean_squared_error(y, pred_xgb))
-mae  = mean_absolute_error(y, pred_xgb)
-corr = np.corrcoef(y, pred_xgb)[0, 1]
+benchmark = np.full(len(y_test), y_train.mean())
+
+def oos_metrics(y_true, y_pred, label):
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    r2   = r2_score(y_true, y_pred)
+    print(f"{label:20s}  RMSE={rmse:.4f}  R2={r2:.4f}")
+
+oos_metrics(y_test, benchmark,  "Benchmark (media)")
+oos_metrics(y_test, pred_lasso, "LASSO")
+oos_metrics(y_test, pred_ridge, "Ridge")
+oos_metrics(y_test, pred_rf,    "Random Forest")
+oos_metrics(y_test, pred_gb,    "Gradient Boosting")
 \end{verbatim}
 
-Essas métricas são reportadas e discutidas no Capítulo~\ref{chap:cap6_ml}.
+\subsection{Importância das variáveis (Random Forest)}
 
-\section{Visualização: valores reais versus previstos}
-
-Para fins ilustrativos, utiliza-se o gráfico de valores reais versus previstos:
+A importância relativa das variáveis é extraída diretamente do modelo e usada
+para identificar os preditores mais relevantes do BVRP:
 
 \begin{verbatim}
-plt.figure(figsize=(12,6))
-plt.plot(y, label="Real")
-plt.plot(pred_rf, label="Predito (Random Forest)")
-plt.legend()
-plt.show()
+importances = pd.Series(
+    rf.feature_importances_,
+    index=FEATURES,
+).sort_values(ascending=False)
+
+importances.plot(kind="barh")
+plt.xlabel("Importancia relativa")
+plt.tight_layout()
 \end{verbatim}
 
-Esse tipo de visualização auxilia na análise qualitativa da capacidade de
-ajuste dos modelos.
+\section{Limpeza e controle de qualidade dos dados}
+
+\begin{verbatim}
+df = df.replace([np.inf, -np.inf], np.nan)
+df = df.dropna(subset=["iv_30d", "rv_30d", "vrp_30d"])
+df = df.sort_values("date").reset_index(drop=True)
+\end{verbatim}
 
 \section{Resumo}
 
-Os trechos de código apresentados neste apêndice documentam os principais passos
+Os trechos apresentados neste apêndice documentam os principais passos
 computacionais da dissertação, permitindo replicar:
 
 \begin{itemize}
-    \item o cálculo da volatilidade realizada (RV30);
-    \item a manipulação da volatilidade implícita (IV30D);
-    \item a construção do Prêmio de Risco de Volatilidade (BVRP);
-    \item a definição de retornos futuros em múltiplos horizontes;
-    \item a estimação de modelos Random Forest e XGBoost;
-    \item a avaliação e visualização do desempenho preditivo.
+    \item o cálculo da volatilidade realizada ($RV_{30}$) e do BVRP;
+    \item a construção dos retornos futuros logarítmicos em cinco horizontes
+          ($h \in \{1, 5, 10, 20, 30\}$ dias);
+    \item a classificação das observações em regimes de baixa, média e alta
+          volatilidade realizada ($q_{25} = 38{,}8\%$; $q_{75} = 65{,}9\%$);
+    \item as regressões OLS com erros-padrão de Newey--West e os modelos
+          condicionais com interação BVRP $\times$ regime;
+    \item a estimação dos quatro modelos supervisionados (LASSO, Ridge,
+          \textit{Random Forest}, \textit{Gradient Boosting}) com avaliação
+          genuína fora da amostra (divisão 70\,\%/30\,\%).
 \end{itemize}
 
-Os scripts podem ser facilmente estendidos para novos horizontes, variáveis
-explicativas e algoritmos, servindo como base para futuras extensões da pesquisa.
+Os scripts completos estão disponíveis no repositório da dissertação e podem
+ser estendidos para novos horizontes, conjuntos de variáveis ou algoritmos.
