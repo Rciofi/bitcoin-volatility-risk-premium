@@ -1,33 +1,53 @@
 \chapter*{Resumo}
 \addcontentsline{toc}{chapter}{Resumo}
 
-Esta dissertação investiga de forma abrangente o \textit{Bitcoin Volatility Risk Premium} (BVRP),
-definido como a diferença entre a volatilidade implícita e a volatilidade realizada, com o objetivo
-de caracterizar suas propriedades estatísticas, identificar regimes de comportamento e avaliar seu
-potencial preditivo para retornos futuros do Bitcoin. A volatilidade implícita a 30 dias (IV30D)
-é obtida por meio do índice DVOL (Deribit Volatility Index), enquanto a volatilidade realizada
-(RV30D) é construída a partir de retornos logarítmicos diários do mercado à vista.
+Esta dissertação investiga de forma abrangente o \textit{Bitcoin Volatility Risk
+Premium} (BVRP), definido como a diferença entre a volatilidade implícita a 30
+dias (IV30D) e a volatilidade realizada a 30 dias (RV30D). A IV30D é obtida a
+partir do índice DVOL (\textit{Deribit Volatility Index}), enquanto a RV30D é
+construída a partir de retornos logarítmicos diários do mercado à vista do
+Bitcoin. A amostra cobre o período de abril de 2021 a abril de 2026, totalizando
+1.776 observações diárias. O estudo examina as propriedades estatísticas do BVRP,
+seu conteúdo informacional para retornos futuros, sua previsibilidade fora da
+amostra por modelos de aprendizado de máquina, seu papel em estratégias
+condicionais de negociação e seu comportamento em diferentes regimes de
+volatilidade realizada.
 
-Os resultados empíricos demonstram que o BVRP apresenta média positiva ao longo do período,
-evidenciando a existência de um prêmio de proteção sistemático no mercado de opções de Bitcoin,
-em linha com a literatura tradicional de \textit{volatility risk premium}. A distribuição do BVRP
-mostra assimetria negativa acentuada e caudas pesadas, características associadas a episódios de
-estresse, liquidações em cascata e choques idiossincráticos que elevam abruptamente a volatilidade
-realizada. A análise temporal revela regimes distintos — complacência, transição e estresse —
-refletindo mudanças estruturais no equilíbrio entre volatilidade implícita e realizada.
+Os resultados empíricos confirmam que o BVRP apresenta média positiva ao longo
+do período, em linha com a literatura de prêmio de risco de volatilidade, e exibe
+assimetria negativa e caudas pesadas que refletem episódios de elevação abrupta
+da volatilidade realizada. Regressões OLS com erros-padrão de Newey--West
+indicam que o BVRP possui poder preditivo estatisticamente significativo para
+retornos do Bitcoin nos horizontes de 20 e 30 dias, embora a variância explicada
+permaneça modesta, consistente com a elevada relação sinal-ruído de mercados
+especulativos.
 
-A relação entre o BVRP e retornos futuros do Bitcoin é moderada, porém crescente em horizontes
-mais longos, especialmente em janelas de 20 dias. Para investigar essa dinâmica, implementaram-se
-modelos não lineares de aprendizado de máquina (Random Forest e XGBoost), os quais indicam que
-variáveis de volatilidade — particularmente RV30D e o próprio BVRP — carregam informação
-incremental relevante para previsão de retornos, embora o poder preditivo permaneça limitado
-dada a elevada complexidade e o ruído estrutural do mercado cripto.
+Quatro classes de modelos supervisionados --- LASSO, Ridge, \textit{Random
+Forest} e \textit{Gradient Boosting} --- são aplicadas em um desenho
+\textit{rolling} fora da amostra para prever o nível do BVRP. Os modelos
+baseados em árvores superam os lineares em horizontes específicos, com a
+volatilidade realizada emergindo como o preditor dominante, respondendo por
+aproximadamente 69\% da importância total das variáveis no \textit{Random
+Forest}. Estratégias condicionais baseadas em quantis e em regimes do BVRP
+(Capítulo 7) geram retornos ajustados ao risco positivos, com as regras que
+filtram períodos de BVRP elevado apresentando o desempenho mais consistente.
 
-As evidências sugerem que o BVRP é mais eficaz como indicador de regime do que como sinal
-direcional isolado, podendo ser integrado a modelos quantitativos híbridos, filtros de risco
-e estratégias de volatilidade. Em conjunto, os achados reforçam a utilidade do BVRP como
-ferramenta complementar de análise e gestão, ao mesmo tempo em que destacam suas limitações
-em um ambiente marcado por eventos extremos e alta incerteza.
+Uma análise formal de regimes (Capítulo 9) classifica as observações em regimes
+de baixa, média e alta volatilidade realizada com base nos percentis 25 e 75 da
+RV30D. O BVRP médio é de $+13{,}25$ pontos percentuais no regime de baixa
+volatilidade e torna-se negativo ($-1{,}50$ p.p.) no regime de alta
+volatilidade, evidenciando a tendência de a volatilidade realizada superar a
+implícita em períodos de estresse. Testes $t$ de Welch confirmam que os retornos
+futuros diferem significativamente entre os regimes a partir do horizonte de 10
+dias ($p < 0{,}05$), com o efeito de regime operando de forma aditiva e não por
+meio de uma modulação do poder preditivo do BVRP.
 
-\textbf{Palavras-chave:} Bitcoin; volatilidade implícita; volatilidade realizada; prêmio de risco
-de volatilidade; DVOL; Deribit; aprendizado de máquina.
+Em conjunto, os resultados indicam que o BVRP atua primordialmente como
+indicador de regime de volatilidade. Seu valor para aplicações práticas está na
+capacidade de condicionar regras de entrada e filtros de risco em estratégias
+quantitativas, mais do que na previsão direcional isolada.
+
+\textbf{Palavras-chave:} Bitcoin; volatilidade implícita; volatilidade realizada;
+prêmio de risco de volatilidade; DVOL; Deribit; aprendizado de máquina;
+\textit{random forest}; \textit{gradient boosting}; regimes de volatilidade;
+estratégias de negociação.
