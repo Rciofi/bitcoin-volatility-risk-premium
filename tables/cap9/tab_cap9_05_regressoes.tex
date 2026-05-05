@@ -1,0 +1,30 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Regressões condicionais do retorno futuro em função do BVRP e do regime de volatilidade.
+Erros-padrão de Newey--West com $h$ defasagens. Coeficientes com $t$-estatísticas entre parênteses.}
+\label{tab:cap9_regressoes}
+\begin{tabular}{lrrrrr}
+\toprule
+Variável & 1d & 5d & 10d & 20d & 30d \\
+\midrule
+Constante & 0,0003 & 0,0039 & 0,0091 & 0,0268* & 0,0410* \\
+ & (0,2677) & (0,8822) & (1,1470) & (1,6853) & (1,6720) \\
+\addlinespace[2pt]
+BVRP & 0,0000 & -0,0001 & -0,0004 & -0,0017 & -0,0025 \\
+ & (0,3123) & (-0,3375) & (-0,6917) & (-1,3881) & (-1,4091) \\
+\addlinespace[2pt]
+Alta Volatilidade & -0,0013 & -0,0084 & -0,0154 & -0,0370 & -0,0557 \\
+ & (-0,6783) & (-1,0743) & (-1,0089) & (-1,2207) & (-1,2603) \\
+\addlinespace[2pt]
+BVRP $\times$ Alta Vol & 0,0001 & 0,0003 & 0,0007 & 0,0024 & 0,0029 \\
+ & (0,6499) & (0,6178) & (0,8882) & (1,5669) & (1,3769) \\
+\addlinespace[2pt]
+\midrule
+$R^2$ & 0,0019 & 0,0033 & 0,0051 & 0,0171 & 0,0221 \\
+$N$ & 1776 & 1776 & 1776 & 1776 & 1776 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$.
+\end{table}

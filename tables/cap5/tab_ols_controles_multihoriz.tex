@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\caption{Resultados OLS (HAC) com controles de volatilidade (RV e IV) para múltiplos horizontes de previsão.}
+\label{tab:ols_controles_multihoriz}
+\footnotesize
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cccccccr}
+\toprule
+Horizonte ($h$) & $\hat{\beta}_{\text{BVRP}}$ & Estat.\ $t$ & $p$-valor & $\hat{\beta}_{\text{RV}}$ & $\hat{\beta}_{\text{IV}}$ & $R^2$ & $N$ \\
+\midrule
+  1 & +0.002500 & +0.858 & 0.391 & +0.000773 & +0.003273 & 0.0015 & 1258 \\
+  5 & -0.000544 & -0.053 & 0.958 & -0.004475 & -0.005019 & 0.0056 & 1258 \\
+ 10 & -0.008631 & -0.550 & 0.582 & -0.014198 & -0.022829 & 0.0134 & 1258 \\
+ 20 & -0.026950 & -1.145 & 0.252 & -0.035810 & -0.062760 & 0.0309 & 1258 \\
+ 30 & -0.046138 & -1.501 & 0.133 & -0.058840 & -0.104977 & 0.0520 & 1258 \\
+ 60 & -0.106881 & -2.150 & 0.032 & -0.107324 & -0.214205 & 0.0561 & 1258 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\smallskip
+\begin{minipage}{0.92\linewidth}
+\footnotesize
+\textit{Nota}: Erros padrão HAC (Newey--West) com 5 defasagens. Modelo: $R_{t+h} = \alpha_h +
+\beta_{1,h}\,\text{BVRP}_t + \beta_{2,h}\,\text{RV}_t + \beta_{3,h}\,\text{IV}_t + \varepsilon_{t+h}$.
+Como $\text{BVRP} = \text{IV} - \text{RV}$ por construção, há multicolinearidade entre os regressores;
+coeficientes individuais devem ser interpretados com cautela. Horizontes em dias.
+\end{minipage}
+\end{table}

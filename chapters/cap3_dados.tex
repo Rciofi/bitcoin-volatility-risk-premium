@@ -42,7 +42,8 @@ volatilidade apresenta média positiva ao longo da amostra, consistente com a
 existência de uma compensação exigida pelos investidores para assumir risco de
 volatilidade no mercado de opções de Bitcoin.
 
-  \input{tables/tabela_cap3_estatisticas_completas.tex}
+\IfFileExists{tables/cap3/tabela_cap3_estatisticas_completas.tex}{
+  \input{tables/cap3/tabela_cap3_estatisticas_completas.tex}
 }{}
 
 % =========================================================
@@ -56,10 +57,10 @@ eventos relevantes do mercado de criptoativos. A
 Figura~\ref{fig:vrp_timeseries} apresenta a evolução temporal do prêmio de risco
 de volatilidade do Bitcoin ao longo da amostra.
 
-\IfFileExists{figs/vrp_timeseries.png}{
+\IfFileExists{figs/cap3/vrp_timeseries.png}{
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{figs/vrp_timeseries.png}
+    \includegraphics[width=0.9\linewidth]{figs/cap3/vrp_timeseries.png}
     \caption{Evolução temporal do prêmio de risco de volatilidade do Bitcoin (BVRP)}
     \label{fig:vrp_timeseries}
 \end{figure}
@@ -81,46 +82,63 @@ propriedades estatísticas das variáveis consideradas. A
 Figura~\ref{fig:vrp_hist} apresenta o histograma do prêmio de risco de
 volatilidade do Bitcoin, juntamente com uma estimativa de densidade por kernel.
 
-\IfFileExists{figs/vrp_histogram_kde.png}{
+\IfFileExists{figs/cap3/vrp_histogram_kde.png}{
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{figs/vrp_histogram_kde.png}
+    \includegraphics[width=0.75\linewidth]{figs/cap3/vrp_histogram_kde.png}
     \caption{Distribuição empírica do prêmio de risco de volatilidade do Bitcoin}
     \label{fig:vrp_hist}
 \end{figure}
 }{}
 
-Observa-se que a distribuição do prêmio de risco de volatilidade apresenta
-assimetria e caudas pesadas, afastando-se da hipótese de normalidade. Essas
-características são amplamente documentadas na literatura empírica sobre
-mercados financeiros e tornam-se ainda mais pronunciadas no contexto de
-criptoativos, nos quais eventos extremos ocorrem com maior frequência. Tal
-evidência reforça a necessidade de abordagens econométricas robustas e motiva o
-uso de metodologias mais flexíveis nos capítulos subsequentes.
+A distribuição do prêmio de risco de volatilidade apresenta duas
+características marcantes. Primeira, a presença de assimetria negativa
+(coeficiente de assimetria de $-1{,}20$) e caudas pesadas (excesso de curtose
+de $2{,}05$), afastando-se da hipótese de normalidade. Segunda, e mais relevante
+sob o ponto de vista econômico, a distribuição exibe um perfil bimodal:
+identifica-se um modo dominante na região de valores positivos, concentrado
+entre 5 e 15 pontos percentuais de volatilidade anualizada, e uma concentração
+secundária na região de valores negativos.
+
+Essa bimodalidade possui interpretação econômica direta. O modo positivo
+corresponde ao regime de mercado predominante, no qual a volatilidade implícita
+supera a volatilidade realizada, gerando um prêmio de risco positivo ---
+consistente com a compensação exigida pelos investidores para assumir exposição
+ao risco de volatilidade por meio de contratos de opções. A concentração de
+valores negativos, por sua vez, corresponde a episódios de estresse agudo, em
+que a volatilidade realizada supera inesperadamente a volatilidade implícita.
+Esses episódios tipicamente ocorrem durante choques abruptos de mercado, quando
+a velocidade e a magnitude das oscilações de preço superam as expectativas
+incorporadas nos prêmios de opções.
+
+A coexistência dessas duas concentrações sugere que o BVRP é melhor descrito
+por uma mistura de regimes do que por uma distribuição unimodal contínua. Tal
+evidência fornece suporte empírico à análise de subperíodos desenvolvida na
+Seção~\ref{sec:regimes} e justifica a adoção de abordagens que acomodem
+heterogeneidade e mudanças de regime nos capítulos subsequentes.
 
 % =========================================================
 \section{Análise por regimes e subperíodos}
 \label{sec:regimes}
 
 Com o objetivo de avaliar a heterogeneidade temporal do prêmio de risco de
-volatilidade, a amostra é segmentada em subperíodos e regimes associados a
-diferentes níveis de volatilidade. A
-Figura~\ref{fig:vrp_boxplot} apresenta a distribuição do BVRP ao longo do tempo
-por meio de boxplots.
+volatilidade, a amostra é agrupada por ano e a distribuição do BVRP em cada
+subperíodo é examinada por meio de boxplots. A
+Figura~\ref{fig:vrp_boxplot} apresenta os resultados desse agrupamento anual.
 
-\IfFileExists{figs/vrp_boxplot.png}{
+\IfFileExists{figs/cap3/vrp_boxplot.png}{
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{figs/vrp_boxplot.png}
-    \caption{Distribuição do prêmio de risco de volatilidade do Bitcoin por
-    subperíodos e regimes}
+    \includegraphics[width=0.85\linewidth]{figs/cap3/vrp_boxplot.png}
+    \caption{Distribuição anual do prêmio de risco de volatilidade do Bitcoin (BVRP)}
     \label{fig:vrp_boxplot}
 \end{figure}
 }{}
 
 Os resultados indicam que o prêmio de risco de volatilidade não é homogêneo ao
-longo do tempo, assumindo valores mais elevados em períodos caracterizados por
-maior incerteza e volatilidade do mercado. Essa evidência sugere que modelos com
+longo do tempo. Em 2023, o BVRP apresentou maior variabilidade e valores medianos
+mais elevados, ao passo que 2024 e 2025 exibiram distribuições mais comprimidas,
+porém com persistência do prêmio positivo. Essa evidência sugere que modelos com
 parâmetros constantes podem ser insuficientes para capturar plenamente a
 dinâmica do BVRP, justificando a adoção de abordagens que permitam variação
 temporal e efeitos de regime nos capítulos subsequentes.
@@ -136,21 +154,24 @@ Figura~\ref{fig:vrp_ret_20d} apresenta o gráfico de dispersão entre o BVRP
 observado no tempo $t$ e o retorno futuro acumulado do Bitcoin no horizonte de
 20 dias, juntamente com uma reta de tendência linear.
 
-\IfFileExists{figs/vrp_vs_return_20d.png}{
+\IfFileExists{figs/cap3/vrp_vs_return_20d.png}{
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{figs/vrp_vs_return_20d.png}
+    \includegraphics[width=0.75\linewidth]{figs/cap3/vrp_vs_return_20d.png}
     \caption{Relação exploratória entre o prêmio de risco de volatilidade e os
     retornos futuros do Bitcoin (h = 20 dias)}
     \label{fig:vrp_ret_20d}
 \end{figure}
 }{}
 
-A análise visual sugere a existência de uma relação média entre o prêmio de risco
-de volatilidade e os retornos futuros, ainda que acompanhada por elevada
-dispersão. Essas evidências possuem caráter estritamente descritivo e não
-implicam relações causais. Ainda assim, fornecem motivação econômica clara para
-os testes econométricos desenvolvidos no Capítulo~\ref{chap:resultados_ols}, nos
-quais o conteúdo informacional do prêmio de risco de volatilidade é avaliado de
-forma rigorosa por meio de modelos lineares estimados por mínimos quadrados
-ordinários.
+O gráfico evidencia uma associação positiva e de magnitude modesta entre o BVRP
+e os retornos futuros no horizonte de 20 dias, com coeficiente de correlação de
+$0{,}20$. A elevada dispersão em torno da reta de tendência indica que o prêmio
+de risco de volatilidade captura apenas parcialmente a variação dos retornos
+futuros, sugerindo que outros fatores exercem papel relevante na determinação do
+desempenho do ativo nesse horizonte. A direção positiva da associação ---
+valores mais elevados do BVRP tendem a preceder retornos mais altos nos 20 dias
+subsequentes --- é consistente com a hipótese de que o prêmio de risco de
+volatilidade carrega conteúdo informacional sobre o desempenho futuro do Bitcoin,
+fornecendo motivação econômica para os testes formais desenvolvidos no
+Capítulo~\ref{chap:resultados_ols}.

@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\caption{Resultados OLS (HAC) do BVRP para múltiplos horizontes de previsão.}
+\label{tab:ols_basico_multihoriz}
+\footnotesize
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cccccr}
+\toprule
+Horizonte ($h$) & $\hat{\beta}_h$ & Estat.\ $t$ & $p$-valor & $R^2$ & $N$ \\
+\midrule
+  1 & +0.001168 & +1.306 & 0.192 & 0.0012 & 1258 \\
+  5 & +0.005242 & +1.376 & 0.169 & 0.0052 & 1258 \\
+ 10 & +0.010678 & +1.764 & 0.078 & 0.0107 & 1258 \\
+ 20 & +0.022468 & +2.480 & 0.013 & 0.0221 & 1258 \\
+ 30 & +0.035316 & +3.181 & 0.001 & 0.0361 & 1258 \\
+ 60 & +0.044828 & +2.597 & 0.009 & 0.0273 & 1258 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\smallskip
+\begin{minipage}{0.92\linewidth}
+\footnotesize
+\textit{Nota}: Erros padrão HAC (Newey--West) com 5 defasagens. $\hat{\beta}_h$ é o coeficiente
+do BVRP na regressão $R_{t+h} = \alpha_h + \beta_h\,\text{BVRP}_t + \varepsilon_{t+h}$.
+Horizontes em dias.
+\end{minipage}
+\end{table}

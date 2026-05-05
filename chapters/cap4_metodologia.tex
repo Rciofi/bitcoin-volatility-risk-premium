@@ -35,18 +35,15 @@ Capítulo~\ref{chap:dados}, são formuladas as seguintes hipóteses de pesquisa:
     \item \textbf{H1:} O prêmio de risco de volatilidade do Bitcoin é, em média,
     estatisticamente diferente de zero ao longo da amostra, refletindo a
     compensação exigida pelos investidores para assumir risco de volatilidade
-    no mercado de opções.
+    no mercado de opções. Esta hipótese é avaliada por meio de um teste $t$
+    sobre a média amostral do BVRP.
 
     \item \textbf{H2:} O prêmio de risco de volatilidade do Bitcoin contém
     informação relevante para a previsão de retornos futuros do ativo,
     apresentando relação estatisticamente significativa com os retornos
-    esperados em horizontes subsequentes.
+    esperados em horizontes subsequentes. Esta hipótese é avaliada por meio
+    de modelos de regressão linear e abordagens preditivas mais flexíveis.
 \end{itemize}
-
-Essas hipóteses são avaliadas por meio de modelos econométricos lineares de
-referência e de abordagens preditivas mais flexíveis, permitindo investigar
-tanto a significância estatística quanto a relevância econômica do prêmio de
-risco de volatilidade.
 
 % =========================================================
 \section{Definição das variáveis e horizontes de previsão}
@@ -70,18 +67,20 @@ $h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão.
 A principal variável explicativa é o prêmio de risco de volatilidade observado
 no tempo $t$, definido como a diferença entre a volatilidade implícita extraída
 do mercado de opções e a volatilidade realizada no mercado à vista, ambas
-construídas em janelas móveis de 30 dias. Essa variável sintetiza a percepção de
-risco e incerteza futura implícita nos preços das opções de Bitcoin.
+construídas em janelas móveis de 30 dias:
+\[
+\text{BVRP}_t = \text{IV}_{30,t} - \text{RV}_{30,t}.
+\]
+Essa variável sintetiza a percepção de risco e incerteza futura implícita nos
+preços das opções de Bitcoin. Em especificações alternativas, são também
+consideradas a volatilidade implícita ($\text{IV}_{30,t}$) e a volatilidade
+realizada ($\text{RV}_{30,t}$) isoladamente como controles adicionais.
 
-Em especificações alternativas, são consideradas variáveis de controle
-adicionais, incluindo medidas de volatilidade implícita e volatilidade
-realizada isoladamente. Todas as variáveis explicativas são defasadas de forma
-consistente, garantindo que estariam disponíveis aos agentes econômicos no
-momento da formação das expectativas.
-
-A consideração de múltiplos horizontes de previsão permite investigar se o
-conteúdo informacional do prêmio de risco de volatilidade se manifesta de forma
-distinta ao longo do tempo.
+Todas as variáveis explicativas são medidas no tempo $t$, garantindo que
+estariam disponíveis aos agentes econômicos no momento da formação das
+expectativas. A consideração de múltiplos horizontes de previsão permite
+investigar se o conteúdo informacional do BVRP se manifesta de forma distinta
+ao longo do tempo.
 
 % =========================================================
 \section{Modelos econométricos de referência}
@@ -93,55 +92,60 @@ retornos futuros do ativo. O objetivo desses modelos é estabelecer uma linha de
 base empírica simples, transparente e comparável à literatura existente, antes
 da introdução de abordagens mais flexíveis e não lineares.
 
-Os modelos considerados são especificações lineares estimadas por mínimos
-quadrados ordinários (OLS), nas quais os retornos futuros do Bitcoin são
-explicados pelo prêmio de risco de volatilidade observado no período anterior.
+Os modelos são especificações lineares estimadas por mínimos quadrados
+ordinários (OLS) sobre a amostra completa disponível, nas quais os retornos
+futuros do Bitcoin são explicados pelo prêmio de risco de volatilidade observado
+no período anterior.
 
 \subsection{Especificação básica}
 
 A especificação econométrica básica é dada por:
-\[
+\begin{equation}
 R_{t+h} = \alpha_h + \beta_h \, \text{BVRP}_t + \varepsilon_{t+h},
-\]
+\label{eq:ols_basico}
+\end{equation}
 em que $R_{t+h}$ representa o retorno acumulado do Bitcoin no horizonte $h$,
 $\text{BVRP}_t$ denota o prêmio de risco de volatilidade observado no tempo $t$,
-$\alpha_h$ é um intercepto específico do horizonte de previsão,
+$\alpha_h$ é um intercepto específico ao horizonte de previsão,
 $\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$ representa o termo
 de erro.
 
 O coeficiente $\beta_h$ captura a relação marginal entre o prêmio de risco de
 volatilidade e os retornos futuros do Bitcoin. A análise empírica não impõe
 restrições \textit{a priori} sobre o sinal desse coeficiente, permitindo que os
-dados determinem a direção da relação.
-
-As regressões são estimadas separadamente para cada horizonte de previsão,
-permitindo avaliar como o efeito do prêmio de risco de volatilidade varia ao
-longo do tempo.
+dados determinem a direção da relação. As regressões são estimadas separadamente
+para cada horizonte de previsão, permitindo avaliar como o efeito do BVRP varia
+ao longo do tempo.
 
 \subsection{Extensão com variáveis de controle}
 
-Para avaliar a robustez dos resultados e mitigar potenciais problemas de
-omissão de variáveis relevantes, são consideradas extensões da especificação
-básica que incluem variáveis de controle adicionais:
-\[
+Para avaliar a robustez dos resultados, a especificação básica é estendida com
+a inclusão da volatilidade realizada e da volatilidade implícita como controles
+adicionais:
+\begin{equation}
 R_{t+h} = \alpha_h + \beta_{1,h} \, \text{BVRP}_t + \beta_{2,h} \, \text{RV}_t
-+ \beta_{3,h} \, \text{IV}_t + \varepsilon_{t+h},
-\]
-em que $\text{RV}_t$ e $\text{IV}_t$ representam, respectivamente, a
-volatilidade realizada e a volatilidade implícita observadas no tempo $t$.
++ \beta_{3,h} \, \text{IV}_t + \varepsilon_{t+h}.
+\label{eq:ols_controles}
+\end{equation}
 
-A inclusão dessas variáveis permite investigar se o prêmio de risco de
-volatilidade possui poder explicativo adicional além do contido em medidas
-tradicionais de volatilidade, reconhecendo a elevada correlação entre essas
-variáveis.
+Esta especificação permite investigar se o BVRP possui conteúdo informacional
+além do que já está contido nos níveis individuais de volatilidade implícita e
+realizada. Cabe notar, contudo, que como $\text{BVRP}_t = \text{IV}_t -
+\text{RV}_t$ por construção, há dependência linear entre os três regressores,
+o que introduz multicolinearidade na estimação. Em consequência, os coeficientes
+individuais devem ser interpretados com cautela, reconhecendo que a atribuição
+de efeitos marginais entre BVRP, IV e RV é parcialmente arbitrária nesse
+contexto. O modelo serve, portanto, como exercício de robustez, e não como
+especificação estrutural definitiva.
 
 \subsection{Inferência estatística}
 
 A inferência estatística é conduzida com erros padrão robustos à
 heterocedasticidade e à autocorrelação serial, reconhecendo que retornos
 financeiros frequentemente exibem tais características. Em particular, são
-utilizados erros padrão do tipo Newey--West, com número de defasagens compatível
-com o horizonte de previsão considerado.
+utilizados erros padrão do tipo HAC (Newey--West), com número de defasagens
+compatível com o horizonte de previsão considerado, de modo a acomodar a
+sobreposição temporal inerente à construção dos retornos acumulados.
 
 A significância estatística dos coeficientes é avaliada por meio de testes $t$,
 enquanto a relevância econômica é analisada a partir da magnitude, sinal e
@@ -152,32 +156,38 @@ especificações.
 \section{Estratégia empírica e procedimento de estimação}
 \label{sec:estrategia_empirica}
 
-A análise empírica é conduzida em frequência diária, respeitando a ordenação
+A análise econométrica é conduzida em frequência diária, respeitando a ordenação
 temporal das informações. Em todas as especificações, as variáveis explicativas
 são observadas no tempo $t$, enquanto as variáveis dependentes correspondem a
 retornos acumulados em horizontes futuros $t+h$, assegurando que apenas
 informação disponível \textit{ex ante} seja utilizada na previsão.
 
-\subsection{Estrutura temporal e janelas de estimação}
+\subsection{Estimação sobre a amostra completa}
 
-Os modelos econométricos são estimados utilizando janelas móveis ao longo do
-tempo, permitindo que os parâmetros se ajustem gradualmente a mudanças
-estruturais no mercado de criptoativos. Esse procedimento reflete de forma mais
-realista o ambiente de decisão enfrentado por agentes econômicos.
-
-\subsection{Separação entre amostras de treino e teste}
-
-Para as análises preditivas, a amostra é dividida em períodos de treino e teste,
-respeitando estritamente a ordem temporal das observações. A amostra de treino é
-utilizada para a estimação dos parâmetros, enquanto a amostra de teste é
-reservada para a avaliação de desempenho fora da amostra.
+Os modelos OLS são estimados sobre a amostra completa disponível, sem divisão
+em janelas móveis ou subperíodos. Essa abordagem é padrão na literatura de
+previsão de retornos com variáveis de risco e permite a obtenção de estimativas
+estáveis dos parâmetros, aproveitando ao máximo a informação disponível.
 
 \subsection{Sobreposição temporal}
 
 Como os retornos futuros considerados correspondem a horizontes superiores a um
-dia, as observações apresentam sobreposição temporal. Para lidar com esse
-problema, a inferência estatística é conduzida utilizando erros padrão robustos
-à autocorrelação, conforme descrito anteriormente.
+dia, as observações apresentam sobreposição temporal (\textit{overlapping
+observations}). Esse fenômeno introduz autocorrelação no termo de erro que não
+reflete necessariamente dependência econômica, mas decorre da própria construção
+da variável dependente. Para lidar com esse problema, a inferência estatística é
+conduzida com erros padrão HAC (Newey--West), com número de defasagens igual a
+$h - 1$, compatível com o horizonte de previsão.
+
+\subsection{Separação treino e teste para modelos preditivos}
+
+Para as análises preditivas baseadas em \textit{machine learning}, desenvolvidas
+no Capítulo~\ref{chap:ml}, a amostra é dividida em períodos de treino e teste,
+respeitando estritamente a ordem temporal das observações. A amostra de treino é
+utilizada para a estimação dos parâmetros, enquanto a amostra de teste é
+reservada para a avaliação de desempenho fora da amostra (\textit{out-of-sample}).
+Essa separação não se aplica às regressões OLS, cujo objetivo é avaliar relações
+em amostra.
 
 % =========================================================
 \section{Considerações sobre robustez e extensões}
@@ -190,7 +200,6 @@ explicativas.
 
 Adicionalmente, são exploradas extensões que incorporam não linearidades,
 interações entre variáveis e possíveis efeitos de regime, reconhecendo que a
-relação entre volatilidade implícita, volatilidade realizada e retornos futuros
-do Bitcoin pode variar ao longo do tempo. Essas extensões motivam a adoção de
-modelos de \textit{machine learning}, desenvolvidos em detalhe no
-Capítulo~\ref{chap:ml}.
+relação entre o BVRP e os retornos futuros do Bitcoin pode variar ao longo do
+tempo. Essas extensões motivam a adoção de modelos de \textit{machine learning},
+desenvolvidos em detalhe no Capítulo~\ref{chap:ml}.

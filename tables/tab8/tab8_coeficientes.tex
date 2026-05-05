@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Coeficientes estimados dos modelos lineares regularizados --- LASSO e Ridge.
+Os coeficientes são ordenados pela magnitude absoluta do LASSO.
+Variáveis com coeficiente LASSO exatamente zero foram eliminadas pela penalidade $L_1$.}
+\label{tab:cap8_coeficientes}
+\begin{tabular}{lrr}
+\toprule
+Variável & LASSO & Ridge \\
+\midrule
+Regime de volatilidade & 9,8889 & 9,8659 \\
+Retorno defasado (1d) & -6,4651 & -1,2335 \\
+Retorno defasado (5d) & 3,7181 & 1,5559 \\
+Retorno diário & 3,3875 & 1,1163 \\
+Fim do mês & -1,8478 & -1,7589 \\
+Retorno defasado (20d) & 1,3558 & 1,3920 \\
+Mês & 0,2772 & 0,2808 \\
+Início do mês & 0,1959 & 0,2857 \\
+Variação da IV (1d) & 0,1881 & 0,1960 \\
+Dia da semana & -0,1138 & -0,1110 \\
+Variação do BVRP (1d) & -0,0591 & -0,0586 \\
+Preço (close) & 0,0001 & 0,0001 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: LASSO estimado com $\alpha=0{,}001$ (50.000 iterações máx.); Ridge com $\alpha=1{,}0$. Os coeficientes estão na escala original de cada variável (sem padronização prévia), razão pela qual não são diretamente comparáveis entre variáveis com magnitudes distintas. A diferença entre os coeficientes LASSO e Ridge para uma mesma variável reflete o diferente grau de regularização imposto pelos dois valores de $\alpha$. Período de treino: 19~abr.\ 2023 -- 13~jun.\ 2024 (422 observações).
+\end{table}

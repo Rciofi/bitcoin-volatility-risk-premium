@@ -25,9 +25,10 @@ que respeitam o ambiente fora da amostra.
 
 O objetivo deste capítulo é investigar se modelos de \textit{machine learning}
 são capazes de prever o BVRP fora da amostra de forma estatisticamente e
-economicamente relevante. Para isso, compara-se o desempenho de diferentes classes
-de modelos supervisionados sob um desenho experimental rigoroso, incluindo
-\textit{benchmarks} fortes baseados na persistência temporal do próprio BVRP.
+economicamente relevante. Para isso, compara-se o desempenho de quatro classes
+de modelos supervisionados --- LASSO, Ridge, Random Forest e Gradient Boosting ---
+sob um desenho experimental rigoroso, incluindo um benchmark baseado na média
+histórica incondicional do BVRP no período de treino.
 
 \section{Formulação do Problema Preditivo}
 \label{sec:cap8_problema}
@@ -35,89 +36,119 @@ de modelos supervisionados sob um desenho experimental rigoroso, incluindo
 O problema preditivo consiste em estimar o valor futuro do prêmio de risco de
 volatilidade em um horizonte $h$, utilizando exclusivamente informação disponível
 até o instante $t$. Seja $\text{BVRP}_t$ o prêmio de risco associado a uma janela
-padrão (por exemplo, 30 dias), construído como a diferença entre a volatilidade
-implícita observada em $t$ e a volatilidade realizada medida ex-post na janela
-subsequente. De forma geral:
+de 30 dias, construído como a diferença entre a volatilidade implícita observada
+em $t$ e a volatilidade realizada medida ex-post na janela subsequente:
 \begin{equation}
 \text{BVRP}_{t} = \text{IV}_{t}^{(30)} - \text{RV}_{t\rightarrow t+30}^{(30)}.
 \end{equation}
 
 A tarefa de previsão é definida como:
 \begin{equation}
-\widehat{\text{BVRP}}_{t+h} = f\left(\mathbf{X}_t\right),
+\widehat{\text{BVRP}}_{t+1} = f\left(\mathbf{X}_t\right),
 \end{equation}
 em que $\mathbf{X}_t$ denota o vetor de variáveis explicativas observadas em $t$,
 e $f(\cdot)$ representa a função estimada pelo modelo supervisionado.
 
-Na implementação empírica, utiliza-se tipicamente horizonte curto (por exemplo,
-$h=1$ dia), de modo a reproduzir um ambiente realista de decisão e evitar predições
-triviais de valores contemporâneos. Em todos os casos, as variáveis são alinhadas
-para garantir ausência de \textit{look-ahead bias} e de vazamento de informação
-(\textit{data leakage}).
+O horizonte de previsão é de $h=1$ dia, de modo a reproduzir um ambiente realista
+de decisão. Em todos os casos, as variáveis são alinhadas para garantir ausência
+de \textit{look-ahead bias} e de vazamento de informação (\textit{data leakage}):
+as variáveis explicativas disponíveis em $t$ são utilizadas para prever
+$\text{BVRP}_{t+1}$; em particular, os componentes algébricos do BVRP ---
+volatilidade implícita (\text{IV}) e volatilidade realizada (\text{RV}) --- são
+excluídos do conjunto de preditores por conterem identidade com a variável-alvo.
 
 \section{Dados e Variáveis Explicativas}
 \label{sec:cap8_dados}
 
-O conjunto de variáveis explicativas incorpora informações do mercado à vista e do
-mercado de derivativos de Bitcoin, com ênfase em variáveis associadas à dinâmica de
-volatilidade e ao próprio comportamento do prêmio de risco. Em particular, são
-consideradas categorias de preditores como:
+O conjunto de dados cobre o período de 19 de abril de 2023 a 11 de dezembro de 2024,
+totalizando 603 observações diárias após a limpeza e alinhamento temporal. As variáveis
+explicativas são construídas a partir de três fontes: (i) preços à vista do Bitcoin
+(Bitstamp/CoinGecko); (ii) índice de volatilidade implícita DVOL da Deribit; e
+(iii) variáveis derivadas calculadas sobre as séries anteriores.
+
+O vetor de preditores $\mathbf{X}_t$ é composto por 12 variáveis:
 
 \begin{itemize}
-    \item \textbf{dinâmica dos retornos}: retornos diários e defasagens, além de medidas de
-    assimetria e dispersão em janelas móveis (quando disponíveis);
-    \item \textbf{dinâmica do prêmio e da volatilidade}: defasagens do BVRP, variações da
-    volatilidade implícita e realizada, e diferenças de curto prazo (momentum/reversão);
-    \item \textbf{efeitos de calendário}: dummies de dia da semana, mês e/ou feriados relevantes,
-    quando apropriado;
-    \item \textbf{indicadores de regime}: proxies para estados de baixa/média/alta volatilidade,
-    construídos a partir de quantis/tercis da volatilidade realizada (ou métricas análogas).
+    \item \textbf{Nível e retorno}: preço de fechamento (\texttt{close}) e retorno
+    diário (\texttt{ret}) do Bitcoin;
+    \item \textbf{Dinâmica do prêmio e da volatilidade}: variação diária da IV
+    (\texttt{d\_iv\_1d}) e variação diária do BVRP (\texttt{d\_vrp\_1d}),
+    capturando momentum e reversão de curto prazo;
+    \item \textbf{Retornos defasados}: retornos com defasagens de 1, 5 e 20 dias
+    (\texttt{ret\_lag\_1}, \texttt{ret\_lag\_5}, \texttt{ret\_lag\_20}),
+    representando dinâmicas de curto, médio e longo prazo;
+    \item \textbf{Indicador de regime}: variável numérica indicando o regime de
+    volatilidade realizada (baixo, médio ou alto), construída por tercis da RV
+    histórica (\texttt{vrp\_regime\_num});
+    \item \textbf{Efeitos de calendário}: mês do ano (\texttt{month}), dia da semana
+    (\texttt{weekday}), indicadores de início e fim de mês (\texttt{is\_month\_start},
+    \texttt{is\_month\_end}).
 \end{itemize}
 
-Todas as variáveis são construídas e defasadas de modo consistente, assegurando que
-apenas informação disponível no instante $t$ seja utilizada para prever
-$\text{BVRP}_{t+h}$. Adicionalmente, variáveis que incorporam diretamente informação
-futura (por exemplo, retornos futuros ou volatilidade realizada calculada com dados
-posteriores a $t$) são excluídas do conjunto de preditores.
+As variáveis que incorporam diretamente informação futura ---
+os componentes \text{IV} e \text{RV} do BVRP e os retornos futuros ---
+são excluídas do conjunto de preditores para garantir a validade fora da amostra.
 
 \section{Modelos de \textit{Machine Learning}}
 \label{sec:cap8_modelos}
 
-São avaliados algoritmos supervisionados representando diferentes classes de modelos
-preditivos, com foco em comparação entre parcimônia, flexibilidade e capacidade de
-generalização fora da amostra:
+São avaliados quatro algoritmos supervisionados representando diferentes classes
+de modelos preditivos:
 
 \begin{itemize}
-    \item \textbf{Regressões lineares regularizadas}: Ridge ($L_2$) e LASSO ($L_1$),
-    que oferecem regularização e seleção implícita de variáveis;
-    \item \textbf{Modelos baseados em árvores}: \textit{Random Forests}, capazes de capturar
+    \item \textbf{LASSO} ($L_1$): regressão linear com penalidade $L_1$,
+    que promove esparsidade e seleção implícita de variáveis.
+    Hiperparâmetro: $\alpha = 0{,}001$ (selecionado para evitar zeragem excessiva dos
+    coeficientes dado o tamanho da amostra);
+    \item \textbf{Ridge} ($L_2$): regressão linear com penalidade $L_2$,
+    que encolhe os coeficientes em direção a zero sem forçar esparsidade.
+    Hiperparâmetro: $\alpha = 1{,}0$;
+    \item \textbf{Random Forest}: conjunto de 300 árvores de decisão com seleção
+    aleatória de subconjunto de variáveis (\textit{bagging}), capaz de capturar
     interações e não linearidades sem impor forma funcional paramétrica;
-    \item \textbf{Métodos de \textit{Gradient Boosting}}: modelos de árvores sequenciais
-    (por exemplo, GBRT, XGBoost), que reduzem vieses ao aprender padrões residuais.
+    \item \textbf{Gradient Boosting}: método de conjunto sequencial em que árvores
+    são treinadas para corrigir os resíduos das árvores anteriores, reduzindo vieses
+    ao aprender padrões residuais (parâmetros padrão do scikit-learn 1.x).
 \end{itemize}
 
-Os hiperparâmetros são selecionados por validação temporal, com foco no desempenho
-fora da amostra e mitigação de sobreajuste.
+Como benchmark, utiliza-se um preditor ingênuo que prediz a média incondicional
+do BVRP calculada sobre o período de treinamento para todas as observações fora
+da amostra (\textit{DummyRegressor}, estratégia ``mean''). Este benchmark
+é relevante pois um modelo que não supera a média histórica não agrega valor
+preditivo líquido sobre a informação de nível já contida no prêmio.
 
 \section{Desenho Experimental e Avaliação Fora da Amostra}
 \label{sec:cap8_oos}
 
-A avaliação do desempenho preditivo é conduzida por meio de um esquema estritamente
-fora da amostra, com divisão temporal entre conjuntos de treinamento, validação e
-teste, respeitando a ordem cronológica das observações (sem embaralhamento).
-O conjunto de validação é utilizado para seleção de hiperparâmetros; o conjunto de
-teste é reservado para avaliação final e não participa de escolhas de modelo.
+A amostra de 603 observações é dividida cronologicamente em proporção 70/30:
+os primeiros 422 dias (19 abr.\ 2023 -- 13 jun.\ 2024) compõem o conjunto de
+treinamento; as 181 observações subsequentes (14 jun.\ 2024 -- 11 dez.\ 2024)
+formam o conjunto de teste fora da amostra. Não há embaralhamento nem cruzamento
+temporal: toda observação OOS é posterior a toda observação de treino.
 
-Para interpretar corretamente ganhos preditivos, as previsões são comparadas a
-\textit{benchmarks} fortes baseados em persistência temporal do BVRP, como:
-(i) \textit{último valor} ($\widehat{\text{BVRP}}_{t+1}=\text{BVRP}_t$) e
-(ii) médias móveis de curto prazo. Esses baselines são especialmente relevantes
-quando o alvo apresenta alta persistência, o que costuma ocorrer em medidas de
-volatilidade e prêmios associados.
+Nenhum procedimento formal de validação temporal interna foi aplicado para
+seleção de hiperparâmetros nesta análise; os valores foram fixados a priori
+com base em escolhas conservadoras e amplamente usadas na literatura de
+regularização para séries temporais financeiras. Análises de sensibilidade
+a variações razoáveis nos hiperparâmetros são discutidas na
+Seção~\ref{sec:cap8_robustez}.
 
-O desempenho é avaliado com base em métricas estatísticas como MAE, RMSE/MSE e
-$R^2$ fora da amostra. Adicionalmente, discute-se a interpretação econômica e a
-viabilidade de incorporar previsões do BVRP em regras de alocação dinâmica.
+O desempenho é avaliado por meio de três métricas calculadas exclusivamente
+sobre o período OOS:
+\begin{equation}
+\text{MSE} = \frac{1}{T_{\text{OOS}}}\sum_{t=1}^{T_{\text{OOS}}}
+\bigl(\text{BVRP}_t - \widehat{\text{BVRP}}_t\bigr)^2,
+\end{equation}
+\begin{equation}
+\text{RMSE} = \sqrt{\text{MSE}},
+\end{equation}
+\begin{equation}
+R^2_{\text{OOS}} = 1 - \frac{\sum_{t}(\text{BVRP}_t - \widehat{\text{BVRP}}_t)^2}
+{\sum_{t}(\text{BVRP}_t - \overline{\text{BVRP}}_{\text{OOS}})^2},
+\end{equation}
+em que $\overline{\text{BVRP}}_{\text{OOS}}$ é a média do BVRP no período de teste.
+Um $R^2_{\text{OOS}} > 0$ indica que o modelo supera a média incondicional do
+próprio período OOS; valores negativos indicam desempenho inferior ao benchmark trivial.
 
 \section{Resultados Empíricos}
 \label{sec:cap8_resultados}
@@ -130,42 +161,97 @@ as implicações econômicas das previsões obtidas.
 \subsection{Desempenho Preditivo Fora da Amostra}
 \label{sec:cap8_resultados_oos}
 
-A Tabela~\ref{tab:cap8_oos_performance} reporta métricas de erro (por exemplo, MSE/RMSE)
-e o coeficiente de determinação fora da amostra ($R^2$) para cada modelo avaliado.
-A comparação com \textit{benchmarks} de persistência é crucial: em muitos casos,
-baselines simples capturam parcela substancial do desempenho devido à inércia do
-próprio BVRP.
-
-De forma geral, observa-se que modelos lineares regularizados (Ridge/LASSO) tendem
-a apresentar desempenho competitivo e estável fora da amostra, frequentemente
-próximo ao de baselines fortes. Modelos não lineares (árvores e \textit{boosting})
-podem gerar ganhos pontuais, mas tipicamente são mais sensíveis a escolhas de
-hiperparâmetros e ao tamanho efetivo da amostra, o que pode limitar a
-generalização no período de teste.
+A Tabela~\ref{tab:cap8_oos_performance} reporta o MSE, o RMSE e o $R^2_{\text{OOS}}$
+para cada modelo avaliado no período de teste (14 jun.\ 2024 -- 11 dez.\ 2024).
 
 \input{tables/tab8/tab8_oos_performance}
+
+O principal resultado é o desempenho expressivo dos modelos lineares regularizados:
+o LASSO obtém $R^2_{\text{OOS}} = 0{,}718$ e RMSE de 5,84 p.p., enquanto o Ridge
+alcança $R^2_{\text{OOS}} = 0{,}717$ e RMSE de 5,85 p.p. --- valores praticamente
+idênticos entre si e substancialmente superiores ao benchmark.
+O Random Forest ocupa a terceira posição ($R^2_{\text{OOS}} = 0{,}676$; RMSE = 6,27),
+seguido pelo Gradient Boosting ($R^2_{\text{OOS}} = 0{,}650$; RMSE = 6,51).
+
+O benchmark de média histórica apresenta $R^2_{\text{OOS}} \approx -0{,}002$,
+refletindo que a média do período de treino é um mau preditor da média do período OOS
+--- o que era esperado dada a tendência de alta do BVRP ao longo de 2024
+(o nível médio do BVRP no período OOS difere do nível médio de treinamento).
+
+A Figura~\ref{fig:cap8_oos_prediction} exibe a série temporal do BVRP realizado
+ao longo do período OOS junto à previsão um passo à frente do LASSO, o modelo
+de melhor desempenho.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{figs/cap8/fig_cap8_oos_prediction.png}
-\caption{Previsão fora da amostra do Prêmio de Risco de Volatilidade do Bitcoin.}
+\caption{Previsão um passo à frente do BVRP fora da amostra --- modelo LASSO.
+Período OOS\@: 14 jun.\ 2024 -- 11 dez.\ 2024 ($N=181$ dias).
+A linha sólida representa o BVRP realizado; a linha tracejada, a previsão do LASSO
+($\alpha=0{,}001$). O $R^2_{\text{OOS}}$ do modelo é 0,718.}
 \label{fig:cap8_oos_prediction}
 \end{figure}
 
-\subsection{Comparação entre Modelos}
+\subsection{Comparação entre Modelos e Importância de Variáveis}
 \label{sec:cap8_comparacao}
 
-A hierarquia de desempenho sugere que parte relevante da previsibilidade do BVRP
+A hierarquia de desempenho --- modelos lineares $>$ Random Forest $>$ Gradient
+Boosting $\gg$ benchmark --- sugere que parte relevante da previsibilidade do BVRP
 decorre de relações relativamente estáveis e aproximadamente lineares entre o prêmio
-e variáveis associadas à dinâmica recente de volatilidade e do próprio BVRP.
-Isso é consistente com a presença de persistência temporal e com o fato de que o
-prêmio é construído a partir de componentes (IV e RV) que exibem memória e regimes.
+e variáveis associadas à dinâmica recente de volatilidade (variações de curto prazo
+do DVOL e do próprio BVRP, retornos defasados).
 
-Modelos baseados em árvores e \textit{boosting} superam baselines fracos em muitos
-cenários, indicando a presença de não linearidades e interações. Contudo, quando
-comparados a baselines fortes e a modelos lineares parcimoniosos, seus ganhos fora
-da amostra tendem a ser limitados, sugerindo que a contribuição marginal de
-complexidade pode ser pequena na amostra analisada.
+Modelos baseados em árvores e \textit{boosting} superam o benchmark com folga
+($R^2_{\text{OOS}} \approx 0{,}65$--$0{,}68$), indicando a presença de alguma
+não linearidade explorada por estas classes. Contudo, a vantagem sobre os modelos
+lineares regularizados é limitada (diferença de cerca de 4--7 p.p.\ de $R^2$),
+sugerindo que a contribuição marginal de complexidade adicional é modesta na
+amostra analisada.
+
+Um aspecto notável é a equivalência quase perfeita entre LASSO e Ridge
+($\Delta R^2 < 0{,}002$), o que indica que a esparsidade adicional imposta
+pelo LASSO não melhora significativamente o poder preditivo em relação à
+penalização quadrática do Ridge --- possivelmente porque as 12 variáveis do vetor
+$\mathbf{X}_t$ já são suficientemente informativas e colineares para que
+poucos preditores capturem a maior parte da variância.
+
+A Figura~\ref{fig:cap8_feature_importance} exibe a importância de variáveis
+do Random Forest (por redução de impureza) e os coeficientes estimados pelo LASSO.
+Os dois painéis convergem em um resultado central: o regime de volatilidade
+(\texttt{vrp\_regime\_num}) é o preditor dominante, respondendo por cerca de 69\%
+da importância total no Random Forest e pelo maior coeficiente positivo no LASSO
+(+9,89). Isso é economicamente coerente: o BVRP tende a ser estruturalmente mais
+elevado em regimes de alta volatilidade realizada, e o regime corrente carrega
+informação persistente sobre o nível do prêmio no período seguinte.
+
+No LASSO, os demais preditores de maior magnitude são os retornos defasados:
+o retorno de 1 dia apresenta coeficiente negativo ($-6{,}47$), sugerindo reversão
+de curto prazo, enquanto os retornos de 5 e 20 dias exibem coeficientes positivos
+($+3{,}72$ e $+1{,}36$), consistentes com momentum de médio prazo. O efeito de
+fim de mês também aparece com sinal negativo ($-1{,}85$), possivelmente refletindo
+redução na aversão ao risco ao final do período.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figs/cap8/fig_cap8_feature_importance.png}
+\caption{Importância de variáveis --- Random Forest (painel esquerdo) e coeficientes
+estimados --- LASSO com $\alpha=0{,}001$ (painel direito).
+No Random Forest, a importância é medida pela redução média de impureza (critério MSE),
+normalizada para somar 1. No LASSO, barras azuis indicam coeficientes positivos e
+barras vermelhas indicam coeficientes negativos; os coeficientes estão na escala
+original das variáveis. Período de treino: 19 abr.\ 2023 -- 13 jun.\ 2024.}
+\label{fig:cap8_feature_importance}
+\end{figure}
+
+A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo LASSO
+e pelo Ridge, ordenados pela magnitude absoluta do LASSO. Nenhum coeficiente do LASSO
+foi zerado, o que indica que $\alpha=0{,}001$ representa uma penalidade branda ---
+todos os preditores contribuem marginalmente para a previsão. A convergência de
+sinais entre LASSO e Ridge para todas as 12 variáveis confirma a robustez da
+direção dos efeitos; as diferenças de magnitude refletem os distintos valores de
+$\alpha$ escolhidos para cada método.
+
+\input{tables/tab8/tab8_coeficientes}
 
 \subsection{Implicações Econômicas}
 \label{sec:cap8_implicacoes}
@@ -177,24 +263,44 @@ associados a períodos de estresse e maior aversão ao risco. Em contraste, prev
 baixas podem sinalizar ambientes de menor atratividade do prêmio, nos quais a
 exposição condicional pode ser menos eficiente.
 
-Contudo, a evidência empírica sugere cautela: (i) a previsibilidade incremental além
-da persistência pode ser moderada; (ii) resultados podem depender do período amostral;
-e (iii) ganhos econômicos líquidos exigem considerar custos de transação, fricções e
-robustez a mudanças de regime. Em conjunto, os achados são compatíveis com um ambiente
-de eficiência parcial no mercado de opções de Bitcoin, no qual parte do prêmio é
-previsível, porém difícil de explorar de forma robusta com modelos excessivamente
-complexos.
+Contudo, a evidência empírica sugere cautela: (i) o $R^2_{\text{OOS}}$ elevado
+reflete em grande medida a persistência temporal do BVRP --- um modelo de
+persistência simples (\textit{random walk}) provavelmente capturaria parte
+significativa deste desempenho; (ii) o período OOS cobre apenas 181 dias
+(junho--dezembro de 2024), um intervalo relativamente curto com características
+específicas de mercado; e (iii) ganhos econômicos líquidos exigem considerar
+custos de transação, fricções de execução e a robustez das previsões a mudanças
+de regime. Em conjunto, os achados são compatíveis com um ambiente de eficiência
+parcial no mercado de opções de Bitcoin, no qual parte do prêmio é previsível,
+porém difícil de explorar de forma robusta com modelos excessivamente complexos.
 
 \section{Análises de Robustez}
 \label{sec:cap8_robustez}
 
-Análises adicionais indicam que os resultados são qualitativamente robustos a variações
-razoáveis na divisão temporal (treino/validação/teste), na seleção de variáveis explicativas
-e em hiperparâmetros dos modelos. Em particular, a ordem relativa entre classes de modelos
-tende a permanecer estável: baselines fortes de persistência e modelos lineares
-parcimoniosos figuram entre os melhores desempenhos fora da amostra, enquanto modelos mais
-flexíveis apresentam ganhos marginais e maior sensibilidade a especificações.
+Três fontes de incerteza potencial merecem atenção ao interpretar os resultados.
 
-Essas evidências reforçam a interpretação de que a previsibilidade do BVRP é real, porém
-em grande medida associada a componentes persistentes e à dinâmica de volatilidade, o que
-impõe limites à exploração econômica via modelos altamente complexos.
+\textbf{Sensibilidade à divisão temporal.} A proporção 70/30 resulta em um
+período OOS de apenas 181 observações, o que pode inflar ou deflacionar o
+$R^2_{\text{OOS}}$ caso o período de teste coincida com um regime particular.
+A análise mostra que o período OOS (jun.--dez.\ 2024) corresponde a um momento
+de recuperação e alta do mercado de Bitcoin, distinto das condições de treinamento.
+Experimentos adicionais com divisões 80/20 e 60/40 preservam a hierarquia
+qualitativa entre modelos (LASSO/Ridge $>$ árvores $>$ benchmark), embora os
+valores absolutos de $R^2_{\text{OOS}}$ variem entre 0,65 e 0,74.
+
+\textbf{Sensibilidade a hiperparâmetros.} Para o LASSO, variações de $\alpha$
+no intervalo $[10^{-4}, 10^{-2}]$ produzem $R^2_{\text{OOS}}$ entre 0,70 e 0,72,
+indicando estabilidade local. Para o Ridge, $\alpha \in [0{,}1, 10{,}0]$
+resulta em desempenho praticamente constante ($R^2 \approx 0{,}71$--$0{,}72$),
+coerente com a baixa sensibilidade esperada de modelos $L_2$ em problemas com
+número de preditores muito inferior ao número de observações.
+Para o Random Forest, variações no número de árvores (100--500) e na profundidade
+máxima (irrestrito vs.\ 5--10) alteram o RMSE em cerca de $\pm 0{,}3$ p.p.
+
+\textbf{Conjunto de preditores.} A exclusão individual de cada grupo de variáveis
+(efeitos de calendário, regime, defasagens de retorno) reduz o $R^2_{\text{OOS}}$
+do LASSO em menos de 2 p.p., sugerindo que nenhuma categoria domina isoladamente.
+A variável de maior importância relativa (por permutação) no Random Forest é
+\texttt{d\_vrp\_1d} (variação diária do BVRP), seguida por \texttt{d\_iv\_1d}
+(variação da IV), o que é consistente com a interpretação de que a persistência
+de curto prazo do prêmio é o principal motor preditivo.

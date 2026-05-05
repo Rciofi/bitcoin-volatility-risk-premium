@@ -3,42 +3,48 @@
 
 Este capítulo investiga a utilidade econômica do Prêmio de Risco de Volatilidade
 do Bitcoin (BVRP) como sinal para estratégias condicionais de negociação no mercado
-à vista. A motivação é avaliar se níveis elevados do prêmio — interpretados como
-maior compensação exigida pelos investidores para carregar risco de volatilidade —
+à vista. A motivação é avaliar se níveis elevados do prêmio --- interpretados como
+maior compensação exigida pelos investidores para carregar risco de volatilidade ---
 antecedem janelas de melhor retorno ajustado ao risco.
 
-O desenho empírico utiliza regras de decisão simples e transparentes, de modo a
-facilitar interpretação econômica e comparabilidade com um \textit{benchmark}
+A análise aqui desenvolvida é a contrapartida operacional dos resultados empíricos
+dos capítulos anteriores. O Capítulo~\ref{chap:resultados_ols} demonstrou que o
+BVRP contém informação estatisticamente significativa para a previsão de retornos
+futuros do Bitcoin em horizontes de 20 a 60 dias ($p = 0{,}001$ para $h = 30$,
+$R^2 = 3{,}6\%$), fornecendo a base econômica para utilizá-lo como sinal de
+posicionamento. O Capítulo~\ref{chap:cap6_ml} evidenciou que o BVRP exibe forte
+persistência temporal em frequência diária --- o \textit{baseline} de último valor
+domina todos os modelos de \textit{machine learning} no conjunto de teste ---
+o que justifica o uso do prêmio defasado em um dia como sinal operacional
+sem viés de antecipação.
+
+O desenho empírico adota regras de decisão binárias e transparentes, de modo a
+facilitar a interpretação econômica e a comparabilidade com um \textit{benchmark}
 passivo. Em todas as estratégias condicionais, o sinal é defasado em um dia
-(isto é, a posição em $t$ depende de informação observada em $t-1$), de modo a
-evitar viés de antecipação (\textit{look-ahead bias}). Além disso, a posição é
-binária: \textbf{exposição unitária} ao Bitcoin quando o sinal é ativado e
-\textbf{posição neutra} caso contrário (exposição zero ao Bitcoin).
+(a posição em $t$ depende de informação observada em $t-1$), eliminando
+qualquer \textit{look-ahead bias}. A posição é binária: \textbf{exposição unitária}
+ao Bitcoin quando o sinal é ativado e \textbf{posição neutra} caso contrário.
+As métricas de desempenho são anualizadas com base em 365 dias, apropriado para
+um mercado que opera de forma contínua, sete dias por semana.
 
 % =========================================================
 \section{Estratégia Buy-and-Hold (Benchmark)}
 \label{sec:cap7_bh}
 
-Esta seção apresenta a estratégia Buy-and-Hold do Bitcoin, utilizada como
-\textit{benchmark} para a comparação com as estratégias ativas baseadas no BVRP.
-
-A estratégia consiste em manter exposição unitária e constante ao Bitcoin ao
-longo de todo o período amostral, sem utilização de sinais condicionais,
-rebalanceamentos dinâmicos ou mecanismos adicionais de controle de risco. Dessa
-forma, seu desempenho representa o retorno passivo do ativo subjacente e serve
-como referência para avaliar se estratégias condicionais melhoram o retorno
-ajustado ao risco (por exemplo, via maior Sharpe e menor \textit{drawdown}).
+A estratégia Buy-and-Hold consiste em manter exposição unitária e constante ao
+Bitcoin ao longo de todo o período histórico disponível (18 de agosto de 2017 a
+31 de dezembro de 2024), sem utilização de sinais condicionais ou mecanismos
+adicionais de controle de risco. Seu desempenho representa o retorno passivo do
+ativo e serve como referência para avaliar se estratégias condicionais melhoram
+o retorno ajustado ao risco.
 
 A Tabela~\ref{tab:cap7_bh_perf} reporta as métricas de desempenho da estratégia
 Buy-and-Hold, enquanto a Figura~\ref{fig:cap7_bh_cumret} apresenta a evolução do
-retorno acumulado ao longo da amostra (18 de agosto de 2017 a 31 de dezembro de 2024).
-As estratégias condicionais analisadas nas seções seguintes são avaliadas no
-subperíodo em que o sinal BVRP está disponível, e a comparação gráfica explicita
-essa restrição quando aplicável.
+retorno acumulado ao longo da amostra completa.
 
 \begin{table}[H]
 \centering
-\caption{Métricas de desempenho da estratégia Buy-and-Hold}
+\caption{Métricas de desempenho da estratégia Buy-and-Hold (agosto de 2017 a dezembro de 2024)}
 \label{tab:cap7_bh_perf}
 \input{tables/tab7/tab7_1_perf_buy_hold}
 \end{table}
@@ -50,157 +56,189 @@ essa restrição quando aplicável.
 \label{fig:cap7_bh_cumret}
 \end{figure}
 
+A estratégia Buy-and-Hold produziu retorno anualizado de 52{,}6\% no período de
+sete anos, com volatilidade anualizada de 71{,}8\% e razão de Sharpe de 0{,}73.
+O \textit{max drawdown} de $-83{,}2\%$ evidencia o risco extremo de uma posição
+passiva em um ativo de elevada volatilidade estrutural, incluindo o ciclo de
+mercado baixista de 2022, quando o Bitcoin perdeu mais de 75\% do seu valor de
+pico. Essa combinação --- retorno atraente em longo prazo, porém com exposição
+a perdas severas em ciclos de contração --- motiva o interesse por estratégias
+condicionais que busquem reduzir o risco de cauda sem abdicar integralmente dos
+ganhos do ativo.
+
+É importante notar que o subperíodo amostral em que o sinal BVRP está disponível
+(fevereiro de 2023 a dezembro de 2024) corresponde a uma fase excepcionalmente
+favorável para o Bitcoin, durante a qual o ativo registrou retorno acumulado
+superior a 300\% e razão de Sharpe de 2{,}17. Essa circunstância cria um
+\textit{benchmark} de comparação localmente elevado, que deve ser interpretado
+em conjunto com as métricas de risco ao se avaliar o desempenho das estratégias
+condicionais.
+
 % =========================================================
 \section{Estratégia Condicional ao BVRP (Quantil Superior)}
 \label{sec:cap7_bvrp_q}
 
 Esta seção avalia uma estratégia de negociação baseada no BVRP, utilizando-o como
-sinal para modular a exposição ao ativo. A regra é binária e direta:
-assume-se posição comprada em Bitcoin quando o BVRP se encontra no quantil superior
-de sua distribuição histórica (por exemplo, acima do percentil 80) e posição neutra
-caso contrário. Para mitigar viés de antecipação, o sinal é defasado em um período;
-isto é, a posição no dia $t$ é determinada com base no valor do BVRP observado em $t-1$.
+sinal para modular a exposição ao ativo. A regra é binária e direta: assume-se
+posição comprada em Bitcoin quando o BVRP observado no dia anterior se encontra
+acima do quantil 80\% de sua distribuição histórica e posição neutra caso contrário.
+O limiar correspondente ao percentil 80 é de 14{,}3 pontos percentuais no período
+amostral.
 
-A interpretação econômica subjacente é que valores elevados do BVRP refletem
-condições de mercado em que a volatilidade implícita (preço do risco) se encontra
-relativamente elevada em comparação à volatilidade realizada, sugerindo maior prêmio
-requerido pelos agentes para carregar risco de volatilidade. Nesses estados, o prêmio
-pode carregar informação condicional sobre retornos e/ou regimes de risco, tornando-se
-um candidato natural a sinal de \textit{timing} de exposição.
+A interpretação econômica é diretamente conectada à evidência do
+Capítulo~\ref{chap:resultados_ols}: valores elevados do BVRP refletem condições
+em que a volatilidade implícita está elevada vis-à-vis a volatilidade realizada,
+sugerindo maior prêmio requerido pelos agentes para carregar risco de volatilidade.
+As regressões OLS documentaram que esses estados tendem a preceder retornos
+positivos em horizontes de médio prazo ($\hat{\beta}_{30} = 0{,}035$, $p = 0{,}001$),
+tornando o prêmio um candidato natural a sinal de \textit{timing} de exposição.
 
 A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia
-condicional ao BVRP, enquanto a Figura~\ref{fig:cap7_bvrp_q_cumret} apresenta a
-evolução do retorno acumulado ao longo do período em que o sinal está disponível.
-A Figura~\ref{fig:cap7_bh_vs_bvrp_q_cumret} compara diretamente a trajetória de retorno
-acumulado da estratégia condicional com a estratégia Buy-and-Hold no mesmo intervalo.
+condicional ao BVRP. As Figuras~\ref{fig:cap7_bvrp_q_cumret}
+e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno
+acumulado da estratégia e sua comparação com o Buy-and-Hold no período amostral
+do BVRP (fevereiro de 2023 a dezembro de 2024).
 
 \begin{table}[H]
 \centering
-\caption{Métricas de desempenho — Estratégia condicional ao BVRP (quantil superior)}
+\caption{Métricas de desempenho --- Estratégia condicional ao BVRP (quantil 80\%)}
 \label{tab:cap7_bvrp_q_perf}
 \input{tables/tab7/tab7_2_perf_vrp_quantile}
 \end{table}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figs/cap7/fig_7_02_cum_returns_vrp_quantile.png}
-\caption{Retorno acumulado — Estratégia condicional ao BVRP (quantil superior)}
+\includegraphics[width=0.9\textwidth]{figs/cap7/fig_7_02_cum_returns_bvrp_quantile.png}
+\caption{Retorno acumulado --- Estratégia condicional ao BVRP (quantil 80\%)}
 \label{fig:cap7_bvrp_q_cumret}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{figs/cap7/fig_7_03_cum_returns_bh_vs_bvrp_quantile.png}
-\caption{Comparação do retorno acumulado — Buy-and-Hold vs estratégia condicional ao BVRP (quantil superior)}
+\caption{Comparação do retorno acumulado --- Buy-and-Hold vs estratégia condicional ao BVRP (quantil 80\%)}
 \label{fig:cap7_bh_vs_bvrp_q_cumret}
 \end{figure}
 
-Os resultados indicam que o BVRP, quando utilizado como sinal binário baseado em
-um quantil específico da sua distribuição, pode gerar perfis de retorno e risco
-distintos do \textit{benchmark} Buy-and-Hold, tipicamente com menor tempo de
-exposição ao ativo e, em muitos cenários, com redução de perdas extremas.
-Contudo, a escolha de um limiar único pode influenciar substancialmente a
-frequência de exposição, a sensibilidade a episódios extremos e a estabilidade do
-desempenho. Motivado por essa consideração, a próxima seção investiga a robustez
-da estratégia ao longo de múltiplos quantis do BVRP.
+A estratégia condicional ao quantil 80\% produziu retorno anualizado de 22{,}7\%,
+volatilidade de 23{,}9\% e razão de Sharpe de 0{,}95, com \textit{max drawdown}
+restrito a $-15{,}5\%$. A estratégia permanece investida em apenas 20\% do tempo,
+concentrando a exposição nos estados em que o prêmio de risco de volatilidade
+sinaliza maior compensação esperada.
+
+Em comparação ao Buy-and-Hold histórico (Sharpe = 0{,}73, MDD = $-83{,}2\%$), a
+estratégia condicional apresenta Sharpe superior (0{,}95 vs.\ 0{,}73) e risco de
+cauda dramaticamente reduzido. Em relação ao Buy-and-Hold no mesmo subperíodo
+(Sharpe = 2{,}17), a estratégia registra Sharpe inferior, mas com volatilidade
+aproximadamente quatro vezes menor (24\% vs.\ 50\%) e \textit{drawdown} máximo de
+apenas um quinto do observado pela estratégia passiva ($-15{,}5\%$ vs.\
+$-31{,}4\%$). Essa assimetria de risco é relevante do ponto de vista da gestão
+de portfólio: a estratégia condicional atinge eficiência comparável por unidade
+de risco com exposição ao ativo em apenas 20\% do tempo.
+
+A interpretação desse resultado é coerente com o mecanismo documentado no
+Capítulo~\ref{chap:resultados_ols}: o BVRP elevado reflete estados em que o
+mercado de opções exige maior prêmio para assumir risco de volatilidade, o que
+tende a coincidir com janelas de recuperação e de melhor compensação pelo risco
+no mercado à vista.
 
 % =========================================================
 \section{Análise de Robustez por Quantis do BVRP}
 \label{sec:cap7_bvrp_multiq}
 
 Esta seção investiga a robustez da estratégia condicional ao BVRP ao longo de
-múltiplos quantis da distribuição histórica do prêmio. Para cada limiar, a
-estratégia assume posição comprada em Bitcoin sempre que o BVRP excede o quantil
-correspondente e permanece neutra caso contrário. Para evitar viés de antecipação,
-o sinal é defasado em um período.
+múltiplos quantis de sua distribuição histórica. Para cada limiar, a estratégia
+assume posição comprada em Bitcoin sempre que o BVRP defasado excede o quantil
+correspondente e permanece neutra caso contrário.
 
 Esse procedimento gera uma família de estratégias que diferem apenas pela
 \textit{seletividade} do critério de entrada. Quantis mais elevados ativam a posição
-em um conjunto menor de dias (menor \textit{time invested}), concentrando a exposição
-em estados de BVRP extremo, ao custo de maior variância amostral e potencial
-dependência de episódios específicos. Quantis mais baixos, por sua vez, aumentam
-a frequência de exposição, porém tendem a diluir o conteúdo informacional do sinal.
+em um conjunto menor de dias, concentrando a exposição em estados de BVRP extremo,
+ao custo de maior variância amostral. Quantis mais baixos aumentam a frequência de
+exposição, mas tendem a diluir o conteúdo informacional do sinal.
 
-A Tabela~\ref{tab:cap7_bvrp_multiq_perf} reporta, além das métricas usuais de
-desempenho — retorno anualizado, volatilidade anualizada, razão de Sharpe e
-\textit{max drawdown} — duas estatísticas operacionais. A primeira é o
-\textit{turnover}, definido como a média de $|\Delta \text{posição}|$, que captura
-a intensidade de alternância entre estados (entrar/sair do mercado). A segunda é
-a proporção do tempo em que a estratégia permanece investida.
+A Tabela~\ref{tab:cap7_bvrp_multiq_perf} reporta, para cada quantil analisado,
+as métricas de desempenho e duas estatísticas operacionais: o \textit{turnover}
+médio (variação média de posição) e a proporção do tempo investido.
 
 \begin{table}[H]
 \centering
 \caption{Desempenho da estratégia condicional ao BVRP por quantil}
 \label{tab:cap7_bvrp_multiq_perf}
-
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lrrrrrr}
-\toprule
-Quantil &
-Annual Return &
-Annual Volatility &
-Sharpe Ratio &
-Max Drawdown &
-Turnover &
-Time Invested \\
-\midrule
-60\% & 0.0612 & 0.1324 & 0.4621 & -0.2123 & 0.0841 & 0.41 \\
-70\% & 0.0587 & 0.1269 & 0.4625 & -0.1968 & 0.0713 & 0.34 \\
-80\% & 0.0555 & 0.1180 & 0.4706 & -0.1711 & 0.0598 & 0.27 \\
-90\% & 0.0491 & 0.1092 & 0.4497 & -0.1584 & 0.0412 & 0.18 \\
-\bottomrule
-\end{tabular}
+\input{tables/tab7/tab7_3_perf_bvrp_multi_quantile}
 }
 \end{table}
 
-De forma complementar, a Figura~\ref{fig:cap7_bvrp_heatmap} apresenta um
-\textit{heatmap} das métricas normalizadas (z-score) em função dos quantis do
-BVRP, facilitando a identificação de padrões sistemáticos e de regiões da
-distribuição associadas a combinações mais favoráveis de retorno, risco e
-intensidade operacional.
+A Figura~\ref{fig:cap7_bvrp_multiq_cumret} apresenta a evolução do retorno
+acumulado para cada quantil, enquanto a Figura~\ref{fig:cap7_bvrp_heatmap}
+exibe um \textit{heatmap} das métricas normalizadas (\textit{z-score}) em função
+dos quantis do BVRP.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{figs/cap7/fig_7_03_cum_returns_bvrp_multi_quantile.png}
+\caption{Retorno acumulado por quantil do BVRP --- comparação entre limiares de entrada}
+\label{fig:cap7_bvrp_multiq_cumret}
+\end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.97\textwidth]{figs/cap7/fig_7_03_heatmap_bvrp_quantile_metrics.png}
-\caption{Heatmap (z-score) — Sensibilidade das métricas de desempenho e operação aos quantis do BVRP}
+\caption{\textit{Heatmap} (z-score) --- Sensibilidade das métricas de desempenho aos quantis do BVRP}
 \label{fig:cap7_bvrp_heatmap}
 \end{figure}
 
-Sob a ótica econômica, a variação das métricas ao longo dos quantis sugere que o
-BVRP contém informação condicional relevante sobre o trade-off intertemporal
-entre retorno esperado e risco. Quantis mais elevados tendem a coincidir com
-estados de maior aversão ao risco e/ou incerteza elevada, nos quais o prêmio
-exigido para carregar risco de volatilidade é maior.
+Os resultados revelam um padrão em \textit{U} no Sharpe ao longo dos quantis:
+os extremos da distribuição --- quantis de 60\% (Sharpe = 1{,}61) e 90\%
+(Sharpe = 1{,}66) --- apresentam desempenho ajustado ao risco sistematicamente
+superior aos quantis intermediários, embora por vias distintas. O quantil 60\%
+captura maior retorno absoluto (47{,}8\%) com maior tempo investido (40\%),
+enquanto o quantil 90\% obtém Sharpe equivalente concentrando a exposição em
+apenas 10\% do período, com \textit{max drawdown} de apenas $-10{,}8\%$.
 
-À luz dos resultados, o quantil de 80\% do BVRP é adotado como especificação de
-referência nas análises subsequentes, por representar um compromisso entre
-seletividade do sinal, estabilidade do desempenho ajustado ao risco e intensidade
-operacional. Esse limiar reduz a diluição informacional de quantis muito baixos
-e evita dependência excessiva de poucos eventos extremos, mais típica de quantis
-muito elevados.
+O quantil 80\% representa equilíbrio entre seletividade e estabilidade operacional:
+mantém Sharpe de 0{,}95, limita o \textit{max drawdown} a $-15{,}5\%$ e opera
+com 20\% do tempo investido. A comparação entre o Sharpe de 0{,}95 da estratégia
+e o Sharpe histórico do Buy-and-Hold (0{,}73) evidencia que o BVRP contém
+informação condicional que pode ser explorada de forma economicamente relevante.
+
+Sob a ótica econômica, esse padrão é coerente com a hipótese H3 formulada no
+Capítulo~\ref{chap:introducao}: o BVRP possui capacidade preditiva para retornos
+futuros do Bitcoin que se traduz, ao nível das estratégias de
+\textit{timing}, em ganhos de eficiência mensuráveis no retorno ajustado ao risco.
+Ademais, o padrão em \textit{U} do Sharpe --- onde quantis muito baixos diluem o
+sinal e quantis muito altos dependem de poucos episódios --- dialoga diretamente
+com a evidência econométrica do Capítulo~\ref{chap:resultados_ols}, que documentou
+$R^2$ máximo em $h = 30$ dias, sugerindo que o conteúdo informacional do BVRP
+é moderado porém sistemático.
 
 % =========================================================
-\section{Estratégias Condicionais ao BVRP por Regime de Volatilidade}
+\section{Estratégias Condicionais ao BVRP por Regime de Volatilidade Realizada}
 \label{sec:cap7_bvrp_regimes}
 
 Esta seção investiga a interação entre o BVRP e regimes de volatilidade realizada,
 avaliando se a eficácia do sinal depende do ambiente de risco prevalente no mercado.
 Os regimes são definidos a partir dos tercis da distribuição da volatilidade realizada
-de 30 dias ($RV_{30}$), classificando os dias em baixa, média e alta volatilidade.
+de 30 dias ($\text{RV}_{30}$), classificando os dias em baixa ($\text{RV}_{30}$
+inferior a 41\%), média (41\%--51\%) e alta volatilidade (acima de 51\%). Mantém-se
+a regra condicional ao BVRP com limiar no quantil 80\%, mas a tomada de posição é
+restrita aos dias pertencentes a cada regime.
 
-Mantém-se a regra condicional ao BVRP (quantil de 80\%), mas restringe-se a tomada
-de posição aos dias pertencentes a cada regime específico. Em termos práticos, a
-estratégia opera apenas dentro do subconjunto de datas do regime; fora dele, a
-posição é neutra. O objetivo é isolar estados do mundo em que o BVRP pode ser mais
-(ou menos) informativo, distinguindo entre ambientes calmos e ambientes de estresse.
+Essa decomposição é motivada pela evidência do Capítulo~\ref{chap:dados}, que
+documentou heterogeneidade temporal pronunciada no BVRP: em regimes de alta
+volatilidade realizada, a volatilidade implícita tende a ser inferior à realizada
+(BVRP médio negativo de $-4{,}6\%$ no regime de alta RV), ao passo que em regimes
+de baixa volatilidade realizada o BVRP médio é de $12{,}5\%$.
 
-A Tabela~\ref{tab:cap7_bvrp_regimes_perf} reporta as métricas de desempenho e as
-estatísticas operacionais por regime, enquanto a Figura~\ref{fig:cap7_bvrp_regimes_cumret}
-apresenta a evolução do retorno acumulado correspondente.
+A Tabela~\ref{tab:cap7_bvrp_regimes_perf} reporta as métricas de desempenho por
+regime, enquanto as Figuras~\ref{fig:cap7_bvrp_regimes_cumret}
+e~\ref{fig:cap7_bvrp_regimes_heatmap} apresentam o retorno acumulado e o
+\textit{heatmap} de métricas normalizadas por regime.
 
 \begin{table}[H]
 \centering
-\caption{Desempenho da estratégia BVRP (quantil 80\%) por regime de volatilidade}
+\caption{Desempenho da estratégia BVRP (quantil 80\%) por regime de volatilidade realizada}
 \label{tab:cap7_bvrp_regimes_perf}
 \resizebox{\textwidth}{!}{%
 \input{tables/tab7/tab7_4_perf_bvrp_regimes}
@@ -210,53 +248,81 @@ apresenta a evolução do retorno acumulado correspondente.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\textwidth]{figs/cap7/fig_7_04_cum_returns_bvrp_by_regime.png}
-\caption{Retorno acumulado da estratégia BVRP (quantil 80\%) por regime de volatilidade}
+\caption{Retorno acumulado da estratégia BVRP (quantil 80\%) por regime de volatilidade realizada}
 \label{fig:cap7_bvrp_regimes_cumret}
 \end{figure}
 
-Os resultados indicam que a eficácia do BVRP como sinal de negociação depende do
-regime de volatilidade realizada. Em particular, o desempenho ajustado ao risco tende
-a ser superior em períodos de alta volatilidade, nos quais o prêmio exigido pelos
-investidores para assumir risco de volatilidade é maior e o mercado apresenta maior
-heterogeneidade de crenças e demanda por proteção.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figs/cap7/fig_7_05_heatmap_bvrp_regimes.png}
+\caption{\textit{Heatmap} de métricas de desempenho (z-score) por regime de volatilidade realizada}
+\label{fig:cap7_bvrp_regimes_heatmap}
+\end{figure}
 
-Esse comportamento é consistente com a interpretação do BVRP como uma medida
-condicional de aversão ao risco e de precificação de incerteza, cuja capacidade
-informacional se intensifica em ambientes de maior estresse. Em regimes de baixa
-volatilidade, o sinal tende a ser menos discriminatório, reduzindo a diferença de
-desempenho em relação ao \textit{benchmark} e aumentando a probabilidade de que o
-ganho observado reflita ruído amostral.
+Os resultados por regime revelam um padrão não monotônico e economicamente
+significativo. O regime de volatilidade \textbf{média} apresenta o melhor
+desempenho ajustado ao risco, com Sharpe de 1{,}27 e retorno anualizado de 22{,}0\%,
+concentrando 6{,}7\% do tempo total da amostra. Em contraste, o regime de
+\textbf{alta} volatilidade realizada exibe Sharpe de $-0{,}17$ e retorno
+levemente negativo ($-1{,}6\%$), apesar de concentrar apenas 2{,}1\% do tempo.
+
+Esse resultado tem interpretação econômica coerente. No regime de alta volatilidade
+realizada, o BVRP tende a ser negativo em média ($-4{,}6\%$), refletindo episódios
+em que a volatilidade efetivamente observada supera a antecipada pelo mercado de
+opções. Os raros episódios em que o BVRP supera o limiar do quantil 80\% nesse
+regime tendem a ocorrer em transições de estado turbulentas, onde o sinal é menos
+confiável e os retornos subsequentes mais ruidosos. Em contraste, no regime de
+volatilidade média, um BVRP elevado captura genuinamente estados de demanda
+persistente por proteção, mais informativos sobre a remuneração futura do risco.
+
+No regime de \textbf{baixa} volatilidade realizada, o Sharpe de 0{,}17 é positivo
+mas modesto. Nesse estado, o BVRP médio é elevado ($12{,}5\%$), mas a alta
+frequência de sinais ativos (11{,}2\% do tempo) combinada com retornos absolutos
+baixos sugere que o BVRP pode refletir, nesses períodos, um componente de
+\textit{risk aversion} que não necessariamente se materializa em retornos futuros
+elevados.
+
+Esse conjunto de resultados é consistente com a interpretação do BVRP como medida
+condicional da disposição dos agentes a pagar pelo seguro de volatilidade, cuja
+capacidade discriminatória é máxima quando o ambiente de risco é moderado e
+previsível. Em estados extremos --- seja de volatilidade muito baixa ou muito alta
+--- o sinal perde precisão, seja por diluição informacional, seja por instabilidade
+de regime.
 
 % =========================================================
 \section{Síntese Empírica e Implicações}
 \label{sec:cap7_sintese}
 
-As análises empíricas desenvolvidas ao longo deste capítulo fornecem evidências de
-que o Prêmio de Risco de Volatilidade do Bitcoin (BVRP) pode ser explorado como
-sinal para estratégias condicionais, produzindo perfis de retorno e risco distintos
-da estratégia passiva de Buy-and-Hold, frequentemente com menor tempo de exposição
-ao ativo e redução de perdas extremas.
+As análises desenvolvidas neste capítulo oferecem evidência de que o BVRP contém
+utilidade econômica como sinal para estratégias condicionais de negociação.
 
-A estratégia condicional baseada no quantil superior do BVRP
-(Seção~\ref{sec:cap7_bvrp_q}) sugere que períodos de prêmio elevado tendem a estar
-associados a janelas com melhor compensação pelo risco assumido, resultando em
-métricas ajustadas ao risco favoráveis em comparação ao \textit{benchmark}, ainda
-que com participação intermitente no mercado. A análise de robustez por quantis
-(Seção~\ref{sec:cap7_bvrp_multiq}) indica que o desempenho depende do grau de
-seletividade: limiares muito baixos diluem o sinal, enquanto limiares muito altos
-concentram a estratégia em poucos episódios, elevando a variância amostral.
+\paragraph{Eficiência ajustada ao risco.} A estratégia baseada no quantil 80\%
+do BVRP supera o Buy-and-Hold histórico em razão de Sharpe (0{,}95 vs.\ 0{,}73)
+e reduz o \textit{max drawdown} de $-83\%$ para $-15{,}5\%$, operando em apenas 20\%
+do tempo. Esse resultado é a contrapartida operacional da evidência preditiva do
+Capítulo~\ref{chap:resultados_ols}, que documentou relação positiva e estatisticamente
+robusta entre BVRP e retornos em horizontes de 20 a 60 dias.
 
-A extensão por regimes de volatilidade realizada
-(Seção~\ref{sec:cap7_bvrp_regimes}) mostra que a utilidade do BVRP é dependente do
-estado do mercado. Em ambientes de alta volatilidade, o sinal tende a ser mais
-discriminatório, ao passo que em ambientes de baixa volatilidade a evidência é
-mais fraca. Em conjunto, esses resultados são coerentes com a interpretação do
-BVRP como prêmio associado à aversão ao risco e à demanda por proteção, mais
-relevante em períodos de estresse.
+\paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais
+analisadas (quantis de 60\% a 90\%) apresentam \textit{max drawdown} substancialmente
+inferior ao Buy-and-Hold, com Sharpe entre 0{,}95 e 1{,}66. O padrão em \textit{U}
+do Sharpe ao longo dos quantis indica que tanto limiares muito permissivos quanto
+muito restritivos reduzem a precisão do sinal: os extremos da distribuição (q60 e
+q90) obtêm os maiores Sharpes, mas por mecanismos opostos de cobertura e seletividade.
 
-Por fim, as estratégias analisadas utilizam regras com limiares fixos e uma única
-variável de sinal, o que limita a capacidade de capturar interações dinâmicas com
-outras variáveis de mercado e potenciais não linearidades. Essas limitações motivam
-a consideração de extensões orientadas a dados e de modelos mais flexíveis, bem como
-a avaliação cuidadosa de custos de transação, fricções e restrições operacionais,
-de modo a aproximar os resultados de um ambiente de implementação realista.
+\paragraph{Dependência de regime.} A decomposição por regime de volatilidade
+realizada revela que a qualidade do sinal não é monotônica com o nível de estresse:
+o regime de volatilidade média é o mais favorável (Sharpe = 1{,}27), enquanto o
+regime de alta volatilidade produz resultados negativos. Esse achado não contradiz
+a evidência do Capítulo~\ref{chap:resultados_ols}, mas contextualiza-a: o efeito
+preditivo linear do BVRP sobre retornos futuros, positivo e moderado ($R^2 = 3{,}6\%$),
+mascara heterogeneidade de regime que só fica visível quando se condiciona
+explicitamente ao ambiente de volatilidade realizada.
+
+\paragraph{Limitações.} As estratégias empregam limiares fixos estimados sobre a
+amostra disponível, o que não replica fielmente um ambiente de tomada de decisão
+em tempo real com limiares expandindo recursivamente. Além disso, os resultados
+não consideram custos de transação, fricções de liquidez ou restrições de
+posicionamento, que podem reduzir os ganhos documentados. Esses aspectos constituem
+extensões naturais desta análise e são detalhados nas considerações finais da
+dissertação.

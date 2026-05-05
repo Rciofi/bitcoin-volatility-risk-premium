@@ -10,14 +10,14 @@ retornos futuros do ativo em diferentes horizontes temporais.
 As análises desenvolvidas neste capítulo seguem diretamente o arcabouço
 metodológico apresentado no Capítulo~\ref{chap:metodologia}. A inferência
 estatística é conduzida com erros padrão robustos à heterocedasticidade e à
-autocorrelação serial, utilizando o estimador HAC (Newey--West), garantindo
-validade estatística mesmo na presença de dependência temporal nos retornos
-financeiros.
+autocorrelação serial, utilizando o estimador HAC (Newey--West) com 5 defasagens,
+garantindo validade estatística na presença de sobreposição temporal nos retornos
+acumulados.
 
 Os resultados aqui apresentados devem ser interpretados como evidência empírica
 inicial. Embora modelos lineares possuam capacidade limitada para capturar
-não linearidades, interações complexas e mudanças de regime — características
-marcantes do mercado de criptoativos —, eles fornecem uma base empírica
+não linearidades, interações complexas e mudanças de regime --- características
+marcantes do mercado de criptoativos ---, eles fornecem uma base empírica
 transparente e comparável à literatura clássica sobre prêmio de risco de
 volatilidade, permitindo avaliar a direção, a magnitude e a significância
 estatística do efeito associado ao BVRP.
@@ -41,84 +41,70 @@ heterogênea de agentes. Nesse ambiente, o BVRP pode capturar variações nas
 expectativas de risco e na precificação da incerteza, potencialmente
 antecipando movimentos futuros dos retornos no mercado à vista.
 
-A estratégia empírica adotada consiste em estimar regressões lineares nas quais
-os retornos futuros acumulados do Bitcoin são explicados pelo BVRP observado no
-tempo $t$. As estimações são realizadas para múltiplos horizontes de previsão,
-permitindo investigar se o conteúdo informacional do prêmio de risco de
-volatilidade se manifesta de forma distinta ao longo do tempo.
-
-Todas as especificações respeitam estritamente a ordenação temporal dos dados,
-evitando viés de \textit{look-ahead}. O BVRP é sempre medido no tempo $t$, enquanto
-os retornos correspondem a períodos futuros, assegurando que apenas informação
+A estratégia empírica consiste em estimar regressões OLS nas quais os retornos
+futuros acumulados do Bitcoin são explicados pelo BVRP observado no tempo $t$,
+para $h \in \{1, 5, 10, 20, 30, 60\}$ dias. Todas as especificações respeitam
+estritamente a ordenação temporal dos dados, assegurando que apenas informação
 disponível \textit{ex ante} seja utilizada na análise.
 
 % =========================================================
 \section{Resultados OLS univariados}
 \label{sec:ols_univariado}
 
-Nesta seção são apresentados os resultados das regressões OLS univariadas, cujo
-objetivo é avaliar a relação empírica entre o prêmio de risco de volatilidade do
-Bitcoin (BVRP) e os retornos futuros do ativo em diferentes horizontes temporais.
-A inferência estatística é conduzida com erros padrão robustos à
-heterocedasticidade e autocorrelação, utilizando o estimador HAC de
-Newey--West.
+O modelo estimado é dado pela equação~\eqref{eq:ols_basico}, reproduzida aqui
+por conveniência:
+\begin{equation*}
+R_{t+h} = \alpha_h + \beta_h \cdot \text{BVRP}_t + \varepsilon_{t+h}.
+\end{equation*}
 
-O modelo estimado é dado por:
-\begin{equation}
-R_{t+h} = \alpha_h + \beta_h \cdot \text{BVRP}_t + \varepsilon_{t+h},
-\end{equation}
-em que $R_{t+h}$ representa o retorno futuro acumulado do Bitcoin no horizonte
-$h$ dias à frente e $\text{BVRP}_t$ corresponde ao prêmio de risco de
-volatilidade observado no tempo $t$.
+A Tabela~\ref{tab:ols_basico_multihoriz} reporta os coeficientes estimados para
+os seis horizontes de previsão.
 
-A Tabela~\ref{tab:ols_basico_multihoriz} apresenta os coeficientes estimados para
-múltiplos horizontes de previsão. Observa-se que o coeficiente associado ao BVRP
-apresenta sinal positivo em todos os horizontes analisados, sugerindo que níveis
-mais elevados do prêmio de risco de volatilidade estão associados, em média, a
-retornos futuros mais altos do Bitcoin.
+\IfFileExists{tables/cap5/tab_ols_basico_multihoriz.tex}{
+  \input{tables/cap5/tab_ols_basico_multihoriz.tex}
+}{}
 
-\IfFileExists{tables/tab_ols_basico_multihoriz.tex}{
-  \input{tables/tab_ols_basico_multihoriz.tex}
-}{
-  \begin{center}
-  \fbox{\parbox{0.92\linewidth}{
-  \textbf{Aviso:} arquivo \texttt{tables/tab\_ols\_basico\_multihoriz.tex} não encontrado.
-  Faça upload desse arquivo para a pasta \texttt{tables/}.}}
-  \end{center}
-}
-
-Em horizontes de curtíssimo prazo, a relação estimada tende a ser mais fraca e,
-em geral, estatisticamente indistinguível de zero, consistente com a presença
-de ruído microestrutural e choques idiossincráticos. Para horizontes
-intermediários, em especial entre 20 e 30 dias, a evidência torna-se mais
-robusta, em linha com a interpretação de que a informação contida no mercado de
-opções se materializa de forma gradual nos retornos do ativo subjacente.
+Os resultados revelam um padrão consistente: o coeficiente $\hat{\beta}_h$
+apresenta sinal positivo em todos os horizontes, com magnitude crescente à
+medida que o horizonte se alonga. Para horizontes curtos ($h = 1$ e $h = 5$),
+o coeficiente é positivo porém estatisticamente indistinguível de zero
+($p > 0{,}15$), refletindo a presença de ruído microestrutural e choques
+idiossincráticos de curto prazo. Para $h = 10$, observa-se evidência
+marginal ($p = 0{,}078$). A partir de $h = 20$, a evidência torna-se
+estatisticamente robusta: o coeficiente é de $0{,}022$ com $p = 0{,}013$;
+para $h = 30$, atinge $0{,}035$ com $p = 0{,}001$; e para $h = 60$, chega a
+$0{,}045$ com $p = 0{,}009$. O poder explicativo, medido pelo $R^2$, atinge
+o pico em $h = 30$ ($R^2 = 3{,}6\%$) e recua ligeiramente em $h = 60$, sugerindo
+que o horizonte de 30 dias é o mais informativo em termos de ajuste, ainda que a
+magnitude do coeficiente continue crescendo. Esse padrão é consistente com a
+interpretação de que a informação contida no mercado de opções se materializa de
+forma gradual nos retornos do ativo subjacente, e não de maneira imediata.
 
 % =========================================================
 \section{Análise por horizonte temporal}
 \label{sec:analise_horizontes}
 
-Para facilitar a interpretação dos resultados multihorizonte,
-a Figura~\ref{fig:beta_horizonte_basico} apresenta a trajetória do coeficiente
-$\beta_h$ associado ao BVRP ao longo dos diferentes horizontes de previsão no
-modelo OLS básico (HAC).
+Para facilitar a interpretação dos resultados multihorizonte, a
+Figura~\ref{fig:beta_horizonte_basico} apresenta a trajetória do coeficiente
+$\hat{\beta}_h$ ao longo dos diferentes horizontes de previsão.
 
-\IfFileExists{tables/fig_beta_por_horizonte_basico.tex}{
-  \input{tables/fig_beta_por_horizonte_basico.tex}
-}{
-  \begin{center}
-  \fbox{\parbox{0.92\linewidth}{
-  \textbf{Aviso:} arquivo \texttt{tables/fig\_beta\_por\_horizonte\_basico.tex} não encontrado.
-  Faça upload desse arquivo para a pasta \texttt{tables/}.}}
-  \end{center}
-}
+\IfFileExists{figs/cap5/beta_por_horizonte_basico.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\linewidth]{figs/cap5/beta_por_horizonte_basico.png}
+    \caption{Coeficiente estimado do BVRP em regressões OLS (HAC) para diferentes
+    horizontes de previsão.}
+    \label{fig:beta_horizonte_basico}
+\end{figure}
+}{}
 
-A análise evidencia que a magnitude do coeficiente do BVRP tende a aumentar à
-medida que o horizonte de previsão se alonga, atingindo valores mais elevados
-em janelas intermediárias. Esse padrão sugere que o conteúdo informacional do
-prêmio de risco de volatilidade não se manifesta de forma imediata nos retornos
-de curtíssimo prazo, mas se incorpora aos preços de maneira mais clara ao longo
-do tempo.
+A figura evidencia o padrão de acúmulo gradual do sinal preditivo: o coeficiente
+cresce de forma monotônica entre $h = 1$ e $h = 60$ dias, sem reversão visível.
+O $R^2$, no entanto, atinge seu valor máximo em $h = 30$ ($3{,}6\%$) e recua
+ligeiramente em $h = 60$ ($2{,}7\%$), sugerindo que o horizonte de 30 dias é
+o mais eficiente em termos de ajuste da regressão. A trajetória crescente do
+coeficiente reforça a interpretação de que o BVRP carrega informação sobre o
+desempenho futuro do Bitcoin que se incorpora gradualmente ao preço do ativo.
 
 % =========================================================
 \section{Diagnóstico visual}
@@ -129,21 +115,22 @@ Figura~\ref{fig:scatter_bvrp_ret_30d} apresenta o gráfico de dispersão entre o
 BVRP observado no tempo $t$ e o retorno futuro acumulado do Bitcoin no horizonte
 de 30 dias, juntamente com a reta estimada via OLS.
 
-\IfFileExists{tables/fig_scatter_bvrp_ret_fut_30d.tex}{
-  \input{tables/fig_scatter_bvrp_ret_fut_30d.tex}
-}{
-  \begin{center}
-  \fbox{\parbox{0.92\linewidth}{
-  \textbf{Aviso:} arquivo \texttt{tables/fig\_scatter\_bvrp\_ret\_fut\_30d.tex} não encontrado.
-  Faça upload desse arquivo para a pasta \texttt{tables/}.}}
-  \end{center}
-}
+\IfFileExists{figs/cap5/scatter_bvrp_ret_fut_30d.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\linewidth]{figs/cap5/scatter_bvrp_ret_fut_30d.png}
+    \caption{Dispersão entre o BVRP observado no tempo $t$ e o retorno futuro
+    acumulado do Bitcoin em 30 dias, com reta ajustada por OLS.}
+    \label{fig:scatter_bvrp_ret_30d}
+\end{figure}
+}{}
 
-O gráfico sugere uma relação média positiva entre o prêmio de risco de
-volatilidade e os retornos futuros, embora acompanhada por elevada dispersão —
+O gráfico confirma a associação positiva identificada na regressão: valores mais
+elevados do BVRP tendem a preceder retornos maiores no horizonte de 30 dias. A
+elevada dispersão em torno da reta é esperada dado o $R^2$ de $3{,}6\%$ e é
 característica típica do mercado de criptoativos, no qual choques exógenos,
-mudanças de regime e eventos extremos desempenham papel relevante na dinâmica
-dos preços.
+mudanças de regime e eventos extremos exercem papel relevante na dinâmica dos
+preços.
 
 % =========================================================
 \section{Robustez com controles de volatilidade}
@@ -151,62 +138,57 @@ dos preços.
 
 Para avaliar a robustez dos resultados, a especificação básica é estendida de
 modo a incluir controles explícitos para volatilidade realizada e volatilidade
-implícita:
-\begin{equation}
-R_{t+h} = \alpha_h
-+ \beta_{1,h}\cdot \text{BVRP}_t
-+ \beta_{2,h}\cdot \text{RV}_t
-+ \beta_{3,h}\cdot \text{IV}_t
-+ \varepsilon_{t+h}.
-\end{equation}
-
-A Tabela~\ref{tab:ols_controles_multihoriz} reporta os resultados para múltiplos
+implícita, conforme a equação~\eqref{eq:ols_controles}. A
+Tabela~\ref{tab:ols_controles_multihoriz} reporta os resultados para os seis
 horizontes de previsão.
 
-\IfFileExists{tables/tab_ols_controles_multihoriz.tex}{
-  \input{tables/tab_ols_controles_multihoriz.tex}
-}{
-  \begin{center}
-  \fbox{\parbox{0.92\linewidth}{
-  \textbf{Aviso:} arquivo \texttt{tables/tab\_ols\_controles\_multihoriz.tex} não encontrado.
-  Faça upload desse arquivo para a pasta \texttt{tables/}.}}
-  \end{center}
-}
+\IfFileExists{tables/cap5/tab_ols_controles_multihoriz.tex}{
+  \input{tables/cap5/tab_ols_controles_multihoriz.tex}
+}{}
 
 A Figura~\ref{fig:beta_comparacao_basico_controles} compara, por horizonte, o
-coeficiente do BVRP estimado no modelo básico e no modelo com controles (HAC).
+coeficiente do BVRP estimado no modelo básico e no modelo com controles.
 
-\IfFileExists{tables/fig_beta_comparacao_basico_vs_controles.tex}{
-  \input{tables/fig_beta_comparacao_basico_vs_controles.tex}
-}{
-  \begin{center}
-  \fbox{\parbox{0.92\linewidth}{
-  \textbf{Aviso:} arquivo \texttt{tables/fig\_beta\_comparacao\_basico\_vs\_controles.tex} não encontrado.
-  Faça upload desse arquivo para a pasta \texttt{tables/}.}}
-  \end{center}
-}
+\IfFileExists{figs/cap5/beta_comparacao_basico_vs_controles.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\linewidth]{figs/cap5/beta_comparacao_basico_vs_controles.png}
+    \caption{Comparação do coeficiente do BVRP entre o modelo OLS básico e o
+    modelo com controles de volatilidade (RV e IV), por horizonte de previsão.}
+    \label{fig:beta_comparacao_basico_controles}
+\end{figure}
+}{}
 
-De modo geral, a inclusão simultânea de IV e RV reduz a significância estatística
-do coeficiente associado ao BVRP em alguns horizontes, refletindo a elevada
-correlação entre as variáveis explicativas, dado que o BVRP é definido como uma
-diferença entre IV e RV. Assim, a evidência deve ser interpretada com cautela:
-a contribuição marginal do BVRP em modelos lineares aditivos pode ser atenuada
-por multicolinearidade, mesmo que a variável continue capturando condições
-agregadas de risco precificadas no mercado de opções.
+A inclusão simultânea de $\text{RV}_t$ e $\text{IV}_t$ altera substancialmente
+os coeficientes estimados: $\hat{\beta}_{\text{BVRP}}$ passa a apresentar sinal
+negativo em praticamente todos os horizontes e perde significância estatística na
+maioria deles. Esse resultado é, em parte, esperado: como $\text{BVRP} =
+\text{IV} - \text{RV}$ por construção, a inclusão simultânea dos três regressores
+introduz multicolinearidade, tornando a identificação dos efeitos individuais
+instável. A inversão de sinal não implica, portanto, que o BVRP deixe de
+conter informação sobre retornos futuros, mas reflete a dificuldade de separar
+seus efeitos dos de IV e RV em um modelo linear aditivo. A evidência do modelo
+básico --- mais parcimonioso e identificado --- permanece como resultado central
+deste capítulo.
 
 % =========================================================
 \section{Síntese dos resultados}
 \label{sec:sintese_ols}
 
 Em conjunto, os resultados deste capítulo fornecem evidência empírica inicial
-de que o prêmio de risco de volatilidade do Bitcoin contém informação relevante
-para a previsão de retornos futuros, sobretudo em horizontes de médio prazo.
-Embora o poder explicativo dos modelos lineares seja limitado, os coeficientes
-estimados apresentam sinais consistentes com a interpretação econômica do BVRP.
+favorável à hipótese H2: o BVRP contém informação relevante para a previsão de
+retornos futuros do Bitcoin, com efeito estatisticamente significativo a partir
+do horizonte de 20 dias ($p = 0{,}013$), mais robusto em 30 dias ($p = 0{,}001$)
+e persistente em 60 dias ($p = 0{,}009$). O $R^2$ máximo de $3{,}6\%$ em $h = 30$
+é modesto em termos absolutos, mas compatível com os encontrados na literatura de
+previsão de retornos em mercados financeiros. A significância estatística em todos
+os horizontes a partir de $h = 20$ e o padrão monotonicamente crescente dos
+coeficientes fornecem evidência consistente de que a informação do mercado de
+opções se transmite gradualmente aos retornos do ativo subjacente.
 
-A análise de robustez sugere que parte do efeito identificado é mediada pelo
-nível geral de volatilidade do mercado e que a relação pode envolver
-não linearidades, interações e efeitos de regime. Esses aspectos motivam a
-análise desenvolvida no capítulo seguinte, no qual são empregadas técnicas de
-aprendizado de máquina para capturar padrões mais complexos na relação entre o
-BVRP e os retornos futuros do Bitcoin.
+A análise de robustez indica que o efeito positivo do BVRP é sensível à
+inclusão de controles de volatilidade, o que motiva a investigação de padrões
+mais complexos por meio de abordagens não lineares. Esses aspectos são
+explorados no capítulo seguinte, no qual são empregadas técnicas de aprendizado
+de máquina para capturar interações e efeitos de regime na relação entre o BVRP
+e os retornos futuros do Bitcoin.

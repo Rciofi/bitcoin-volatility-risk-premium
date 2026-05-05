@@ -1,15 +1,22 @@
-\begin{table}
-\caption{Desempenho preditivo fora da amostra para o Prêmio de Risco de Volatilidade do Bitcoin.}
+\begin{table}[H]
+\centering
+\small
+\caption{Desempenho preditivo fora da amostra --- Prêmio de Risco de Volatilidade do Bitcoin.
+Período OOS\@: 14~jun.\ 2024 -- 11~dez.\ 2024 ($N=181$ observações diárias).
+O MSE e o RMSE são reportados em unidades percentuais ao quadrado e percentuais, respectivamente.}
 \label{tab:cap8_oos_performance}
-\begin{tabular}{lrr}
+\begin{tabular}{lccc}
 \toprule
-Modelo & MSE_OOS & R2_OOS \\
+Modelo & MSE & RMSE & $R^2_{\text{OOS}}$ \\
 \midrule
-Lasso & 34.121142 & 0.718384 \\
-Ridge & 34.253677 & 0.717290 \\
-RandomForest & 39.316510 & 0.675505 \\
-GradientBoosting & 42.388130 & 0.650153 \\
-Benchmark_Media & 121.455581 & -0.002423 \\
+LASSO & 34,12 & 5,84 & 0,718 \\
+Ridge & 34,25 & 5,85 & 0,717 \\
+Random Forest & 39,32 & 6,27 & 0,676 \\
+Gradient Boosting & 42,39 & 6,51 & 0,650 \\
+\midrule
+Benchmark (Média) & 121,46 & 11,02 & $-$0,002 \\
 \bottomrule
 \end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS (70\% inicial da amostra, 422 observações). O benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{,}0$), LASSO ($\alpha=0{,}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).
 \end{table}

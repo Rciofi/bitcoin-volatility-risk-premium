@@ -25,42 +25,31 @@ def fetch_dvol_chunk(start_ts, end_ts):
 
 
 def download_dvol_full():
-    print("\nBaixando DVOL 30D HISTÓRICO COMPLETO da Deribit...\n")
+    print("\nBaixando DVOL 30D HISTORICO COMPLETO da Deribit...\n")
 
-    end_dt = datetime.now(timezone.utc)
-    end_ts = int(end_dt.timestamp() * 1000)
+    # DVOL lancado em 2021-01-11; vai ate hoje em chunks de 180 dias
+    start_dt = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    end_dt   = datetime.now(timezone.utc)
+    chunk_days = 180
 
-    chunks = []
-    total_rows = 0
-    batch_size = 1000
+    all_rows = []
+    cur = start_dt
+    while cur < end_dt:
+        nxt = min(cur + timedelta(days=chunk_days), end_dt)
+        start_ts = int(cur.timestamp() * 1000)
+        end_ts   = int(nxt.timestamp() * 1000)
 
-    while True:
-        start_dt = end_dt - timedelta(days=batch_size * 2)
-        start_ts = int(start_dt.timestamp() * 1000)
-
-        print(f"Baixando chunk: {start_dt.date()} → {end_dt.date()}")
-
+        print(f"Baixando chunk: {cur.date()} a {nxt.date()}")
         chunk = fetch_dvol_chunk(start_ts, end_ts)
+        if chunk:
+            all_rows.extend(chunk)
+        cur = nxt
 
-        if not chunk:
-            print("Fim dos dados ou chunk vazio.")
-            break
-
-        chunks.extend(chunk)
-        total_rows += len(chunk)
-
-        # Atualiza janela
-        end_dt = start_dt
-
-        # Se chegou antes de 2017, para
-        if end_dt.year < 2017:
-            break
-
-    print(f"\nTotal baixado: {total_rows} linhas")
+    print(f"\nTotal baixado: {len(all_rows)} linhas")
 
     # Converte para DataFrame
     df = pd.DataFrame(
-        chunks, columns=["timestamp_ms", "open", "high", "low", "close"])
+        all_rows, columns=["timestamp_ms", "open", "high", "low", "close"])
     df["timestamp"] = pd.to_datetime(df["timestamp_ms"], unit="ms", utc=True)
 
     df = df.sort_values("timestamp").drop_duplicates().reset_index(drop=True)
@@ -73,7 +62,7 @@ def download_dvol_full():
     out_path = os.path.join(data_dir, "dvol_30d_full.csv")
     df.to_csv(out_path, index=False)
 
-    print(f"\n✔ Arquivo completo salvo em:\n{out_path}")
+    print(f"\nArquivo completo salvo em:\n{out_path}")
     print(f"Linhas finais: {len(df)}")
 
 
