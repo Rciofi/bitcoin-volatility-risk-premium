@@ -3,9 +3,10 @@
 
 Este apêndice apresenta a formulação das variáveis utilizadas ao longo da
 dissertação: retornos logarítmicos, volatilidade realizada (RV), volatilidade
-implícita (IV), prêmio de risco de volatilidade do Bitcoin (BVRP) e retornos
-futuros. As expressões seguem práticas padrão em finanças quantitativas, com
-adaptações relevantes ao mercado de criptoativos (negociação contínua 24/7).
+implícita (IV), prêmio de risco de volatilidade do Bitcoin (BVRP), retornos
+futuros e classificação de regimes de volatilidade. As expressões seguem práticas
+padrão em finanças quantitativas, com adaptações relevantes ao mercado de
+criptoativos (negociação contínua 24/7).
 
 \section{Retornos logarítmicos}
 
@@ -115,19 +116,59 @@ logarítmicos acumulados no horizonte $h$:
 ret\_fut\_h(t) = \ln(P_{t+h}) - \ln(P_t).
 \]
 
-Em particular, são utilizados:
-\[
-ret\_fut\_1(t) = \ln(P_{t+1}) - \ln(P_t), \qquad
-ret\_fut\_5(t) = \ln(P_{t+5}) - \ln(P_t), \qquad
-ret\_fut\_20(t) = \ln(P_{t+20}) - \ln(P_t).
-\]
+Em particular, são utilizados os seguintes horizontes $h \in \{1, 5, 10, 20, 30\}$:
 
-Os horizontes escolhidos capturam:
+\begin{align*}
+r_{t+1}  &= \ln(P_{t+1})  - \ln(P_t), \\
+r_{t+5}  &= \ln(P_{t+5})  - \ln(P_t), \\
+r_{t+10} &= \ln(P_{t+10}) - \ln(P_t), \\
+r_{t+20} &= \ln(P_{t+20}) - \ln(P_t), \\
+r_{t+30} &= \ln(P_{t+30}) - \ln(P_t).
+\end{align*}
+
+Os horizontes escolhidos capturam diferentes janelas de previsão:
 \begin{itemize}
-    \item \textbf{1 dia}: resposta de curtíssimo prazo e influência de ruído;
+    \item \textbf{1 dia}: resposta de curtíssimo prazo; dominada por ruído;
     \item \textbf{5 dias}: dinâmica semanal frequentemente analisada em criptoativos;
-    \item \textbf{20 dias}: horizonte aproximadamente mensal, com maior suavização de ruído.
+    \item \textbf{10 dias}: horizonte intermediário, onde efeitos preditivos do BVRP
+          começam a ser detectáveis estatisticamente;
+    \item \textbf{20 dias}: horizonte aproximadamente mensal, com maior suavização de
+          ruído e poder preditivo mais pronunciado;
+    \item \textbf{30 dias}: horizonte de médio prazo, alinhado à janela de cálculo do
+          BVRP e com diferenças de retorno mais robustas entre regimes de volatilidade.
 \end{itemize}
+
+A inclusão de múltiplos horizontes permite avaliar como o poder preditivo do BVRP
+varia com o tempo --- padrão documentado nos Capítulos~\ref{chap:resultados_ols}
+e~\ref{chap:regimes}.
+
+\section{Classificação de regimes de volatilidade}
+
+O Capítulo~\ref{chap:regimes} classifica cada observação em um de três regimes
+mutuamente exclusivos com base nos quantis da $RV_{30,t}$ calculados sobre a
+amostra completa:
+
+\begin{itemize}
+    \item \textbf{Baixa volatilidade}: $RV_{30,t} \leq q_{25}(RV_{30})$;
+    \item \textbf{Média volatilidade}: $q_{25}(RV_{30}) < RV_{30,t} < q_{75}(RV_{30})$;
+    \item \textbf{Alta volatilidade}: $RV_{30,t} \geq q_{75}(RV_{30})$.
+\end{itemize}
+
+Na amostra de abril de 2021 a abril de 2026 ($N = 1.776$), os limiares estimados
+são $q_{25} = 38{,}8\%$ e $q_{75} = 65{,}9\%$ (em base anualizada), resultando em
+444 observações em cada regime extremo e 888 no regime intermediário.
+
+A variável indicadora de alta volatilidade $D_t^{\text{alto}}$ é definida como:
+\[
+D_t^{\text{alto}} = \mathbf{1}\!\left\{RV_{30,t} \geq q_{75}(RV_{30})\right\},
+\]
+sendo utilizada tanto nas estratégias condicionais do
+Capítulo~\ref{chap:estrategias} quanto nos termos de interação das regressões
+do Capítulo~\ref{chap:regimes}:
+\[
+r_{t+h} = \alpha + \beta_1\,\text{BVRP}_t + \beta_2\,D_t^{\text{alto}}
+          + \beta_3\,(\text{BVRP}_t \times D_t^{\text{alto}}) + \varepsilon_{t+h}.
+\]
 
 \section{Defasagem das variáveis e prevenção de \textit{look-ahead bias}}
 
@@ -148,8 +189,11 @@ o que garante que:
 
 \section{Resumo}
 
-Este apêndice consolidou a formulação matemática das variáveis centrais da dissertação
---- retornos, $RV_{30,t}$, $IV_{30,t}$, $BVRP_t$ e retornos futuros ---
-assegurando precisão e alinhamento com práticas usuais na literatura de volatilidade
-e prêmio de risco. Essas definições fundamentam a construção dos \textit{datasets},
-as análises econométricas e os exercícios preditivos discutidos nos capítulos principais.
+Este apêndice consolidou a formulação matemática das variáveis centrais da
+dissertação --- retornos logarítmicos, $RV_{30,t}$, $IV_{30,t}$, $BVRP_t$,
+retornos futuros em cinco horizontes ($h \in \{1,5,10,20,30\}$ dias) e a
+classificação de regimes de volatilidade com base nos quantis da $RV_{30,t}$
+--- assegurando precisão e alinhamento com práticas usuais na literatura de
+volatilidade e prêmio de risco. Essas definições fundamentam a construção dos
+\textit{datasets}, as análises econométricas e os exercícios preditivos e de
+estratégias discutidos nos capítulos principais.
