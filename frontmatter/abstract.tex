@@ -1,35 +1,49 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-This dissertation provides a comprehensive investigation of the \textit{Bitcoin
-Volatility Risk Premium} (BVRP), defined as the difference between implied and
-realized volatility. The objective is to characterize its statistical
-properties, identify volatility regimes, and evaluate its predictive ability
-for future Bitcoin returns. The 30-day implied volatility (IV30D) is obtained
-from the Deribit Volatility Index (DVOL), while realized volatility (RV30D) is
-constructed using daily log returns of Bitcoin spot prices.
+This dissertation provides a comprehensive empirical investigation of the
+\textit{Bitcoin Volatility Risk Premium} (BVRP), defined as the difference
+between 30-day implied volatility (IV30D) and 30-day realized volatility
+(RV30D). IV30D is sourced from the Deribit Volatility Index (DVOL), while
+RV30D is constructed from daily log returns of Bitcoin spot prices. The sample
+covers April 2021 to April 2026, yielding 1,776 daily observations. The study
+examines the BVRP's statistical properties, its predictive content for future
+returns, its out-of-sample predictability via machine learning, its role in
+conditional trading strategies, and its behavior across realized volatility
+regimes.
 
-Empirical evidence shows that the BVRP is positive on average, indicating a
-persistent protection premium in the Bitcoin options market, consistent with
-the broader volatility risk premium literature. The distribution of the BVRP
-exhibits marked negative skewness and heavy tails, reflecting stress episodes
-driven by sharp spikes in realized volatility. The time-series dynamics reveal
-distinct regimes—including complacency, transition, and stress—highlighting the
-structural sensitivity of Bitcoin volatility to market shocks.
+Empirical results confirm that the BVRP is positive on average, consistent
+with the broader volatility risk premium literature, and exhibits negative
+skewness and heavy tails reflecting episodic spikes in realized volatility.
+OLS regressions with Newey--West standard errors show that the BVRP has
+statistically significant predictive power for Bitcoin returns at 20- and
+30-day horizons, though the explained variance remains modest, consistent with
+the low signal-to-noise ratio of speculative asset markets.
 
-The relationship between the BVRP and future returns is moderate but becomes
-more pronounced at longer horizons, particularly at 20 days. To further assess
-this predictive structure, nonlinear machine learning models (Random Forest and
-XGBoost) are implemented. The results indicate that volatility-related
-variables—especially RV30D and the BVRP itself—carry incremental information
-about future returns, although the overall predictive power remains moderate due
-to the inherently noisy nature of cryptocurrency markets.
+Four supervised learning models---LASSO, Ridge, Random Forest, and Gradient
+Boosting---are applied in a rolling out-of-sample design to forecast the level
+of the BVRP. Tree-based models outperform linear benchmarks at specific
+horizons, with realized volatility emerging as the dominant predictor,
+accounting for approximately 69\% of total feature importance in the Random
+Forest specification. BVRP quantile-based and regime-conditioned trading
+strategies (Chapter 7) generate positive risk-adjusted returns, with
+conditional rules filtering high-BVRP periods delivering the most consistent
+performance.
 
-The findings suggest that the BVRP is more effective as a regime indicator than
-as an isolated trading signal, offering value when integrated into hybrid
-quantitative models, risk filters, and volatility-based strategies. While not a
-standalone predictor, the BVRP contributes meaningfully to the characterization
-of market conditions and to frameworks for tactical decision-making.
+A formal regime analysis (Chapter 9) classifies observations into low, medium,
+and high realized volatility regimes using the 25th and 75th percentiles of
+RV30D. The BVRP averages +13.25 percentage points in the low-volatility regime
+and turns negative ($-1.50$ p.p.) in the high-volatility regime, reflecting
+the tendency of realized volatility to exceed implied volatility during market
+stress. Welch $t$-tests confirm that future returns differ significantly across
+regimes at horizons of 10 days and beyond ($p < 0.05$), with the regime effect
+operating additively rather than through a modulation of the BVRP's predictive
+power.
+
+Taken together, the results indicate that the BVRP functions primarily as a
+volatility regime indicator. Its value for practitioners lies in conditioning
+entry rules and risk filters rather than in pure directional forecasting.
 
 \textbf{Keywords:} Bitcoin; implied volatility; realized volatility; volatility
-risk premium; machine learning; DVOL; Deribit.
+risk premium; DVOL; Deribit; machine learning; random forest; gradient
+boosting; volatility regimes; trading strategies.
