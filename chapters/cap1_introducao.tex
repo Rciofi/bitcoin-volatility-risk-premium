@@ -129,8 +129,16 @@ De forma mais detalhada, buscam-se os seguintes objetivos específicos:
           períodos de estresse de mercado.
     \item Investigar a relação entre o BVRP e retornos futuros do Bitcoin em
           diferentes horizontes temporais, por meio de análises gráficas,
-          correlações e regressões lineares.
-   \item Implementar modelos de aprendizado de máquina, em particular Random Forest e XGBoost, com o objetivo de capturar potenciais não linearidades, interações complexas e efeitos de regime presentes na dinâmica do Prêmio de Risco de Volatilidade (BVRP). Busca-se avaliar se essas abordagens, ao incorporarem o BVRP e variáveis de estado de mercado, são capazes de gerar ganhos preditivos fora da amostra em relação a modelos lineares de referência, tradicionalmente utilizados na literatura.
+          correlações e regressões lineares com erros-padrão robustos.
+    \item Implementar modelos de aprendizado de máquina --- em particular LASSO,
+          Ridge, \textit{Random Forest} e \textit{Gradient Boosting} --- com o
+          objetivo de capturar potenciais não linearidades, interações complexas
+          e efeitos de regime presentes na dinâmica do BVRP, avaliando ganhos
+          preditivos fora da amostra em relação a modelos lineares de referência.
+    \item Analisar o comportamento do BVRP sob diferentes regimes de volatilidade
+          realizada, investigando se a distribuição do prêmio e o poder preditivo
+          sobre retornos futuros variam sistematicamente entre ambientes de alta
+          e baixa volatilidade.
     \item Discutir as implicações dos resultados para estratégias quantitativas,
           ressaltando oportunidades e riscos associados a operações que exploram
           o BVRP no mercado de opções de Bitcoin.
@@ -182,37 +190,51 @@ As contribuições deste trabalho podem ser agrupadas em três dimensões:
 Além deste capítulo introdutório, a dissertação está organizada da seguinte forma:
 
 \begin{itemize}
-    \item O Capítulo 2 apresenta o referencial teórico que fundamenta o estudo,
+    \item O Capítulo~2 apresenta o referencial teórico que fundamenta o estudo,
           discutindo conceitos de volatilidade implícita e realizada, prêmio de
           risco de volatilidade, especificidades do mercado de opções de
           criptoativos e aplicações recentes de modelos de aprendizado de
           máquina em finanças.
 
-    \item O Capítulo 3 descreve a metodologia adotada, incluindo as fontes de
-          dados utilizadas, os procedimentos de construção das variáveis de
-          interesse, a estimação do prêmio de risco de volatilidade do Bitcoin
-          (BVRP) e a especificação dos modelos empíricos considerados.
+    \item O Capítulo~3 descreve as bases de dados utilizadas e apresenta uma
+          análise exploratória das principais variáveis de interesse, incluindo
+          a construção das séries de volatilidade implícita (IV30D) e realizada
+          (RV30D) e as estatísticas descritivas do BVRP.
 
-    \item O Capítulo 4 apresenta análises descritivas e evidências empíricas
-          iniciais sobre o comportamento do BVRP, bem como sua relação preliminar
-          com retornos futuros do Bitcoin.
+    \item O Capítulo~4 apresenta a metodologia empírica adotada, especificando
+          os modelos econométricos, o protocolo de validação fora da amostra e
+          as variáveis de estado de mercado utilizadas ao longo da dissertação.
 
-    \item O Capítulo 5 aprofunda a análise empírica do BVRP, examinando suas
-          propriedades estatísticas, distribuição, regimes de volatilidade e
-          relações com retornos em diferentes horizontes temporais.
+    \item O Capítulo~5 apresenta os primeiros resultados econométricos, obtidos
+          por meio de regressões OLS com erros-padrão de Newey--West, avaliando
+          o conteúdo informacional do BVRP para a previsão de retornos futuros
+          do Bitcoin em múltiplos horizontes.
 
-    \item O Capítulo 6 discute os resultados obtidos a partir da aplicação de
-          modelos de aprendizado de máquina na previsão de retornos do Bitcoin,
-          com ênfase no papel do BVRP e de variáveis de estado de mercado como
-          preditores.
+    \item O Capítulo~6 investiga a previsibilidade do BVRP fora da amostra por
+          meio de modelos de \textit{machine learning} --- LASSO, Ridge,
+          \textit{Random Forest} e \textit{Gradient Boosting} ---, comparando
+          seu desempenho a \textit{benchmarks} baseados na média histórica do
+          prêmio.
 
-    \item O Capítulo 7 integra os resultados empíricos apresentados anteriormente
-          e discute suas implicações para a construção de estratégias
-          quantitativas e para a gestão de risco no mercado de derivativos de
-          Bitcoin.
+    \item O Capítulo~7 analisa a utilidade econômica do BVRP como sinal para
+          estratégias condicionais de negociação no mercado à vista, avaliando
+          estratégias baseadas em quantis e em regimes de volatilidade realizada
+          por meio de métricas de desempenho ajustadas ao risco.
 
- \item Por fim, o Capítulo 8 de conclusão sintetiza as principais evidências
-      encontradas ao longo do trabalho, discute suas limitações e aponta
-      possíveis extensões para pesquisas futuras.
-      
+    \item O Capítulo~8 retoma a análise preditiva do BVRP em uma abordagem
+          supervisionada mais estruturada, motivada pelas limitações das regras
+          determinísticas do capítulo anterior. Compara-se o desempenho de quatro
+          classes de modelos supervisionados sob um desenho experimental rigoroso,
+          com ênfase na importância das variáveis preditoras e na estabilidade
+          temporal das estimativas.
+
+    \item O Capítulo~9 analisa o comportamento do BVRP sob diferentes regimes de
+          volatilidade realizada, caracterizando a distribuição do prêmio por
+          regime, testando diferenças nos retornos futuros e investigando o poder
+          preditivo incremental da interação entre o BVRP e o ambiente de
+          volatilidade.
+
+    \item Por fim, as Considerações Finais sintetizam as principais evidências
+          encontradas ao longo do trabalho, discutem as limitações da análise e
+          apontam extensões para pesquisas futuras.
 \end{itemize}
