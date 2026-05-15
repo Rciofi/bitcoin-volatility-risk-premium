@@ -10,7 +10,7 @@ especificados os modelos econométricos e preditivos utilizados ao longo da
 dissertação.
 
 A estratégia empírica combina modelos econométricos lineares de referência com
-abordagens mais flexíveis, incluindo técnicas de \textit{machine learning}, com
+abordagens mais flexíveis, incluindo técnicas de aprendizado de máquina, com
 o objetivo de capturar possíveis não linearidades, variação temporal de
 parâmetros e interações complexas características do mercado de criptoativos.
 Este capítulo concentra-se na definição formal das hipóteses, das variáveis e
@@ -27,23 +27,19 @@ volatilidade estatisticamente e economicamente relevante no mercado de opções
 de Bitcoin. A segunda diz respeito ao potencial conteúdo informacional desse
 prêmio para a previsão de retornos futuros do Bitcoin no mercado à vista.
 
-Com base na literatura sobre prêmios de risco de volatilidade em mercados
-financeiros tradicionais e nas evidências descritivas apresentadas no
-Capítulo~\ref{chap:dados}, são formuladas as seguintes hipóteses de pesquisa:
+As hipóteses de trabalho que orientam a análise empírica desta dissertação
+estão formalmente enunciadas no Capítulo~\ref{chap:introducao}
+(Seção~\ref{sec:cap1-hipoteses}). Para fins de operacionalização, cada uma
+é testada por procedimentos específicos detalhados nas seções seguintes:
+H1~(existência do prêmio) é avaliada por teste~$t$ sobre a média amostral
+do BVRP; H2~(previsibilidade linear) é avaliada por regressões MQO com
+erros-padrão HAC (Newey--West, $\text{maxlags} = h$) em múltiplos horizontes;
+H3~(utilidade econômica) é avaliada por estratégias condicionais baseadas em
+quantis do BVRP; e H4~(heterogeneidade condicional e não linearidade) é
+avaliada por modelos de aprendizado de máquina com variáveis de estado de
+mercado. Cada procedimento segue protocolos metodológicos próprios detalhados
+nas seções correspondentes.
 
-\begin{itemize}
-    \item \textbf{H1:} O prêmio de risco de volatilidade do Bitcoin é, em média,
-    estatisticamente diferente de zero ao longo da amostra, refletindo a
-    compensação exigida pelos investidores para assumir risco de volatilidade
-    no mercado de opções. Esta hipótese é avaliada por meio de um teste $t$
-    sobre a média amostral do BVRP.
-
-    \item \textbf{H2:} O prêmio de risco de volatilidade do Bitcoin contém
-    informação relevante para a previsão de retornos futuros do ativo,
-    apresentando relação estatisticamente significativa com os retornos
-    esperados em horizontes subsequentes. Esta hipótese é avaliada por meio
-    de modelos de regressão linear e abordagens preditivas mais flexíveis.
-\end{itemize}
 
 % =========================================================
 \section{Definição das variáveis e horizontes de previsão}
@@ -65,11 +61,11 @@ em que $r_t$ denota o retorno logarítmico diário e
 $h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão.
 
 A principal variável explicativa é o prêmio de risco de volatilidade observado
-no tempo $t$, definido como a diferença entre a volatilidade implícita extraída
-do mercado de opções e a volatilidade realizada no mercado à vista, ambas
+no tempo $t$, definido como a diferença entre a volatilidade realizada no mercado
+à vista e a volatilidade implícita extraída do mercado de opções, ambas
 construídas em janelas móveis de 30 dias:
 \[
-\text{BVRP}_t = \text{IV}_{30,t} - \text{RV}_{30,t}.
+\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}.
 \]
 Essa variável sintetiza a percepção de risco e incerteza futura implícita nos
 preços das opções de Bitcoin. Em especificações alternativas, são também
@@ -93,7 +89,7 @@ base empírica simples, transparente e comparável à literatura existente, ante
 da introdução de abordagens mais flexíveis e não lineares.
 
 Os modelos são especificações lineares estimadas por mínimos quadrados
-ordinários (OLS) sobre a amostra completa disponível, nas quais os retornos
+ordinários (MQO) sobre a amostra completa disponível, nas quais os retornos
 futuros do Bitcoin são explicados pelo prêmio de risco de volatilidade observado
 no período anterior.
 
@@ -164,7 +160,7 @@ informação disponível \textit{ex ante} seja utilizada na previsão.
 
 \subsection{Estimação sobre a amostra completa}
 
-Os modelos OLS são estimados sobre a amostra completa disponível, sem divisão
+Os modelos de MQO são estimados sobre a amostra completa disponível, sem divisão
 em janelas móveis ou subperíodos. Essa abordagem é padrão na literatura de
 previsão de retornos com variáveis de risco e permite a obtenção de estimativas
 estáveis dos parâmetros, aproveitando ao máximo a informação disponível.
@@ -181,12 +177,12 @@ $h - 1$, compatível com o horizonte de previsão.
 
 \subsection{Separação treino e teste para modelos preditivos}
 
-Para as análises preditivas baseadas em \textit{machine learning}, desenvolvidas
-no Capítulo~\ref{chap:ml}, a amostra é dividida em períodos de treino e teste,
+Para as análises preditivas baseadas em aprendizado de máquina, desenvolvidas
+no Capítulo~\ref{chap:cap6_ml}, a amostra é dividida em períodos de treino e teste,
 respeitando estritamente a ordem temporal das observações. A amostra de treino é
 utilizada para a estimação dos parâmetros, enquanto a amostra de teste é
 reservada para a avaliação de desempenho fora da amostra (\textit{out-of-sample}).
-Essa separação não se aplica às regressões OLS, cujo objetivo é avaliar relações
+Essa separação não se aplica às regressões por MQO, cujo objetivo é avaliar relações
 em amostra.
 
 % =========================================================
@@ -201,5 +197,5 @@ explicativas.
 Adicionalmente, são exploradas extensões que incorporam não linearidades,
 interações entre variáveis e possíveis efeitos de regime, reconhecendo que a
 relação entre o BVRP e os retornos futuros do Bitcoin pode variar ao longo do
-tempo. Essas extensões motivam a adoção de modelos de \textit{machine learning},
-desenvolvidos em detalhe no Capítulo~\ref{chap:ml}.
+tempo. Essas extensões motivam a adoção de modelos de aprendizado de máquina,
+desenvolvidos em detalhe no Capítulo~\ref{chap:cap6_ml}.
