@@ -1,4 +1,4 @@
-\chapter{Regimes de Volatilidade e o Prêmio de Risco de Volatilidade do Bitcoin}
+﻿\chapter{Regimes de Volatilidade e o Prêmio de Risco de Volatilidade do Bitcoin}
 \label{chap:regimes}
 
 \section{Motivação e Objetivo do Capítulo}
@@ -13,7 +13,7 @@ heterogeneidade importante: a relação entre o BVRP e os retornos futuros não 
 ao longo do tempo, e sua magnitude depende do ambiente de volatilidade vigente.
 
 O indicador de regime de volatilidade realizada figurou como o preditor de maior
-importância no modelo de \textit{floresta aleatória} do Capítulo~\ref{chap:ml_bvrp},
+importância no modelo de \textit{floresta aleatória} do Capítulo~\ref{chap:cap5_ml},
 respondendo por aproximadamente 69\% da importância total. Isso motiva a investigação
 direta da dependência entre o nível do BVRP, o regime de volatilidade
 vigente e a relação condicional do prêmio com os retornos futuros do Bitcoin.
@@ -241,7 +241,7 @@ Os resultados deste capítulo estabelecem três conclusões empíricas sobre a h
 
 \paragraph{Achado 2 --- Significância estatística apenas em horizontes médios.} Diferenças de retorno futuro entre regimes de baixa e alta volatilidade atingem significância estatística apenas a partir de $h = 20$ dias ($p = 0{,}0097$) e tornam-se mais robustas em $h = 30$ dias ($p = 0{,}0001$). Em horizontes curtos ($h \leq 10$), os valores-$p$ situam-se entre $0{,}16$ e $0{,}82$, indicando que o efeito de regime não opera em frequências de curtíssimo prazo.
 
-\paragraph{Achado 3 --- Heterogeneidade como motivação para modelos não lineares.} A combinação de prêmio condicionalmente variável, dispersão dramaticamente maior em estresse e significância restrita a horizontes médios sugere que a relação entre BVRP e dinâmica futura do Bitcoin é estruturalmente não linear. Esse achado motiva diretamente o uso de modelos não paramétricos (Capítulo~\ref{chap:ml_bvrp}), nos quais a variável de regime de volatilidade emerge como o preditor dominante --- confirmação independente da hipótese H4 formulada no Capítulo~\ref{chap:introducao}.
+\paragraph{Achado 3 --- Heterogeneidade como motivação para modelos não lineares.} A combinação de prêmio condicionalmente variável, dispersão dramaticamente maior em estresse e significância restrita a horizontes médios sugere que a relação entre BVRP e dinâmica futura do Bitcoin é estruturalmente não linear. Esse achado motiva diretamente o uso de modelos não paramétricos (Capítulo~\ref{chap:cap5_ml}), nos quais a variável de regime de volatilidade emerge como o preditor dominante --- confirmação independente da hipótese H4 formulada no Capítulo~\ref{chap:introducao}.
 
 
 \paragraph{Achado 4 --- Ausência de leverage effect.} A análise condicional ao sinal do retorno corrente (Seção~\ref{sec:cap9_sinal_retorno}) estabelece que o BVRP do Bitcoin não exibe assimetria estatisticamente significativa em função da direção do movimento recente de preço, em contraste com o \textit{leverage effect} documentado em mercados de equity. Esse resultado adiciona dimensão complementar à evidência de heterogeneidade condicional: o prêmio de risco de variância é estruturalmente sensível ao \textit{nível} de volatilidade realizada (Achados 1 a 3), mas não ao \textit{sinal} do retorno corrente.
