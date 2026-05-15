@@ -1,12 +1,20 @@
+﻿# ==========================================
 # Python
+# ==========================================
 .venv/
+venv/
 __pycache__/
 *.pyc
+*.pyo
 
+# ==========================================
 # Jupyter
+# ==========================================
 .ipynb_checkpoints/
 
-# LaTeX temporarios
+# ==========================================
+# LaTeX (arquivos temporários de compilação)
+# ==========================================
 *.aux
 *.log
 *.out
@@ -16,29 +24,45 @@ __pycache__/
 *.synctex.gz
 *.bbl
 *.blg
+*.lof
+*.lot
+frontmatter/main.pdf
 
-# Sistema
+# ==========================================
+# Backups de editor (Overleaf, vim, etc)
+# ==========================================
+*.bak
+*.bak[0-9]*
+*~
+*.swp
+
+# ==========================================
+# Credenciais (NUNCA COMMITAR)
+# ==========================================
+.olauth
+.env
+*.key
+
+# ==========================================
+# Sistema operacional
+# ==========================================
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# VS Code
+# ==========================================
+# Editor / IDE
+# ==========================================
 .vscode/
+.idea/
 
-# Pastas que NAO queremos subir
-Backup/
-outputs/
-Overleaf/
-dissertacao_bitcoin_vrp_ml/
-figuras/
-.sixth/
-
-# Dados grandes
-binance_raw/
-btc_raw/
-
-# Dados intermediarios
-data/
-code/data/
-
-# Modelos ML
+# ==========================================
+# Modelos ML treinados (grandes, regeneráveis)
+# ==========================================
 *.joblib
+*.pkl
+
+# ==========================================
+# Temporários do fluxo de limpeza
+# ==========================================
+git-status-temp.txt
