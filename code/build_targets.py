@@ -25,11 +25,14 @@ def build_targets():
     #  CRIA RETORNOS FUTUROS
     # =======================
 
-    df["ret_fut_1d"] = df["close"].shift(-1) / df["close"] - 1
-    df["ret_fut_5d"] = df["close"].shift(-5) / df["close"] - 1
+    df["ret_fut_1d"]  = df["close"].shift(-1)  / df["close"] - 1
+    df["ret_fut_5d"]  = df["close"].shift(-5)  / df["close"] - 1
     df["ret_fut_20d"] = df["close"].shift(-20) / df["close"] - 1
+    df["ret_fut_10d"] = df["close"].shift(-10) / df["close"] - 1
+    df["ret_fut_30d"] = df["close"].shift(-30) / df["close"] - 1
+    df["ret_fut_60d"] = df["close"].shift(-60) / df["close"] - 1  # Tarefa 3 — h=60 (Decisão 2)
 
-    # Remove linhas sem target futuro (últimos 20 dias)
+    # Remove linhas sem target futuro (últimas 60 linhas, critério h=60)
     df_clean = df.dropna().reset_index(drop=True)
 
     # Salvar dataset expandido
@@ -39,7 +42,7 @@ def build_targets():
     print("\n=== RETORNOS FUTUROS GERADOS COM SUCESSO ===")
     print(f"Arquivo salvo em: {out_path}")
     print(f"Linhas finais: {len(df_clean)}")
-    print("Colunas criadas: ret_fut_1d, ret_fut_5d, ret_fut_20d")
+    print("Colunas criadas: ret_fut_1d, ret_fut_5d, ret_fut_10d, ret_fut_20d, ret_fut_30d, ret_fut_60d")
 
     # Estatísticas descritivas dos retornos futuros
     print("\nResumo estatístico dos retornos futuros:")

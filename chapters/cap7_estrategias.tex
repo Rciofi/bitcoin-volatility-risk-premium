@@ -9,12 +9,15 @@ antecedem janelas de melhor retorno ajustado ao risco.
 
 A análise aqui desenvolvida é a contrapartida operacional dos resultados empíricos
 dos capítulos anteriores. O Capítulo~\ref{chap:resultados_ols} demonstrou que o
-BVRP contém informação estatisticamente significativa para a previsão de retornos
-futuros do Bitcoin em horizontes de 20 a 60 dias ($p = 0{,}001$ para $h = 30$,
-$R^2 = 3{,}6\%$), fornecendo a base econômica para utilizá-lo como sinal de
-posicionamento. O Capítulo~\ref{chap:cap6_ml} evidenciou que o BVRP exibe forte
+BVRP \emph{não} exibe previsibilidade linear estatisticamente significativa para os retornos futuros
+do Bitcoin em nenhum dos horizontes analisados --- o menor valor-$p$ observado foi de $0{,}241$,
+resultado robusto à reamostragem em blocos e à correção para múltiplos testes. A motivação para
+utilizá-lo como sinal de posicionamento repousa, portanto, não em relações lineares, mas em uma
+hipótese de filtragem condicional: que estados extremos do prêmio identifiquem regimes de risco
+estruturalmente distintos, gerando janelas em que o perfil risco--retorno do Bitcoin se desvia do
+equilíbrio de longo prazo. O Capítulo~\ref{chap:cap6_ml} evidenciou que o BVRP exibe forte
 persistência temporal em frequência diária --- o \textit{baseline} de último valor
-domina todos os modelos de \textit{machine learning} no conjunto de teste ---
+domina todos os modelos de aprendizado de máquina no conjunto de teste ---
 o que justifica o uso do prêmio defasado em um dia como sinal operacional
 sem viés de antecipação.
 
@@ -28,10 +31,10 @@ As métricas de desempenho são anualizadas com base em 365 dias, apropriado par
 um mercado que opera de forma contínua, sete dias por semana.
 
 % =========================================================
-\section{Estratégia Buy-and-Hold (Benchmark)}
+\section{Estratégia de compra e manutenção (Benchmark)}
 \label{sec:cap7_bh}
 
-A estratégia Buy-and-Hold consiste em manter exposição unitária e constante ao
+A estratégia compra e manutenção consiste em manter exposição unitária e constante ao
 Bitcoin ao longo de todo o período histórico disponível (18 de agosto de 2017 a
 31 de dezembro de 2024), sem utilização de sinais condicionais ou mecanismos
 adicionais de controle de risco. Seu desempenho representa o retorno passivo do
@@ -39,12 +42,12 @@ ativo e serve como referência para avaliar se estratégias condicionais melhora
 o retorno ajustado ao risco.
 
 A Tabela~\ref{tab:cap7_bh_perf} reporta as métricas de desempenho da estratégia
-Buy-and-Hold, enquanto a Figura~\ref{fig:cap7_bh_cumret} apresenta a evolução do
+compra e manutenção, enquanto a Figura~\ref{fig:cap7_bh_cumret} apresenta a evolução do
 retorno acumulado ao longo da amostra completa.
 
 \begin{table}[H]
 \centering
-\caption{Métricas de desempenho da estratégia Buy-and-Hold (agosto de 2017 a dezembro de 2024)}
+\caption{Métricas de desempenho da estratégia compra e manutenção (agosto de 2017 a dezembro de 2024)}
 \label{tab:cap7_bh_perf}
 \input{tables/tab7/tab7_1_perf_buy_hold}
 \end{table}
@@ -52,11 +55,11 @@ retorno acumulado ao longo da amostra completa.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{figs/cap7/fig_7_01_cum_returns_buy_hold.png}
-\caption{Retorno acumulado da estratégia Buy-and-Hold para o Bitcoin (BTCUSDT, dados diários)}
+\caption{Retorno acumulado da estratégia compra e manutenção para o Bitcoin (BTCUSDT, dados diários)}
 \label{fig:cap7_bh_cumret}
 \end{figure}
 
-A estratégia Buy-and-Hold produziu retorno anualizado de 52{,}6\% no período de
+A estratégia compra e manutenção produziu retorno anualizado de 52{,}6\% no período de
 sete anos, com volatilidade anualizada de 71{,}8\% e razão de Sharpe de 0{,}73.
 O \textit{max drawdown} de $-83{,}2\%$ evidencia o risco extremo de uma posição
 passiva em um ativo de elevada volatilidade estrutural, incluindo o ciclo de
@@ -89,14 +92,18 @@ A interpretação econômica é diretamente conectada à evidência do
 Capítulo~\ref{chap:resultados_ols}: valores elevados do BVRP refletem condições
 em que a volatilidade implícita está elevada vis-à-vis a volatilidade realizada,
 sugerindo maior prêmio requerido pelos agentes para carregar risco de volatilidade.
-As regressões OLS documentaram que esses estados tendem a preceder retornos
-positivos em horizontes de médio prazo ($\hat{\beta}_{30} = 0{,}035$, $p = 0{,}001$),
-tornando o prêmio um candidato natural a sinal de \textit{timing} de exposição.
+A motivação para o uso do BVRP como sinal de intervalo de tempo não repousa em previsibilidade
+linear --- ausente nos dados, conforme demonstrado no Capítulo~\ref{chap:resultados_ols} ---,
+mas em uma hipótese de filtragem condicional: que estados de prêmio extremamente elevado em
+magnitude reflitam episódios em que o risco de volatilidade está sendo precificado de forma
+assimétrica, gerando assim janelas em que a relação risco--retorno do Bitcoin se desvia do
+equilíbrio de longo prazo. Sob essa ótica, a estratégia não busca prever a direção dos
+retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
 
 A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia
 condicional ao BVRP. As Figuras~\ref{fig:cap7_bvrp_q_cumret}
 e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno
-acumulado da estratégia e sua comparação com o Buy-and-Hold no período amostral
+acumulado da estratégia e sua comparação com o compra e manutenção no período amostral
 do BVRP (fevereiro de 2023 a dezembro de 2024).
 
 \begin{table}[H]
@@ -116,7 +123,7 @@ do BVRP (fevereiro de 2023 a dezembro de 2024).
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{figs/cap7/fig_7_03_cum_returns_bh_vs_bvrp_quantile.png}
-\caption{Comparação do retorno acumulado --- Buy-and-Hold vs estratégia condicional ao BVRP (quantil 80\%)}
+\caption{Comparação do retorno acumulado --- compra e manutenção vs estratégia condicional ao BVRP (quantil 80\%)}
 \label{fig:cap7_bh_vs_bvrp_q_cumret}
 \end{figure}
 
@@ -126,9 +133,9 @@ restrito a $-15{,}5\%$. A estratégia permanece investida em apenas 20\% do temp
 concentrando a exposição nos estados em que o prêmio de risco de volatilidade
 sinaliza maior compensação esperada.
 
-Em comparação ao Buy-and-Hold histórico (Sharpe = 0{,}73, MDD = $-83{,}2\%$), a
+Em comparação ao compra e manutenção histórico (Sharpe = 0{,}73, MDD = $-83{,}2\%$), a
 estratégia condicional apresenta Sharpe superior (0{,}95 vs.\ 0{,}73) e risco de
-cauda dramaticamente reduzido. Em relação ao Buy-and-Hold no mesmo subperíodo
+cauda dramaticamente reduzido. Em relação ao compra e manutenção no mesmo subperíodo
 (Sharpe = 2{,}17), a estratégia registra Sharpe inferior, mas com volatilidade
 aproximadamente quatro vezes menor (24\% vs.\ 50\%) e \textit{drawdown} máximo de
 apenas um quinto do observado pela estratégia passiva ($-15{,}5\%$ vs.\
@@ -200,18 +207,19 @@ apenas 10\% do período, com \textit{max drawdown} de apenas $-10{,}8\%$.
 O quantil 80\% representa equilíbrio entre seletividade e estabilidade operacional:
 mantém Sharpe de 0{,}95, limita o \textit{max drawdown} a $-15{,}5\%$ e opera
 com 20\% do tempo investido. A comparação entre o Sharpe de 0{,}95 da estratégia
-e o Sharpe histórico do Buy-and-Hold (0{,}73) evidencia que o BVRP contém
+e o Sharpe histórico do compra e manutenção (0{,}73) evidencia que o BVRP contém
 informação condicional que pode ser explorada de forma economicamente relevante.
 
 Sob a ótica econômica, esse padrão é coerente com a hipótese H3 formulada no
-Capítulo~\ref{chap:introducao}: o BVRP possui capacidade preditiva para retornos
-futuros do Bitcoin que se traduz, ao nível das estratégias de
-\textit{timing}, em ganhos de eficiência mensuráveis no retorno ajustado ao risco.
-Ademais, o padrão em \textit{U} do Sharpe --- onde quantis muito baixos diluem o
-sinal e quantis muito altos dependem de poucos episódios --- dialoga diretamente
-com a evidência econométrica do Capítulo~\ref{chap:resultados_ols}, que documentou
-$R^2$ máximo em $h = 30$ dias, sugerindo que o conteúdo informacional do BVRP
-é moderado porém sistemático.
+Capítulo~\ref{chap:introducao}: mesmo na ausência de previsibilidade linear
+robusta --- documentada no Capítulo~\ref{chap:resultados_ols} ---, sinais
+derivados de quantis extremos do BVRP traduzem-se em ganhos de eficiência
+mensuráveis no retorno ajustado ao risco. O mecanismo não é de previsão
+linear dos retornos, mas de filtragem condicional: o BVRP em quantis elevados
+seleciona estados de mercado nos quais o risco de cauda está precificado de
+forma assimétrica, gerando vantagem no perfil risco--retorno independentemente
+do estado da volatilidade implícita.
+
 
 % =========================================================
 \section{Estratégias Condicionais ao BVRP por Regime de Volatilidade Realizada}
@@ -290,14 +298,14 @@ previsível. Em estados extremos --- seja de volatilidade muito baixa ou muito a
 de regime.
 
 % =========================================================
-\section{Síntese Empírica e Implicações}
+\section{Resultados e implicações}
 \label{sec:cap7_sintese}
 
 As análises desenvolvidas neste capítulo oferecem evidência de que o BVRP contém
 utilidade econômica como sinal para estratégias condicionais de negociação.
 
 \paragraph{Eficiência ajustada ao risco.} A estratégia baseada no quantil 80\%
-do BVRP supera o Buy-and-Hold histórico em razão de Sharpe (0{,}95 vs.\ 0{,}73)
+do BVRP supera o compra e manutenção histórico em razão de Sharpe (0{,}95 vs.\ 0{,}73)
 e reduz o \textit{max drawdown} de $-83\%$ para $-15{,}5\%$, operando em apenas 20\%
 do tempo. Esse resultado é a contrapartida operacional da evidência preditiva do
 Capítulo~\ref{chap:resultados_ols}, que documentou relação positiva e estatisticamente
@@ -305,7 +313,7 @@ robusta entre BVRP e retornos em horizontes de 20 a 60 dias.
 
 \paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais
 analisadas (quantis de 60\% a 90\%) apresentam \textit{max drawdown} substancialmente
-inferior ao Buy-and-Hold, com Sharpe entre 0{,}95 e 1{,}66. O padrão em \textit{U}
+inferior ao compra e manutenção, com Sharpe entre 0{,}95 e 1{,}66. O padrão em \textit{U}
 do Sharpe ao longo dos quantis indica que tanto limiares muito permissivos quanto
 muito restritivos reduzem a precisão do sinal: os extremos da distribuição (q60 e
 q90) obtêm os maiores Sharpes, mas por mecanismos opostos de cobertura e seletividade.

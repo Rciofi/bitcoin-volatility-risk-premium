@@ -10,10 +10,10 @@ capítulos anteriores.
 
 Os códigos foram organizados em blocos temáticos: (i) importação de bibliotecas;
 (ii) construção das variáveis de volatilidade; (iii) retornos futuros; (iv) BVRP;
-(v) classificação de regimes; (vi) regressão OLS com erros-padrão de Newey--West;
+(v) classificação de regimes; (vi) regressão por MQO com erros-padrão de Newey--West;
 e (vii) estimação dos quatro modelos de aprendizado de máquina com avaliação fora
 da amostra. A implementação usa bibliotecas consolidadas em finanças quantitativas e
-\textit{machine learning} \citep{andersen2003realized, corsi2009har,
+aprendizado de máquina \citep{andersen2003realized, corsi2009har,
 breiman2001randomforest, friedman2001gradientboosting, Gu2020EmpiricalML}.
 
 \section{Importação de bibliotecas}
@@ -70,11 +70,12 @@ Capítulos~\ref{chap:resultados_ols}, \ref{chap:cap6_ml},
 
 \section{Cálculo do BVRP}
 
-O prêmio de risco de volatilidade é a diferença entre volatilidade implícita e
-realizada, ambas anualizadas em base de 30 dias:
+O prêmio de risco de volatilidade é a diferença entre volatilidade realizada e
+implícita, ambas anualizadas em base de 30 dias (convenção RV $-$ IV,
+Decisão~1 --- Fase~0):
 
 \begin{verbatim}
-df["vrp_30d"] = df["iv_30d"] - df["rv_30d"]
+df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
 \end{verbatim}
 
 \section{Classificação de regimes de volatilidade}
@@ -83,8 +84,8 @@ Os regimes são definidos pelos percentis 25 e 75 da \texttt{rv\_30d},
 calculados sobre a amostra completa:
 
 \begin{verbatim}
-q25 = df["rv_30d"].quantile(0.25)   # 38,8% na amostra
-q75 = df["rv_30d"].quantile(0.75)   # 65,9% na amostra
+q25 = df["rv_30d"].quantile(0.25)   # 39,3% na amostra
+q75 = df["rv_30d"].quantile(0.75)   # 65,6% na amostra
 
 df["regime"] = "media"
 df.loc[df["rv_30d"] <= q25, "regime"] = "baixa"
@@ -94,7 +95,7 @@ df.loc[df["rv_30d"] >= q75, "regime"] = "alta"
 df["dummy_alta"] = (df["regime"] == "alta").astype(int)
 \end{verbatim}
 
-\section{Regressão OLS com erros-padrão de Newey--West}
+\section{Regressão por MQO com erros-padrão de Newey--West}
 
 As regressões do Capítulo~\ref{chap:resultados_ols} são estimadas com
 \texttt{statsmodels}, usando erros-padrão HAC com $h$ defasagens para corrigir
@@ -167,14 +168,14 @@ scaler = StandardScaler()
 Xtr_s  = scaler.fit_transform(X_train)
 Xte_s  = scaler.transform(X_test)
 
-lasso = Lasso(alpha=0.01, max_iter=5000).fit(Xtr_s, y_train)
+lasso = Lasso(alpha=0.001, max_iter=50000).fit(Xtr_s, y_train)
 ridge = Ridge(alpha=1.0).fit(Xtr_s, y_train)
 
 pred_lasso = lasso.predict(Xte_s)
 pred_ridge = ridge.predict(Xte_s)
 \end{verbatim}
 
-\subsection{Random Forest e Gradient Boosting}
+\subsection{Floresta aleatória e Gradient Boosting}
 
 Os modelos baseados em árvores operam diretamente sobre as variáveis não
 padronizadas:
@@ -218,7 +219,7 @@ oos_metrics(y_test, pred_rf,    "Random Forest")
 oos_metrics(y_test, pred_gb,    "Gradient Boosting")
 \end{verbatim}
 
-\subsection{Importância das variáveis (Random Forest)}
+\subsection{Importância das variáveis (floresta aleatória)}
 
 A importância relativa das variáveis é extraída diretamente do modelo e usada
 para identificar os preditores mais relevantes do BVRP:
@@ -252,13 +253,13 @@ computacionais da dissertação, permitindo replicar:
     \item a construção dos retornos futuros logarítmicos em cinco horizontes
           ($h \in \{1, 5, 10, 20, 30\}$ dias);
     \item a classificação das observações em regimes de baixa, média e alta
-          volatilidade realizada ($q_{25} = 38{,}8\%$; $q_{75} = 65{,}9\%$);
-    \item as regressões OLS com erros-padrão de Newey--West e os modelos
+          volatilidade realizada ($q_{25} = 39{,}3\%$; $q_{75} = 65{,}6\%$);
+    \item as regressões por MQO com erros-padrão de Newey--West e os modelos
           condicionais com interação BVRP $\times$ regime;
     \item a estimação dos quatro modelos supervisionados (LASSO, Ridge,
-          \textit{Random Forest}, \textit{Gradient Boosting}) com avaliação
+          \textit{floresta aleatória}, \textit{Gradient Boosting}) com avaliação
           genuína fora da amostra (divisão 70\,\%/30\,\%).
 \end{itemize}
 
 Os scripts completos estão disponíveis no repositório da dissertação e podem
-ser estendidos para novos horizontes, conjuntos de variáveis ou algoritmos.
+ser estendidos para novos horizontes, conjuntos de variáveis ou algoritmos

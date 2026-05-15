@@ -34,7 +34,7 @@ matplotlib.rcParams.update({
 })
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_PATH = ROOT / "data" / "vrp_30d_dataset.csv"
+DATA_PATH = ROOT / "data" / "vrp_with_regimes.csv"   # IC1: fonte canonica com ret_fut_* (1.775 obs)
 OUT_FIGS = ROOT / "figs" / "cap9"
 OUT_TABS = ROOT / "tables" / "cap9"
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
@@ -55,6 +55,9 @@ df = df.reset_index(drop=True)
 print(f"Período: {df['date'].min().date()} a {df['date'].max().date()}, N={len(df)}")
 
 # ── 2. Definir regimes por quantis (q25 / q75 da RV 30d) ─────────────────────
+# NOTA: quantis calculados sobre amostra completa (sem janela expansiva).
+# Uso e analise descritiva condicional — lookahead menos critico que em modelos preditivos.
+# Para analise preditiva com regime_vol, considerar janela expansiva futuramente.
 q25 = df["rv_30d"].quantile(0.25)
 q75 = df["rv_30d"].quantile(0.75)
 

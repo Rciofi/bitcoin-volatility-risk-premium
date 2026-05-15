@@ -38,7 +38,7 @@ def main():
     stats_all.index = [
         "IV30D",
         "RV30D",
-        "BVRP (IV30D - RV30D)",
+        "BVRP (RV30D - IV30D)",
         "Retorno futuro 1D",
         "Retorno futuro 5D",
         "Retorno futuro 20D",

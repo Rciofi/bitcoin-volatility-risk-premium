@@ -39,18 +39,40 @@ def main():
             raise ValueError(f"Coluna obrigatória '{col}' não encontrada em vrp_with_targets.csv")
 
     # ===============================
-    # 1) Definir tercis de VRP (Q1, Q2)
+    # 1) Definir tercis de VRP — janela expansiva (E4)
     # ===============================
+    # CORRECAO E4: limiares calculados via expanding window com min_periods=252
+    # para eliminar vies de antecipacao (lookahead bias).
+    # As primeiras 251 obs (2021-03-24 a 2021-11-29) ficam sem rotulo (NaN)
+    # e sao removidas automaticamente pelo dropna em build_ml_dataset.py.
+    # Amostra efetiva para modelos com regime: ~1.504 obs (a partir de 2021-11-30).
+    # Analises sem regime (Cap. 4, Cap. 6 modelos lineares): usam 1.755 obs completas.
+    MIN_PERIODS_REGIME = 252
 
-    q1 = df["vrp_30d"].quantile(1/3)
-    q2 = df["vrp_30d"].quantile(2/3)
+    q1_series = df["vrp_30d"].expanding(min_periods=MIN_PERIODS_REGIME).quantile(1/3)
+    q2_series = df["vrp_30d"].expanding(min_periods=MIN_PERIODS_REGIME).quantile(2/3)
 
-    print("\nQuantis de VRP 30D (em p.p. de vol):")
-    print(f"  Q1 (1/3): {q1:.2f}")
-    print(f"  Q2 (2/3): {q2:.2f}")
+    # Cria coluna de regime — NaN para obs sem historico suficiente
+    df["vrp_regime"] = [
+        classify_regime(v, r1, r2) if pd.notna(r1) else np.nan
+        for v, r1, r2 in zip(df["vrp_30d"], q1_series, q2_series)
+    ]
 
-    # Cria coluna de regime
-    df["vrp_regime"] = df["vrp_30d"].apply(lambda x: classify_regime(x, q1, q2))
+    # Relatorio de limiares em pontos representativos
+    checkpoints = {252: "dia 252 (primeiro rotulo)", 500: "dia 500",
+                   1000: "dia 1000", len(df): "dia final"}
+    print("\nEvolucao dos limiares (janela expansiva, min_periods=252):")
+    print(f"  {'Ponto':<28} {'Data':>12}  {'Q1':>10}  {'Q2':>10}")
+    for idx_1, label in checkpoints.items():
+        i = min(idx_1 - 1, len(df) - 1)
+        print(f"  {label:<28} {str(df['date'].iloc[i].date()):>12}  "
+              f"{q1_series.iloc[i]:>+10.4f}  {q2_series.iloc[i]:>+10.4f}")
+
+    n_nan = df["vrp_regime"].isna().sum()
+    print(f"\nObs sem rotulo (NaN): {n_nan} "
+          f"({df['date'].iloc[0].date()} a "
+          f"{df.loc[df['vrp_regime'].isna(), 'date'].max().date()})")
+    print(f"Obs com rotulo valido: {len(df) - n_nan}")
 
     # ===============================
     # 2) Estatísticas por regime

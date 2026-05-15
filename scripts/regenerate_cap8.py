@@ -15,6 +15,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import shap
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import Lasso, Ridge
@@ -30,23 +31,27 @@ matplotlib.rcParams.update({
 })
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_PATH = ROOT / "chapters" / "cap8_ml" / "data" / "ml_dataset.csv"
+DATA_PATH = ROOT / "data" / "ml_dataset.csv"   # Tarefa 3/Passo 4: fonte canonica (1.755 obs)
 OUT_FIGS  = ROOT / "figs" / "cap8"
 OUT_TABS  = ROOT / "tables" / "tab8"
+OUT_SHAP  = ROOT / "tables" / "cap8"   # [M1] CSV com shap_values
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
+OUT_SHAP.mkdir(parents=True, exist_ok=True)
 
 # ── 1. Carregar e preparar dados ──────────────────────────────────────────────
 TARGET = "vrp_30d"
 COLS_EXCLUIR = [
     TARGET,
+    "close",       # serie I(1) -- removida das features (E3)
     "iv_30d", "rv_30d",
     "ret_fut_1d", "ret_fut_5d", "ret_fut_20d",
+    "ret_fut_10d", "ret_fut_30d", "ret_fut_60d",  # [M1] retornos futuros -- lookahead direto
     "vrp_regime",
 ]
 
 FEATURE_LABELS = {
-    "close":          "Preço (close)",
+    # "close" removido — serie I(1), excluida das features (E3)
     "ret":            "Retorno diário",
     "month":          "Mês",
     "weekday":        "Dia da semana",
@@ -114,7 +119,64 @@ fig.savefig(OUT_FIGS / "fig_cap8_oos_prediction.png", dpi=300)
 plt.close(fig)
 print("OK fig_cap8_oos_prediction.png salva")
 
-# ── 4. Fig. 8.2 — Importância (RF) + coeficientes (Lasso) ────────────────────
+
+# -- 4. SHAP -- Importancia das variaveis com TreeExplainer [M1] ----------------
+rf_model    = models["Random Forest"]
+feat_names  = X.columns.tolist()
+feat_labels = [FEATURE_LABELS.get(f, f) for f in feat_names]
+
+import time as _time
+_t0 = _time.time()
+
+# TreeExplainer e O(n x p) -- eficiente para florestas; calculado no TESTE
+# (usar dados de teste evita inflar importancias com overfitting do treino)
+SHAP_SAMPLE  = 200  # subamostrar X_test -- suficiente para beeswarm, evita timeout
+explainer_rf = shap.TreeExplainer(rf_model)
+Xte_shap     = X_test.sample(n=SHAP_SAMPLE, random_state=42)  # amostra representativa
+shap_values  = explainer_rf.shap_values(Xte_shap, approximate=True)  # approx: rapido com 300 arvores
+_elapsed = _time.time() - _t0
+print(f"\n[M1] SHAP calculado: {shap_values.shape[0]} obs x {shap_values.shape[1]} features  ({_elapsed:.1f}s)")
+
+# [M1] Salvar shap_values como CSV para reprodutibilidade
+shap_df = pd.DataFrame(shap_values, columns=feat_names, index=Xte_shap.index)
+shap_df.to_csv(OUT_SHAP / "shap_values_rf_cap8.csv")
+print(f"[M1] shap_values_rf_cap8.csv salvo: {shap_df.shape}")
+
+# [M1] Fig. 8.2 -- Beeswarm plot (substituicao da importancia MDI como figura principal)
+shap.summary_plot(
+    shap_values, Xte_shap, feature_names=feat_labels,
+    show=False, plot_type="dot",
+    max_display=len(feat_labels),
+)
+plt.tight_layout()
+plt.savefig(str(OUT_FIGS / "fig_cap8_shap_beeswarm.png"), dpi=300, bbox_inches="tight")
+plt.close()
+print("OK fig_cap8_shap_beeswarm.png salva")
+
+# [M1] Fig. 8.3 -- Bar plot (importancia media |SHAP|)
+shap.summary_plot(
+    shap_values, Xte_shap, feature_names=feat_labels,
+    show=False, plot_type="bar",
+    max_display=len(feat_labels),
+)
+plt.tight_layout()
+plt.savefig(str(OUT_FIGS / "fig_cap8_shap_bar.png"), dpi=300, bbox_inches="tight")
+plt.close()
+print("OK fig_cap8_shap_bar.png salva")
+
+# Ranking SHAP (importancia media |SHAP|) para log
+import numpy as _np
+shap_mean_abs = pd.Series(
+    _np.abs(shap_values).mean(axis=0),
+    index=feat_names
+).sort_values(ascending=False)
+print("\n[M1] Ranking SHAP (importancia media |SHAP|):")
+for rank, (fname, val) in enumerate(shap_mean_abs.items(), 1):
+    label = FEATURE_LABELS.get(fname, fname)
+    print(f"  {rank:2d}. {label:<35s} {val:.6f}")
+
+# -- 5. Fig. apendice -- MDI (RF) + coeficientes (Lasso) -- movido para apendice [M1] --
+
 rf_model    = models["Random Forest"]
 lasso_model = models["LASSO"]
 
@@ -157,9 +219,9 @@ ax.set_title("LASSO — Coeficientes ($\\alpha=0{,}001$)", fontsize=10)
 ax.tick_params(axis="y", labelsize=8)
 
 fig.tight_layout(pad=2.0)
-fig.savefig(OUT_FIGS / "fig_cap8_feature_importance.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_cap8_mdi_appendix.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap8_feature_importance.png salva")
+print("OK fig_cap8_mdi_appendix.png salva (apendice -- MDI mantido para referencia)")
 
 # ── 5. Tab. 8.1 — Desempenho OOS (regera, formato já correto) ────────────────
 tab1_path = OUT_TABS / "tab8_oos_performance.tex"
@@ -248,6 +310,9 @@ print("OK tab8_coeficientes.tex salva")
 
 print("\nResumo de outputs:")
 print(f"  {OUT_FIGS / 'fig_cap8_oos_prediction.png'}")
-print(f"  {OUT_FIGS / 'fig_cap8_feature_importance.png'}")
+print(f"  {OUT_FIGS / 'fig_cap8_shap_beeswarm.png'}   [M1 -- novo, figura principal]")
+print(f"  {OUT_FIGS / 'fig_cap8_shap_bar.png'}         [M1 -- novo, bar plot]")
+print(f"  {OUT_FIGS / 'fig_cap8_mdi_appendix.png'}     [M1 -- MDI movido para apendice]")
+print(f"  {OUT_SHAP / 'shap_values_rf_cap8.csv'}       [M1 -- shap_values CSV]")
 print(f"  {OUT_TABS / 'tab8_oos_performance.tex'}")
 print(f"  {OUT_TABS / 'tab8_coeficientes.tex'}")

@@ -88,24 +88,27 @@ volatilidade de mercado, como no caso do VIX.
 O Prêmio de Risco de Volatilidade do Bitcoin (BVRP), variável central da dissertação,
 é definido como:
 \[
-BVRP_t = IV_{30,t} - RV_{30,t}.
+BVRP_t = RV_{30,t} - IV_{30,t}.
 \]
 
-Em termos econômicos, $BVRP_t$ mede o diferencial entre a incerteza precificada
-no mercado de opções (via IV) e a volatilidade efetivamente observada no mercado
-à vista (via RV, construída em janela móvel). Valores positivos indicam que a
-volatilidade implícita está acima da volatilidade realizada, consistente com a
-interpretação de um prêmio associado à demanda por proteção. Valores negativos
-podem ocorrer em episódios de choques, liquidações e movimentos abruptos em que
-a volatilidade realizada supera a implícita.
+Em termos econômicos, $BVRP_t$ mede o diferencial entre a volatilidade
+efetivamente observada no mercado à vista (via RV, construída em janela
+retrospectiva de 30 dias) e a incerteza precificada no mercado de opções
+(via IV). Valores negativos --- o estado típico --- indicam que a volatilidade
+implícita está acima da volatilidade realizada, consistente com um prêmio pago
+pelos compradores de opções como proteção contra choques de variância. Valores
+positivos ocorrem em episódios de surpresa, em que a volatilidade realizada
+supera a implícita.
 
 \begin{itemize}
-    \item \textbf{BVRP positivo:} IV $>$ RV, típico de mercados com demanda por proteção e/ou
-    aversão ao risco elevada;
-    \item \textbf{BVRP negativo:} RV $>$ IV, típico de episódios de surpresa (choques exógenos,
-    liquidações em cascata, \textit{jumps});
-    \item \textbf{Alta magnitude:} indica períodos de forte assimetria entre volatilidade
-    precificada e observada, frequentemente associados a mudanças de regime.
+    \item \textbf{BVRP negativo:} IV $>$ RV, estado típico --- prêmio de seguro
+    embutido nos preços de opções; quanto mais negativo, maior a demanda por
+    proteção e/ou aversão ao risco;
+    \item \textbf{BVRP positivo:} RV $>$ IV, típico de episódios de surpresa
+    (choques exógenos, liquidações em cascata, \textit{jumps});
+    \item \textbf{Alta magnitude (em módulo):} indica períodos de forte assimetria
+    entre volatilidade precificada e observada, frequentemente associados a
+    mudanças de regime.
 \end{itemize}
 
 \section{Retornos futuros}
@@ -126,20 +129,28 @@ r_{t+20} &= \ln(P_{t+20}) - \ln(P_t), \\
 r_{t+30} &= \ln(P_{t+30}) - \ln(P_t).
 \end{align*}
 
-Os horizontes escolhidos capturam diferentes janelas de previsão:
+Os horizontes escolhidos capturam diferentes janelas de
+previsão e correspondem aos utilizados na literatura
+empírica de prêmios de risco de volatilidade:
 \begin{itemize}
-    \item \textbf{1 dia}: resposta de curtíssimo prazo; dominada por ruído;
-    \item \textbf{5 dias}: dinâmica semanal frequentemente analisada em criptoativos;
-    \item \textbf{10 dias}: horizonte intermediário, onde efeitos preditivos do BVRP
-          começam a ser detectáveis estatisticamente;
-    \item \textbf{20 dias}: horizonte aproximadamente mensal, com maior suavização de
-          ruído e poder preditivo mais pronunciado;
-    \item \textbf{30 dias}: horizonte de médio prazo, alinhado à janela de cálculo do
-          BVRP e com diferenças de retorno mais robustas entre regimes de volatilidade.
+    \item \textbf{1 dia}: horizonte de curtíssimo prazo, dominado
+    por ruído de microestrutura;
+    \item \textbf{5 dias}: dinâmica semanal frequentemente analisada
+    em criptoativos;
+    \item \textbf{10 dias}: horizonte intermediário curto;
+    \item \textbf{20 dias}: horizonte aproximadamente mensal, com
+    maior suavização do ruído de curto prazo;
+    \item \textbf{30 dias}: horizonte de médio prazo, alinhado à
+    janela de cálculo do BVRP;
+    \item \textbf{60 dias}: horizonte de médio-longo prazo,
+    utilizado como referência para análise da estabilidade
+    dos resultados.
 \end{itemize}
 
-A inclusão de múltiplos horizontes permite avaliar como o poder preditivo do BVRP
-varia com o tempo --- padrão documentado nos Capítulos~\ref{chap:resultados_ols}
+A inclusão de múltiplos horizontes permite avaliar como
+a relação entre o BVRP e os retornos futuros varia com
+o horizonte de previsão, conforme discutido nos
+Capítulos~\ref{chap:resultados_ols}
 e~\ref{chap:regimes}.
 
 \section{Classificação de regimes de volatilidade}
@@ -154,8 +165,8 @@ amostra completa:
     \item \textbf{Alta volatilidade}: $RV_{30,t} \geq q_{75}(RV_{30})$.
 \end{itemize}
 
-Na amostra de abril de 2021 a abril de 2026 ($N = 1.776$), os limiares estimados
-são $q_{25} = 38{,}8\%$ e $q_{75} = 65{,}9\%$ (em base anualizada), resultando em
+Na amostra de abril de 2021 a abril de 2026 ($N = 1.775$), os limiares estimados
+são $q_{25} = 39{,}3\%$ e $q_{75} = 65{,}6\%$ (em base anualizada), resultando em
 444 observações em cada regime extremo e 888 no regime intermediário.
 
 A variável indicadora de alta volatilidade $D_t^{\text{alto}}$ é definida como:

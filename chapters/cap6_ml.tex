@@ -1,8 +1,8 @@
-\chapter{Previsão do Prêmio de Risco de Volatilidade do Bitcoin: Evidência Fora da Amostra e Modelos de \textit{Machine Learning}}
+\chapter{Previsão do Prêmio de Risco de Volatilidade do Bitcoin: Evidência Fora da Amostra e Modelos de Aprendizado de Máquina}
 \label{chap:cap6_ml}
 
 Este capítulo investiga a previsibilidade do Prêmio de Risco de Volatilidade do
-Bitcoin (BVRP) por meio de técnicas de \textit{machine learning}. O objetivo é
+Bitcoin (BVRP) por meio de técnicas de aprendizado de máquina. O objetivo é
 avaliar se modelos lineares regulares e métodos não lineares conseguem produzir
 ganhos preditivos \textit{fora da amostra} quando comparados a \textit{benchmarks}
 fortes e economicamente plausíveis, baseados na dinâmica temporal do próprio BVRP.
@@ -192,7 +192,7 @@ iv\_30d & 52{,}27     & 11{,}17     \\
 \label{sec:cap6_baselines}
 % =========================================================
 
-Antes da estimação de modelos de \textit{machine learning}, são estabelecidos
+Antes da estimação de modelos de aprendizado de máquina, são estabelecidos
 \textit{benchmarks} de desempenho preditivo. Esses modelos servem como referências
 mínimas e ajudam a distinguir ganhos genuínos de resultados que apenas refletem
 persistência temporal.
@@ -244,7 +244,7 @@ Após o estabelecimento de \textit{benchmarks} preditivos, esta seção avalia m
 lineares regulares. O objetivo é investigar se relações lineares entre o BVRP futuro
 e variáveis observadas em $t$ produzem ganho incremental fora da amostra.
 
-Consideram-se três modelos: OLS, Ridge ($L_2$) e Lasso ($L_1$). O parâmetro de
+Consideram-se três modelos: MQO, Ridge ($L_2$) e Lasso ($L_1$). O parâmetro de
 regularização é selecionado por desempenho no conjunto de validação.
 
 \subsection{Resultados e interpretação}
@@ -284,7 +284,7 @@ Figura~\ref{fig:cap6_linear_coef} ilustra os coeficientes estimados sobre
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.88\linewidth]{figs/cap6/fig_6_09_linear_coefficients.png}
-\caption{Coeficientes estimados (\textit{features} padronizadas): OLS vs Ridge vs Lasso.}
+\caption{Coeficientes estimados (\textit{features} padronizadas): MQO vs Ridge vs Lasso.}
 \label{fig:cap6_linear_coef}
 \end{figure}
 }{}
@@ -333,7 +333,7 @@ realizada e implícita na previsão do BVRP.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.88\linewidth]{figs/cap6/fig_6_10_rf_feature_importance.png}
-\caption{Importância de variáveis no Random Forest (ajustado).}
+\caption{Importância de variáveis na floresta aleatória (ajustado).}
 \label{fig:cap6_rf_importance}
 \end{figure}
 }{}
@@ -378,7 +378,7 @@ lightgbm & Test & 3{,}121 & 4{,}014 & 0{,}790 \\
 
 Para fins de comparação, as Figuras~\ref{fig:cap6_rf_real_vs_pred}
 e~\ref{fig:cap6_xgb_real_vs_pred} apresentam os gráficos de dispersão entre
-$\text{BVRP}_{t+1}$ real e previsto no conjunto de teste para o Random Forest
+$\text{BVRP}_{t+1}$ real e previsto no conjunto de teste para a floresta aleatória
 (melhor modelo baseado em árvores) e o XGBoost (melhor método de
 \textit{boosting}), respectivamente. A aderência à linha diagonal é visível nos
 dois casos, reflexo da alta persistência da série, porém com dispersão maior do
@@ -388,7 +388,7 @@ que a observada no baseline de último valor.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.78\linewidth]{figs/cap6/fig_6_11_rf_real_vs_pred.png}
-\caption{Random Forest --- $\text{BVRP}_{t+1}$ real vs.\ previsto no conjunto de teste (p.p.).}
+\caption{floresta aleatória --- $\text{BVRP}_{t+1}$ real vs.\ previsto no conjunto de teste (p.p.).}
 \label{fig:cap6_rf_real_vs_pred}
 \end{figure}
 }{}
@@ -416,13 +416,17 @@ horizontes. Essa evidência não constitui o alvo principal deste capítulo (pre
 do BVRP em $t+1$), mas ajuda a contextualizar a relevância econômica do prêmio de
 risco e a motivar o interesse por modelos preditivos.
 
-As Tabelas~\ref{tab:ols_basico_multihoriz} e~\ref{tab:ols_controles_multihoriz},
-apresentadas no Capítulo~\ref{chap:resultados_ols}, reportam os resultados do
-modelo básico e do modelo com controles de volatilidade, respectivamente. O
-coeficiente do BVRP é positivo e estatisticamente significativo a partir do
-horizonte de 20 dias ($p = 0{,}013$), com efeito mais robusto em 30 dias
-($p = 0{,}001$), e o $R^2$ máximo de $3{,}6\%$ é compatível com os encontrados
-na literatura de previsão de retornos em mercados financeiros.
+A Tabela~\ref{tab:ols_basico_multihoriz},
+apresentada no Capítulo~\ref{chap:resultados_ols},
+reporta os resultados do modelo básico de regressão de retornos futuros sobre
+o nível corrente do BVRP em seis horizontes. Conforme demonstrado naquele
+capítulo, o BVRP não apresenta capacidade preditiva linear estatisticamente
+significativa em nenhum dos horizontes analisados, com o menor valor-$p$
+observado sendo de $0{,}241$ ($h=1$). A ausência de previsibilidade linear ---
+robusta à reamostragem em blocos e à correção para múltiplos testes ---
+motiva diretamente o uso de modelos não paramétricos aplicados neste capítulo,
+capazes de capturar relações não lineares e interações entre preditores que
+regressões lineares simples não detectam.
 
 De forma geral, a evidência é consistente com a interpretação de que o prêmio de
 risco carrega informação econômica relevante para a previsão de retornos, mas que
@@ -501,13 +505,13 @@ previsão diária do nível do BVRP devem priorizar modelos parcimoniosos e
 de sobreajuste e o custo de implementação sem ganhos econômicos proporcionais.
 
 % =========================================================
-\section{Considerações finais}
+\section{Conclusão do capítulo}
 \label{sec:cap6_conclusion}
 % =========================================================
 
 Este capítulo investigou a previsibilidade fora da amostra do prêmio de risco de
 volatilidade do Bitcoin por meio de uma gama de modelos estatísticos e de
-\textit{machine learning}, incluindo baselines temporais, modelos lineares
+aprendizado de máquina, incluindo baselines temporais, modelos lineares
 regulares, modelos baseados em árvores e métodos de \textit{boosting}.
 
 O desenho empírico foi intencionalmente rigoroso, com divisão temporal, definição

@@ -102,8 +102,8 @@ def build_vrp_dataset():
     print("Fazendo merge entre preços (com RV30D) e IV30D (DVOL)...")
     df = pd.merge(df_price, df_iv, on="date", how="inner")
 
-    # 4) Calcula VRP 30D = IV30D - RV30D
-    df["vrp_30d"] = df["iv_30d"] - df["rv_30d"]
+    # 4) Calcula BVRP 30D = RV30D - IV30D  (Decisão 1 — Fase 0: sinal correto per literatura)
+    df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
 
     # Ordena e limpa colunas
     df = df.sort_values("date").reset_index(drop=True)
@@ -115,7 +115,7 @@ def build_vrp_dataset():
         "ret",        # retorno diário
         "rv_30d",     # realized vol 30D (% a.a.)
         "iv_30d",     # implied vol 30D (DVOL, % a.a.)
-        "vrp_30d",    # VRP 30D = IV - RV
+        "vrp_30d",    # BVRP 30D = RV - IV  (negativo em média: mercado paga prêmio de seguro)
     ]
     cols_order = [c for c in cols_order if c in df.columns]
     df = df[cols_order]
