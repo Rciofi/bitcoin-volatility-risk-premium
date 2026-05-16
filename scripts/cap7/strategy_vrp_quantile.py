@@ -35,4 +35,55 @@ def vrp_quantile_position(
 ) -> pd.Series:
     """Gera posicao 1 quando VRP >= quantil q (janela expansiva, ex-ante).
 
-    vrp:     serie temporal do VRP (index 
+    vrp:     serie temporal do VRP (index = datas)
+    q:       quantil de corte (padrao: 0.80)
+    min_obs: periodo minimo de burn-in (padrao: 252 dias)
+
+    Retorna: Series de posicoes (0 ou 1)
+    """
+    vrp = vrp.dropna().astype(float)
+    pos, _ = expanding_quantile_signal(vrp, quantile=q, min_obs=min_obs)
+    pos.name = "position"
+    return pos
+
+
+def run_bvrp_strategy(
+    returns: pd.Series,
+    bvrp: pd.Series,
+    q: float = 0.80,
+    lag: int = 1,
+    min_obs: int = MIN_PERIODS,
+) -> tuple[pd.Series, pd.Series]:
+    """Estrategia condicional ao BVRP (quantil expansivo, sem lookahead).
+
+    - Limiar calculado com janela expansiva (expanding_quantile_signal)
+    - expanding_quantile_signal ja embute lag=1 (shift do sinal)
+    - Burn-in: primeiros min_obs dias sem posicao
+
+    Parametros
+    ----------
+    returns : retornos diarios do ativo
+    bvrp    : serie do BVRP (vrp_30d)
+    q       : quantil de corte (padrao: 0.80)
+    lag     : defasagem extra alem do lag=1 ja embutido (raramente necessario)
+    min_obs : burn-in minimo em dias
+
+    Retorna
+    -------
+    (strategy_returns, position)
+    """
+    idx = returns.index.intersection(bvrp.index)
+    r = returns.loc[idx].astype(float)
+    s = bvrp.loc[idx].astype(float)
+
+    pos, _ = expanding_quantile_signal(s, quantile=q, min_obs=min_obs)
+
+    # lag adicional alem do ja embutido na expanding_quantile_signal (lag=1)
+    if lag > 1:
+        pos = pos.shift(lag - 1).fillna(0.0)
+
+    strat_ret = pos * r
+    strat_ret.name = f"BVRP q{int(q * 100)}"
+    pos.name = f"pos_BVRP_q{int(q * 100)}"
+
+    return strat_ret, pos
