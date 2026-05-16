@@ -143,14 +143,18 @@ disponível estritamente até $t-1$, com \textit{burn-in} inicial de 252 dias
 
 Para avaliar a robustez econômica a fricções de mercado, as métricas são
 reportadas em três cenários de custo de transação unilateral: 0~bps (bruto),
-5~bps e 10~bps por mudança de posição. A faixa de 5--10~bps é consistente
-com as taxas \textit{taker} praticadas na Binance para o par BTC/USDT no
-período amostral: participantes no nível básico pagam aproximadamente 10~bps
-por operação, enquanto usuários com volume elevado (nível VIP) operam entre
-2{,}5 e 5~bps. Com turnover médio de 20{,}4 operações por ano, o custo anual
-implícito da estratégia situa-se entre 102~bps (5~bps/op) e 204~bps
-(10~bps/op) --- arrasto modesto sobre o capital alocado, dado que a estratégia
-permanece exposta ao ativo em apenas 22{,}5\% do tempo.
+5~bps e 10~bps por mudança de posição. A faixa de 5--10~bps é consistente com as taxas praticadas na Binance
+para o par BTC/USDT no período amostral. A taxa \textit{taker} padrão
+é de 10~bps (0{,}1\% por operação), conforme o \textit{fee schedule}
+público da plataforma \citep{Binance2024fees}. Investidores que optam
+pelo pagamento de taxas em BNB --- opção disponível sem requisito mínimo
+de volume --- obtêm desconto de 25\%, reduzindo o custo efetivo para
+7{,}5~bps. O cenário de 5~bps representa um limite inferior conservador,
+aplicável a usuários que combinam o desconto BNB com uso predominante de
+ordens limitadas (\textit{maker}), cuja taxa base é equivalente à
+\textit{taker} no nível padrão da Binance. Com turnover médio de
+20{,}4 operações por ano, o arrasto anual implícito da estratégia
+situa-se entre 102~bps (5~bps/op) e 204~bps (10~bps/op).
 
 Os resultados evidenciam que a estratégia condicional ao BVRP cumpre um papel
 predominantemente \textbf{defensivo}, não de geração de alfa. O Sharpe bruto
