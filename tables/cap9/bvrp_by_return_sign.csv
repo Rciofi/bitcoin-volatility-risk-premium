@@ -1,0 +1,5 @@
+variavel,label,N_pos,N_neg,media_pos,media_neg,mediana_pos,mediana_neg,dp_pos,dp_neg,diferenca,t_stat,p_valor
+vrp_30d,BVRP (vrp_30d),876,899,-8.030893,-8.468862,-9.264201,-9.275041,12.450179,13.102155,0.437970,0.722069,0.470347
+ret_fut_5d,Retorno futuro  5 dias,876,899,0.001921,0.003627,,,,,-0.001706,-0.557201,0.577460
+ret_fut_20d,Retorno futuro 20 dias,876,899,0.009734,0.012682,,,,,-0.002948,-0.460098,0.645503
+ret_fut_30d,Retorno futuro 30 dias,876,899,0.017934,0.015963,,,,,0.001971,0.245785,0.805877

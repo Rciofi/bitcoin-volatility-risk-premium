@@ -1,0 +1,182 @@
+\chapter{Dados}
+\label{chap:dados}
+
+Este capítulo descreve as bases de dados utilizadas na dissertação e apresenta
+uma análise exploratória das principais variáveis de interesse. O objetivo é
+caracterizar as propriedades estatísticas do prêmio de risco de volatilidade do
+Bitcoin, bem como sua relação preliminar com medidas de volatilidade e retornos
+do ativo, fornecendo motivação empírica para as análises econométricas e
+preditivas desenvolvidas nos capítulos subsequentes.
+
+A análise conduzida neste capítulo possui caráter estritamente descritivo e
+exploratório, não implicando inferências causais. Ainda assim, ela é fundamental
+para compreender a dinâmica temporal, a distribuição estatística e a
+heterogeneidade do prêmio de risco de volatilidade ao longo da amostra,
+estabelecendo o pano de fundo empírico para os modelos apresentados nos
+Capítulos~\ref{chap:metodologia} e~\ref{chap:resultados_ols}.
+
+A amostra utilizada nesta dissertação abrange o período de março de 2021 a março de 2026, cobrindo 1.775 observações diárias. Vale registrar que esse intervalo abrange a aprovação dos ETFs \textit{spot} de Bitcoin pela \textit{Securities and Exchange Commission} (SEC) em janeiro de 2024 --- evento institucional cujo potencial efeito estrutural sobre a dinâmica do BVRP é discutido como limitação no Capítulo~\ref{chap:regimes}.
+
+% =========================================================
+\section{Descrição das variáveis e estatísticas descritivas}
+\label{sec:estatisticas_descritivas}
+
+A base de dados utilizada é composta por observações diárias do mercado de
+Bitcoin, combinando informações do mercado à vista e do mercado de opções.
+Especificamente, são considerados: (i) retornos do Bitcoin no mercado à vista;
+(ii) volatilidade realizada construída a partir desses retornos; (iii)
+volatilidade implícita extraída do mercado de opções negociadas na plataforma
+Deribit; e (iv) o prêmio de risco de volatilidade do Bitcoin (BVRP).
+
+As medidas de volatilidade implícita e realizada são construídas em janelas
+móveis de 30 dias, de modo a garantir comparabilidade temporal entre ambas,
+alinhando-se às práticas de mercado e à literatura empírica sobre prêmio de
+risco de volatilidade. A volatilidade implícita a 30 dias é consistente com o
+horizonte do índice DVOL da Deribit, enquanto a volatilidade realizada é
+anualizada considerando a negociação contínua do mercado de Bitcoin.
+
+A Tabela~\ref{tab:estatisticas_cap3} apresenta estatísticas descritivas das
+principais variáveis empregadas na análise empírica, incluindo média, desvio
+padrão, valores mínimo e máximo. Observa-se que tanto a volatilidade implícita
+quanto a volatilidade realizada exibem elevada variabilidade, refletindo a
+natureza altamente volátil do mercado de criptoativos. O prêmio de risco de
+volatilidade apresenta média negativa ao longo da amostra
+(aproximadamente $-8{,}25$ p.p.), consistente com a existência de uma
+compensação paga pelos investidores para se protegerem do risco de volatilidade
+no mercado de opções de Bitcoin. A volatilidade implícita situa-se
+sistematicamente acima da volatilidade realizada, configurando um prêmio de
+seguro.
+
+\IfFileExists{tables/cap3/tabela_cap3_estatisticas_completas.tex}{
+  \input{tables/cap3/tabela_cap3_estatisticas_completas.tex}
+}{}
+
+% =========================================================
+\section{Séries temporais}
+\label{sec:series_temporais}
+
+A análise das séries temporais das variáveis de interesse permite avaliar a
+dinâmica da volatilidade e do prêmio de risco ao longo do tempo, bem como
+identificar episódios de persistência e mudanças de comportamento associados a
+eventos relevantes do mercado de criptoativos. A
+Figura~\ref{fig:vrp_timeseries} apresenta a evolução temporal do prêmio de risco
+de volatilidade do Bitcoin ao longo da amostra.
+
+\IfFileExists{figs/cap3/vrp_timeseries.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figs/cap3/vrp_timeseries.png}
+    \caption{Evolução temporal do prêmio de risco de volatilidade do Bitcoin (BVRP)}
+    \label{fig:vrp_timeseries}
+\end{figure}
+}{}
+
+A inspeção visual da série evidencia períodos recorrentes de elevação do prêmio
+de risco de volatilidade, frequentemente associados a episódios de estresse no
+mercado, como choques macroeconômicos globais, eventos regulatórios relevantes e
+fases de forte desalavancagem. Observa-se também a presença de persistência
+temporal, sugerindo que o BVRP não se comporta como um processo puramente
+aleatório, mas apresenta dinâmica própria ao longo do tempo.
+
+% =========================================================
+\section{Distribuições empíricas}
+\label{sec:distribuicoes}
+
+A análise das distribuições empíricas fornece evidências adicionais sobre as
+propriedades estatísticas das variáveis consideradas. A
+Figura~\ref{fig:vrp_hist} apresenta o histograma do prêmio de risco de
+volatilidade do Bitcoin, juntamente com uma estimativa de densidade por kernel.
+
+\IfFileExists{figs/cap3/vrp_histogram_kde.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figs/cap3/vrp_histogram_kde.png}
+    \caption{Distribuição empírica do prêmio de risco de volatilidade do Bitcoin}
+    \label{fig:vrp_hist}
+\end{figure}
+}{}
+
+A distribuição do prêmio de risco de volatilidade apresenta duas
+características marcantes. Primeira, a presença de assimetria negativa
+(coeficiente de assimetria de $-1{,}20$) e caudas pesadas (excesso de curtose
+de $2{,}05$), afastando-se da hipótese de normalidade. Segunda, e mais relevante
+sob o ponto de vista econômico, a distribuição exibe um perfil bimodal:
+identifica-se um modo dominante na região de valores positivos, concentrado
+entre 5 e 15 pontos percentuais de volatilidade anualizada, e uma concentração
+secundária na região de valores negativos.
+
+Essa bimodalidade possui interpretação econômica direta. O modo positivo
+corresponde ao regime de mercado predominante, no qual a volatilidade implícita
+supera a volatilidade realizada, gerando um prêmio de risco positivo ---
+consistente com a compensação exigida pelos investidores para assumir exposição
+ao risco de volatilidade por meio de contratos de opções. A concentração de
+valores negativos, por sua vez, corresponde a episódios de estresse agudo, em
+que a volatilidade realizada supera inesperadamente a volatilidade implícita.
+Esses episódios tipicamente ocorrem durante choques abruptos de mercado, quando
+a velocidade e a magnitude das oscilações de preço superam as expectativas
+incorporadas nos prêmios de opções.
+
+A coexistência dessas duas concentrações sugere que o BVRP é melhor descrito
+por uma mistura de regimes do que por uma distribuição unimodal contínua. Tal
+evidência fornece suporte empírico à análise de subperíodos desenvolvida na
+Seção~\ref{sec:regimes} e justifica a adoção de abordagens que acomodem
+heterogeneidade e mudanças de regime nos capítulos subsequentes.
+
+% =========================================================
+\section{Análise por regimes e subperíodos}
+\label{sec:regimes}
+
+Com o objetivo de avaliar a heterogeneidade temporal do prêmio de risco de
+volatilidade, a amostra é agrupada por ano e a distribuição do BVRP em cada
+subperíodo é examinada por meio de boxplots. A
+Figura~\ref{fig:vrp_boxplot} apresenta os resultados desse agrupamento anual.
+
+\IfFileExists{figs/cap3/vrp_boxplot.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figs/cap3/vrp_boxplot.png}
+    \caption{Distribuição anual do prêmio de risco de volatilidade do Bitcoin (BVRP)}
+    \label{fig:vrp_boxplot}
+\end{figure}
+}{}
+
+Os resultados indicam que o prêmio de risco de volatilidade não é homogêneo ao
+longo do tempo. Em 2023, o BVRP apresentou maior variabilidade e valores medianos
+mais elevados, ao passo que 2024 e 2025 exibiram distribuições mais comprimidas,
+porém com persistência do prêmio positivo. Essa evidência sugere que modelos com
+parâmetros constantes podem ser insuficientes para capturar plenamente a
+dinâmica do BVRP, justificando a adoção de abordagens que permitam variação
+temporal e efeitos de regime nos capítulos subsequentes.
+
+% =========================================================
+\section{Relações iniciais entre prêmio de risco de volatilidade e retornos}
+\label{sec:vrp_retornos}
+
+Por fim, são examinadas relações exploratórias entre o prêmio de risco de
+volatilidade do Bitcoin e os retornos futuros do ativo em diferentes horizontes
+temporais. A
+Figura~\ref{fig:vrp_ret_20d} apresenta o gráfico de dispersão entre o BVRP
+observado no tempo $t$ e o retorno futuro acumulado do Bitcoin no horizonte de
+20 dias, juntamente com uma reta de tendência linear.
+
+\IfFileExists{figs/cap3/vrp_vs_return_20d.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figs/cap3/vrp_vs_return_20d.png}
+    \caption{Relação exploratória entre o prêmio de risco de volatilidade e os
+    retornos futuros do Bitcoin (h = 20 dias)}
+    \label{fig:vrp_ret_20d}
+\end{figure}
+}{}
+
+O gráfico evidencia uma associação positiva e de magnitude modesta entre o BVRP
+e os retornos futuros no horizonte de 20 dias, com coeficiente de correlação de
+$0{,}20$. A elevada dispersão em torno da reta de tendência indica que o prêmio
+de risco de volatilidade captura apenas parcialmente a variação dos retornos
+futuros, sugerindo que outros fatores exercem papel relevante na determinação do
+desempenho do ativo nesse horizonte. A direção positiva da associação ---
+valores mais elevados do BVRP tendem a preceder retornos mais altos nos 20 dias
+subsequentes --- é consistente com a hipótese de que o prêmio de risco de
+volatilidade carrega conteúdo informacional sobre o desempenho futuro do Bitcoin,
+fornecendo motivação econômica para os testes formais desenvolvidos no
+Capítulo~\ref{chap:resultados_ols}.

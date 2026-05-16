@@ -1,0 +1,302 @@
+\chapter{Previsão do Prêmio de Risco de Volatilidade com Aprendizado de Máquina}
+\label{chap:ml_bvrp}
+
+\section{Motivação e Objetivo do Capítulo}
+\label{sec:cap8_motivacao}
+
+Os resultados empíricos apresentados no Capítulo~\ref{chap:estrategias}
+indicam que o Prêmio de Risco de Volatilidade do Bitcoin (BVRP) contém informação
+relevante para a construção de estratégias condicionais, sobretudo quando o sinal
+se encontra em níveis elevados e em ambientes específicos de volatilidade realizada.
+Ainda assim, as estratégias avaliadas baseiam-se em regras determinísticas simples,
+definidas por limiares fixos e decisões binárias de alocação.
+
+Embora tais abordagens sejam transparentes e economicamente interpretáveis, elas
+impõem limitações importantes. Em particular, regras exógenas dificilmente capturam:
+(i) interações entre múltiplas variáveis do mercado à vista e de derivativos;
+(ii) relações não lineares ou assimétricas; e (iii) variação temporal na relevância
+das variáveis explicativas (\textit{state dependence}), típica em mercados com mudanças
+frequentes de regime, como o de criptoativos.
+
+Nesse contexto, técnicas de aprendizado de máquina oferecem um arcabouço mais
+flexível para modelar a dinâmica do BVRP, permitindo incorporar simultaneamente
+múltiplos preditores e estruturas não lineares, sob protocolos de validação temporal
+que respeitam o ambiente fora da amostra.
+
+O objetivo deste capítulo é investigar se modelos de aprendizado de máquina
+são capazes de prever o BVRP fora da amostra de forma estatisticamente e
+economicamente relevante. Para isso, compara-se o desempenho de quatro classes
+de modelos supervisionados --- LASSO, Ridge, floresta aleatória e Gradient Boosting ---
+sob um desenho experimental rigoroso, incluindo um benchmark baseado na média
+histórica incondicional do BVRP no período de treino.
+
+\section{Formulação do Problema Preditivo}
+\label{sec:cap8_problema}
+
+O problema preditivo consiste em estimar o valor futuro do prêmio de risco de
+volatilidade em um horizonte $h$, utilizando exclusivamente informação disponível
+até o instante $t$. Seja $\text{BVRP}_t$ o prêmio de risco associado a uma janela
+de 30 dias, construído como a diferença entre a volatilidade realizada em janela
+retrospectiva até $t$ e a volatilidade implícita observada em $t$:
+\begin{equation}
+\text{BVRP}_{t} = \text{RV}_{t-29:t}^{(30)} - \text{IV}_{t}^{(30)}.
+\end{equation}
+
+A tarefa de previsão é definida como:
+\begin{equation}
+\widehat{\text{BVRP}}_{t+1} = f\left(\mathbf{X}_t\right),
+\end{equation}
+em que $\mathbf{X}_t$ denota o vetor de variáveis explicativas observadas em $t$,
+e $f(\cdot)$ representa a função estimada pelo modelo supervisionado.
+
+O horizonte de previsão é de $h=1$ dia, de modo a reproduzir um ambiente realista
+de decisão. Em todos os casos, as variáveis são alinhadas para garantir ausência
+de \textit{look-ahead bias} e de vazamento de informação (\textit{data leakage}):
+as variáveis explicativas disponíveis em $t$ são utilizadas para prever
+$\text{BVRP}_{t+1}$; em particular, os componentes algébricos do BVRP ---
+volatilidade implícita (\text{IV}) e volatilidade realizada (\text{RV}) --- são
+excluídos do conjunto de preditores por conterem identidade com a variável-alvo.
+
+\section{Dados e Variáveis Explicativas}
+\label{sec:cap8_dados}
+
+O conjunto de dados cobre o período de 19 de abril de 2023 a 11 de dezembro de 2024,
+totalizando 603 observações diárias após a limpeza e alinhamento temporal. As variáveis
+explicativas são construídas a partir de três fontes: (i) preços à vista do Bitcoin
+(Bitstamp/CoinGecko); (ii) índice de volatilidade implícita DVOL da Deribit; e
+(iii) variáveis derivadas calculadas sobre as séries anteriores.
+
+O vetor de preditores $\mathbf{X}_t$ é composto por 12 variáveis:
+
+\begin{itemize}
+    \item \textbf{Nível e retorno}: preço de fechamento (\texttt{close}) e retorno
+    diário (\texttt{ret}) do Bitcoin;
+    \item \textbf{Dinâmica do prêmio e da volatilidade}: variação diária da IV
+    (\texttt{d\_iv\_1d}) e variação diária do BVRP (\texttt{d\_vrp\_1d}),
+    capturando momentum e reversão de curto prazo;
+    \item \textbf{Retornos defasados}: retornos com defasagens de 1, 5 e 20 dias
+    (\texttt{ret\_lag\_1}, \texttt{ret\_lag\_5}, \texttt{ret\_lag\_20}),
+    representando dinâmicas de curto, médio e longo prazo;
+    \item \textbf{Indicador de regime}: variável numérica indicando o regime de
+    volatilidade realizada (baixo, médio ou alto), construída por tercis da RV
+    histórica (\texttt{vrp\_regime\_num});
+    \item \textbf{Efeitos de calendário}: mês do ano (\texttt{month}), dia da semana
+    (\texttt{weekday}), indicadores de início e fim de mês (\texttt{is\_month\_start},
+    \texttt{is\_month\_end}).
+\end{itemize}
+
+As variáveis que incorporam diretamente informação futura ---
+os componentes \text{IV} e \text{RV} do BVRP e os retornos futuros ---
+são excluídas do conjunto de preditores para garantir a validade fora da amostra.
+
+\section{Modelos de Aprendizado de Máquina}
+\label{sec:cap8_modelos}
+
+A análise emprega quatro modelos de aprendizado supervisionado, agrupados em duas famílias: modelos lineares regularizados, que ampliam a especificação MQO com penalidades para mitigar multicolinearidade e selecionar variáveis; e modelos baseados em árvores, capazes de capturar relações não lineares e interações entre preditores sem imposição funcional explícita.
+
+\subsection{Modelos lineares regularizados}
+
+\begin{itemize}
+    \item \textbf{LASSO} ($L_1$): regressão linear com penalidade $L_1$,
+    que promove esparsidade e seleção implícita de variáveis.
+    Hiperparâmetro: $\alpha = 0{,}001$ (selecionado para evitar zeragem excessiva dos
+    coeficientes dado o tamanho da amostra);
+    \item \textbf{Ridge} ($L_2$): regressão linear com penalidade $L_2$,
+    que encolhe os coeficientes em direção a zero sem forçar esparsidade.
+    Hiperparâmetro: $\alpha = 1{,}0$;
+\end{itemize}
+
+\subsection{Modelos baseados em árvores}
+
+\begin{itemize}
+    \item \textbf{floresta aleatória}: conjunto de 300 árvores de decisão com seleção
+    aleatória de subconjunto de variáveis (\textit{bagging}), capaz de capturar
+    interações e não linearidades sem impor forma funcional paramétrica;
+    \item \textbf{Gradient Boosting}: método de conjunto sequencial em que árvores
+    são treinadas para corrigir os resíduos das árvores anteriores, reduzindo vieses
+    ao aprender padrões residuais (parâmetros padrão do scikit-learn 1.x).
+\end{itemize}
+
+A Tabela~\ref{tab:cap8-hiperparametros} consolida os hiperparâmetros utilizados em cada modelo, bem como o método de seleção adotado.
+\begin{table}[H]
+\centering
+\caption{Hiperparâmetros dos modelos do Capítulo~\ref{chap:ml_bvrp}.}
+\label{tab:cap8-hiperparametros}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Modelo} & \textbf{Hiperparâmetro} & \textbf{Valor} & \textbf{Método de seleção} \\
+\midrule
+LASSO         & \texttt{alpha}        & $0{,}001$ & Fixado a priori \\
+              & \texttt{max\_iter}    & $50.000$  & Convergência numérica \\
+\midrule
+Ridge         & \texttt{alpha}        & $1{,}0$   & Fixado a priori \\
+\midrule
+floresta aleatória & \texttt{n\_estimators} & $300$    & Fixado a priori \\
+              & \texttt{max\_depth}    & \texttt{None} & Padrão \texttt{scikit-learn} \\
+              & \texttt{max\_features} & \texttt{"sqrt"} & Padrão \texttt{scikit-learn} \\
+              & \texttt{random\_state} & $42$    & Reprodutibilidade \\
+\midrule
+Gradient Boosting & \texttt{n\_estimators}  & $100$   & Padrão \texttt{scikit-learn} \\
+              & \texttt{max\_depth}      & $3$     & Padrão \texttt{scikit-learn} \\
+              & \texttt{learning\_rate}  & $0{,}1$ & Padrão \texttt{scikit-learn} \\
+              & \texttt{random\_state}   & $42$    & Reprodutibilidade \\
+\bottomrule
+\end{tabular}
+\end{table}
+Cabe destacar que, diferentemente do procedimento adotado no Capítulo~\ref{chap:cap6_ml} --- no qual os hiperparâmetros dos modelos lineares são selecionados por validação cruzada temporal com \textit{embargo} de 30 dias ---, no presente capítulo os hiperparâmetros foram fixados em valores convencionalmente adotados na literatura, sem otimização explícita por validação cruzada. Essa escolha representa limitação metodológica reconhecida: hiperparâmetros não otimizados podem subestimar o desempenho preditivo alcançável pelos modelos. A robustez dos achados sobre importância das variáveis preditoras é, contudo, avaliada de forma independente por meio de valores SHAP calculados no conjunto de teste (Seção~\ref{sec:cap8_comparacao}), procedimento cujo ordenamento de importância das variáveis não depende da escolha específica dos hiperparâmetros. Extensões futuras desta análise podem incorporar busca exaustiva por hiperparâmetros via \texttt{GridSearchCV} ou otimização bayesiana via \texttt{Optuna}, conforme o protocolo descrito por Toda (2026) e adotado na literatura recente de finanças quantitativas.
+
+Como benchmark, utiliza-se um preditor ingênuo que prediz a média incondicional
+do BVRP calculada sobre o período de treinamento para todas as observações fora
+da amostra (\textit{DummyRegressor}, estratégia ``mean''). Este benchmark
+é relevante pois um modelo que não supera a média histórica não agrega valor
+preditivo líquido sobre a informação de nível já contida no prêmio.
+
+\section{Desenho Experimental e Avaliação Fora da Amostra}
+\label{sec:cap8_oos}
+
+A amostra de 603 observações é dividida cronologicamente em proporção 70/30:
+os primeiros 422 dias (19 abr.\ 2023 -- 13 jun.\ 2024) compõem o conjunto de
+treinamento; as 181 observações subsequentes (14 jun.\ 2024 -- 11 dez.\ 2024)
+formam o conjunto de teste fora da amostra. Não há embaralhamento nem cruzamento
+temporal: toda observação fora da amostra é posterior a toda observação de treino.
+
+Nenhum procedimento formal de validação temporal interna foi aplicado para
+seleção de hiperparâmetros nesta análise; os valores foram fixados a priori
+com base em escolhas conservadoras e amplamente usadas na literatura de
+regularização para séries temporais financeiras..
+
+O desempenho é avaliado por meio de três métricas calculadas exclusivamente
+sobre o período fora da amostra:
+\begin{equation}
+\text{MSE} = \frac{1}{T_{\text{OOS}}}\sum_{t=1}^{T_{\text{OOS}}}
+\bigl(\text{BVRP}_t - \widehat{\text{BVRP}}_t\bigr)^2,
+\end{equation}
+\begin{equation}
+\text{RMSE} = \sqrt{\text{MSE}},
+\end{equation}
+\begin{equation}
+R^2_{\text{OOS}} = 1 - \frac{\sum_{t}(\text{BVRP}_t - \widehat{\text{BVRP}}_t)^2}
+{\sum_{t}(\text{BVRP}_t - \overline{\text{BVRP}}_{\text{OOS}})^2},
+\end{equation}
+em que $\overline{\text{BVRP}}_{\text{OOS}}$ é a média do BVRP no período de teste.
+Um $R^2_{\text{OOS}} > 0$ indica que o modelo supera a média incondicional do
+próprio período fora da amostra; valores negativos indicam desempenho inferior ao benchmark trivial.
+
+\section{Resultados Empíricos}
+\label{sec:cap8_resultados}
+
+Esta seção apresenta os resultados da previsão do Prêmio de Risco de Volatilidade
+do Bitcoin fora da amostra. Inicialmente, reporta-se o desempenho estatístico dos
+modelos. Em seguida, discute-se a comparação entre classes de modelos e, por fim,
+as implicações econômicas das previsões obtidas.
+
+\subsection{Desempenho Preditivo Fora da Amostra}
+\label{sec:cap8_resultados_oos}
+
+A Tabela~\ref{tab:cap8_oos_performance} reporta o MSE, o RMSE e o $R^2_{\text{OOS}}$
+para cada modelo avaliado no período de teste (14 jun.\ 2024 -- 11 dez.\ 2024).
+
+\input{tables/tab8/tab8_oos_performance}
+
+O principal resultado é o desempenho expressivo dos modelos lineares regularizados:
+o LASSO obtém $R^2_{\text{OOS}} = 0{,}718$ e RMSE de 5,84 p.p., enquanto o Ridge
+alcança $R^2_{\text{OOS}} = 0{,}717$ e RMSE de 5,85 p.p. --- valores praticamente
+idênticos entre si e substancialmente superiores ao benchmark.
+A floresta aleatória ocupa a terceira posição ($R^2_{\text{OOS}} = 0{,}676$; RMSE = 6,27),
+seguido pelo Gradient Boosting ($R^2_{\text{OOS}} = 0{,}650$; RMSE = 6,51).
+
+O benchmark de média histórica apresenta $R^2_{\text{OOS}} \approx -0{,}002$,
+refletindo que a média do período de treino é um mau preditor da média do período fora da amostra
+--- o que era esperado dada a tendência de alta do BVRP ao longo de 2024
+(o nível médio do BVRP no período fora da amostra difere do nível médio de treinamento).
+
+A Figura~\ref{fig:cap8_oos_prediction} exibe a série temporal do BVRP realizado
+ao longo do período fora da amostra junto à previsão um passo à frente do LASSO, o modelo
+de melhor desempenho.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figs/cap8/fig_cap8_oos_prediction.png}
+\caption{Previsão um passo à frente do BVRP fora da amostra --- modelo LASSO.
+Período fora da amostra\@: 14 jun.\ 2024 -- 11 dez.\ 2024 ($N=181$ dias).
+A linha sólida representa o BVRP realizado; a linha tracejada, a previsão do LASSO
+($\alpha=0{,}001$). O $R^2_{\text{OOS}}$ do modelo é 0,718.}
+\label{fig:cap8_oos_prediction}
+\end{figure}
+
+\subsection{Comparação entre Modelos e Importância de Variáveis}
+\label{sec:cap8_comparacao}
+
+A hierarquia de desempenho --- modelos lineares $>$ floresta aleatória $>$ Gradient
+Boosting $\gg$ benchmark --- sugere que parte relevante da previsibilidade do BVRP
+decorre de relações relativamente estáveis e aproximadamente lineares entre o prêmio
+e variáveis associadas à dinâmica recente de volatilidade (variações de curto prazo
+do DVOL e do próprio BVRP, retornos defasados).
+
+Modelos baseados em árvores e \textit{boosting} superam o benchmark com folga
+($R^2_{\text{OOS}} \approx 0{,}65$--$0{,}68$), indicando a presença de alguma
+não linearidade explorada por estas classes. Contudo, a vantagem sobre os modelos
+lineares regularizados é limitada (diferença de cerca de 4--7 p.p.\ de $R^2$),
+sugerindo que a contribuição marginal de complexidade adicional é modesta na
+amostra analisada.
+
+Um aspecto notável é a equivalência quase perfeita entre LASSO e Ridge
+($\Delta R^2 < 0{,}002$), o que indica que a esparsidade adicional imposta
+pelo LASSO não melhora significativamente o poder preditivo em relação à
+penalização quadrática do Ridge --- possivelmente porque as 12 variáveis do vetor
+$\mathbf{X}_t$ já são suficientemente informativas e colineares para que
+poucos preditores capturem a maior parte da variância.
+
+A Figura~\ref{fig:cap8_feature_importance} exibe a importância de variáveis
+do floresta aleatória (por redução de impureza) e os coeficientes estimados pelo LASSO.
+Os dois painéis convergem em um resultado central: o regime de volatilidade
+(\texttt{vrp\_regime\_num}) é o preditor dominante, respondendo por cerca de 69\%
+da importância total na floresta aleatória e pelo maior coeficiente positivo no LASSO
+(+9,89). Isso é economicamente coerente: o BVRP tende a ser estruturalmente mais
+elevado em regimes de alta volatilidade realizada, e o regime corrente carrega
+informação persistente sobre o nível do prêmio no período seguinte.
+
+No LASSO, os demais preditores de maior magnitude são os retornos defasados:
+o retorno de 1 dia apresenta coeficiente negativo ($-6{,}47$), sugerindo reversão
+de curto prazo, enquanto os retornos de 5 e 20 dias exibem coeficientes positivos
+($+3{,}72$ e $+1{,}36$), consistentes com momentum de médio prazo. O efeito de
+fim de mês também aparece com sinal negativo ($-1{,}85$), possivelmente refletindo
+redução na aversão ao risco ao final do período.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figs/cap8/fig_cap8_shap_beeswarm.png}
+\caption{Importância de variáveis --- floresta aleatória via valores SHAP (beeswarm plot).
+Cada ponto representa uma observação do conjunto de teste; a cor indica o valor
+da feature (vermelho $=$ alto, azul $=$ baixo) e a posição horizontal indica o
+impacto marginal sobre a previsão do BVRP. As features estão ordenadas pela
+importância média $|\text{SHAP}|$. Calculado com \texttt{shap.TreeExplainer}
+sobre o conjunto de teste ($N=459$ observações). Período de treino:
+19 abr.\ 2023 -- 13 jun.\ 2024. A figura com importância MDI está no Apêndice.}
+\label{fig:cap8_feature_importance}
+\end{figure}
+
+A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo LASSO
+e pelo Ridge, ordenados pela magnitude absoluta do LASSO. Nenhum coeficiente do LASSO
+foi zerado, o que indica que $\alpha=0{,}001$ representa uma penalidade branda ---
+todos os preditores contribuem marginalmente para a previsão. A convergência de
+sinais entre LASSO e Ridge para todas as 12 variáveis confirma a robustez da
+direção dos efeitos; as diferenças de magnitude refletem os distintos valores de
+$\alpha$ escolhidos para cada método.
+
+\input{tables/tab8/tab8_coeficientes}
+
+\subsection{Implicações Econômicas}
+\label{sec:cap8_implicacoes}
+
+As previsões do BVRP podem ser interpretadas como um insumo adicional para alocação
+dinâmica de risco. Valores previstos elevados do prêmio sugerem ambientes em que a
+compensação esperada por carregar risco de volatilidade é maior, possivelmente
+associados a períodos de estresse e maior aversão ao risco. Em contraste, previsões
+baixas podem sinalizar ambientes de menor atratividade do prêmio, nos quais a
+exposição condicional pode ser menos eficiente.
+
+Contudo, a evidência empírica sugere cautela: (i) o $R^2_{\text{OOS}}$ elevado
+reflete em grande medida a persistência temporal do BVRP --- um modelo de
+persistênci

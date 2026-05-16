@@ -1,0 +1,23 @@
+﻿# Normaliza line endings: LF no repositório, conversão automática local
+* text=auto eol=lf
+
+# Código fonte sempre LF
+*.py text eol=lf
+*.tex text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.bib text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binários (sem conversão)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.joblib binary
+*.pkl binary
+*.xlsx binary
+*.xls binary

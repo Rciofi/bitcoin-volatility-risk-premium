@@ -1,0 +1,67 @@
+% ----------------------------------------------------
+% PREÂMBULO — PACOTES E CONFIGURAÇÕES
+% ----------------------------------------------------
+
+% Codificação e idioma
+\usepackage[utf8]{inputenc}
+\usepackage{pmboxdraw}   % suporte a caracteres box-drawing Unicode (U+2500-U+257F)
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[brazilian]{babel}
+
+% Matemática
+\usepackage{amsmath, amsfonts, amssymb}
+
+% Figuras e tabelas
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{adjustbox}   % tabelas largas
+\usepackage{placeins}    % \FloatBarrier
+
+% Layout e tipografia
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage{indentfirst}
+
+% Legendas e subfiguras
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Referências e links
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+
+% ----------------------------------------------------
+% CONFIGURAÇÃO DE PÁGINA
+% ----------------------------------------------------
+\geometry{
+    a4paper,
+    left=3cm,
+    right=2cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.2cm}
+
+\onehalfspacing
+
+% ----------------------------------------------------
+% HIPERLINKS
+% ----------------------------------------------------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% ----------------------------------------------------
+% TOGGLES (CONDICIONAIS)
+% ----------------------------------------------------
+\newif\ifincludeolstables
+\includeolstablesfalse   % DESLIGA as tabelas OLS (compila sem elas)
+% \includeolstablestrue  % LIGA as tabelas OLS (quando estiverem corrigidas)

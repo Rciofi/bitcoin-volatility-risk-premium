@@ -1,0 +1,15 @@
+{
+  "decision_tree_best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "min_samples_split": 30
+  },
+  "decision_tree_best_rmse_val": 6.746651303856255,
+  "random_forest_best_params": {
+    "n_estimators": 300,
+    "max_depth": 10,
+    "min_samples_leaf": 1,
+    "max_features": 1.0
+  },
+  "random_forest_best_rmse_val": 7.843032734082773
+}

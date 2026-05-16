@@ -1,0 +1,201 @@
+﻿\chapter{Metodologia}
+\label{chap:metodologia}
+
+Este capítulo apresenta a metodologia empírica adotada para investigar a
+existência e as propriedades do prêmio de risco de volatilidade no mercado de
+Bitcoin, bem como seu conteúdo informacional para a previsão de retornos futuros
+do ativo. Com base nas evidências descritivas apresentadas no
+Capítulo~\ref{chap:dados}, são formuladas as hipóteses de pesquisa e
+especificados os modelos econométricos e preditivos utilizados ao longo da
+dissertação.
+
+A estratégia empírica combina modelos econométricos lineares de referência com
+abordagens mais flexíveis, incluindo técnicas de aprendizado de máquina, com
+o objetivo de capturar possíveis não linearidades, variação temporal de
+parâmetros e interações complexas características do mercado de criptoativos.
+Este capítulo concentra-se na definição formal das hipóteses, das variáveis e
+das especificações empíricas, enquanto os resultados são apresentados nos
+capítulos subsequentes.
+
+% =========================================================
+\section{Questões de pesquisa e hipóteses}
+\label{sec:hipoteses}
+
+A análise empírica desenvolvida nesta dissertação é guiada por duas questões
+centrais. A primeira refere-se à existência de um prêmio de risco de
+volatilidade estatisticamente e economicamente relevante no mercado de opções
+de Bitcoin. A segunda diz respeito ao potencial conteúdo informacional desse
+prêmio para a previsão de retornos futuros do Bitcoin no mercado à vista.
+
+As hipóteses de trabalho que orientam a análise empírica desta dissertação
+estão formalmente enunciadas no Capítulo~\ref{chap:introducao}
+(Seção~\ref{sec:cap1-hipoteses}). Para fins de operacionalização, cada uma
+é testada por procedimentos específicos detalhados nas seções seguintes:
+H1~(existência do prêmio) é avaliada por teste~$t$ sobre a média amostral
+do BVRP; H2~(previsibilidade linear) é avaliada por regressões MQO com
+erros-padrão HAC (Newey--West, $\text{maxlags} = h$) em múltiplos horizontes;
+H3~(utilidade econômica) é avaliada por estratégias condicionais baseadas em
+quantis do BVRP; e H4~(heterogeneidade condicional e não linearidade) é
+avaliada por modelos de aprendizado de máquina com variáveis de estado de
+mercado. Cada procedimento segue protocolos metodológicos próprios detalhados
+nas seções correspondentes.
+
+
+% =========================================================
+\section{Definição das variáveis e horizontes de previsão}
+\label{sec:variaveis_horizontes}
+
+Nesta seção são definidas formalmente as variáveis utilizadas nos modelos
+empíricos, bem como os horizontes temporais considerados na análise. Todas as
+variáveis são construídas a partir das séries descritas no
+Capítulo~\ref{chap:dados}, respeitando estritamente a informação disponível no
+tempo $t$, de modo a evitar viés de \textit{look-ahead}.
+
+A variável dependente principal é o retorno futuro do Bitcoin no mercado
+\textit{spot}, definido como o retorno logarítmico acumulado ao longo de um
+horizonte de $h$ dias:
+\[
+R_{t+h} = \sum_{i=1}^{h} r_{t+i},
+\]
+em que $r_t$ denota o retorno logarítmico diário e
+$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão.
+
+A principal variável explicativa é o prêmio de risco de volatilidade observado
+no tempo $t$, definido como a diferença entre a volatilidade realizada no mercado
+à vista e a volatilidade implícita extraída do mercado de opções, ambas
+construídas em janelas móveis de 30 dias:
+\[
+\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}.
+\]
+Essa variável sintetiza a percepção de risco e incerteza futura implícita nos
+preços das opções de Bitcoin. Em especificações alternativas, são também
+consideradas a volatilidade implícita ($\text{IV}_{30,t}$) e a volatilidade
+realizada ($\text{RV}_{30,t}$) isoladamente como controles adicionais.
+
+Todas as variáveis explicativas são medidas no tempo $t$, garantindo que
+estariam disponíveis aos agentes econômicos no momento da formação das
+expectativas. A consideração de múltiplos horizontes de previsão permite
+investigar se o conteúdo informacional do BVRP se manifesta de forma distinta
+ao longo do tempo.
+
+% =========================================================
+\section{Modelos econométricos de referência}
+\label{sec:modelos_referencia}
+
+Esta seção apresenta os modelos econométricos de referência utilizados para
+avaliar a relação entre o prêmio de risco de volatilidade do Bitcoin e os
+retornos futuros do ativo. O objetivo desses modelos é estabelecer uma linha de
+base empírica simples, transparente e comparável à literatura existente, antes
+da introdução de abordagens mais flexíveis e não lineares.
+
+Os modelos são especificações lineares estimadas por mínimos quadrados
+ordinários (MQO) sobre a amostra completa disponível, nas quais os retornos
+futuros do Bitcoin são explicados pelo prêmio de risco de volatilidade observado
+no período anterior.
+
+\subsection{Especificação básica}
+
+A especificação econométrica básica é dada por:
+\begin{equation}
+R_{t+h} = \alpha_h + \beta_h \, \text{BVRP}_t + \varepsilon_{t+h},
+\label{eq:ols_basico}
+\end{equation}
+em que $R_{t+h}$ representa o retorno acumulado do Bitcoin no horizonte $h$,
+$\text{BVRP}_t$ denota o prêmio de risco de volatilidade observado no tempo $t$,
+$\alpha_h$ é um intercepto específico ao horizonte de previsão,
+$\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$ representa o termo
+de erro.
+
+O coeficiente $\beta_h$ captura a relação marginal entre o prêmio de risco de
+volatilidade e os retornos futuros do Bitcoin. A análise empírica não impõe
+restrições \textit{a priori} sobre o sinal desse coeficiente, permitindo que os
+dados determinem a direção da relação. As regressões são estimadas separadamente
+para cada horizonte de previsão, permitindo avaliar como o efeito do BVRP varia
+ao longo do tempo.
+
+\subsection{Extensão com variáveis de controle}
+
+Para avaliar a robustez dos resultados, a especificação básica é estendida com
+a inclusão da volatilidade realizada e da volatilidade implícita como controles
+adicionais:
+\begin{equation}
+R_{t+h} = \alpha_h + \beta_{1,h} \, \text{BVRP}_t + \beta_{2,h} \, \text{RV}_t
++ \beta_{3,h} \, \text{IV}_t + \varepsilon_{t+h}.
+\label{eq:ols_controles}
+\end{equation}
+
+Esta especificação permite investigar se o BVRP possui conteúdo informacional
+além do que já está contido nos níveis individuais de volatilidade implícita e
+realizada. Cabe notar, contudo, que como $\text{BVRP}_t = \text{IV}_t -
+\text{RV}_t$ por construção, há dependência linear entre os três regressores,
+o que introduz multicolinearidade na estimação. Em consequência, os coeficientes
+individuais devem ser interpretados com cautela, reconhecendo que a atribuição
+de efeitos marginais entre BVRP, IV e RV é parcialmente arbitrária nesse
+contexto. O modelo serve, portanto, como exercício de robustez, e não como
+especificação estrutural definitiva.
+
+\subsection{Inferência estatística}
+
+A inferência estatística é conduzida com erros padrão robustos à
+heterocedasticidade e à autocorrelação serial, reconhecendo que retornos
+financeiros frequentemente exibem tais características. Em particular, são
+utilizados erros padrão do tipo HAC (Newey--West), com número de defasagens
+compatível com o horizonte de previsão considerado, de modo a acomodar a
+sobreposição temporal inerente à construção dos retornos acumulados.
+
+A significância estatística dos coeficientes é avaliada por meio de testes $t$,
+enquanto a relevância econômica é analisada a partir da magnitude, sinal e
+estabilidade dos coeficientes estimados ao longo dos diferentes horizontes e
+especificações.
+
+% =========================================================
+\section{Estratégia empírica e procedimento de estimação}
+\label{sec:estrategia_empirica}
+
+A análise econométrica é conduzida em frequência diária, respeitando a ordenação
+temporal das informações. Em todas as especificações, as variáveis explicativas
+são observadas no tempo $t$, enquanto as variáveis dependentes correspondem a
+retornos acumulados em horizontes futuros $t+h$, assegurando que apenas
+informação disponível \textit{ex ante} seja utilizada na previsão.
+
+\subsection{Estimação sobre a amostra completa}
+
+Os modelos de MQO são estimados sobre a amostra completa disponível, sem divisão
+em janelas móveis ou subperíodos. Essa abordagem é padrão na literatura de
+previsão de retornos com variáveis de risco e permite a obtenção de estimativas
+estáveis dos parâmetros, aproveitando ao máximo a informação disponível.
+
+\subsection{Sobreposição temporal}
+
+Como os retornos futuros considerados correspondem a horizontes superiores a um
+dia, as observações apresentam sobreposição temporal (\textit{overlapping
+observations}). Esse fenômeno introduz autocorrelação no termo de erro que não
+reflete necessariamente dependência econômica, mas decorre da própria construção
+da variável dependente. Para lidar com esse problema, a inferência estatística é
+conduzida com erros padrão HAC (Newey--West), com número de defasagens igual a
+$h - 1$, compatível com o horizonte de previsão.
+
+\subsection{Separação treino e teste para modelos preditivos}
+
+Para as análises preditivas baseadas em aprendizado de máquina, desenvolvidas
+no Capítulo~\ref{chap:cap5_ml}, a amostra é dividida em períodos de treino e teste,
+respeitando estritamente a ordem temporal das observações. A amostra de treino é
+utilizada para a estimação dos parâmetros, enquanto a amostra de teste é
+reservada para a avaliação de desempenho fora da amostra (\textit{out-of-sample}).
+Essa separação não se aplica às regressões por MQO, cujo objetivo é avaliar relações
+em amostra.
+
+% =========================================================
+\section{Considerações sobre robustez e extensões}
+\label{sec:robustez}
+
+Além das especificações econométricas básicas, esta dissertação considera
+análises de robustez destinadas a avaliar a estabilidade dos resultados em
+diferentes horizontes de previsão, períodos amostrais e conjuntos de variáveis
+explicativas.
+
+Adicionalmente, são exploradas extensões que incorporam não linearidades,
+interações entre variáveis e possíveis efeitos de regime, reconhecendo que a
+relação entre o BVRP e os retornos futuros do Bitcoin pode variar ao longo do
+tempo. Essas extensões motivam a adoção de modelos de aprendizado de máquina,
+desenvolvidos em detalhe no Capítulo~\ref{chap:cap5_ml}.

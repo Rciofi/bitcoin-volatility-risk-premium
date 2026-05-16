@@ -1,0 +1,9 @@
+{
+  "features": [
+    "close",
+    "ret",
+    "rv_30d",
+    "iv_30d"
+  ],
+  "n_features": 4
+}

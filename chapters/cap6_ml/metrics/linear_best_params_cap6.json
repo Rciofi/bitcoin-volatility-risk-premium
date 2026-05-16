@@ -1,0 +1,6 @@
+{
+  "best_alpha_ridge": 0.0001,
+  "best_rmse_ridge_val": 3.2726752924495353,
+  "best_alpha_lasso": 0.0001,
+  "best_rmse_lasso_val": 3.2726858706990662
+}
