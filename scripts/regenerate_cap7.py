@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*-
-"""Regenera todas as tabelas do Capitulo 7 com dados atualizados e metodologia consistente."""
+"""Regenera todas as tabelas do Capitulo 7.
+
+Melhorias implementadas (Fase 1):
+  [P1] apply_transaction_costs(): cenarios 0, 5 e 10 bps nas Tabs 7.2 e 7.3
+  [P2] expanding_quantile_signal(): encapsula logica de janela expansiva
+  [P3] sortino_ratio(): adicionado em todas as tabelas (7.1 a 7.4)
+  Tab 7.2b (auxiliar): tres cenarios de custo lado a lado
+"""
 
 import pandas as pd
 import numpy as np
 import os
 
 os.makedirs('tables/tab7', exist_ok=True)
-os.makedirs('tables/cap7', exist_ok=True)  # [E6] para strategy_costs_cap7.csv
+os.makedirs('tables/cap7', exist_ok=True)
 
-ANN = 365  # Bitcoin: mercado 24/7
-MIN_PERIODS_Q80 = 252  # [E6] janela minima para limiar expansivo -- elimina lookahead
+ANN = 365        # Bitcoin: mercado 24/7
+MIN_PERIODS = 252  # janela minima para limiar expansivo (elimina lookahead)
 
+# Constante LaTeX para terminador de linha (evita f-string terminando com \\)
+_NL = r"\\"
+
+
+# ============================================================
+# Funcoes auxiliares
+# ============================================================
 
 def perf(rets):
+    """Retorno anualizado, volatilidade anualizada, Sharpe e MaxDD."""
     rets = rets.dropna()
     n = len(rets)
     if n == 0 or rets.std() == 0:
@@ -25,33 +40,84 @@ def perf(rets):
     return float(ret_a), float(vol_a), float(sharpe), mdd
 
 
+def sortino_ratio(returns, target=0, periods_per_year=365):
+    """[P3] Sortino ratio anualizado. Target padrao = 0."""
+    returns = returns.dropna()
+    if len(returns) == 0:
+        return np.nan
+    excess = returns - target / periods_per_year
+    downside_returns = returns[returns < target / periods_per_year]
+    downside_std = downside_returns.std() * np.sqrt(periods_per_year)
+    if downside_std == 0 or np.isnan(downside_std):
+        return np.nan
+    return float((excess.mean() * periods_per_year) / downside_std)
+
+
+def apply_transaction_costs(returns_series, position_series, cost_bps=10):
+    """[P1] Aplica custo proporcional ao turnover diario.
+
+    cost_bps: custo unilateral em pontos-base (10 bps = 0.10%).
+    Custo so incide quando position(t) != position(t-1).
+    """
+    position_change = position_series.diff().abs().fillna(
+        abs(position_series.iloc[0])
+    )
+    cost_per_day = position_change * (cost_bps / 10_000)
+    return returns_series - cost_per_day
+
+
+def expanding_quantile_signal(bvrp_series, quantile=0.80, min_obs=MIN_PERIODS):
+    """[P2] Sinal binario com quantil em janela expansiva (vetorizado).
+
+    Em cada t, o limiar usa APENAS dados de [0, t-1] (ex-ante).
+    O sinal usa BVRP defasado em 1 dia.
+    Burn-in: primeiros min_obs dias sem sinal (signal=0).
+
+    Retorna: (signal Series, threshold Series)
+    """
+    th_series = bvrp_series.expanding(min_periods=min_obs).quantile(quantile)
+    signal = (bvrp_series.shift(1) >= th_series.shift(1)).astype(float)
+    signal = signal.fillna(0.0)
+    signal.iloc[:min_obs] = 0.0
+    return signal, th_series
+
+
+def _fmt(val, d=4):
+    """Formata numero para LaTeX; retorna '--' se NaN."""
+    if val is None or (isinstance(val, float) and np.isnan(val)):
+        return "--"
+    return "{:.{}f}".format(val, d)
+
+
 # ============================================================
 # Dataset 1: BTC historico completo (referencia secundaria)
 # ============================================================
 df_btc = pd.read_csv('data/btc_prices.csv', parse_dates=['date'])
 df_btc = df_btc.sort_values('date').reset_index(drop=True)
 df_btc['ret'] = df_btc['close'].pct_change()
-# [E6] removido filtro <= '2024-12-31' -- usa serie historica completa (2017-2026)
 df_btc = df_btc.dropna(subset=['ret'])
 
-r, v, s, m = perf(df_btc['ret'])
-print(f"BH historico completo (N={len(df_btc)}): Return={r:.4f}, Vol={v:.4f}, Sharpe={s:.4f}, MDD={m:.4f}")
+r_bh, v_bh, s_bh, m_bh = perf(df_btc['ret'])
+sortino_bh = sortino_ratio(df_btc['ret'])
+print("BH historico completo (N={}): Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}".format(
+    len(df_btc), r_bh, v_bh, s_bh, _fmt(sortino_bh), m_bh))
 
-tab1_content = (
-    r"\begin{tabular}{lr}" + "\n"
-    r"\toprule" + "\n"
-    r" & Valor \\" + "\n"
-    r"M\'etrica &  \\" + "\n"
-    r"\midrule" + "\n"
-    f"Retorno Anualizado & {r:.4f} \\\\\n"
-    f"Volatilidade Anualizada & {v:.4f} \\\\\n"
-    f"Sharpe Ratio & {s:.4f} \\\\\n"
-    f"Max Drawdown & {m:.4f} \\\\\n"
-    r"\bottomrule" + "\n"
-    r"\end{tabular}"
-)
-with open('tables/tab7/tab7_1_perf_buy_hold.tex', 'w', encoding='utf-8') as f:
-    f.write(tab1_content)
+# Tab 7.1: metricas do Buy & Hold (formato vertical, + Sortino)
+tab1_rows = [
+    r"\begin{tabular}{lr}",
+    r"\toprule",
+    r"M\'etrica & Valor \\",
+    r"\midrule",
+    "Retorno Anualizado & {:.4f} {}".format(r_bh, _NL),
+    "Volatilidade Anualizada & {:.4f} {}".format(v_bh, _NL),
+    "Sharpe Ratio & {:.4f} {}".format(s_bh, _NL),
+    "Sortino Ratio & {} {}".format(_fmt(sortino_bh), _NL),
+    "Max Drawdown & {:.4f} {}".format(m_bh, _NL),
+    r"\bottomrule",
+    r"\end{tabular}",
+]
+with open('tables/tab7/tab7_1_perf_buy_hold.tex', 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(tab1_rows))
 print("Tabela 1 salva: tables/tab7/tab7_1_perf_buy_hold.tex")
 
 
@@ -61,148 +127,195 @@ print("Tabela 1 salva: tables/tab7/tab7_1_perf_buy_hold.tex")
 df = pd.read_csv('data/vrp_with_regimes.csv', parse_dates=['date'])
 df = df.sort_values('date').reset_index(drop=True)
 df = df.dropna(subset=['vrp_30d', 'ret'])
-print(f"\nDataset BVRP: {df['date'].min().date()} a {df['date'].max().date()}, N={len(df)}")
+print("\nDataset BVRP: {} a {}, N={}".format(
+    df['date'].min().date(), df['date'].max().date(), len(df)))
 
-# [E6] Limiar q80 via janela expansiva (min_periods=252) -- elimina lookahead
-# O sinal usa vrp_30d_{t-1} > q80_{t-1}; o shift(1) garante que
-# o limiar do dia t so usa dados ate t-1.
-q80_series = df['vrp_30d'].expanding(min_periods=MIN_PERIODS_Q80).quantile(0.80)
-n_warmup = int(q80_series.isna().sum()) + 1  # +1 pelo shift(1) aplicado ao sinal
-print(f"Limiar q80 expansivo: NaN iniciais={n_warmup - 1}, "
-      f"primeiro limiar em {df['date'].iloc[n_warmup - 1].date()}, "
-      f"valor final={float(q80_series.iloc[-1]):.4f}")
+# [P2] Sinal q80 via expanding_quantile_signal encapsulada
+sig80, q80_series = expanding_quantile_signal(df['vrp_30d'], quantile=0.80, min_obs=MIN_PERIODS)
 
-# [E6] BH subperiodo: referencia principal -- mesmo periodo operacional da estrategia
+n_nan = int(q80_series.isna().sum())
+n_warmup = n_nan + 1  # +1 pelo shift(1) no sinal
+q80_primeiro = float(q80_series.iloc[n_warmup]) if n_warmup < len(q80_series) else np.nan
+q80_ultimo = float(q80_series.iloc[-1])
+print("Limiar q80 expansivo: NaN iniciais={}, primeiro valido em {} = {:.4f}, ultimo = {:.4f}".format(
+    n_nan, df['date'].iloc[n_warmup].date(), q80_primeiro, q80_ultimo))
+
+# BH subperiodo: referencia principal (mesmo periodo operacional)
 df_sub = df.iloc[n_warmup:].copy()
 r_bh2, v_bh2, s_bh2, m_bh2 = perf(df_sub['ret'])
-print(f"BH subperiodo ({df_sub['date'].min().date()} -> {df_sub['date'].max().date()}, "
-      f"N={len(df_sub)}): Sharpe={s_bh2:.4f}, MDD={m_bh2:.4f}")
+sortino_bh2 = sortino_ratio(df_sub['ret'])
+print("BH subperiodo ({} -> {}, N={}): Sharpe={:.4f}, Sortino={}, MDD={:.4f}".format(
+    df_sub['date'].min().date(), df_sub['date'].max().date(), len(df_sub),
+    s_bh2, _fmt(sortino_bh2), m_bh2))
+
 
 # ============================================================
-# Tab7_2: Estrategia condicional q80
+# Tab 7.2 -- Estrategia q80% com cenarios de custo (0, 5, 10 bps)
 # ============================================================
-# [E6] sinal usa q80_series expansivo com shift para evitar lookahead
-sig80 = (df['vrp_30d'].shift(1) > q80_series.shift(1)).astype(float).fillna(0.0)
 sr80 = sig80 * df['ret']
-r2, v2, s2, m2 = perf(sr80)
-ti2 = float(sig80.mean())
-to2 = float(sig80.diff().abs().mean())
-ops2 = int(sig80.diff().abs().sum())
-print(f"\nEstrategia q80 exp: Return={r2:.4f}, Vol={v2:.4f}, Sharpe={s2:.4f}, MDD={m2:.4f}, "
-      f"Time={ti2:.4f}, Ops={ops2}")
+r80, v80, s80, m80 = perf(sr80)
+sortino_80 = sortino_ratio(sr80)
+ti80 = float(sig80.mean())
+to80 = float(sig80.diff().abs().mean())
+ops80 = int(sig80.diff().abs().sum())
+turnover_anual_80 = to80 * ANN
 
-# [E6] tabela passa de 1 coluna para 2: estrategia + BH subperiodo
-tab2_content = (
-    r"\begin{tabular}{lrr}" + "\n"
-    r"\toprule" + "\n"
-    r" & BVRP Quantil 80\% & Buy \& Hold \\" + "\n"
-    r"\midrule" + "\n"
-    f"Retorno Anualizado & {r2:.4f} & {r_bh2:.4f} \\\\\n"
-    f"Volatilidade Anualizada & {v2:.4f} & {v_bh2:.4f} \\\\\n"
-    f"Sharpe Ratio & {s2:.4f} & {s_bh2:.4f} \\\\\n"
-    f"Max Drawdown & {m2:.4f} & {m_bh2:.4f} \\\\\n"
-    r"\% Tempo Investido & " + f"{ti2:.4f} & 1.0000 \\\\\n"
-    r"\bottomrule" + "\n"
-    r"\end{tabular}"
-)
-with open('tables/tab7/tab7_2_perf_vrp_quantile.tex', 'w', encoding='utf-8') as f:
-    f.write(tab2_content)
-print("Tabela 2 salva.")
+print("\nEstrategia q80: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Ops={}, Turnover/ano={:.2f}".format(
+    r80, v80, s80, _fmt(sortino_80), m80, ops80, turnover_anual_80))
 
-# ============================================================
-# [E6 NOVO] Analise de sensibilidade a custos de transacao
-# ============================================================
-print("\nSensibilidade a custos (estrategia q80 expansiva):")
-cost_rows = []
-for cost_bp in [0, 10, 30]:
-    cost = cost_bp / 10000
-    cost_series = (sig80.diff().abs() * cost).fillna(0.0)
-    sr_net = sr80 - cost_series
+# [P1] Cenarios de custo: 0, 5 e 10 bps
+sharpe_cost80 = {}
+mdd_cost80 = {}
+for cost_bp in [0, 5, 10]:
+    sr_net = apply_transaction_costs(sr80, sig80, cost_bps=cost_bp)
     r_c, v_c, s_c, m_c = perf(sr_net)
-    cost_rows.append({
+    sharpe_cost80[cost_bp] = s_c
+    mdd_cost80[cost_bp] = m_c
+    print("  q80 {}bps -> Sharpe={:.4f}, MDD={:.4f}".format(cost_bp, s_c, m_c))
+
+# Tab 7.2: uma linha por estrategia
+# Colunas: Estrategia | Ret.Anual | Vol.Anual | Sharpe(bruto) | Sharpe(5bps) | Sharpe(10bps) | MaxDD | Sortino(bruto) | %Tempo
+row_q80 = "BVRP q80\\% & {:.4f} & {:.4f} & {} & {} & {} & {:.4f} & {} & {:.4f} {}".format(
+    r80, v80,
+    _fmt(sharpe_cost80[0]), _fmt(sharpe_cost80[5]), _fmt(sharpe_cost80[10]),
+    m80, _fmt(sortino_80), ti80, _NL)
+
+row_bh2 = "Buy \\& Hold & {:.4f} & {:.4f} & {:.4f} & -- & -- & {:.4f} & {} & 1.0000 {}".format(
+    r_bh2, v_bh2, s_bh2, m_bh2, _fmt(sortino_bh2), _NL)
+
+lines2 = [
+    r"\begin{tabular}{lrrrrrrrr}",
+    r"\toprule",
+    r"Estrat\'egia & Ret.\ Anual & Vol.\ Anual & Sharpe & Sharpe & Sharpe & Max & Sortino & \%\ Tempo \\",
+    r" &  &  & (bruto) & (5\,bps) & (10\,bps) & Drawdown & (bruto) &  \\",
+    r"\midrule",
+    row_q80,
+    r"\midrule",
+    row_bh2,
+    r"\bottomrule",
+    r"\end{tabular}",
+]
+with open('tables/tab7/tab7_2_perf_vrp_quantile.tex', 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(lines2))
+print("Tabela 2 salva: tables/tab7/tab7_2_perf_vrp_quantile.tex")
+
+# Tab 7.2b -- tabela auxiliar: tres cenarios de custo (q80)
+cost_rows_csv = []
+lines2b = [
+    r"\begin{tabular}{lrrrrrr}",
+    r"\toprule",
+    r"Custo & Ret.\ Anual & Vol.\ Anual & Sharpe & Sortino & Max Drawdown & N.\ Opera\c{c}\~oes \\",
+    r"\midrule",
+]
+for cost_bp in [0, 5, 10]:
+    sr_net = apply_transaction_costs(sr80, sig80, cost_bps=cost_bp)
+    r_c, v_c, s_c, m_c = perf(sr_net)
+    sortino_c = sortino_ratio(sr_net)
+    lines2b.append("{:d}\\,bps & {:.4f} & {:.4f} & {:.4f} & {} & {:.4f} & {:d} {}".format(
+        cost_bp, r_c, v_c, s_c, _fmt(sortino_c), m_c, ops80, _NL))
+    sortino_val = float(sortino_c) if not (isinstance(sortino_c, float) and np.isnan(sortino_c)) else None
+    cost_rows_csv.append({
         'custos_bp': cost_bp,
         'cagr': round(r_c, 6),
         'vol_anualizada': round(v_c, 6),
         'sharpe': round(s_c, 6),
+        'sortino': round(sortino_c, 6) if sortino_val is not None else np.nan,
         'mdd': round(m_c, 6),
-        'n_operacoes': ops2,
+        'n_operacoes': ops80,
     })
-    print(f"  {cost_bp}bp -> Sharpe={s_c:.4f}, CAGR={r_c:.4f}, MDD={m_c:.4f}")
+lines2b += [r"\bottomrule", r"\end{tabular}"]
+with open('tables/tab7/tab7_2b_custos.tex', 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(lines2b))
+print("Tabela 2b (custos) salva: tables/tab7/tab7_2b_custos.tex")
 
-df_costs = pd.DataFrame(cost_rows)
-df_costs.to_csv('tables/cap7/strategy_costs_cap7.csv', index=False)
-print("Sensibilidade a custos salva: tables/cap7/strategy_costs_cap7.csv")
+pd.DataFrame(cost_rows_csv).to_csv('tables/cap7/strategy_costs_cap7.csv', index=False)
+print("CSV de custos salvo: tables/cap7/strategy_costs_cap7.csv")
+
 
 # ============================================================
-# Tab7_3: Multi-quantis
+# Tab 7.3 -- Multi-quantis (q60, q70, q80, q90) com custos e Sortino
 # ============================================================
 print("\nEstrategias por quantil:")
 rows3 = []
 for q in [0.60, 0.70, 0.80, 0.90]:
-    # [E6] expanding window para todos os quantis -- consistencia metodologica
-    th_series = df['vrp_30d'].expanding(min_periods=MIN_PERIODS_Q80).quantile(q)
-    sig = (df['vrp_30d'].shift(1) > th_series.shift(1)).astype(float).fillna(0.0)
-    sr = sig * df['ret']
-    r, v, s, m = perf(sr)
-    ti = float(sig.mean())
-    to = float(sig.diff().abs().mean())
+    sig_q, _ = expanding_quantile_signal(df['vrp_30d'], quantile=q, min_obs=MIN_PERIODS)
+    sr_q = sig_q * df['ret']
+    r_q, v_q, s_q, m_q = perf(sr_q)
+    sortino_q = sortino_ratio(sr_q)
+    ti_q = float(sig_q.mean())
     qval = int(q * 100)
-    q_label = "q" + str(qval) + r"\%"
-    rows3.append((q_label, r, v, s, m, to, ti))
-    print(f"  q{qval}: Return={r:.4f}, Vol={v:.4f}, Sharpe={s:.4f}, MDD={m:.4f}, Time={ti:.4f}")
+
+    sharpe_q = {}
+    for cost_bp in [0, 5, 10]:
+        sr_net = apply_transaction_costs(sr_q, sig_q, cost_bps=cost_bp)
+        _, _, s_c, _ = perf(sr_net)
+        sharpe_q[cost_bp] = s_c
+
+    q_label = "q{}\\%".format(qval)
+    rows3.append((q_label, r_q, v_q, sharpe_q[0], sharpe_q[5], sharpe_q[10], m_q, sortino_q, ti_q))
+    print("  q{}: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Tempo={:.4f}".format(
+        qval, r_q, v_q, s_q, _fmt(sortino_q), m_q, ti_q))
 
 lines3 = [
-    r"\begin{tabular}{lrrrrrr}",
+    r"\begin{tabular}{lrrrrrrrr}",
     r"\toprule",
-    r"Estrat\'egia & Retorno Anual & Volatilidade Anual & Sharpe Ratio & Max Drawdown & Turnover & \% Tempo Investido \\",
+    r"Estrat\'egia & Ret.\ Anual & Vol.\ Anual & Sharpe & Sharpe & Sharpe & Max & Sortino & \%\ Tempo \\",
+    r" &  &  & (bruto) & (5\,bps) & (10\,bps) & Drawdown & (bruto) &  \\",
     r"\midrule",
 ]
 for row in rows3:
-    lines3.append(f"{row[0]} & {row[1]:.4f} & {row[2]:.4f} & {row[3]:.4f} & {row[4]:.4f} & {row[5]:.4f} & {row[6]:.4f} \\\\")
-# [E6] linha BH subperiodo como referencia contemporanea
+    lines3.append("{} & {:.4f} & {:.4f} & {} & {} & {} & {:.4f} & {} & {:.4f} {}".format(
+        row[0], row[1], row[2],
+        _fmt(row[3]), _fmt(row[4]), _fmt(row[5]),
+        row[6], _fmt(row[7]), row[8], _NL))
 lines3.append(r"\midrule")
-lines3.append(f"Buy \\& Hold & {r_bh2:.4f} & {v_bh2:.4f} & {s_bh2:.4f} & {m_bh2:.4f} & -- & 1.0000 \\\\")
+lines3.append("Buy \\& Hold & {:.4f} & {:.4f} & {:.4f} & -- & -- & {:.4f} & {} & 1.0000 {}".format(
+    r_bh2, v_bh2, s_bh2, m_bh2, _fmt(sortino_bh2), _NL))
 lines3 += [r"\bottomrule", r"\end{tabular}"]
+with open('tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(lines3))
+print("Tabela 3 salva: tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex")
 
-with open('tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-8') as f:
-    f.write("\n".join(lines3))
-print("Tabela 3 salva.")
 
 # ============================================================
-# Tab7_4: Regimes por tercis de RV_30d
+# Tab 7.4 -- Regimes por tercis de RV_30d (+ Sortino)
 # ============================================================
 print("\nRegimes por RV (tercis):")
 df['rv_regime'] = pd.qcut(df['rv_30d'], q=3, labels=['Baixo', 'Medio', 'Alto'])
-rv_stats = df.groupby('rv_regime')['rv_30d'].agg(['min', 'mean', 'max'])
-print(rv_stats)
-vrp_stats = df.groupby('rv_regime')['vrp_30d'].agg(['mean'])
-print(vrp_stats)
 
 rows4 = []
 for regime, label in [('Baixo', 'Baixa RV'), ('Medio', 'Media RV'), ('Alto', 'Alta RV')]:
     mask = df['rv_regime'] == regime
-    # [E6] usa q80_series expansivo -- consistente com Tab7_2
-    sig = ((df['vrp_30d'].shift(1) > q80_series.shift(1)) & mask).astype(float).fillna(0.0)
+    sig = ((df['vrp_30d'].shift(1) >= q80_series.shift(1)) & mask).astype(float).fillna(0.0)
+    sig.iloc[:MIN_PERIODS] = 0.0
     sr = sig * df['ret']
     r, v, s, m = perf(sr)
+    sortino_r = sortino_ratio(sr)
     ti = float(sig.mean())
     to = float(sig.diff().abs().mean())
-    rows4.append((label, r, v, s, m, to, ti))
-    print(f"  {regime}: Return={r:.4f}, Vol={v:.4f}, Sharpe={s:.4f}, MDD={m:.4f}, Time={ti:.4f}")
+    rows4.append((label, r, v, s, m, sortino_r, to, ti))
+    print("  {}: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Tempo={:.4f}".format(
+        regime, r, v, s, _fmt(sortino_r), m, ti))
 
 lines4 = [
-    r"\begin{tabular}{lrrrrrr}",
+    r"\begin{tabular}{lrrrrrrrr}",
     r"\toprule",
-    r" & Retorno Anual & Volatilidade Anual & Sharpe Ratio & Max Drawdown & Turnover & \% Tempo Investido \\",
-    r"Regime de RV &  &  &  &  &  &  \\",
+    r" & Ret.\ Anual & Vol.\ Anual & Sharpe & Max & Sortino & Turnover & \%\ Tempo \\",
+    r"Regime de RV &  &  &  & Drawdown &  &  &  \\",
     r"\midrule",
 ]
 for row in rows4:
-    lines4.append(f"{row[0]} & {row[1]:.4f} & {row[2]:.4f} & {row[3]:.4f} & {row[4]:.4f} & {row[5]:.4f} & {row[6]:.4f} \\\\")
+    lines4.append("{} & {:.4f} & {:.4f} & {:.4f} & {:.4f} & {} & {:.4f} & {:.4f} {}".format(
+        row[0], row[1], row[2], row[3], row[4], _fmt(row[5]), row[6], row[7], _NL))
 lines4 += [r"\bottomrule", r"\end{tabular}"]
-
-with open('tables/tab7/tab7_4_perf_bvrp_regimes.tex', 'w', encoding='utf-8') as f:
-    f.write("\n".join(lines4))
-print("Tabela 4 salva.")
+with open('tables/tab7/tab7_4_perf_bvrp_regimes.tex', 'w', encoding='utf-8') as fh:
+    fh.write("\n".join(lines4))
+print("Tabela 4 salva: tables/tab7/tab7_4_perf_bvrp_regimes.tex")
 
 print("\nTodas as tabelas do cap7 regeneradas com sucesso.")
+print("\n--- RESUMO PASSO 5 ---")
+print("Sortino q80 bruto:          {}".format(_fmt(sortino_80)))
+print("Turnover medio anual q80:   {:.2f} operacoes/ano".format(turnover_anual_80))
+print("Sharpe liquido 10bps q80:   {}".format(_fmt(sharpe_cost80[10])))
+print("Limiar q80 primeiro dia:    {:.4f}".format(q80_primeiro))
+print("Limiar q80 ultimo dia:      {:.4f}".format(q80_ultimo))

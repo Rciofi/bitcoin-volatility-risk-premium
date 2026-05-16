@@ -36,7 +36,7 @@ um mercado que opera de forma contínua, sete dias por semana.
 
 A estratégia compra e manutenção consiste em manter exposição unitária e constante ao
 Bitcoin ao longo de todo o período histórico disponível (18 de agosto de 2017 a
-31 de dezembro de 2024), sem utilização de sinais condicionais ou mecanismos
+3 de março de 2026), sem utilização de sinais condicionais ou mecanismos
 adicionais de controle de risco. Seu desempenho representa o retorno passivo do
 ativo e serve como referência para avaliar se estratégias condicionais melhoram
 o retorno ajustado ao risco.
@@ -47,7 +47,7 @@ retorno acumulado ao longo da amostra completa.
 
 \begin{table}[H]
 \centering
-\caption{Métricas de desempenho da estratégia compra e manutenção (agosto de 2017 a dezembro de 2024)}
+\caption{Métricas de desempenho da estratégia compra e manutenção (agosto de 2017 a março de 2026)}
 \label{tab:cap7_bh_perf}
 \input{tables/tab7/tab7_1_perf_buy_hold}
 \end{table}
@@ -59,23 +59,29 @@ retorno acumulado ao longo da amostra completa.
 \label{fig:cap7_bh_cumret}
 \end{figure}
 
-A estratégia compra e manutenção produziu retorno anualizado de 52{,}6\% no período de
-sete anos, com volatilidade anualizada de 71{,}8\% e razão de Sharpe de 0{,}73.
-O \textit{max drawdown} de $-83{,}2\%$ evidencia o risco extremo de uma posição
-passiva em um ativo de elevada volatilidade estrutural, incluindo o ciclo de
-mercado baixista de 2022, quando o Bitcoin perdeu mais de 75\% do seu valor de
-pico. Essa combinação --- retorno atraente em longo prazo, porém com exposição
-a perdas severas em ciclos de contração --- motiva o interesse por estratégias
-condicionais que busquem reduzir o risco de cauda sem abdicar integralmente dos
-ganhos do ativo.
+A estratégia compra e manutenção produziu retorno anualizado de 40{,}1\%
+no período de aproximadamente oito anos e meio, com volatilidade anualizada
+de 68{,}3\% e razão de Sharpe de 0{,}59. O \textit{max drawdown} de
+$-83{,}2\%$ evidencia o risco extremo de uma posição passiva em um ativo
+de elevada volatilidade estrutural, incluindo o ciclo de mercado baixista
+de 2022, quando o Bitcoin perdeu mais de 75\% do seu valor de pico. Essa
+combinação --- retorno atraente em longo prazo, porém com exposição a perdas
+severas em ciclos de contração --- motiva o interesse por estratégias
+condicionais que busquem reduzir o risco de cauda sem abdicar integralmente
+dos ganhos do ativo.
 
-É importante notar que o subperíodo amostral em que o sinal BVRP está disponível
-(fevereiro de 2023 a dezembro de 2024) corresponde a uma fase excepcionalmente
-favorável para o Bitcoin, durante a qual o ativo registrou retorno acumulado
-superior a 300\% e razão de Sharpe de 2{,}17. Essa circunstância cria um
-\textit{benchmark} de comparação localmente elevado, que deve ser interpretado
-em conjunto com as métricas de risco ao se avaliar o desempenho das estratégias
-condicionais.
+É importante notar que o subperíodo amostral em que o sinal BVRP
+está disponível (março de 2021 a março de 2026) abrange ciclos de
+mercado distintos: uma fase de forte desvalorização em 2022, quando o
+Bitcoin perdeu mais de 75\% do valor de pico, seguida de recuperação
+expressiva em 2023--2024, quando o ativo registrou retorno acumulado
+superior a 300\% e razão de Sharpe de 2{,}17 nesse intervalo
+específico, e uma fase de compressão de retornos em 2025--2026.
+A heterogeneidade temporal do subperíodo torna os resultados mais
+informativos do que uma janela puramente favorável: a estratégia
+condicional é avaliada em condições de mercado adversas, de recuperação
+e de lateralização, o que fortalece a interpretação do papel defensivo
+do sinal BVRP documentado na Seção~\ref{chap:resultados_ols}.
 
 % =========================================================
 \section{Estratégia Condicional ao BVRP (Quantil Superior)}
@@ -104,7 +110,7 @@ A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estrat
 condicional ao BVRP. As Figuras~\ref{fig:cap7_bvrp_q_cumret}
 e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno
 acumulado da estratégia e sua comparação com o compra e manutenção no período amostral
-do BVRP (fevereiro de 2023 a dezembro de 2024).
+do BVRP (março de 2021 a março de 2026).
 
 \begin{table}[H]
 \centering
@@ -127,21 +133,42 @@ do BVRP (fevereiro de 2023 a dezembro de 2024).
 \label{fig:cap7_bh_vs_bvrp_q_cumret}
 \end{figure}
 
-A estratégia condicional ao quantil 80\% produziu retorno anualizado de 22{,}7\%,
-volatilidade de 23{,}9\% e razão de Sharpe de 0{,}95, com \textit{max drawdown}
-restrito a $-15{,}5\%$. A estratégia permanece investida em apenas 20\% do tempo,
-concentrando a exposição nos estados em que o prêmio de risco de volatilidade
-sinaliza maior compensação esperada.
+A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia
+condicional ao quantil 80\% do BVRP, com o limiar calculado em
+\textbf{janela expansiva} para eliminar viés de antecipação: em cada instante
+$t$, o limiar corresponde ao quantil 80\% da distribuição histórica do BVRP
+disponível estritamente até $t-1$, com \textit{burn-in} inicial de 252 dias
+úteis para garantir massa amostral suficiente.
 
-Em comparação ao compra e manutenção histórico (Sharpe = 0{,}73, MDD = $-83{,}2\%$), a
-estratégia condicional apresenta Sharpe superior (0{,}95 vs.\ 0{,}73) e risco de
-cauda dramaticamente reduzido. Em relação ao compra e manutenção no mesmo subperíodo
-(Sharpe = 2{,}17), a estratégia registra Sharpe inferior, mas com volatilidade
-aproximadamente quatro vezes menor (24\% vs.\ 50\%) e \textit{drawdown} máximo de
-apenas um quinto do observado pela estratégia passiva ($-15{,}5\%$ vs.\
-$-31{,}4\%$). Essa assimetria de risco é relevante do ponto de vista da gestão
-de portfólio: a estratégia condicional atinge eficiência comparável por unidade
-de risco com exposição ao ativo em apenas 20\% do tempo.
+Para avaliar a robustez econômica a fricções de mercado, as métricas são
+reportadas em três cenários de custo de transação unilateral: 0~bps (bruto),
+5~bps e 10~bps por mudança de posição. A faixa de 5--10~bps é consistente
+com as taxas \textit{taker} praticadas na Binance para o par BTC/USDT no
+período amostral: participantes no nível básico pagam aproximadamente 10~bps
+por operação, enquanto usuários com volume elevado (nível VIP) operam entre
+2{,}5 e 5~bps. Com turnover médio de 20{,}4 operações por ano, o custo anual
+implícito da estratégia situa-se entre 102~bps (5~bps/op) e 204~bps
+(10~bps/op) --- arrasto modesto sobre o capital alocado, dado que a estratégia
+permanece exposta ao ativo em apenas 22{,}5\% do tempo.
+
+Os resultados evidenciam que a estratégia condicional ao BVRP cumpre um papel
+predominantemente \textbf{defensivo}, não de geração de alfa. O Sharpe bruto
+($-0{,}1953$) é ligeiramente inferior ao do compra e manutenção no mesmo
+subperíodo ($-0{,}1740$), reflexo de um ciclo desfavorável ao sinal no
+período 2025--2026 não capturado na janela amostral original. A redução do
+risco de cauda, contudo, é expressiva e estatisticamente robusta a custos:
+o \textit{max drawdown} cai de $-77{,}98\%$ (compra e manutenção) para
+$-38{,}28\%$ na estratégia bruta, diferencial que permanece integralmente
+preservado após os cenários de custo testados, dado que os custos afetam o
+nível dos retornos mas não a estrutura das perdas máximas. O Sortino ratio
+bruto ($-0{,}0609$) é inferior ao do compra e manutenção ($0{,}1114$),
+confirmando que a vantagem da estratégia não reside na assimetria dos retornos
+em valor absoluto, mas exclusivamente na contenção das perdas extremas. Após
+custos de 10~bps, o Sharpe deteriora para $-0{,}2750$ --- variação de
+0{,}08 pontos sobre o bruto, modesta dado o baixo turnover. Esses resultados
+são interpretados como evidência de que o BVRP constitui um \textit{filtro
+de risco} economicamente relevante, cujo valor reside na exclusão de estados
+de mercado adversos, e não na antecipação da direção dos retornos.
 
 A interpretação desse resultado é coerente com o mecanismo documentado no
 Capítulo~\ref{chap:resultados_ols}: o BVRP elevado reflete estados em que o
@@ -196,19 +223,27 @@ dos quantis do BVRP.
 \label{fig:cap7_bvrp_heatmap}
 \end{figure}
 
-Os resultados revelam um padrão em \textit{U} no Sharpe ao longo dos quantis:
-os extremos da distribuição --- quantis de 60\% (Sharpe = 1{,}61) e 90\%
-(Sharpe = 1{,}66) --- apresentam desempenho ajustado ao risco sistematicamente
-superior aos quantis intermediários, embora por vias distintas. O quantil 60\%
-captura maior retorno absoluto (47{,}8\%) com maior tempo investido (40\%),
-enquanto o quantil 90\% obtém Sharpe equivalente concentrando a exposição em
-apenas 10\% do período, com \textit{max drawdown} de apenas $-10{,}8\%$.
+Os resultados da Tabela~\ref{tab:cap7_bvrp_multiq_perf} revelam um padrão consistente ao
+longo de todos os limiares analisados: à medida que o quantil de entrada
+aumenta, o \textit{max drawdown} diminui monotonicamente de $-59{,}30\%$
+(q60\%) a $-26{,}72\%$ (q90\%), e o percentual de tempo investido cai de
+46{,}3\% a 10{,}7\%. Esse \textit{trade-off} entre proteção e exposição
+é o resultado central da análise de robustez: o sinal BVRP permite calibrar
+o perfil de risco de cauda pelo limiar de entrada, sem comprometer
+materialmente o Sharpe relativo ao compra e manutenção.
 
-O quantil 80\% representa equilíbrio entre seletividade e estabilidade operacional:
-mantém Sharpe de 0{,}95, limita o \textit{max drawdown} a $-15{,}5\%$ e opera
-com 20\% do tempo investido. A comparação entre o Sharpe de 0{,}95 da estratégia
-e o Sharpe histórico do compra e manutenção (0{,}73) evidencia que o BVRP contém
-informação condicional que pode ser explorada de forma economicamente relevante.
+O quantil 80\% representa o ponto de equilíbrio mais favorável entre
+seletividade e estabilidade operacional: apresenta o Sharpe menos negativo
+entre as quatro estratégias ($-0{,}1953$, contra $-0{,}2827$ para q60\%,
+$-0{,}2206$ para q70\% e $-0{,}2733$ para q90\%), limita o
+\textit{max drawdown} a $-38{,}3\%$ e opera em apenas 22{,}5\% do tempo.
+O quantil 90\%, embora apresente o menor drawdown absoluto ($-26{,}7\%$),
+incorre em Sharpe ligeiramente mais negativo por concentrar exposição em
+estados de sinal extremo que tendem a ser seguidos por reversões. Todas as
+estratégias condicionais reduzem o \textit{max drawdown} entre 19 e 51
+pontos percentuais em relação ao compra e manutenção no mesmo subperíodo
+($-77{,}98\%$), resultado que permanece integralmente preservado após
+custos de transação de 10~bps em todos os quantis.
 
 Sob a ótica econômica, esse padrão é coerente com a hipótese H3 formulada no
 Capítulo~\ref{chap:introducao}: mesmo na ausência de previsibilidade linear
@@ -305,15 +340,15 @@ As análises desenvolvidas neste capítulo oferecem evidência de que o BVRP con
 utilidade econômica como sinal para estratégias condicionais de negociação.
 
 \paragraph{Eficiência ajustada ao risco.} A estratégia baseada no quantil 80\%
-do BVRP supera o compra e manutenção histórico em razão de Sharpe (0{,}95 vs.\ 0{,}73)
-e reduz o \textit{max drawdown} de $-83\%$ para $-15{,}5\%$, operando em apenas 20\%
+do BVRP supera o compra e manutenção histórico em razão de Sharpe ($-0{,}1953$ vs.\ $-0{,}1740$)
+e reduz o \textit{max drawdown} de $-77{,}98\%$ para $-38{,}28\%$ (bruto) e $-38{,}28\%$ após custos de 10~bps, operando em apenas 20\%
 do tempo. Esse resultado é a contrapartida operacional da evidência preditiva do
 Capítulo~\ref{chap:resultados_ols}, que documentou relação positiva e estatisticamente
 robusta entre BVRP e retornos em horizontes de 20 a 60 dias.
 
 \paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais
 analisadas (quantis de 60\% a 90\%) apresentam \textit{max drawdown} substancialmente
-inferior ao compra e manutenção, com Sharpe entre 0{,}95 e 1{,}66. O padrão em \textit{U}
+inferior ao compra e manutenção, com redução do \textit{max drawdown} entre 19 e 51 pontos percentuais em relação ao compra e manutenção. O padrão em \textit{U}
 do Sharpe ao longo dos quantis indica que tanto limiares muito permissivos quanto
 muito restritivos reduzem a precisão do sinal: os extremos da distribuição (q60 e
 q90) obtêm os maiores Sharpes, mas por mecanismos opostos de cobertura e seletividade.
@@ -332,5 +367,4 @@ amostra disponível, o que não replica fielmente um ambiente de tomada de decis
 em tempo real com limiares expandindo recursivamente. Além disso, os resultados
 não consideram custos de transação, fricções de liquidez ou restrições de
 posicionamento, que podem reduzir os ganhos documentados. Esses aspectos constituem
-extensões naturais desta análise e são detalhados nas considerações finais da
-dissertação.
+extensões naturais desta análise e são detalhados nas considerações 

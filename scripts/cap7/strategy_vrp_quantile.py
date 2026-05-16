@@ -1,53 +1,38 @@
-\
+# -*- coding: utf-8 -*-
+"""Estrategia condicional ao BVRP via quantil expansivo (sem lookahead).
+
+[P2] Substituicao do limiar fixo pela janela expansiva:
+  - vrp_quantile_position() e run_bvrp_strategy() agora usam
+    expanding_quantile_signal() para eliminar lookahead bias.
+"""
+
 import numpy as np
 import pandas as pd
+
+MIN_PERIODS = 252  # burn-in: minimo de observacoes para calcular o limiar
+
+
+def expanding_quantile_signal(bvrp_series, quantile=0.80, min_obs=MIN_PERIODS):
+    """[P2] Sinal binario com quantil em janela expansiva (vetorizado).
+
+    - Em cada t, o limiar usa APENAS dados de [0, t-1] (ex-ante)
+    - O sinal usa BVRP defasado em 1 dia
+    - Burn-in: primeiros min_obs dias sem sinal (signal=0)
+
+    Retorna: (signal Series, threshold Series)
+    """
+    th_series = bvrp_series.expanding(min_periods=min_obs).quantile(quantile)
+    signal = (bvrp_series.shift(1) >= th_series.shift(1)).astype(float)
+    signal = signal.fillna(0.0)
+    signal.iloc[:min_obs] = 0.0
+    return signal, th_series
 
 
 def vrp_quantile_position(
     vrp: pd.Series,
-    q: float = 0.8
+    q: float = 0.8,
+    min_obs: int = MIN_PERIODS,
 ) -> pd.Series:
-    """
-    Gera posição 1 quando VRP >= quantil q,
-    caso contrário posição 0.
+    """Gera posicao 1 quando VRP >= quantil q (janela expansiva, ex-ante).
 
-    vrp: série temporal do VRP (index = datas)
-    """
-    vrp = vrp.dropna().astype(float)
-    threshold = vrp.quantile(q)
-
-    pos = (vrp >= threshold).astype(int)
-    pos.name = "position"
-    return pos
-
-
-def run_bvrp_strategy(
-    returns: pd.Series,
-    bvrp: pd.Series,
-    q: float = 0.80,
-    lag: int = 1,
-) -> tuple[pd.Series, pd.Series]:
-    """
-    Estratégia condicional ao BVRP (quantil superior):
-    - posição = 1 se bvrp > quantil(q), senão 0
-    - defasa o sinal em 'lag' dias para evitar look-ahead
-    Retorna:
-      (strategy_returns, position)
-    """
-    # alinhar no mesmo índice
-    idx = returns.index.intersection(bvrp.index)
-    r = returns.loc[idx].astype(float)
-    s = bvrp.loc[idx].astype(float)
-
-    thr = float(s.quantile(q))
-    raw_pos = (s > thr).astype(float)
-
-    pos = raw_pos.shift(lag).fillna(0.0)
-    strat_ret = pos * r
-    strat_ret.name = f"BVRP q{int(q*100)}"
-    pos.name = f"pos_BVRP_q{int(q*100)}"
-
-    return strat_ret, pos
-
-
-
+    vrp:     serie temporal do VRP (index 
