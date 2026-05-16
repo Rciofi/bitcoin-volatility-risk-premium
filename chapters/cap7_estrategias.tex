@@ -91,8 +91,9 @@ Esta seção avalia uma estratégia de negociação baseada no BVRP, utilizando-
 sinal para modular a exposição ao ativo. A regra é binária e direta: assume-se
 posição comprada em Bitcoin quando o BVRP observado no dia anterior se encontra
 acima do quantil 80\% de sua distribuição histórica e posição neutra caso contrário.
-O limiar correspondente ao percentil 80 é de 14{,}3 pontos percentuais no período
-amostral.
+O limiar é recalculado em janela expansiva a cada instante $t$, utilizando apenas
+a distribuição histórica do BVRP disponível até $t-1$, de modo que não existe
+um valor fixo único para o percentil 80 ao longo da amostra.
 
 A interpretação econômica é diretamente conectada à evidência do
 Capítulo~\ref{chap:resultados_ols}: valores elevados do BVRP refletem condições
@@ -339,19 +340,22 @@ de regime.
 As análises desenvolvidas neste capítulo oferecem evidência de que o BVRP contém
 utilidade econômica como sinal para estratégias condicionais de negociação.
 
-\paragraph{Eficiência ajustada ao risco.} A estratégia baseada no quantil 80\%
-do BVRP supera o compra e manutenção histórico em razão de Sharpe ($-0{,}1953$ vs.\ $-0{,}1740$)
-e reduz o \textit{max drawdown} de $-77{,}98\%$ para $-38{,}28\%$ (bruto) e $-38{,}28\%$ após custos de 10~bps, operando em apenas 20\%
-do tempo. Esse resultado é a contrapartida operacional da evidência preditiva do
+\paragraph{Eficiência ajustada ao risco.} A estratégia baseada no quantil 80\% do BVRP apresenta Sharpe bruto de
+$-0{,}1953$, ligeiramente inferior ao do compra e manutenção no mesmo
+subperíodo ($-0{,}1740$), operando em apenas 22{,}5\% do tempo. O ganho
+concentra-se integralmente na redução do risco de cauda: o \textit{max
+drawdown} cai de $-77{,}98\%$ para $-38{,}28\%$, diferencial que permanece
+preservado após custos de 10~bps, confirmando o papel defensivo do sinal
+BVRP documentado nas seções anteriores. Esse resultado é a contrapartida operacional da evidência preditiva do
 Capítulo~\ref{chap:resultados_ols}, que documentou relação positiva e estatisticamente
 robusta entre BVRP e retornos em horizontes de 20 a 60 dias.
 
-\paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais
-analisadas (quantis de 60\% a 90\%) apresentam \textit{max drawdown} substancialmente
-inferior ao compra e manutenção, com redução do \textit{max drawdown} entre 19 e 51 pontos percentuais em relação ao compra e manutenção. O padrão em \textit{U}
-do Sharpe ao longo dos quantis indica que tanto limiares muito permissivos quanto
-muito restritivos reduzem a precisão do sinal: os extremos da distribuição (q60 e
-q90) obtêm os maiores Sharpes, mas por mecanismos opostos de cobertura e seletividade.
+\paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais analisadas (quantis de 60\% a 90\%)
+apresentam \textit{max drawdown} substancialmente inferior ao compra e
+manutenção, com redução entre 19 e 51 pontos percentuais. O quantil 80\%
+destaca-se por apresentar o Sharpe menos negativo entre as quatro estratégias
+($-0{,}1953$), combinando proteção moderada de cauda com turnover operacional
+reduzido.
 
 \paragraph{Dependência de regime.} A decomposição por regime de volatilidade
 realizada revela que a qualidade do sinal não é monotônica com o nível de estresse:
@@ -364,7 +368,9 @@ explicitamente ao ambiente de volatilidade realizada.
 
 \paragraph{Limitações.} As estratégias empregam limiares fixos estimados sobre a
 amostra disponível, o que não replica fielmente um ambiente de tomada de decisão
-em tempo real com limiares expandindo recursivamente. Além disso, os resultados
-não consideram custos de transação, fricções de liquidez ou restrições de
-posicionamento, que podem reduzir os ganhos documentados. Esses aspectos constituem
-extensões naturais desta análise e são detalhados nas considerações 
+em tempo real com limiares expandindo recursivamente. Além disso, os resultados incorporam custos de transação unilaterais de até 10~bps por operação,
+mas não capturam fricções de liquidez intradiária, \textit{slippage} em períodos de
+baixa profundidade ou restrições de posicionamento, que podem reduzir os ganhos
+documentados em implementações reais. Esses aspectos constituem
+extensões naturais desta análise e são detalhados nas considerações finais da
+dissertação.
