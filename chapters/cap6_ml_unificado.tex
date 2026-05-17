@@ -56,8 +56,6 @@ A tarefa de previsão é:
 em que $\mathbf{X}_t$ denota o vetor de variáveis explicativas observadas em $t$
 e $f(\cdot)$ representa a função estimada pelo modelo supervisionado.
 
-\subsection{Dataset e período amostral}
-\label{subsec:cap5_dataset}
 
 O conjunto de dados possui frequência diária e contém as variáveis
 \texttt{date}, \texttt{close}, \texttt{ret}, \texttt{rv\_30d}, \texttt{iv\_30d}
@@ -161,8 +159,6 @@ Consideram-se três modelos lineares: MQO (sem regularização), Ridge (L2) e
 LASSO (L1). O parâmetro de regularização é selecionado por validação cruzada
 temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots, 10^{2}\}$.
 
-\subsection{Resultados fora da amostra}
-\label{subsec:cap5_lineares_resultados}
 
 A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos exibem
 resultados próximos entre si, sugerindo baixa sensibilidade à regularização no
@@ -172,7 +168,7 @@ incremental relevante além da persistência do prêmio.
 
 % (Tabela removida — pertence ao Cap. 5 OLS)
 
-\subsection{Coeficientes e interpretação}
+\subsection{Resultados e interpretação dos modelos lineares}
 \label{subsec:cap5_lineares_coeficientes}
 
 A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo
