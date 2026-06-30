@@ -190,6 +190,28 @@ out_boot = TABS / "bootstrap_ci_cap5.csv"
 df_boot.to_csv(out_boot, index=False)
 print("Bootstrap CI salvo: %s" % out_boot)
 
+tab_boot = TABS / "tab_bootstrap_ci.tex"
+tab_boot.write_text(r"""\begin{table}[H]
+\centering
+\caption{Coeficientes $\hat{\beta}_h$ do modelo básico com intervalos de
+confiança de 95\% obtidos por \textit{Moving Block Bootstrap}
+(tamanho de bloco de 30 dias, 1.000 replicações).}
+\label{tab:cap5-bootstrap}
+\begin{tabular}{rrrrrr}
+\toprule
+$h$ & $\hat{\beta}_h$ & IC 2{,}5\% & IC 97{,}5\% & $p$-HAC & $p$-bootstrap \\
+\midrule
+""" + "\n".join(
+    "     %2d & %.6f & %.6f & %.6f & %.6f & %.6f \\\\" % (
+        int(r.horizon), r.beta_hat, r.ic_lower, r.ic_upper, r.p_hac, r.p_boot)
+    for r in df_boot.itertuples()
+) + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""", encoding="utf-8")
+print("Tabela bootstrap salva: %s" % tab_boot)
+
 # ---------------------------------------------------------------------------
 # 4. Modelo com controles: BVRP + RV + IV - REMOVIDO (E1)
 # ---------------------------------------------------------------------------
@@ -310,7 +332,7 @@ _hdr = (
     "\\toprule\n"
     "$h$ & $\\hat{\\beta}_{RV}$ & $t_{RV}$ & $p_{RV}$ "
     "& $\\hat{\\beta}_{IV}$ & $t_{IV}$ & $p_{IV}$ "
-    "& $\\hat{\\beta}_1{+}\\hat{\\beta}_2$ & Simetria (\\%%) & $R^2$ & $N$ \\\\\n"
+    "& $\\hat{\\beta}_1{+}\\hat{\\beta}_2$ & Simetria (\\%) & $R^2$ & $N$ \\\\\n"
     "\\midrule\n"
 )
 _body = "\n".join(
