@@ -107,9 +107,9 @@ características marcantes. Primeira, a presença de assimetria positiva
 (coeficiente de assimetria de $+0{,}59$) e caudas moderadamente pesadas
 (excesso de curtose de $+0{,}95$), afastando-se da hipótese de normalidade.
 Segunda, a distribuição é unimodal, com o modo concentrado em torno de
-$-7{,}5$ pontos percentuais de volatilidade anualizada, consistente com a
-média amostral negativa ($-8{,}25$ p.p.) e com o predomínio de um regime em
-que a volatilidade implícita supera a realizada.
+$-9$ pontos percentuais de volatilidade anualizada, consistente com a média
+amostral negativa ($-8{,}25$ p.p.) e com o predomínio de um regime em que a
+volatilidade implícita supera a realizada.
 
 Embora unimodal, a distribuição exibe assimetria positiva e uma cauda
 direita não desprezível: a maior parte das observações concentra-se em
@@ -146,19 +146,21 @@ Figura~\ref{fig:vrp_boxplot} apresenta os resultados desse agrupamento anual.
 Os resultados indicam que o prêmio de risco de volatilidade não é homogêneo
 ao longo do tempo. O prêmio é negativo em todos os anos da amostra --- a
 mediana anual permanece abaixo de zero de 2021 a 2026 ---, confirmando a
-persistência do prêmio de seguro. Sua magnitude, contudo, atenua-se ao longo
-do período: a mediana passa de aproximadamente $-18$ p.p. em 2021 para cerca
-de $-4$ p.p. na fração inicial de 2026, indicando compressão gradual do
-prêmio à medida que o mercado de opções de Bitcoin amadurece. A dispersão
-não segue padrão monotônico: os anos de 2021 e 2022 exibem a maior
-variabilidade (amplitude interquartílica próxima de $17$ e $19$ p.p.,
-respectivamente), refletindo a turbulência do mercado nesse período, ao passo
-que 2023, 2025 e a fração de 2026 apresentam distribuições mais comprimidas.
-O ano de 2024 constitui exceção parcial, com dispersão novamente elevada,
-possivelmente associada ao reposicionamento do mercado após a aprovação dos
-ETFs \textit{spot} em janeiro daquele ano. Essa heterogeneidade sugere que
-modelos com parâmetros constantes podem ser insuficientes para capturar
-plenamente a dinâmica do BVRP, justificando a adoção de abordagens que
+persistência do prêmio de seguro, e sua mediana atenua-se ao longo do período,
+passando de aproximadamente $-18$ p.p. em 2021 para cerca de $-5$ p.p. no
+início de 2026. A dispersão, contudo, não acompanha essa tendência de forma
+monotônica. Os anos de 2021 e 2022 exibem elevada variabilidade (amplitude
+interquartílica próxima de $16$ e $19$ p.p., respectivamente), refletindo a
+turbulência do mercado nesse período, enquanto 2023 e 2025 apresentam
+distribuições mais comprimidas. O ano de 2024 constitui exceção, com dispersão
+novamente elevada, possivelmente associada ao reposicionamento do mercado após
+a aprovação dos ETFs \textit{spot} em janeiro daquele ano. Já o início de 2026
+--- período parcial cobrindo apenas os primeiros meses do ano ($N = 62$) ---
+destaca-se pela maior dispersão de toda a amostra, refletindo um episódio agudo
+de estresse no primeiro trimestre, visível como um pico pronunciado do BVRP ao
+final da série temporal (Figura~\ref{fig:vrp_timeseries}). Essa heterogeneidade
+sugere que modelos com parâmetros constantes podem ser insuficientes para
+capturar plenamente a dinâmica do BVRP, justificando a adoção de abordagens que
 permitam variação temporal e efeitos de regime nos capítulos subsequentes.
 
 % =========================================================

@@ -17,6 +17,13 @@ def main():
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values("date").reset_index(drop=True)
 
+    # Trunca para a amostra canonica (mar/2021-mar/2026, N=1.775), igual a
+    # vrp_with_targets.csv e as Tabelas 3.1/3.2. vrp_30d_dataset.csv tem 60
+    # dias a mais (ate mai/2026) que ainda nao entraram na fonte canonica.
+    AMOSTRA_FIM = "2026-03-03"
+    df = df[df["date"] <= AMOSTRA_FIM].reset_index(drop=True)
+    print(f"Truncado para amostra canonica: N={len(df)}  {df['date'].min().date()} a {df['date'].max().date()}")
+
     figs_dir = os.path.join(base_dir, "figs", "cap3")
     os.makedirs(figs_dir, exist_ok=True)
 
