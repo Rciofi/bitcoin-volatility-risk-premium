@@ -171,8 +171,9 @@ dia, as observações apresentam sobreposição temporal (\textit{overlapping
 observations}). Esse fenômeno introduz autocorrelação no termo de erro que não
 reflete necessariamente dependência econômica, mas decorre da própria construção
 da variável dependente. Para lidar com esse problema, a inferência estatística é
-conduzida com erros padrão HAC (Newey--West), com número de defasagens igual a
-$h - 1$, compatível com o horizonte de previsão.
+conduzida com erros padrão HAC (Newey--West), com número de defasagens igual ao
+horizonte de previsão ($\text{maxlags} = h$), conforme implementado nos scripts
+de estimação e consistente com a Seção~\ref{sec:modelos_referencia}.
 
 \subsection{Separação treino e teste para modelos preditivos}
 
