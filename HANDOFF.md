@@ -1,8 +1,38 @@
 # Estado da revisão — retomada
 
-_Última atualização: 01/07/2026, sessão de revisão Cap. 5/Cap. 6 — Cap. 6 fechado e verificado visualmente._
+_Última atualização: 01/07/2026, sessão de revisão Cap. 3/5/6 — Cap. 3 e Cap. 6 fechados e verificados visualmente._
 
 ## Estado atual
+
+**O Cap. 3 está FECHADO.** Revisado, corrigido e verificado visualmente no PDF
+compilado. Era o capítulo mais traiçoeiro da leva: quatro figuras eram fósseis no
+sinal antigo (IV−RV, de antes da "Decisão 1 — Fase 0" que corrigiu o cálculo para
+RV−IV), um script (`plot_vrp_vs_return.py`) salvava em `figuras/` em vez de
+`figs/cap3/` (a figura nunca chegava ao PDF mesmo regenerada), e a amostra do
+histograma/boxplot (`vrp_30d_dataset.csv`, N=1.835) divergia da amostra canônica
+das tabelas (`vrp_with_targets.csv`, N=1.775) por 60 dias — cuja remoção **inverteu**
+uma conclusão do texto: 2026 deixou de ser "o ano mais comprimido" e passou a ser
+**o de maior dispersão de toda a série** (IQR=40,11), porque os 60 dias removidos
+(abr–mai/2026) diluíam um pico de estresse agudo do BVRP em fev–mar/2026 (visível
+na Fig. 3.1, dentro da amostra canônica). Corrigido: sinal RV−IV nas 4 figuras,
+bug de path no script, amostra alinhada a N=1.775 em tudo, texto das Seções 3.3/3.4
+reescrito com os números reais (assimetria +0,61, curtose +0,91, modo ≈−9, 2026
+como outlier de dispersão com nota de período parcial N=62), e a Seção 3.5/Fig. 3.4
+corrigida de "correlação +0,20 motivando H1" para "+0,013, estatisticamente nula,
+antecipação do null do Cap. 5". Commits: `8510b2b`, `bbdfa12`, `c277583`, `1e5ab4a`,
+`a03e65a`. Sincronizado: `local`/`overleaf/master`/`origin/main` todos em `a03e65a`.
+
+**Nota conceitual não-bloqueante:** o pico de estresse de fev–mar/2026 que aparece
+no Cap. 3 está dentro da amostra usada nas regressões do Cap. 5 e no período de
+teste OOS do Cap. 6 (dez/2024–mar/2026 termina exatamente nesse pico). Não é erro —
+é característica real da amostra —, mas vale ter consciência de que o fim da janela
+amostral contém um evento extremo, caso a banca pergunte sobre sensibilidade dos
+resultados ao fim da amostra.
+
+**Pendência de dados não-bloqueante:** `vrp_30d_dataset.csv` está 60 dias à frente
+de `vrp_with_targets.csv` (a fonte canônica). Não é bug — é atualização assíncrona
+entre os dois pipelines —, mas as duas fontes deveriam ser reconciliadas em algum
+momento para não reabrir essa divergência em uma próxima regeneração.
 
 **O Cap. 6 está FECHADO.** Merge com `overleaf/master` (Plano v3.1) feito (commit
 `8327188`), correção residual de N=458→457 na legenda da Fig. 6.1 feita (commit
@@ -45,11 +75,16 @@ Backups de segurança, congelados antes do merge (permanecem válidos):
 
 ## Pendente, nesta ordem
 
-1. **Conferir visualmente a tabela ADF/KPSS do Cap. 3** (`tables/cap3/adf_kpss_table.tex`,
-   trazida pelo merge v3.1) — único arquivo do merge ainda não visto renderizado no PDF,
-   mesmo padrão de escrutínio que o Cap. 6 recebeu (não só "compilou sem erro").
+1. **Cap. 4 — verificar "maxlags = h−1" na Seção 4.4.2 (linha ~174-175).** Confere
+   contra o resto do capítulo e contra o script (que usa `maxlags=h`, não `h-1`) —
+   último ponto aberto da revisão dos quatro capítulos desta leva (3/4/5/6).
 
-2. **Cap. 5**, pendências que apareceram no caminho:
+2. **Conferir visualmente a tabela ADF/KPSS do Cap. 3** (`tables/cap3/adf_kpss_table.tex`,
+   trazida pelo merge v3.1) — único arquivo do merge ainda não visto renderizado no PDF,
+   mesmo padrão de escrutínio que o Cap. 6 e o Cap. 3 já receberam (não só "compilou
+   sem erro").
+
+3. **Cap. 5**, pendências que apareceram no caminho:
    - Três entradas de bibliografia soltas em texto puro no capítulo de bootstrap
      (Künsch 1989, Politis & Romano 1994, Stambaugh 1999) — precisam virar `\cite`
      de verdade no `references.bib`, mesmo tratamento que já foi dado a
@@ -57,7 +92,7 @@ Backups de segurança, congelados antes do merge (permanecem válidos):
    - MBB (Moving Block Bootstrap) ainda pendente de rodar formalmente na regressão de
      magnitude (`|ret_fut_30d| ~ BVRP`) para fechar a robustez daquele achado.
 
-3. **Pós-defesa (não bloqueante):** dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro
+4. **Pós-defesa (não bloqueante):** dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro
    do arquivo do Cap. 6 — strings funcionam, mas confunde quem procurar por `cap6_`
    intuitivamente.
 
