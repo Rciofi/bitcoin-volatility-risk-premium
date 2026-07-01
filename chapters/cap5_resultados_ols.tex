@@ -193,12 +193,13 @@ Dois procedimentos de robustez foram aplicados aos resultados do modelo
 básico (Seção~\ref{sec:cap5-univariado}). Em primeiro lugar, dado que o BVRP
 exibe persistência elevada --- característica que, em conjunto com retornos
 sobrepostos, pode produzir valores-$p$ assintóticos otimistas em amostras
-finitas, fenômeno conhecido como viés de Stambaugh ---, foram calculados
-intervalos de confiança de $95\%$ para cada $\hat{\beta}_h$ por meio de
-\textit{Moving Block Bootstrap} (MBB) com tamanho de bloco igual a $30$
-dias e $1{.}000$ replicações. O procedimento, devido a Künsch (1989) e
-Politis \& Romano (1994), preserva a estrutura de dependência serial conjunta
-de $X$ e $y$ sem impor hipóteses paramétricas sobre os erros.
+finitas, fenômeno conhecido como viés de Stambaugh \citep{stambaugh1999} ---,
+foram calculados intervalos de confiança de $95\%$ para cada $\hat{\beta}_h$
+por meio de \textit{Moving Block Bootstrap} (MBB) com tamanho de bloco igual
+a $30$ dias e $1{.}000$ replicações. O procedimento, devido a
+\citet{kunsch1989} e \citet{politisromano1994}, preserva a estrutura de
+dependência serial conjunta de $X$ e $y$ sem impor hipóteses paramétricas
+sobre os erros.
 
 \IfFileExists{tables/cap5/tab_bootstrap_ci.tex}{
   \input{tables/cap5/tab_bootstrap_ci}
