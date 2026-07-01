@@ -123,34 +123,19 @@ referência.
 \label{sec:cap5_benchmarks}
 % =========================================================
 
-Antes da estimação dos modelos de aprendizado de máquina, estabelecem-se dois
-benchmarks temporais:
+Antes da estimação dos modelos de aprendizado de máquina, estabelece-se um
+benchmark temporal:
 
 \begin{itemize}
-    \item \textbf{Último valor} (\textit{last value}):
-    $\widehat{\text{BVRP}}_{t+1} = \text{BVRP}_t$;
-    \item \textbf{Média móvel} com $k = 5$:
-    $\widehat{\text{BVRP}}_{t+1} = \frac{1}{5}\sum_{j=0}^{4}\text{BVRP}_{t-j}$.
+    \item \textbf{Último valor} (\textit{last value}, persistência):
+    $\widehat{\text{BVRP}}_{t+1} = \text{BVRP}_t$.
 \end{itemize}
 
-A Tabela~\ref{tab:cap5_benchmarks} reporta os resultados. O benchmark de último
-valor domina em todos os horizontes, reforçando que a persistência temporal do
-BVRP constitui a principal fonte de previsibilidade em frequência diária.
-
-\begin{table}[H]
-\centering
-\caption{Desempenho dos modelos de referência}
-\label{tab:cap5_benchmarks}
-\footnotesize
-\begin{tabular}{llrrr}
-\toprule
-Modelo & Conjunto & MAE & RMSE & $R^2$ \\
-\midrule
-Último valor    & Teste & 1,759 & 2,861 & 0,893 \\
-Média móvel (5) & Teste & 2,861 & 4,227 & 0,767 \\
-\bottomrule
-\end{tabular}
-\end{table}
+A Tabela~\ref{tab:cap8_oos_performance} (Seção~\ref{subsec:cap5_arvores_resultados})
+reporta o desempenho do benchmark de último valor lado a lado com todos os
+modelos supervisionados, calculado sobre o mesmo conjunto de teste. O benchmark
+de último valor domina todos os modelos, reforçando que a persistência temporal
+do BVRP constitui a principal fonte de previsibilidade em frequência diária.
 
 % =========================================================
 \section{Modelos lineares regularizados}

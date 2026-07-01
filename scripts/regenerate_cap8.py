@@ -102,6 +102,15 @@ for name, model in models.items():
     metrics.append({"Modelo": name, "MSE": mse, "RMSE": math.sqrt(mse), "R2_OOS": r2})
     print(f"  {name:20s}  MSE={mse:7.3f}  R²={r2:.4f}")
 
+# Benchmark de persistencia (random walk): previsao = ultimo valor observado
+# (BVRP_{t+1} = BVRP_t). Usa o valor real em t-1, incluindo a fronteira
+# treino/teste (primeira obs de teste usa a ultima obs de treino).
+y_prev_persist = pd.concat([y_train, y_test]).shift(1).loc[y_test.index]
+mse_p = mean_squared_error(y_test, y_prev_persist)
+r2_p  = r2_score(y_test, y_prev_persist)
+metrics.append({"Modelo": "Persistência (valor anterior)", "MSE": mse_p, "RMSE": math.sqrt(mse_p), "R2_OOS": r2_p})
+print(f"  {'Persistência (valor anterior)':20s}  MSE={mse_p:7.3f}  R²={r2_p:.4f}")
+
 results = pd.DataFrame(metrics).sort_values("MSE").reset_index(drop=True)
 
 # ── 3. Fig. 8.1 — BVRP realizado vs. Lasso previsto (melhorada) ──────────────
@@ -226,12 +235,24 @@ print("OK fig_cap8_mdi_appendix.png salva (apendice -- MDI mantido para referenc
 # ── 5. Tab. 8.1 — Desempenho OOS (regera, formato já correto) ────────────────
 tab1_path = OUT_TABS / "tab8_oos_performance.tex"
 
+_MESES_ABREV = {1: "jan.", 2: "fev.", 3: "mar.", 4: "abr.", 5: "mai.", 6: "jun.",
+                7: "jul.", 8: "ago.", 9: "set.", 10: "out.", 11: "nov.", 12: "dez."}
+
+def _fmt_data_pt(d):
+    return f"{d.day}~{_MESES_ABREV[d.month]}\\ {d.year}"
+
+_oos_ini = _fmt_data_pt(y_test.index[0])
+_oos_fim = _fmt_data_pt(y_test.index[-1])
+_n_oos   = len(y_test)
+_n_train = len(y_train)
+_pct_train = round(100 * _n_train / (_n_train + _n_oos))
+
 lines = [
     r"\begin{table}[H]",
     r"\centering",
     r"\small",
     r"\caption{Desempenho preditivo fora da amostra --- Prêmio de Risco de Volatilidade do Bitcoin.",
-    r"Período OOS\@: 14~jun.\ 2024 -- 11~dez.\ 2024 ($N=181$ observações diárias).",
+    f"Período OOS\\@: {_oos_ini} -- {_oos_fim} ($N={_n_oos}$ observações diárias).",
     r"O MSE e o RMSE são reportados em unidades percentuais ao quadrado e percentuais, respectivamente.}",
     r"\label{tab:cap8_oos_performance}",
     r"\begin{tabular}{lccc}",
@@ -256,7 +277,7 @@ lines += [
     r"\bottomrule",
     r"\end{tabular}",
     r"\par\smallskip",
-    r"\footnotesize\textit{Nota}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS (70\% inicial da amostra, 422 observações). O benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{,}0$), LASSO ($\alpha=0{,}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).",
+    rf"\footnotesize\textit{{Nota}}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS ({_pct_train}\% inicial da amostra, {_n_train} observações). O benchmark ``Persistência'' prediz $\text{{BVRP}}_{{t+1}}=\text{{BVRP}}_t$; o benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{{,}}0$), LASSO ($\alpha=0{{,}}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).",
     r"\end{table}",
 ]
 
@@ -300,7 +321,7 @@ tab2_lines += [
     r"\par\smallskip",
     r"\footnotesize\textit{Nota}: LASSO estimado com $\alpha=0{,}001$ (50.000 iterações máx.); Ridge com $\alpha=1{,}0$. "
     r"Variáveis padronizadas internamente pelo scikit-learn (cada feature centrada na média de treino). "
-    r"Período de treino: 19~abr.\ 2023 -- 13~jun.\ 2024 (422 observações).",
+    f"Período de treino: {_fmt_data_pt(y_train.index[0])} -- {_fmt_data_pt(y_train.index[-1])} ({_n_train} observações).",
     r"\end{table}",
 ]
 

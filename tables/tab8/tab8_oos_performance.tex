@@ -2,13 +2,14 @@
 \centering
 \small
 \caption{Desempenho preditivo fora da amostra --- Prêmio de Risco de Volatilidade do Bitcoin.
-Período OOS\@: 14~jun.\ 2024 -- 11~dez.\ 2024 ($N=181$ observações diárias).
+Período OOS\@: 1~dez.\ 2024 -- 3~mar.\ 2026 ($N=458$ observações diárias).
 O MSE e o RMSE são reportados em unidades percentuais ao quadrado e percentuais, respectivamente.}
 \label{tab:cap8_oos_performance}
 \begin{tabular}{lccc}
 \toprule
 Modelo & MSE & RMSE & $R^2_{\text{OOS}}$ \\
 \midrule
+Persistência (valor anterior) & 7,97 & 2,82 & 0,937 \\
 Gradient Boosting & 70,27 & 8,38 & 0,441 \\
 Ridge & 72,03 & 8,49 & 0,426 \\
 Random Forest & 72,10 & 8,49 & 0,426 \\
@@ -18,5 +19,5 @@ Benchmark (Média) & 138,93 & 11,79 & $-$0,106 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\footnotesize\textit{Nota}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS (70\% inicial da amostra, 422 observações). O benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{,}0$), LASSO ($\alpha=0{,}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).
+\footnotesize\textit{Nota}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS (70\% inicial da amostra, 1066 observações). O benchmark ``Persistência'' prediz $\text{BVRP}_{t+1}=\text{BVRP}_t$; o benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{,}0$), LASSO ($\alpha=0{,}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).
 \end{table}
