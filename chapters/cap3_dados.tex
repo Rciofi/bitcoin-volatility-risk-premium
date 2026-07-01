@@ -35,7 +35,7 @@ risco de volatilidade. A volatilidade implícita a 30 dias é consistente com o
 horizonte do índice DVOL da Deribit, enquanto a volatilidade realizada é
 anualizada considerando a negociação contínua do mercado de Bitcoin.
 
-A Tabela~\ref{tab:estatisticas_cap3} apresenta estatísticas descritivas das
+A Tabela~\ref{tab:cap3_desc_stats} apresenta estatísticas descritivas das
 principais variáveis empregadas na análise empírica, incluindo média, desvio
 padrão, valores mínimo e máximo. Observa-se que tanto a volatilidade implícita
 quanto a volatilidade realizada exibem elevada variabilidade, refletindo a
@@ -47,9 +47,15 @@ no mercado de opções de Bitcoin. A volatilidade implícita situa-se
 sistematicamente acima da volatilidade realizada, configurando um prêmio de
 seguro.
 
-\IfFileExists{tables/cap3/tabela_cap3_estatisticas_completas.tex}{
-  \input{tables/cap3/tabela_cap3_estatisticas_completas.tex}
+\IfFileExists{tables/cap3/desc_stats_cap3.tex}{
+  \input{tables/cap3/desc_stats_cap3.tex}
 }{}
+Os testes formais de estacionariedade confirmam que o preço do Bitcoin (\textit{close}) é integrado de primeira ordem I(1), enquanto os retornos diários são estacionários I(0). As medidas de volatilidade (RV 30d e IV 30d) e o BVRP apresentam resultados inconclusivos, compatíveis com processos de longa memória, e são mantidos em nível nas especificações econométricas da dissertação (Tabela~\ref{tab:adf_kpss}).
+
+\IfFileExists{tables/cap3/adf_kpss_table.tex}{
+  \input{tables/cap3/adf_kpss_table.tex}
+}{}
+
 
 % =========================================================
 \section{Séries temporais}
@@ -101,16 +107,16 @@ características marcantes. Primeira, a presença de assimetria negativa
 (coeficiente de assimetria de $-1{,}20$) e caudas pesadas (excesso de curtose
 de $2{,}05$), afastando-se da hipótese de normalidade. Segunda, e mais relevante
 sob o ponto de vista econômico, a distribuição exibe um perfil bimodal:
-identifica-se um modo dominante na região de valores positivos, concentrado
-entre 5 e 15 pontos percentuais de volatilidade anualizada, e uma concentração
-secundária na região de valores negativos.
+identifica-se um modo dominante na região de valores negativos, concentrado
+entre $-15$ e $-5$ pontos percentuais de volatilidade anualizada, e uma concentração
+secundária na região de valores positivos.
 
-Essa bimodalidade possui interpretação econômica direta. O modo positivo
+Essa bimodalidade possui interpretação econômica direta. O modo negativo
 corresponde ao regime de mercado predominante, no qual a volatilidade implícita
-supera a volatilidade realizada, gerando um prêmio de risco positivo ---
+supera a volatilidade realizada, configurando um prêmio de seguro pago pelos compradores de opções ---
 consistente com a compensação exigida pelos investidores para assumir exposição
 ao risco de volatilidade por meio de contratos de opções. A concentração de
-valores negativos, por sua vez, corresponde a episódios de estresse agudo, em
+valores positivos, por sua vez, corresponde a episódios de estresse agudo, em
 que a volatilidade realizada supera inesperadamente a volatilidade implícita.
 Esses episódios tipicamente ocorrem durante choques abruptos de mercado, quando
 a velocidade e a magnitude das oscilações de preço superam as expectativas
@@ -143,7 +149,7 @@ Figura~\ref{fig:vrp_boxplot} apresenta os resultados desse agrupamento anual.
 Os resultados indicam que o prêmio de risco de volatilidade não é homogêneo ao
 longo do tempo. Em 2023, o BVRP apresentou maior variabilidade e valores medianos
 mais elevados, ao passo que 2024 e 2025 exibiram distribuições mais comprimidas,
-porém com persistência do prêmio positivo. Essa evidência sugere que modelos com
+porém com persistência do prêmio de seguro (valores negativos do BVRP). Essa evidência sugere que modelos com
 parâmetros constantes podem ser insuficientes para capturar plenamente a
 dinâmica do BVRP, justificando a adoção de abordagens que permitam variação
 temporal e efeitos de regime nos capítulos subsequentes.

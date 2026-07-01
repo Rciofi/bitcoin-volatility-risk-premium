@@ -116,23 +116,22 @@ ao longo do tempo.
 \subsection{Extensão com variáveis de controle}
 
 Para avaliar a robustez dos resultados, a especificação básica é estendida com
-a inclusão da volatilidade realizada e da volatilidade implícita como controles
-adicionais:
+a inclusão da volatilidade realizada e da volatilidade implícita como regressores
+individuais, sem o BVRP:
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_{1,h} \, \text{BVRP}_t + \beta_{2,h} \, \text{RV}_t
-+ \beta_{3,h} \, \text{IV}_t + \varepsilon_{t+h}.
+R_{t+h} = \alpha_h + \beta_{1,h} \, \text{RV}_t + \beta_{2,h} \,
+\text{IV}_t + \varepsilon_{t+h}.
 \label{eq:ols_controles}
 \end{equation}
 
-Esta especificação permite investigar se o BVRP possui conteúdo informacional
-além do que já está contido nos níveis individuais de volatilidade implícita e
-realizada. Cabe notar, contudo, que como $\text{BVRP}_t = \text{IV}_t -
-\text{RV}_t$ por construção, há dependência linear entre os três regressores,
-o que introduz multicolinearidade na estimação. Em consequência, os coeficientes
-individuais devem ser interpretados com cautela, reconhecendo que a atribuição
-de efeitos marginais entre BVRP, IV e RV é parcialmente arbitrária nesse
-contexto. O modelo serve, portanto, como exercício de robustez, e não como
-especificação estrutural definitiva.
+Essa formulação evita a colinearidade perfeita que surgiria ao incluir
+$\text{BVRP}_t$, $\text{RV}_t$ e $\text{IV}_t$ simultaneamente, uma vez que
+$\text{BVRP}_t \equiv \text{RV}_t - \text{IV}_t$ por construção. O teste de
+robustez consiste em verificar se os coeficientes estimados satisfazem
+$\hat{\beta}_{1,h} \approx -\hat{\beta}_{2,h}$: caso positivo, o BVRP
+sintetiza de forma suficiente o conteúdo informacional conjunto das duas
+medidas de volatilidade. Os resultados e a interpretação econômica são
+apresentados no Capítulo 5.
 
 \subsection{Inferência estatística}
 

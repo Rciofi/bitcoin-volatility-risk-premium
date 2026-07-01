@@ -35,6 +35,8 @@ Ao longo da dissertação, utiliza-se majoritariamente $h=30$, de modo que:
 RV_{30,t} = \sqrt{\frac{365}{30}\sum_{i=1}^{30} r_{t-i+1}^{2}}.
 \]
 
+Cabe distinguir duas noções de volatilidade frequentemente confundidas na literatura. A \textit{volatilidade de processo} refere-se ao parâmetro latente $\sigma_t$ do processo gerador dos retornos --- grandeza não observável diretamente. A \textit{volatilidade amostral} (ou realizada), $RV_{h,t}$, é um estimador não paramétrico construído a partir dos retornos observados em janela de $h$ períodos. Essa distinção é relevante para o BVRP: a diferença $RV_{30,t} - IV_{30,t}$ compara uma medida histórica (amostral) com uma medida de expectativa neutra ao risco, e não o parâmetro latente com a expectativa teórica.
+
 \subsection{Observação sobre alinhamento temporal}
 
 A definição acima corresponde ao estimador \textit{backward-looking}, isto é,
