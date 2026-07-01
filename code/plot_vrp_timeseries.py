@@ -33,8 +33,8 @@ def main():
     ax1.set_xlabel("Data")
     ax1.set_ylabel("Volatilidade (% a.a.)")
     ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
-    ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=0, ha="center")
+    ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, ha="right")
 
     ax2 = ax1.twinx()
     ax2.plot(df["date"], df["vrp_30d"], color="steelblue", linewidth=1.0,
