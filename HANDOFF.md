@@ -105,12 +105,28 @@ Backups de segurança, congelados antes do merge (permanecem válidos):
 
 ## Pendente — tudo não-bloqueante, nesta ordem de relevância
 
-1. **MBB na regressão de magnitude (`|ret_fut_30d| ~ BVRP`) — único item real pendente.**
-   Hoje só tem HAC (p=0,003). Não é correção mecânica de texto/número: requer rodar o
-   Moving Block Bootstrap nessa regressão, verificar se o achado sobrevive ao teste
-   mais rigoroso, e **decidir** onde ele entra (corpo do capítulo, apêndice, ou fica de
-   fora) — decisão de conteúdo de tese, não só código. Fazer com cabeça descansada,
-   não encaixado no fim de uma sessão longa.
+1. **CORREÇÃO a uma entrada anterior deste arquivo: o MBB da magnitude não está
+   pendente — já foi feito.** Uma versão anterior deste HANDOFF listava "MBB ainda
+   pendente de rodar" como item de maior prioridade; isso estava desatualizado. O
+   teste de magnitude (`|ret_fut_30d| ~ BVRP`) mora no **Cap. 8** (`cap8_regimes.tex`,
+   seção "Apêndice do capítulo: robustez do teste de magnitude",
+   `sec:cap8-apendice-magnitude`), não no Cap. 5, e a tabela já publicada ali reporta
+   **quatro** métodos, não só HAC:
+   ```
+   Newey--West (HAC)        p=0,0027   Sobreposta (N=1.775)
+   Hansen--Hodrick           p=0,0054   Sobreposta (N=1.775)
+   Moving Block Bootstrap    p=0,0120   Sobreposta (N=1.775)
+   Não sobreposta (mediana)  p=0,1048   30 fases, N≈59 cada
+   ```
+   Script: `code/analyze_magnitude_bvrp.py` (roda HAC + Breusch-Pagan + MBB +
+   decomposição RV/IV; a decomposição mostra `beta_RV=-0,0016` (p=0,0071) e
+   `beta_IV=+0,0018` (p=0,0065), simetria=6,0% — BVRP capta a combinação, não RV
+   ou IV isolados). Reexecutado nesta sessão para confirmar: números idênticos aos
+   já publicados no texto, nada mudou. O texto já é honesto sobre a fragilidade
+   ("significância estatística é marginal sob a correção mais conservadora...
+   evidência sugestiva, não achado confirmatório"). **Não há código pendente aqui.**
+   Se sobra algo, é só revisitar se o posicionamento (apêndice de capítulo, não
+   corpo principal) continua sendo o desejado — não é bloqueante.
 
 2. **Nota pré-defesa:** conferir volume/número de páginas das três referências do
    bootstrap (Künsch 1989, Politis \& Romano 1994, Stambaugh 1999) contra o DOI/fonte
