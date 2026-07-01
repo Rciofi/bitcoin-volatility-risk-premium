@@ -38,7 +38,7 @@ def main():
 
     ax2 = ax1.twinx()
     ax2.plot(df["date"], df["vrp_30d"], color="steelblue", linewidth=1.0,
-             linestyle="--", alpha=0.7, label="VRP 30D (IV30D – RV30D)")
+             linestyle="--", alpha=0.7, label="VRP 30D (RV30D – IV30D)")
     ax2.set_ylabel("VRP 30D (p.p. de vol.)")
     ax2.axhline(0, color="gray", linewidth=0.7, linestyle=":")
 
@@ -61,7 +61,7 @@ def main():
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.histplot(df["vrp_30d"], bins=30, kde=True, stat="density",
                  linewidth=0.5, color="steelblue", ax=ax)
-    ax.set_xlabel("VRP 30D (IV30D – RV30D)")
+    ax.set_xlabel("VRP 30D (RV30D – IV30D)")
     ax.set_ylabel("Densidade")
     ax.grid(True, alpha=0.6)
     fig.tight_layout()

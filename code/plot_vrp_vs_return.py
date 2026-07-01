@@ -33,7 +33,7 @@ def scatter_plot(df, x, y, title, out_path):
     )
 
     ax.set_title(title)
-    ax.set_xlabel("VRP 30D (IV30D – RV30D)")
+    ax.set_xlabel("VRP 30D (RV30D – IV30D)")
     ax.set_ylabel(y)
     ax.grid(True, alpha=0.6)
     ax.legend(frameon=False)
@@ -61,7 +61,7 @@ def main():
     df = df.sort_values("date").reset_index(drop=True)
 
     # Diretório de figuras
-    figs_dir = os.path.join(base_dir, "figuras")
+    figs_dir = os.path.join(base_dir, "figs", "cap3")
     os.makedirs(figs_dir, exist_ok=True)
 
     # ====== VRP(t) vs Retorno Futuro ======

@@ -84,7 +84,7 @@ def build_vrp_dataset():
     - Lê preços do BTC (Binance) e DVOL 30D (Deribit)
     - Calcula RV30D (realized vol 30 dias, anualizada)
     - Faz merge por data
-    - Calcula VRP30D = IV30D - RV30D
+    - Calcula VRP30D = RV30D - IV30D
     - Salva em data/vrp_30d_dataset.csv
     - Gera estatísticas descritivas de RV30D, IV30D e VRP30D
     """
@@ -140,7 +140,7 @@ def build_vrp_dataset():
     )
 
     # deixa o índice bonito pra bater com a dissertação
-    stats.index = ["RV30D", "IV30D", "BVRP (IV30D - RV30D)"]
+    stats.index = ["RV30D", "IV30D", "BVRP (RV30D - IV30D)"]
 
     # renomeia colunas pra português e arredonda
     stats = stats.rename(
