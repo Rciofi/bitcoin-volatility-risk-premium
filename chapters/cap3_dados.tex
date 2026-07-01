@@ -103,30 +103,28 @@ volatilidade do Bitcoin, juntamente com uma estimativa de densidade por kernel.
 }{}
 
 A distribuição do prêmio de risco de volatilidade apresenta duas
-características marcantes. Primeira, a presença de assimetria negativa
-(coeficiente de assimetria de $-1{,}20$) e caudas pesadas (excesso de curtose
-de $2{,}05$), afastando-se da hipótese de normalidade. Segunda, e mais relevante
-sob o ponto de vista econômico, a distribuição exibe um perfil bimodal:
-identifica-se um modo dominante na região de valores negativos, concentrado
-entre $-15$ e $-5$ pontos percentuais de volatilidade anualizada, e uma concentração
-secundária na região de valores positivos.
+características marcantes. Primeira, a presença de assimetria positiva
+(coeficiente de assimetria de $+0{,}59$) e caudas moderadamente pesadas
+(excesso de curtose de $+0{,}95$), afastando-se da hipótese de normalidade.
+Segunda, a distribuição é unimodal, com o modo concentrado na região de
+valores negativos (entre aproximadamente $-5$ e $-3$ pontos percentuais de
+volatilidade anualizada), consistente com a média amostral negativa
+($-8{,}25$ p.p.) e com o predomínio de um regime em que a volatilidade
+implícita supera a realizada.
 
-Essa bimodalidade possui interpretação econômica direta. O modo negativo
-corresponde ao regime de mercado predominante, no qual a volatilidade implícita
-supera a volatilidade realizada, configurando um prêmio de seguro pago pelos compradores de opções ---
-consistente com a compensação exigida pelos investidores para assumir exposição
-ao risco de volatilidade por meio de contratos de opções. A concentração de
-valores positivos, por sua vez, corresponde a episódios de estresse agudo, em
-que a volatilidade realizada supera inesperadamente a volatilidade implícita.
-Esses episódios tipicamente ocorrem durante choques abruptos de mercado, quando
-a velocidade e a magnitude das oscilações de preço superam as expectativas
-incorporadas nos prêmios de opções.
-
-A coexistência dessas duas concentrações sugere que o BVRP é melhor descrito
-por uma mistura de regimes do que por uma distribuição unimodal contínua. Tal
-evidência fornece suporte empírico à análise de subperíodos desenvolvida na
-Seção~\ref{sec:regimes} e justifica a adoção de abordagens que acomodem
-heterogeneidade e mudanças de regime nos capítulos subsequentes.
+Embora unimodal, a distribuição exibe assimetria positiva e uma cauda
+direita não desprezível: a maior parte das observações concentra-se em
+valores negativos --- o regime predominante, no qual a volatilidade implícita
+supera a realizada, configurando um prêmio capturado pelos vendedores de
+volatilidade ---, mas há uma minoria de observações na região positiva,
+correspondente a episódios de estresse agudo em que a volatilidade realizada
+supera inesperadamente a implícita. Esses episódios ocorrem durante choques
+abruptos de mercado, quando a magnitude das oscilações de preço supera as
+expectativas incorporadas nos prêmios de opções. A coexistência de um regime
+dominante negativo com uma cauda de episódios positivos sugere que o BVRP é
+melhor descrito por uma dinâmica sensível ao regime de mercado do que por um
+processo homogêneo, fornecendo suporte empírico à análise de subperíodos
+desenvolvida na Seção~\ref{sec:regimes}.
 
 % =========================================================
 \section{Análise por regimes e subperíodos}
@@ -170,19 +168,21 @@ observado no tempo $t$ e o retorno futuro acumulado do Bitcoin no horizonte de
     \centering
     \includegraphics[width=0.75\linewidth]{figs/cap3/vrp_vs_return_20d.png}
     \caption{Relação exploratória entre o prêmio de risco de volatilidade e os
-    retornos futuros do Bitcoin (h = 20 dias)}
+    retornos futuros do Bitcoin (h = 20 dias). Coeficiente de correlação de
+    $+0{,}013$, estatisticamente nulo.}
     \label{fig:vrp_ret_20d}
 \end{figure}
 }{}
 
-O gráfico evidencia uma associação positiva e de magnitude modesta entre o BVRP
-e os retornos futuros no horizonte de 20 dias, com coeficiente de correlação de
-$0{,}20$. A elevada dispersão em torno da reta de tendência indica que o prêmio
-de risco de volatilidade captura apenas parcialmente a variação dos retornos
-futuros, sugerindo que outros fatores exercem papel relevante na determinação do
-desempenho do ativo nesse horizonte. A direção positiva da associação ---
-valores mais elevados do BVRP tendem a preceder retornos mais altos nos 20 dias
-subsequentes --- é consistente com a hipótese de que o prêmio de risco de
-volatilidade carrega conteúdo informacional sobre o desempenho futuro do Bitcoin,
-fornecendo motivação econômica para os testes formais desenvolvidos no
-Capítulo~\ref{chap:resultados_ols}.
+O gráfico não evidencia associação linear relevante entre o BVRP e os
+retornos futuros no horizonte de 20 dias: o coeficiente de correlação é de
+apenas $+0{,}013$, estatisticamente indistinguível de zero, e a nuvem de
+pontos dispersa-se amplamente em torno de uma reta de tendência praticamente
+horizontal. Essa ausência de relação linear na análise exploratória antecipa,
+de forma preliminar, o resultado central do Capítulo~\ref{chap:resultados_ols},
+onde a ausência de previsibilidade linear do BVRP sobre os retornos futuros é
+formalmente estabelecida por regressões com inferência robusta. A dispersão
+elevada indica que, se o prêmio de risco de volatilidade carrega conteúdo
+informacional sobre o desempenho futuro do Bitcoin, esse conteúdo não se
+manifesta em uma relação linear simples --- motivando as abordagens não
+lineares e condicionais desenvolvidas nos capítulos subsequentes.
