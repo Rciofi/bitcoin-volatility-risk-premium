@@ -1,8 +1,38 @@
 # Estado da revisão — retomada
 
-_Última atualização: 01/07/2026, sessão de revisão Cap. 3/5/6 — Cap. 3 e Cap. 6 fechados e verificados visualmente._
+_Última atualização: 01/07/2026, sessão de revisão Cap. 3/4/5/6 — os quatro capítulos revisados, corrigidos e sincronizados._
 
 ## Estado atual
+
+**Os quatro capítulos da leva (3, 4, 5, 6) estão revisados, corrigidos e sincronizados.**
+Cap. 3 e Cap. 6 têm verificação visual completa no PDF compilado; Cap. 4 e Cap. 5
+tiveram correções pontuais de texto (baixo risco, verificação visual ainda pendente,
+mas mudança é texto puro, não lógica/dado). `local`, `overleaf/master` e `origin/main`
+sincronizados em `24a5cc3`.
+
+**O Cap. 5 está FECHADO nesta leva.** Duas partes:
+- **Parte B (verificação prévia):** as três tabelas do capítulo (`tab_ols_basico_multihoriz.tex`,
+  `tab_ols_rv_iv_multihoriz.tex`, `tab_bootstrap_ci.tex`) foram confirmadas **frescas**,
+  não fósseis — reexecutei `regenerate_cap5.py` e `git diff` contra as tabelas commitadas
+  veio vazio. Diferente do que se encontrou no Cap. 3, aqui não havia descompasso
+  script↔tabela.
+- **Quick win do bootstrap (commit `658c3f0`):** três referências citadas em prosa solta
+  (Künsch 1989, Politis \& Romano 1994, Stambaugh 1999) nunca tinham entrada no
+  `references.bib` nem `\citet`/`\citep` de verdade — adicionadas as três entradas e
+  vinculado o texto com `natbib` (`\citet{kunsch1989}`, `\citet{politisromano1994}`,
+  `\citep{stambaugh1999}`).
+- **Correções de redação (commit `24a5cc3`):** Seção 5.3 tinha uma imprecisão --- dizia
+  que $h\in\{5,30\}$ tinham "o mesmo sinal negativo" quando na verdade os sinais são
+  opostos nesses horizontes (só a magnitude deixa de cancelar, diferente de
+  $h\in\{10,20\}$ onde os sinais são de fato iguais); Seção 5.5 alinhada à formulação
+  do prêmio de seguro padronizada no Cap. 3 (nomeando vendedores e compradores de
+  volatilidade, não só "pago pelos compradores").
+
+**O Cap. 4 recebeu uma correção pontual (commit `75d5177`):** a Seção "Sobreposição
+temporal" afirmava `maxlags = h-1` para o HAC/Newey-West, contradizendo o resto do
+capítulo (que já dizia `h`), o Cap. 5 inteiro (3 menções, todas `h`) e o script real
+(`regenerate_cap5.py`, `regenerate_cap9.py` — ambos usam `maxlags=h`). Corrigido para
+`h`, com referência cruzada à seção de inferência do capítulo.
 
 **O Cap. 3 está FECHADO.** Revisado, corrigido e verificado visualmente no PDF
 compilado. Era o capítulo mais traiçoeiro da leva: quatro figuras eram fósseis no
@@ -73,26 +103,34 @@ Backups de segurança, congelados antes do merge (permanecem válidos):
 - `backup-overleaf-1782881323` / `backup-overleaf-1782881189` (estado do `overleaf/master`
   pré-merge)
 
-## Pendente, nesta ordem
+## Pendente — tudo não-bloqueante, nesta ordem de relevância
 
-1. **Cap. 4 — verificar "maxlags = h−1" na Seção 4.4.2 (linha ~174-175).** Confere
-   contra o resto do capítulo e contra o script (que usa `maxlags=h`, não `h-1`) —
-   último ponto aberto da revisão dos quatro capítulos desta leva (3/4/5/6).
+1. **MBB na regressão de magnitude (`|ret_fut_30d| ~ BVRP`) — único item real pendente.**
+   Hoje só tem HAC (p=0,003). Não é correção mecânica de texto/número: requer rodar o
+   Moving Block Bootstrap nessa regressão, verificar se o achado sobrevive ao teste
+   mais rigoroso, e **decidir** onde ele entra (corpo do capítulo, apêndice, ou fica de
+   fora) — decisão de conteúdo de tese, não só código. Fazer com cabeça descansada,
+   não encaixado no fim de uma sessão longa.
 
-2. **Conferir visualmente a tabela ADF/KPSS do Cap. 3** (`tables/cap3/adf_kpss_table.tex`,
-   trazida pelo merge v3.1) — único arquivo do merge ainda não visto renderizado no PDF,
-   mesmo padrão de escrutínio que o Cap. 6 e o Cap. 3 já receberam (não só "compilou
-   sem erro").
+2. **Nota pré-defesa:** conferir volume/número de páginas das três referências do
+   bootstrap (Künsch 1989, Politis \& Romano 1994, Stambaugh 1999) contra o DOI/fonte
+   original — foram digitadas de memória/conhecimento geral, não copiadas de uma fonte
+   primária conferida.
 
-3. **Cap. 5**, pendências que apareceram no caminho:
-   - Três entradas de bibliografia soltas em texto puro no capítulo de bootstrap
-     (Künsch 1989, Politis & Romano 1994, Stambaugh 1999) — precisam virar `\cite`
-     de verdade no `references.bib`, mesmo tratamento que já foi dado a
-     Ferson-Sarkissian-Simin (2003).
-   - MBB (Moving Block Bootstrap) ainda pendente de rodar formalmente na regressão de
-     magnitude (`|ret_fut_30d| ~ BVRP`) para fechar a robustez daquele achado.
+3. **Reconciliação de datasets:** `vrp_30d_dataset.csv` está 60 dias à frente de
+   `vrp_with_targets.csv` (a fonte canônica). Não é bug agora (já tratado no Cap. 3
+   truncando para a amostra comum), mas as duas fontes deveriam convergir num único
+   pipeline de atualização para não reabrir a divergência numa próxima regeneração.
 
-4. **Pós-defesa (não bloqueante):** dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro
+4. **Verificação visual ainda não feita (baixo risco, mudança foi só texto):**
+   - Cap. 4 e Cap. 5: as correções desta leva (`75d5177`, `658c3f0`, `24a5cc3`) ainda
+     não foram vistas renderizadas no PDF — mudança é texto puro (sem tocar em dado,
+     script ou tabela), risco mínimo, mas confirma antes de considerar 100% fechado.
+   - Tabela ADF/KPSS nova do Cap. 3 (`tables/cap3/adf_kpss_table.tex`, trazida pelo
+     merge v3.1) — nunca foi vista renderizada; "compilou sem erro" não é o mesmo
+     padrão de verificação que os outros itens já receberam.
+
+5. **Pós-defesa (não bloqueante):** dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro
    do arquivo do Cap. 6 — strings funcionam, mas confunde quem procurar por `cap6_`
    intuitivamente.
 
