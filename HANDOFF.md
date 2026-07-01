@@ -1,45 +1,62 @@
 # Estado da revisão — retomada
 
-_Última atualização: 01/07/2026, sessão de revisão Cap. 5/Cap. 6._
+_Última atualização: 01/07/2026, sessão de revisão Cap. 5/Cap. 6 — pós-merge com overleaf/master._
 
 ## Estado atual
 
-Commit `935c871` no `main` local tem o Cap. 6 com pipeline de **forecasting completo**
-(script + tabelas + figuras + prosa, coerentes entre si) — **mas nunca foi compilado
-em lugar nenhum.**
+**O merge com `overleaf/master` (Plano v3.1) está feito e fechado.** Commit `8327188`
+no `main` local é o merge commit (dois pais); `git rev-list --left-right --count
+main...overleaf/master` dá `7 0` — o `0` do lado direito confirma que todo o v3.1 foi
+absorvido, nada dele ficou pra trás. O `7` do lado esquerdo é esperado (os 6 commits
+locais anteriores + o próprio commit de merge, que só existe em `main` por definição).
 
-Backups de segurança, congelados antes de qualquer merge:
-- `backup-main-1782881323` (estado do `main` local)
-- `backup-overleaf-1782881323` (estado do `overleaf/master` no momento do backup)
+O `cap6_ml_unificado.tex` resultante tem a costura das duas dimensões: a reescrita
+forecasting completa (script + tabelas + figuras + prosa, N=1.523/457, persistência
+R²=0,9365, regime≈12,4 p.p.) como base, com a terminologia e a fusão de subseções do
+v3.1 transplantadas por cima. No caminho, corrigiu-se um bug que o merge automático
+introduziu silenciosamente (sem gerar conflito): o commit `c7fd24d` do v3.1 fez um
+find-replace cego de "Random Forest"→"floresta aleatória" que duplicou o termo dentro
+de um parêntese que já o traduzia — "floresta aleatória (floresta aleatória)". Corrigido.
+
+**Ainda não compilado em lugar nenhum.** Esse é o próximo passo, e o único que falta.
+
+Backups de segurança, congelados antes do merge (permanecem válidos, o merge não os
+tocou):
+- `backup-main-1782881323` / `backup-main-1782881189` (estado do `main` local pré-merge)
+- `backup-overleaf-1782881323` / `backup-overleaf-1782881189` (estado do `overleaf/master`
+  pré-merge)
 
 ## Pendente, nesta ordem
 
-1. **Merge com `overleaf/master`.** `git rev-list --left-right --count main...overleaf/master`
-   dá `4 15` — 4 commits só no `main` local, 15 só no `overleaf/master`. São ortogonais
-   em conteúdo:
-   - Local (`main`): números e narrativa do Cap. 5 (bootstrap, órfãos) e Cap. 6
-     (forecasting, benchmark de persistência, prosa reescrita).
-   - Overleaf (`overleaf/master`, "Plano v3.1"): estrutura e nomenclatura — fusão de
-     subseções do Cap. 6 (`Mu1`), correção "Random Forest→floresta aleatória",
-     correções pontuais em Cap. 2/3/4/7, apêndice A, nota metodológica.
+1. **Compilar no Overleaf.** Duas camadas de verificação, não uma:
 
-   `cap6_ml_unificado.tex` foi tocado pelos dois lados e vai conflitar linha a linha,
-   mas as duas versões são combináveis (nenhuma invalida a outra). A resolução não é
-   escolher um lado — é costurar a prosa numérica nova dentro da estrutura de seções
-   fundida pelo v3.1. Atenção: a fusão de subseções pode deslocar onde cada bloco de
-   prosa cai; não é um merge puramente mecânico.
+   - **Camada 1 — Cap. 6 (o que foi reescrito):**
+     - Três refs resolvem sem `??`: `eq:cap5_persist`, `tab:cap8_oos_performance`,
+       `tab:cap8_coeficientes`.
+     - Três figuras renderizam de verdade (o `\IfFileExists` falha silencioso).
+     - Números batem o `\input`: N=1.523/457, persistência R²=0,9365, lineares≈0,39,
+       árvores 0,42–0,44, regime≈12,4 p.p. (LASSO e Ridge).
+     - Sem `Overfull \hbox` grave na `tab8_coeficientes` (ganhou coluna mais longa).
 
-2. **Compilar no Overleaf** (só depois do merge resolvido).
+   - **Camada 2 — os 10 arquivos que vieram do v3.1 via merge "auto-resolvido":**
+     `Nota_metodologica.tex`, `apendiceA_variaveis.tex`, `cap2_referencial.tex`,
+     `cap3_dados.tex`, `cap4_metodologia.tex`, `cap8_regimes.tex`,
+     `tables/cap3/adf_kpss_table.tex` (novo), `tables/cap3/desc_stats_cap3.tex`,
+     `tables/cap7/tab7_1_perf_buy_hold.tex`, `tables/tab7/tab7_2_perf_vrp_quantile.tex`.
+     "Auto-merged sem CONFLICT" não é garantia de conteúdo correto — foi assim que o
+     bug "floresta aleatória (floresta aleatória)" passou batido no Cap. 6. Esses 10
+     arquivos entram no PDF pela primeira vez desde o merge; olho neles também, não só
+     nos três da Camada 1.
 
-3. **Conferir no PDF, com o próprio olho, não só no log:**
-   - Três refs resolvem sem `??`: `eq:cap5_persist`, `tab:cap8_oos_performance`,
-     `tab:cap8_coeficientes`.
-   - Três figuras renderizam de verdade (o `\IfFileExists` falha silencioso).
-   - Números batem o `\input`: N=1.523/457, persistência R²=0,9365, lineares≈0,39,
-     árvores 0,42–0,44, regime≈12,4 p.p. (LASSO e Ridge).
-   - Sem `Overfull \hbox` grave na `tab8_coeficientes` (ganhou coluna mais longa).
-
-   Só depois desses quatro pontos baterem o Cap. 6 fecha de verdade.
+2. **Só depois de compilar limpo, os dois pushes, nesta ordem:**
+   - `git push overleaf main:master` primeiro (leva a costura pro Overleaf; deve ser
+     fast-forward do lado do Overleaf, já que o merge absorveu o v3.1 inteiro — se o
+     Git reclamar de non-fast-forward ou pedir `--force`, **parar**, algo mudou no
+     Overleaf depois do último fetch, investigar antes, nunca `--force` sem confirmar
+     o que seria apagado).
+   - `git push origin main` depois (GitHub, segundo lugar físico do trabalho).
+   - Se a compilação revelar problema: consertar local, recommitar, só então pushar.
+     O remote nunca deve ver estado quebrado.
 
 ## Mais pra frente (não bloqueante)
 
