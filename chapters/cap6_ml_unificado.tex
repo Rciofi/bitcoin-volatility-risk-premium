@@ -25,9 +25,10 @@ Nesse contexto, técnicas de aprendizado de máquina oferecem um arcabouço mais
 flexível para modelar a dinâmica do BVRP. O objetivo deste capítulo é investigar se
 modelos supervisionados conseguem prever o BVRP fora da amostra de forma
 estatisticamente e economicamente relevante. Compara-se o desempenho de quatro
-classes de modelos — LASSO, Ridge, floresta aleatória e Gradient Boosting —
-sob um protocolo rigoroso de avaliação temporal, com benchmark baseado na
-persistência do último valor observado do BVRP.
+classes de modelos — LASSO, Ridge, floresta aleatória e \textit{Gradient Boosting} —
+sob um protocolo rigoroso de avaliação temporal, tendo como referência principal
+o benchmark de persistência (previsão pelo último valor observado do BVRP),
+particularmente exigente dada a forte autocorrelação da série em frequência diária.
 
 % =========================================================
 \section{Desenho experimental}
@@ -62,12 +63,14 @@ e $f(\cdot)$ representa a função estimada pelo modelo supervisionado.
 O conjunto de dados possui frequência diária e contém as variáveis
 \texttt{date}, \texttt{close}, \texttt{ret}, \texttt{rv\_30d}, \texttt{iv\_30d}
 e \texttt{vrp\_30d}. As observações utilizadas neste capítulo compreendem o período
-de abril de 2023 a dezembro de 2024, totalizando 603 observações após os tratamentos
-e alinhamentos temporais.\footnote{A redução de 1.776 (amostra completa) para 603
-observações decorre da engenharia de variáveis: a construção de retornos defasados
-(1, 5, 10, 20 dias), variáveis de calendário e o próprio BVRP defasado exige um
-período de aquecimento (\textit{burn-in}) de aproximadamente 30 dias no início da
-série, e as últimas 30 observações são descartadas por ausência de alvo futuro disponível.}
+de novembro de 2021 a março de 2026, totalizando 1.523 observações após a
+engenharia de variáveis e o alinhamento do alvo em $t+1$.\footnote{A amostra deste capítulo inicia-se em novembro
+de 2021, e não em março de 2021 como a amostra completa da dissertação (1.775
+observações). A diferença decorre da variável de regime de volatilidade, cujos
+limiares são estimados por janela expansiva com período mínimo de 252 observações
+(Seção~\ref{subsec:cap5_features}); os primeiros 252 dias da série são consumidos
+nesse aquecimento e não dispõem de valor de regime válido. O horizonte final e as
+últimas observações preservam o alinhamento com o alvo em $t+1$.}
 
 As validações indicam ausência de datas duplicadas e de valores ausentes nas
 variáveis críticas para a modelagem.
@@ -79,21 +82,27 @@ O vetor $\mathbf{X}_t$ inclui variáveis de volatilidade, retorno e calendário,
 todas medidas em $t$ para garantir o protocolo estritamente \textit{ex ante}:
 
 \begin{itemize}
-    \item \textbf{Volatilidade e prêmio:} \texttt{rv\_30d} (volatilidade realizada),
-    \texttt{iv\_30d} (volatilidade implícita), \texttt{vrp\_30d} defasado em 1 período;
-    \item \textbf{Retornos defasados:} retornos logarítmicos acumulados em $h \in \{1, 5, 10, 20\}$ dias;
-    \item \textbf{Variação da IV:} variação diária da volatilidade implícita;
+    \item \textbf{Variação de volatilidade e prêmio:} variação diária da IV
+    (\texttt{d\_iv\_1d}) e variação diária do BVRP (\texttt{d\_vrp\_1d}). O nível
+    de \texttt{rv\_30d} e \texttt{iv\_30d}, bem como o valor contemporâneo do
+    BVRP, \textbf{não} entram como regressores — apenas suas variações de um dia;
+    \item \textbf{Retorno:} retorno diário corrente e retornos defasados em
+    $h \in \{1, 5, 20\}$ dias;
     \item \textbf{Regime de volatilidade:} variável categórica construída com janela
-    expansiva (quantis $q_{25}$ e $q_{75}$ recalculados a cada $t$ usando apenas
-    dados até $t$), evitando viés de antecipação;
+    expansiva (quantis $1/3$ e $2/3$ recalculados a cada $t$ usando apenas
+    dados até $t$, com período mínimo de 252 observações), evitando viés de
+    antecipação;
     \item \textbf{Variáveis de calendário:} dia da semana, mês, indicadores de início
     e fim de mês.
 \end{itemize}
 
-Séries com prefixo \texttt{ret\_fut\_} não são utilizadas como entradas dos modelos.
-A variável \texttt{close} (preço em nível, não estacionário) foi substituída por
-retornos e variações, eliminando o componente $I(1)$ identificado nos testes de raiz
-unitária do Capítulo~\ref{chap:dados}.
+O vetor final possui 11 variáveis. Séries com prefixo \texttt{ret\_fut\_} não são
+utilizadas como entradas dos modelos. A variável \texttt{close} (preço em nível,
+não estacionário) foi substituída por retornos e variações, eliminando o componente
+$I(1)$ identificado nos testes de raiz unitária do Capítulo~\ref{chap:dados}.
+Note-se que \texttt{rv\_30d} e \texttt{iv\_30d} em nível também foram excluídos do
+vetor de regressores, para evitar redundância direta com a variável-alvo
+($\text{BVRP} = \text{RV} - \text{IV}$).
 
 \subsection{Protocolo de avaliação fora da amostra}
 \label{subsec:cap5_protocolo}
@@ -101,41 +110,42 @@ unitária do Capítulo~\ref{chap:dados}.
 Adota-se divisão temporal das observações em proporção 70\%/30\%:
 
 \begin{itemize}
-    \item \textbf{Treino:} 70\% iniciais ($\approx$422 observações);
-    \item \textbf{Teste:} 30\% finais ($\approx$181 observações).
+    \item \textbf{Treino:} 70\% iniciais (1.066 observações; nov.~2021\,–\,nov.~2024);
+    \item \textbf{Teste:} 30\% finais (457 observações; dez.~2024\,–\,mar.~2026).
 \end{itemize}
 
 A padronização (\textit{z-score}) é calibrada exclusivamente no conjunto de
-treinamento e aplicada aos demais conjuntos sem reestimação, evitando vazamento
+treinamento e aplicada ao conjunto de teste sem reestimação, evitando vazamento
 de informação. As métricas de avaliação são $R^2$ fora da amostra, RMSE e MAE.
 
 O modelo de referência (\textit{benchmark}) é o \textbf{último valor observado}:
 \begin{equation}
 \widehat{\text{BVRP}}_{t+1}^{\text{ref}} = \text{BVRP}_t.
+\label{eq:cap5_persist}
 \end{equation}
-Esse benchmark é extremamente competitivo dado que o BVRP exibe forte persistência
-em frequência diária ($R^2 \approx 0{,}89$ no conjunto de teste). Ganhos incrementais
-dos modelos supervisionados devem ser interpretados \textit{relativamente} a essa
-referência.
+Esse benchmark é extremamente competitivo: dada a elevada persistência do BVRP em
+frequência diária, prever o valor de amanhã pelo valor de hoje explica sozinho
+$R^2 = 0{,}9365$ da variância fora da amostra. Ganhos dos modelos supervisionados
+devem, portanto, ser interpretados \textit{relativamente} a essa referência, e não
+contra um benchmark trivial como a média incondicional.
 
 % =========================================================
 \section{Modelos de referência}
 \label{sec:cap5_benchmarks}
 % =========================================================
 
-Antes da estimação dos modelos de aprendizado de máquina, estabelece-se um
-benchmark temporal:
+Estabelecem-se dois pontos de referência. O primeiro é o benchmark de
+persistência (Equação~\ref{eq:cap5_persist}), que prevê o BVRP de $t+1$ pelo valor
+observado em $t$. O segundo é a média incondicional do conjunto de treinamento,
+incluída apenas para fixar o piso de desempenho: um modelo que não supere a média
+não capturou estrutura alguma.
 
-\begin{itemize}
-    \item \textbf{Último valor} (\textit{last value}, persistência):
-    $\widehat{\text{BVRP}}_{t+1} = \text{BVRP}_t$.
-\end{itemize}
-
-A Tabela~\ref{tab:cap8_oos_performance} (Seção~\ref{subsec:cap5_arvores_resultados})
-reporta o desempenho do benchmark de último valor lado a lado com todos os
-modelos supervisionados, calculado sobre o mesmo conjunto de teste. O benchmark
-de último valor domina todos os modelos, reforçando que a persistência temporal
-do BVRP constitui a principal fonte de previsibilidade em frequência diária.
+A comparação sistemática entre benchmarks e modelos é reportada de forma unificada
+na Tabela~\ref{tab:cap8_oos_performance} (Seção~\ref{subsec:cap5_arvores_resultados}),
+que apresenta todos os modelos e as duas referências avaliados no mesmo conjunto de
+teste. O benchmark de persistência domina todas as especificações, confirmando que a
+autocorrelação temporal do BVRP é a principal fonte de previsibilidade em frequência
+diária.
 
 % =========================================================
 \section{Modelos lineares regularizados}
@@ -149,11 +159,11 @@ temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots, 10^{2
 \subsection{Resultados fora da amostra}
 \label{subsec:cap5_lineares_resultados}
 
-A a Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos exibem
-resultados próximos entre si, sugerindo baixa sensibilidade à regularização no
-problema analisado, e nenhum supera o benchmark de persistência de forma robusta.
-Isso é consistente com a hipótese de que a estrutura linear não captura informação
-incremental relevante além da persistência do prêmio.
+A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos
+lineares exibem $R^2$ fora da amostra próximos entre si (LASSO 0,39, Ridge 0,39),
+superando com folga a média incondicional, mas ficando muito aquém do benchmark
+de persistência (0,94). A proximidade entre eles sugere baixa sensibilidade à
+escolha do tipo de regularização no problema analisado.
 
 % (Tabela removida — pertence ao Cap. 5 OLS)
 
@@ -161,10 +171,17 @@ incremental relevante além da persistência do prêmio.
 \label{subsec:cap5_lineares_coeficientes}
 
 A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo
-LASSO e pelo Ridge, ordenados pela magnitude absoluta do LASSO. O regime de
-volatilidade emerge como preditor de maior magnitude ($\approx$9,9 pontos percentuais),
-seguido pelos retornos defasados em 1 e 5 dias. A convergência de sinais entre LASSO
-e Ridge para todas as variáveis confirma a robustez das direções dos efeitos.
+LASSO e pelo Ridge, ordenados pela magnitude absoluta. Dois preditores concentram
+o peso linear: o regime de volatilidade e o retorno diário contemporâneo. O regime
+apresenta magnitude estável entre os dois modelos ($\approx$12,4 pontos percentuais
+em ambos), ao passo que o retorno diário oscila fortemente (de $\approx$7,7 no Ridge
+a $\approx$15,6 no LASSO). Essa assimetria é típica de colinearidade entre preditores:
+o LASSO concentra peso em um regressor e encolhe os correlacionados, enquanto o Ridge
+o distribui. A estabilidade do coeficiente de regime entre as duas penalizações
+indica que ele carrega informação que os demais preditores não replicam — leitura
+corroborada pela análise SHAP (Seção~\ref{subsec:cap5_shap}). Os sinais são positivos
+e concordantes entre LASSO e Ridge: sob a convenção $\text{BVRP} = \text{RV} - \text{IV}$,
+regimes de volatilidade realizada elevada deslocam o prêmio para cima (menos negativo).
 
 \input{tables/tab8/tab8_coeficientes}
 
@@ -180,11 +197,21 @@ selecionados por validação cruzada temporal.
 \subsection{Resultados fora da amostra}
 \label{subsec:cap5_arvores_resultados}
 
-A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho comparativo de todos os modelos.
-Os modelos baseados em árvores não superam o benchmark de persistência nem os
-modelos lineares de forma consistente, sugerindo que a informação capturada por
-não linearidades e interações é limitada no contexto analisado, ou que a amostra
-disponível (603 observações) é insuficiente para sustentar ganhos robustos.
+A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho comparativo de todos
+os modelos e benchmarks. Os modelos baseados em árvores alcançam $R^2$ fora da
+amostra em torno de 0,42 a 0,44 (floresta aleatória 0,42, \textit{Gradient Boosting}
+0,44), ligeiramente acima dos lineares, mas igualmente distantes do benchmark de
+persistência. Nenhuma família de modelos supervisionados se aproxima da referência
+de último valor.
+
+Esse resultado tem explicação direta e verificável: a matriz de preditores não inclui
+o valor contemporâneo do BVRP ($\text{BVRP}_t$), apenas variáveis de volatilidade,
+retorno e calendário observadas em $t$. Como o benchmark de persistência é exatamente
+$\text{BVRP}_t$, os modelos competem sem acesso ao único regressor que replicaria
+trivialmente a referência. O que os modelos capturam, portanto, é a informação
+\textit{incremental} sobre o BVRP futuro contida nas demais variáveis — e essa
+informação, isoladamente, explica menos da metade da variância que a própria
+persistência da série.
 
 \input{tables/tab8/tab8_oos_performance}
 
@@ -201,7 +228,7 @@ mas com erros expressivos em episódios de reversão abrupta.
     figs/cap8/fig\_cap8\_oos\_prediction.png}}%
 }
 \caption{Previsão um passo à frente do BVRP fora da amostra — modelo LASSO.
-Período de teste: jun.~2024\,–\,dez.~2024 ($N = 181$ dias).
+Período de teste: dez.~2024\,–\,mar.~2026 ($N = 458$ dias).
 A linha sólida representa o BVRP realizado; a linha tracejada, a previsão do LASSO.}
 \label{fig:cap5_oos_pred}
 \end{figure}
@@ -247,10 +274,11 @@ na previsão.}
 \label{fig:cap5_shap_beeswarm}
 \end{figure}
 
-O regime de volatilidade realizada emerge como o preditor de maior impacto,
-confirmando que a estrutura de regime — e não os retornos passados — domina a
-previsibilidade do BVRP. A volatilidade realizada e implícita aparecem em seguida,
-enquanto as variáveis de calendário contribuem marginalmente.
+O regime de volatilidade emerge como o preditor de maior impacto, muito à frente de
+todas as demais variáveis, confirmando que a estrutura de regime — e não os retornos
+passados — domina a previsibilidade do BVRP. A variável de calendário mês e os
+retornos defasados em 20 e 5 dias ocupam as posições seguintes, enquanto as
+variações de IV e BVRP e as demais variáveis de calendário contribuem marginalmente.
 
 % =========================================================
 \section{Comparação geral e síntese}
@@ -259,26 +287,37 @@ enquanto as variáveis de calendário contribuem marginalmente.
 
 Os resultados deste capítulo convergem para uma conclusão robusta: a
 \textbf{persistência temporal} do BVRP constitui o benchmark dominante em
-frequência diária, e nenhuma família de modelos supervisionados produz ganhos
-incrementais fora da amostra de forma consistente e economicamente relevante.
+frequência diária ($R^2 = 0{,}9365$ fora da amostra), e nenhuma família de modelos
+supervisionados o supera. Trata-se de um resultado nulo, no sentido de que os
+preditores auxiliares não agregam poder preditivo sobre o nível do BVRP além do
+que a própria série de ontem já entrega. Longe de ser um impasse, esse achado
+delimita com precisão onde reside a informação econômica do BVRP.
 
 Três achados merecem destaque:
 
 \begin{enumerate}
-    \item \textbf{Modelos lineares regularizados} (LASSO, Ridge) não superam a
-    persistência, sugerindo que as relações lineares entre preditores e BVRP futuro
-    são fracas em horizonte de 1 dia;
+    \item \textbf{Nenhum modelo supera a persistência.} Modelos lineares
+    ($R^2 \approx 0{,}39$) e baseados em árvores ($R^2 \approx 0{,}42$--$0{,}44$)
+    superam a média incondicional, mas ficam muito aquém do benchmark de último
+    valor. Como a matriz de preditores não contém $\text{BVRP}_t$, o exercício mede
+    a informação incremental das demais variáveis — que é limitada em horizonte de
+    um dia;
 
-    \item \textbf{Modelos baseados em árvores} (floresta aleatória, Gradient Boosting)
-    também não apresentam ganhos robustos, indicando que a amostra disponível pode
-    ser insuficiente para sustentar a estimação de não linearidades complexas;
+    \item \textbf{A não linearidade não resgata o desempenho.} Floresta aleatória e
+    \textit{Gradient Boosting} não se distanciam materialmente dos modelos lineares,
+    indicando que interações e não linearidades entre os preditores disponíveis não
+    contêm sinal explorável relevante sobre o nível do BVRP;
 
-    \item \textbf{A variável de regime} é o preditor dominante em todos os modelos,
-    tanto pela magnitude dos coeficientes (LASSO/Ridge) quanto pela importância SHAP
-    (floresta aleatória). Isso sugere que o BVRP é primordialmente um indicador de
-    estado de mercado — sua exploração mais efetiva reside no condicionamento a
-    regimes, tema aprofundado nos Capítulos~\ref{chap:estrategias}
-    e~\ref{chap:regimes}.
+    \item \textbf{A variável de regime é o preditor mais robusto} em todos os
+    modelos. Nos modelos lineares, seu coeficiente é estável entre LASSO e Ridge,
+    enquanto o retorno diário — o outro preditor de peso — oscila conforme a
+    penalização, sinal de colinearidade que fragiliza sua interpretação isolada.
+    Na floresta aleatória, a importância SHAP aponta o regime como dominante isolado,
+    à frente de todos os demais. Essa convergência desloca a leitura do BVRP: seu
+    valor não está na previsão pontual do nível diário, mas na identificação do
+    \textit{estado} de mercado. Essa evidência motiva o condicionamento a regimes
+    explorado nos Capítulos~\ref{chap:estrategias} e~\ref{chap:regimes}, em vez da
+    previsão de nível.
 \end{enumerate}
 
 % =========================================================
@@ -286,8 +325,9 @@ Três achados merecem destaque:
 \label{sec:cap5_implicacoes}
 % =========================================================
 
-Embora os modelos supervisionados não superem o benchmark de persistência de forma
-consistente, os padrões identificados têm implicações práticas relevantes.
+Embora nenhum modelo supervisionado supere o benchmark de persistência na previsão
+do nível do BVRP, a estrutura identificada tem implicações práticas relevantes — e
+elas residem no \textit{estado} de mercado, não na previsão pontual.
 
 As previsões do BVRP podem ser utilizadas como insumo adicional para alocação
 dinâmica de risco: valores previstos elevados sinalizam ambientes em que a
@@ -302,6 +342,7 @@ Capítulo~\ref{chap:estrategias}, que analisa a utilidade econômica do BVRP em
 estratégias condicionais de negociação.
 
 Por fim, cabe ressaltar que os resultados deste capítulo são condicionados à
-amostra disponível (603 observações, 2023–2024) e ao horizonte de previsão de
-1 dia. Amostras mais longas, frequências intradiárias ou horizontes mais curtos
-podem alterar as conclusões — avenidas que pesquisas futuras poderão explorar.
+amostra disponível (1.523 observações, nov.~2021–mar.~2026) e ao horizonte de
+previsão de 1 dia. Amostras mais longas, frequências intradiárias ou horizontes
+mais curtos podem alterar as conclusões — avenidas que pesquisas futuras poderão
+explorar.

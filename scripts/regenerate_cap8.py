@@ -67,7 +67,14 @@ FEATURE_LABELS = {
 
 df = pd.read_csv(DATA_PATH, parse_dates=["date"]).sort_values("date").set_index("date")
 
-y = df[TARGET].copy()
+# Forecasting real (t -> t+1): o alvo e o BVRP do dia SEGUINTE, nao do dia
+# corrente. y_level preserva o nivel contemporaneo (BVRP_t) para servir de
+# benchmark de persistencia (Eq. 6.2: BVRP_hat_{t+1} = BVRP_t); y desloca -1
+# para alinhar cada linha t com o alvo t+1. A ultima observacao perde o alvo
+# (nao ha t+1 disponivel) e cai no dropna.
+y_level = df[TARGET].copy()
+y = y_level.shift(-1)
+y.name = TARGET
 X = df.drop(columns=[c for c in COLS_EXCLUIR if c in df.columns])
 
 data_ml = pd.concat([y, X], axis=1).dropna()
@@ -102,10 +109,11 @@ for name, model in models.items():
     metrics.append({"Modelo": name, "MSE": mse, "RMSE": math.sqrt(mse), "R2_OOS": r2})
     print(f"  {name:20s}  MSE={mse:7.3f}  R²={r2:.4f}")
 
-# Benchmark de persistencia (random walk): previsao = ultimo valor observado
-# (BVRP_{t+1} = BVRP_t). Usa o valor real em t-1, incluindo a fronteira
-# treino/teste (primeira obs de teste usa a ultima obs de treino).
-y_prev_persist = pd.concat([y_train, y_test]).shift(1).loc[y_test.index]
+# Benchmark de persistencia (random walk): previsao do alvo em t+1 pelo
+# nivel contemporaneo observado em t (Eq. 6.2: BVRP_hat_{t+1} = BVRP_t).
+# y_level esta alinhado ao indice original (t), y_test tambem (o shift(-1)
+# preserva o indice de t, so desloca o VALOR para o de t+1).
+y_prev_persist = y_level.loc[y_test.index]
 mse_p = mean_squared_error(y_test, y_prev_persist)
 r2_p  = r2_score(y_test, y_prev_persist)
 metrics.append({"Modelo": "Persistência (valor anterior)", "MSE": mse_p, "RMSE": math.sqrt(mse_p), "R2_OOS": r2_p})
