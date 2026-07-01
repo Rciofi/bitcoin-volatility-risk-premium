@@ -1,74 +1,65 @@
 # Estado da revisão — retomada
 
-_Última atualização: 01/07/2026, sessão de revisão Cap. 5/Cap. 6 — pós-merge com overleaf/master._
+_Última atualização: 01/07/2026, sessão de revisão Cap. 5/Cap. 6 — Cap. 6 fechado e verificado visualmente._
 
 ## Estado atual
 
-**O merge com `overleaf/master` (Plano v3.1) está feito e fechado.** Commit `8327188`
-no `main` local é o merge commit (dois pais); `git rev-list --left-right --count
-main...overleaf/master` dá `7 0` — o `0` do lado direito confirma que todo o v3.1 foi
-absorvido, nada dele ficou pra trás. O `7` do lado esquerdo é esperado (os 6 commits
-locais anteriores + o próprio commit de merge, que só existe em `main` por definição).
+**O Cap. 6 está FECHADO.** Merge com `overleaf/master` (Plano v3.1) feito (commit
+`8327188`), correção residual de N=458→457 na legenda da Fig. 6.1 feita (commit
+`8a14aa6`), e **compilação confirmada no Overleaf: 0 erros**, apenas 1 warning
+inofensivo de `\showhyphens`. Verificação visual (não só log) confirmou: as três
+figuras do Cap. 6 renderizam como imagens reais (não caíram na caixa `\IfFileExists`),
+e os números batem entre texto/tabela/figura/script — N=1.523/457, persistência
+R²=0,9365, lineares≈0,39, árvores 0,42–0,44, regime≈12,4 p.p.
 
-O `cap6_ml_unificado.tex` resultante tem a costura das duas dimensões: a reescrita
-forecasting completa (script + tabelas + figuras + prosa, N=1.523/457, persistência
-R²=0,9365, regime≈12,4 p.p.) como base, com a terminologia e a fusão de subseções do
-v3.1 transplantadas por cima. No caminho, corrigiu-se um bug que o merge automático
-introduziu silenciosamente (sem gerar conflito): o commit `c7fd24d` do v3.1 fez um
-find-replace cego de "Random Forest"→"floresta aleatória" que duplicou o termo dentro
-de um parêntese que já o traduzia — "floresta aleatória (floresta aleatória)". Corrigido.
+`local` (main, commit `8a14aa6`), `overleaf/master` e `origin/main` (GitHub) estão
+todos sincronizados no mesmo commit. Três lugares físicos, nenhuma divergência.
 
-**Ainda não compilado em lugar nenhum.** Esse é o próximo passo, e o único que falta.
+O `cap6_ml_unificado.tex` final tem a costura das duas dimensões: a reescrita
+forecasting completa (script + tabelas + figuras + prosa) como base, com a
+terminologia e a fusão de subseções do v3.1 (Plano v3.1) transplantadas por cima.
+No caminho, dois bugs foram corrigidos: (1) o merge automático introduziu em
+silêncio — sem gerar conflito — a redundância "floresta aleatória (floresta
+aleatória)", resultado de um find-replace cego do commit `c7fd24d` do v3.1;
+corrigido. (2) A legenda da Fig. 6.1 ficou com N=458 residual depois da correção
+do `shift(-1)` para forecasting genuíno (que reduziu o teste de 458 para 457
+observações); corrigido no commit `8a14aa6`.
 
-Backups de segurança, congelados antes do merge (permanecem válidos, o merge não os
-tocou):
+**Verificação visual cobriu só o Cap. 6.** Os outros 10 arquivos que vieram do v3.1
+via merge "auto-resolvido" (`Nota_metodologica.tex`, `apendiceA_variaveis.tex`,
+`cap2_referencial.tex`, `cap3_dados.tex`, `cap4_metodologia.tex`, `cap8_regimes.tex`,
+`tables/cap3/adf_kpss_table.tex`, `tables/cap3/desc_stats_cap3.tex`,
+`tables/cap7/tab7_1_perf_buy_hold.tex`, `tables/tab7/tab7_2_perf_vrp_quantile.tex`)
+**compilaram sem erro** (fazem parte do mesmo 0-erros do PDF), mas **não foram
+conferidos visualmente um a um** — só o Cap. 6 recebeu esse escrutínio. Em especial,
+a tabela ADF/KPSS nova do Cap. 3 (`adf_kpss_table.tex`) nunca foi vista renderizada;
+"compilou sem erro" não é o mesmo padrão de verificação que os quatro pontos do Cap. 6
+receberam (essa distinção é a lição central desta sessão — "auto-merged sem
+CONFLICT" ou "compila sem erro" não são garantia de conteúdo correto, só de sintaxe
+válida).
+
+Backups de segurança, congelados antes do merge (permanecem válidos):
 - `backup-main-1782881323` / `backup-main-1782881189` (estado do `main` local pré-merge)
 - `backup-overleaf-1782881323` / `backup-overleaf-1782881189` (estado do `overleaf/master`
   pré-merge)
 
 ## Pendente, nesta ordem
 
-1. **Compilar no Overleaf.** Duas camadas de verificação, não uma:
+1. **Conferir visualmente a tabela ADF/KPSS do Cap. 3** (`tables/cap3/adf_kpss_table.tex`,
+   trazida pelo merge v3.1) — único arquivo do merge ainda não visto renderizado no PDF,
+   mesmo padrão de escrutínio que o Cap. 6 recebeu (não só "compilou sem erro").
 
-   - **Camada 1 — Cap. 6 (o que foi reescrito):**
-     - Três refs resolvem sem `??`: `eq:cap5_persist`, `tab:cap8_oos_performance`,
-       `tab:cap8_coeficientes`.
-     - Três figuras renderizam de verdade (o `\IfFileExists` falha silencioso).
-     - Números batem o `\input`: N=1.523/457, persistência R²=0,9365, lineares≈0,39,
-       árvores 0,42–0,44, regime≈12,4 p.p. (LASSO e Ridge).
-     - Sem `Overfull \hbox` grave na `tab8_coeficientes` (ganhou coluna mais longa).
+2. **Cap. 5**, pendências que apareceram no caminho:
+   - Três entradas de bibliografia soltas em texto puro no capítulo de bootstrap
+     (Künsch 1989, Politis & Romano 1994, Stambaugh 1999) — precisam virar `\cite`
+     de verdade no `references.bib`, mesmo tratamento que já foi dado a
+     Ferson-Sarkissian-Simin (2003).
+   - MBB (Moving Block Bootstrap) ainda pendente de rodar formalmente na regressão de
+     magnitude (`|ret_fut_30d| ~ BVRP`) para fechar a robustez daquele achado.
 
-   - **Camada 2 — os 10 arquivos que vieram do v3.1 via merge "auto-resolvido":**
-     `Nota_metodologica.tex`, `apendiceA_variaveis.tex`, `cap2_referencial.tex`,
-     `cap3_dados.tex`, `cap4_metodologia.tex`, `cap8_regimes.tex`,
-     `tables/cap3/adf_kpss_table.tex` (novo), `tables/cap3/desc_stats_cap3.tex`,
-     `tables/cap7/tab7_1_perf_buy_hold.tex`, `tables/tab7/tab7_2_perf_vrp_quantile.tex`.
-     "Auto-merged sem CONFLICT" não é garantia de conteúdo correto — foi assim que o
-     bug "floresta aleatória (floresta aleatória)" passou batido no Cap. 6. Esses 10
-     arquivos entram no PDF pela primeira vez desde o merge; olho neles também, não só
-     nos três da Camada 1.
-
-2. **Só depois de compilar limpo, os dois pushes, nesta ordem:**
-   - `git push overleaf main:master` primeiro (leva a costura pro Overleaf; deve ser
-     fast-forward do lado do Overleaf, já que o merge absorveu o v3.1 inteiro — se o
-     Git reclamar de non-fast-forward ou pedir `--force`, **parar**, algo mudou no
-     Overleaf depois do último fetch, investigar antes, nunca `--force` sem confirmar
-     o que seria apagado).
-   - `git push origin main` depois (GitHub, segundo lugar físico do trabalho).
-   - Se a compilação revelar problema: consertar local, recommitar, só então pushar.
-     O remote nunca deve ver estado quebrado.
-
-## Mais pra frente (não bloqueante)
-
-- Dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro do arquivo do Cap. 6 — strings
-  funcionam, mas confunde quem procurar por `cap6_` intuitivamente. Limpeza pós-defesa.
-- **Cap. 5**, pendências que apareceram no caminho:
-  - Três entradas de bibliografia soltas em texto puro no capítulo de bootstrap
-    (Künsch 1989, Politis & Romano 1994, Stambaugh 1999) — precisam virar `\cite`
-    de verdade no `references.bib`, mesmo tratamento que já foi dado a
-    Ferson-Sarkissian-Simin (2003).
-  - MBB (Moving Block Bootstrap) ainda pendente de rodar formalmente na regressão de
-    magnitude (`|ret_fut_30d| ~ BVRP`) para fechar a robustez daquele achado.
+3. **Pós-defesa (não bloqueante):** dívida de nomenclatura `cap5_`/`cap8`/`tab8` dentro
+   do arquivo do Cap. 6 — strings funcionam, mas confunde quem procurar por `cap6_`
+   intuitivamente.
 
 ## O que este ciclo consertou (contexto, não é mais problema)
 
