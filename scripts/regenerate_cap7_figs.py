@@ -68,14 +68,31 @@ df = pd.read_csv('data/vrp_with_regimes.csv', parse_dates=['date'])
 df = df.sort_values('date').reset_index(drop=True)
 df = df.dropna(subset=['vrp_30d', 'ret'])
 
-q80_th = df['vrp_30d'].quantile(0.80)
-
 # Regimes por tercis de RV_30d
 df['rv_regime'] = pd.qcut(df['rv_30d'], q=3, labels=['Baixo', 'Medio', 'Alto'])
 
+# Series diarias de retorno da estrategia (sinal expansivo, mesma fonte que
+# gera as Tabelas 7.2-7.4) -- substitui o quantil fixo com look-ahead bias
+# (q80_th = df['vrp_30d'].quantile(0.80)) usado anteriormente nas figuras de
+# retorno acumulado. Ver regenerate_cap7.py para a definicao do sinal.
+df_sig = pd.read_csv('tables/cap7/daily_returns_cap7.csv', parse_dates=['date'])
+df = df.merge(df_sig.drop(columns=['ret']), on='date', how='left')
+
+# Periodo real plotado (eixo X das figuras de retorno acumulado do BVRP) --
+# usado nos titulos em vez de datas hardcoded, que ficavam fosseis quando a
+# amostra mudava (ex.: "fev 2023 - dez 2024" nao correspondia ao range real).
+_MESES_ABREV_FIG = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+                     'jul', 'ago', 'set', 'out', 'nov', 'dez']
+
+
+def _fmt_periodo_fig(d):
+    return f"{_MESES_ABREV_FIG[d.month - 1]} {d.year}"
+
+
+periodo_bvrp = f"{_fmt_periodo_fig(df['date'].min())} – {_fmt_periodo_fig(df['date'].max())}"
+
 print(f"BTC historico: {df_btc['date'].min().date()} a {df_btc['date'].max().date()} (N={len(df_btc)})")
 print(f"Dataset BVRP:  {df['date'].min().date()} a {df['date'].max().date()} (N={len(df)})")
-print(f"Limiar q80: {q80_th:.2f}")
 
 
 # ====================================================================
@@ -102,9 +119,7 @@ print("  OK: fig_7_01_cum_returns_buy_hold.png")
 # Fig 7-02: Estrategia BVRP q80 — retorno acumulado
 # ====================================================================
 print("Gerando fig_7_02...")
-sig80 = (df['vrp_30d'].shift(1) > q80_th).astype(float)
-sr80  = sig80 * df['ret']
-cum80 = (1 + sr80).cumprod()
+cum80 = (1 + df['sr_q80']).cumprod()
 
 fig, ax = plt.subplots(figsize=FIGSIZE_WIDE)
 ax.plot(df['date'], cum80, color=COLOR_Q80, lw=1.8, label='Estratégia BVRP q80')
@@ -136,7 +151,7 @@ ax.fill_between(df['date'], 1, cum80, alpha=0.10, color=COLOR_Q80)
 ax.axhline(1, color='black', lw=0.8, ls='--', alpha=0.4)
 ax.set_xlabel('Data')
 ax.set_ylabel('Retorno acumulado (base 1)')
-ax.set_title('Buy-and-Hold vs Estratégia BVRP q80 (fev 2023 – dez 2024)')
+ax.set_title(f'Buy-and-Hold vs Estratégia BVRP q80 ({periodo_bvrp})')
 ax.legend(framealpha=0.9)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
@@ -152,16 +167,14 @@ print("Gerando fig_7_03 (multi-quantis)...")
 quantiles = [0.60, 0.70, 0.80, 0.90]
 fig, ax = plt.subplots(figsize=FIGSIZE_COMP)
 for q, color in zip(quantiles, COLOR_PALETTE):
-    th  = df['vrp_30d'].quantile(q)
-    sig = (df['vrp_30d'].shift(1) > th).astype(float)
-    sr  = sig * df['ret']
-    cum = (1 + sr).cumprod()
-    ax.plot(df['date'], cum, color=color, lw=1.6, label=f'q{int(q*100)}%')
+    qval = int(q * 100)
+    cum = (1 + df[f'sr_q{qval}']).cumprod()
+    ax.plot(df['date'], cum, color=color, lw=1.6, label=f'q{qval}%')
 ax.plot(df['date'], cum_bh_sub, color='grey', lw=1.2, ls='--', alpha=0.7, label='Buy-and-Hold')
 ax.axhline(1, color='black', lw=0.7, ls=':', alpha=0.4)
 ax.set_xlabel('Data')
 ax.set_ylabel('Retorno acumulado (base 1)')
-ax.set_title('Retorno acumulado por quantil do BVRP (fev 2023 – dez 2024)')
+ax.set_title(f'Retorno acumulado por quantil do BVRP ({periodo_bvrp})')
 ax.legend(framealpha=0.9, ncol=3)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
@@ -173,18 +186,19 @@ print("  OK: fig_7_03_cum_returns_bvrp_multi_quantile.png")
 # ====================================================================
 # Fig 7-03c: Heatmap multi-quantis (z-score das metricas)
 # ====================================================================
+# Le as metricas do CSV gerado por regenerate_cap7.py (mesma fonte da Tab 7.3),
+# em vez de recalcular o sinal aqui -- garante que a figura bata exatamente
+# com a tabela (evita divergencia por look-ahead bias no limiar, corrigido em
+# c02e22a mas nunca propagado para este script de figuras).
 print("Gerando fig_7_03 (heatmap quantis)...")
+df_q3 = pd.read_csv('tables/cap7/perf_multi_quantile_cap7.csv', index_col='quantil')
 metrics_data = {}
-for q in quantiles:
-    th  = df['vrp_30d'].quantile(q)
-    sig = (df['vrp_30d'].shift(1) > th).astype(float)
-    sr  = sig * df['ret']
-    p   = perf(sr)
-    metrics_data[f'q{int(q*100)}%'] = {
-        'Retorno\nAnual': p['ret'],
-        'Sharpe\nRatio':  p['sharpe'],
-        'Max\nDrawdown':  -p['mdd'],   # positivo para heatmap (menor = pior)
-        'Tempo\nInvestido': sig.mean(),
+for idx in df_q3.index:
+    metrics_data[idx.replace('\\%', '%')] = {
+        'Retorno\nAnual':   df_q3.loc[idx, 'ret_anual'],
+        'Sharpe\nRatio':    df_q3.loc[idx, 'sharpe_bruto'],
+        'Max\nDrawdown':    -df_q3.loc[idx, 'max_drawdown'],
+        'Tempo\nInvestido': df_q3.loc[idx, 'pct_tempo'],
     }
 
 df_heat = pd.DataFrame(metrics_data).T
@@ -212,12 +226,10 @@ print("  OK: fig_7_03_heatmap_bvrp_quantile_metrics.png")
 # Fig 7-04: Retorno acumulado por regime de RV
 # ====================================================================
 print("Gerando fig_7_04 (regimes)...")
+regime_key = {'Baixo': 'baixo', 'Medio': 'medio', 'Alto': 'alto'}
 fig, ax = plt.subplots(figsize=FIGSIZE_COMP)
 for regime, color in REGIME_COLORS.items():
-    mask = df['rv_regime'] == regime
-    sig  = ((df['vrp_30d'].shift(1) > q80_th) & mask).astype(float)
-    sr   = sig * df['ret']
-    cum  = (1 + sr).cumprod()
+    cum = (1 + df[f'sr_regime_{regime_key[regime]}']).cumprod()
     label_map = {'Baixo': 'Baixa RV', 'Medio': 'Média RV', 'Alto': 'Alta RV'}
     ax.plot(df['date'], cum, color=color, lw=1.8, label=label_map[regime])
 ax.axhline(1, color='black', lw=0.8, ls='--', alpha=0.4)
@@ -235,19 +247,18 @@ print("  OK: fig_7_04_cum_returns_bvrp_by_regime.png")
 # ====================================================================
 # Fig 7-05: Heatmap metricas por regime
 # ====================================================================
+# Le as metricas do CSV gerado por regenerate_cap7.py (mesma fonte da Tab 7.4) --
+# ver nota acima sobre o heatmap de quantis.
 print("Gerando fig_7_05 (heatmap regimes)...")
+df_r4 = pd.read_csv('tables/cap7/perf_regimes_cap7.csv', index_col='regime')
+label_map_csv = {'Baixa RV': 'Baixa RV', 'Media RV': 'Média RV', 'Alta RV': 'Alta RV'}
 regime_metrics = {}
-label_map = {'Baixo': 'Baixa RV', 'Medio': 'Média RV', 'Alto': 'Alta RV'}
-for regime in ['Baixo', 'Medio', 'Alto']:
-    mask = df['rv_regime'] == regime
-    sig  = ((df['vrp_30d'].shift(1) > q80_th) & mask).astype(float)
-    sr   = sig * df['ret']
-    p    = perf(sr)
-    regime_metrics[label_map[regime]] = {
-        'Retorno\nAnual':  p['ret'],
-        'Sharpe\nRatio':   p['sharpe'],
-        'Max\nDrawdown':  -p['mdd'],
-        'Tempo\nInvestido': sig.mean(),
+for idx in df_r4.index:
+    regime_metrics[label_map_csv[idx]] = {
+        'Retorno\nAnual':   df_r4.loc[idx, 'ret_anual'],
+        'Sharpe\nRatio':    df_r4.loc[idx, 'sharpe'],
+        'Max\nDrawdown':   -df_r4.loc[idx, 'max_drawdown'],
+        'Tempo\nInvestido': df_r4.loc[idx, 'pct_tempo'],
     }
 
 df_rh = pd.DataFrame(regime_metrics).T

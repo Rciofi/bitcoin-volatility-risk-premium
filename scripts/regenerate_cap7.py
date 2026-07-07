@@ -153,6 +153,12 @@ print("BH subperiodo ({} -> {}, N={}): Sharpe={:.4f}, Sortino={}, MDD={:.4f}".fo
 # Tab 7.2 -- Estrategia q80% com cenarios de custo (0, 5, 10 bps)
 # ============================================================
 sr80 = sig80 * df['ret']
+
+# Serie diaria (date, retorno bruto, retorno da estrategia q80 expansiva) --
+# exportada em CSV para as figuras de retorno acumulado (regenerate_cap7_figs.py)
+# reusarem em vez de recalcular o sinal com quantil fixo (look-ahead bias).
+daily_series = pd.DataFrame({'date': df['date'], 'ret': df['ret'], 'sr_q80': sr80})
+
 r80, v80, s80, m80 = perf(sr80)
 sortino_80 = sortino_ratio(sr80)
 ti80 = float(sig80.mean())
@@ -253,6 +259,7 @@ for q in [0.60, 0.70, 0.80, 0.90]:
 
     q_label = "q{}\\%".format(qval)
     rows3.append((q_label, r_q, v_q, sharpe_q[0], sharpe_q[5], sharpe_q[10], m_q, sortino_q, ti_q))
+    daily_series[f'sr_q{qval}'] = sr_q.values
     print("  q{}: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Tempo={:.4f}".format(
         qval, r_q, v_q, s_q, _fmt(sortino_q), m_q, ti_q))
 
@@ -276,6 +283,15 @@ with open('tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-
     fh.write("\n".join(lines3))
 print("Tabela 3 salva: tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex")
 
+# CSV com as mesmas metricas, para o script de figuras (regenerate_cap7_figs.py)
+# ler em vez de recalcular o sinal -- garante que heatmap e tabela venham da
+# mesma fonte (evita divergencia como a do look-ahead bias corrigido em c02e22a).
+pd.DataFrame(rows3, columns=[
+    "quantil", "ret_anual", "vol_anual", "sharpe_bruto", "sharpe_5bps",
+    "sharpe_10bps", "max_drawdown", "sortino", "pct_tempo",
+]).to_csv('tables/cap7/perf_multi_quantile_cap7.csv', index=False)
+print("CSV salvo: tables/cap7/perf_multi_quantile_cap7.csv")
+
 
 # ============================================================
 # Tab 7.4 -- Regimes por tercis de RV_30d (+ Sortino)
@@ -284,6 +300,7 @@ print("\nRegimes por RV (tercis):")
 df['rv_regime'] = pd.qcut(df['rv_30d'], q=3, labels=['Baixo', 'Medio', 'Alto'])
 
 rows4 = []
+regime_key = {'Baixo': 'baixo', 'Medio': 'medio', 'Alto': 'alto'}
 for regime, label in [('Baixo', 'Baixa RV'), ('Medio', 'Media RV'), ('Alto', 'Alta RV')]:
     mask = df['rv_regime'] == regime
     sig = ((df['vrp_30d'].shift(1) >= q80_series.shift(1)) & mask).astype(float).fillna(0.0)
@@ -294,6 +311,7 @@ for regime, label in [('Baixo', 'Baixa RV'), ('Medio', 'Media RV'), ('Alto', 'Al
     ti = float(sig.mean())
     to = float(sig.diff().abs().mean())
     rows4.append((label, r, v, s, m, sortino_r, to, ti))
+    daily_series[f'sr_regime_{regime_key[regime]}'] = sr.values
     print("  {}: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Tempo={:.4f}".format(
         regime, r, v, s, _fmt(sortino_r), m, ti))
 
@@ -311,6 +329,18 @@ lines4 += [r"\bottomrule", r"\end{tabular}"]
 with open('tables/tab7/tab7_4_perf_bvrp_regimes.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(lines4))
 print("Tabela 4 salva: tables/tab7/tab7_4_perf_bvrp_regimes.tex")
+
+# CSV com as mesmas metricas, para o script de figuras ler (ver nota acima).
+pd.DataFrame(rows4, columns=[
+    "regime", "ret_anual", "vol_anual", "sharpe", "max_drawdown",
+    "sortino", "turnover", "pct_tempo",
+]).to_csv('tables/cap7/perf_regimes_cap7.csv', index=False)
+print("CSV salvo: tables/cap7/perf_regimes_cap7.csv")
+
+# Serie diaria completa (date, ret, sr_q80, sr_q60/70/80/90, sr_regime_*) --
+# fonte unica para as figuras de retorno acumulado (Fig 7.2, 7.3, 7.4, 7.6).
+daily_series.to_csv('tables/cap7/daily_returns_cap7.csv', index=False)
+print("CSV salvo: tables/cap7/daily_returns_cap7.csv")
 
 print("\nTodas as tabelas do cap7 regeneradas com sucesso.")
 print("\n--- RESUMO PASSO 5 ---")
