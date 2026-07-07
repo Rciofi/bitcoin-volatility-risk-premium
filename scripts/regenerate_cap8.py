@@ -18,7 +18,7 @@ import pandas as pd
 import shap
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import Lasso, Ridge
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 
 matplotlib.rcParams.update({
@@ -90,6 +90,7 @@ print(f"Teste  : {X_test.shape}   {y_test.index[0].date()} a {y_test.index[-1].d
 
 # ── 2. Treinar modelos ────────────────────────────────────────────────────────
 models = {
+    "MQO":               LinearRegression(),
     "LASSO":             Lasso(alpha=0.001, max_iter=50_000),
     "Ridge":             Ridge(alpha=1.0),
     "Random Forest":     RandomForestRegressor(n_estimators=300, random_state=42),
@@ -120,6 +121,15 @@ metrics.append({"Modelo": "Persistência (valor anterior)", "MSE": mse_p, "RMSE"
 print(f"  {'Persistência (valor anterior)':20s}  MSE={mse_p:7.3f}  R²={r2_p:.4f}")
 
 results = pd.DataFrame(metrics).sort_values("MSE").reset_index(drop=True)
+
+# Diagnostico: coeficientes do MQO (checar blow-up de colinearidade) -- so print,
+# nao entra em nenhuma tabela ainda.
+mqo_model = models["MQO"]
+mqo_coefs = sorted(zip(X.columns, mqo_model.coef_), key=lambda t: -abs(t[1]))
+print("\n[Diagnostico] Coeficientes MQO (ordenados por |magnitude|):")
+for fname, c in mqo_coefs:
+    label = FEATURE_LABELS.get(fname, fname)
+    print(f"  {label:<28s} {c:+.4f}")
 
 # ── 3. Fig. 8.1 — BVRP realizado vs. Lasso previsto (melhorada) ──────────────
 fig, ax = plt.subplots(figsize=(11, 4))
