@@ -50,7 +50,7 @@ seguro.
 \IfFileExists{tables/cap3/desc_stats_cap3.tex}{
   \input{tables/cap3/desc_stats_cap3.tex}
 }{}
-Os testes formais de estacionariedade confirmam que o preço do Bitcoin (\textit{close}) é integrado de primeira ordem I(1), enquanto os retornos diários são estacionários I(0). As medidas de volatilidade (RV 30d e IV 30d) e o BVRP apresentam resultados inconclusivos, compatíveis com processos de longa memória, e são mantidos em nível nas especificações econométricas da dissertação (Tabela~\ref{tab:adf_kpss}).
+Os testes formais de estacionariedade confirmam que o preço do Bitcoin (\textit{close}) é integrado de primeira ordem I(1), enquanto os retornos diários são estacionários I(0). As medidas de volatilidade (RV 30d e IV 30d) e o BVRP apresentam resultados inconclusivos --- o ADF rejeita a raiz unitária, mas o KPSS também rejeita a estacionariedade ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:resultados_ols}. As três séries são mantidas em nível (Tabela~\ref{tab:adf_kpss}).
 
 \IfFileExists{tables/cap3/adf_kpss_table.tex}{
   \input{tables/cap3/adf_kpss_table.tex}
