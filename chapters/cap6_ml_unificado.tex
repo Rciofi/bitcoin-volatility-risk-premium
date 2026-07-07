@@ -159,16 +159,13 @@ temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots,
 10^{2}\}$; o MQO corresponde ao caso $\alpha = 0$.
 
 A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos
-exibem $R^2$ fora da amostra praticamente idênticos (MQO 0{,}388, LASSO 0{,}388,
-Ridge 0{,}390), superando com folga a média incondicional, mas ficando muito
-aquém do benchmark de persistência (0{,}937). A coincidência é reveladora: o MQO
-não penalizado alcança o mesmo desempenho preditivo que suas versões
-regularizadas, indicando que a regularização é praticamente imaterial neste
+lineares exibem $R^2$ fora da amostra praticamente idênticos (MQO, LASSO e Ridge
+convergem para $\approx 0{,}388$), superando com folga a média incondicional, mas
+ficando muito aquém do benchmark de persistência (0{,}937). A coincidência é
+reveladora: o MQO não penalizado alcança exatamente o mesmo desempenho preditivo
+que suas versões regularizadas, indicando que a regularização é imaterial neste
 problema. O gargalo, portanto, não é sobreajuste --- que a penalização
-corrigiria ---, mas a ausência de sinal linear explorável nos preditores. Ridge
-e LASSO redistribuem o peso entre os regressores (a Tabela~\ref{tab:cap8_coeficientes}
-mostra o encolhimento do coeficiente do retorno diário sob Ridge), mas essa
-redistribuição não se traduz em ganho fora da amostra.
+corrigiria ---, mas a ausência de sinal linear explorável nos preditores.
 
 % (Tabela removida — pertence ao Cap. 5 OLS)
 
@@ -176,17 +173,27 @@ redistribuição não se traduz em ganho fora da amostra.
 \label{subsec:cap5_lineares_coeficientes}
 
 A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo
-LASSO e pelo Ridge, ordenados pela magnitude absoluta. Dois preditores concentram
-o peso linear: o regime de volatilidade e o retorno diário contemporâneo. O regime
-apresenta magnitude estável entre os dois modelos ($\approx$12,4 pontos percentuais
-em ambos), ao passo que o retorno diário oscila fortemente (de $\approx$7,7 no Ridge
-a $\approx$15,6 no LASSO). Essa assimetria é típica de colinearidade entre preditores:
-o LASSO concentra peso em um regressor e encolhe os correlacionados, enquanto o Ridge
-o distribui. A estabilidade do coeficiente de regime entre as duas penalizações
-indica que ele carrega informação que os demais preditores não replicam — leitura
-corroborada pela análise SHAP (Seção~\ref{subsec:cap5_shap}). Os sinais são positivos
-e concordantes entre LASSO e Ridge: sob a convenção $\text{BVRP} = \text{RV} - \text{IV}$,
-regimes de volatilidade realizada elevada deslocam o prêmio para cima (menos negativo).
+LASSO e pelo Ridge, ordenados pela magnitude absoluta e obtidos sobre preditores
+padronizados (\textit{z-score} calibrado no treino), o que torna as magnitudes
+diretamente comparáveis entre si. Um único preditor domina de forma inequívoca:
+o regime de volatilidade, com coeficiente de $\approx 9{,}2$ em ambos os modelos
+--- cerca de doze vezes o segundo colocado. Os demais preditores contribuem de
+forma marginal e homogênea: as variações diárias da IV e do BVRP ($\approx 0{,}77$),
+os retornos defasados em 5 e 20 dias e o retorno diário contemporâneo (todos
+entre $0{,}44$ e $0{,}56$), e as variáveis de calendário com peso próximo de zero.
+
+Dois aspectos merecem destaque. Primeiro, a quase perfeita coincidência entre os
+coeficientes do LASSO e do Ridge --- variável a variável, os dois modelos
+atribuem pesos praticamente idênticos --- indica ausência de colinearidade
+severa entre os preditores retidos: quando há redundância, LASSO e Ridge divergem
+(o primeiro concentra, o segundo distribui), e aqui não divergem. Segundo, e mais
+importante, o LASSO não zerou nenhum coeficiente sob $\alpha = 0{,}001$: todos os
+onze preditores sobrevivem à penalidade $L_1$, ainda que a maioria com peso
+pequeno. A estrutura linear identificada é, portanto, dominada por um único fator
+--- o regime de volatilidade ---, leitura que a análise SHAP da
+Seção~\ref{subsec:cap5_shap} (Figura~\ref{fig:cap5_shap_bar}) corrobora de forma
+independente, situando o mesmo regime como o preditor de maior impacto por ampla
+margem.
 
 \input{tables/tab8/tab8_coeficientes}
 

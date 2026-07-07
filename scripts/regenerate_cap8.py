@@ -20,6 +20,7 @@ from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
 matplotlib.rcParams.update({
     "font.family": "serif",
@@ -89,6 +90,16 @@ print(f"Treino : {X_train.shape}  {y_train.index[0].date()} a {y_train.index[-1]
 print(f"Teste  : {X_test.shape}   {y_test.index[0].date()} a {y_test.index[-1].date()}")
 
 # ── 2. Treinar modelos ────────────────────────────────────────────────────────
+# Padronizacao (z-score) SO para os modelos lineares (MQO/Ridge/LASSO) --
+# scaler fitado exclusivamente no treino, aplicado (transform) no teste, sem
+# vazamento. Arvores (RF/GB) e benchmarks recebem X bruto -- nao precisam de
+# escala e a padronizacao nao altera sua previsao.
+LINEAR_MODELS = {"MQO", "LASSO", "Ridge"}
+
+scaler = StandardScaler().fit(X_train)
+X_train_scaled = pd.DataFrame(scaler.transform(X_train), index=X_train.index, columns=X_train.columns)
+X_test_scaled  = pd.DataFrame(scaler.transform(X_test),  index=X_test.index,  columns=X_test.columns)
+
 models = {
     "MQO":               LinearRegression(),
     "LASSO":             Lasso(alpha=0.001, max_iter=50_000),
@@ -102,8 +113,10 @@ preds   = {}
 metrics = []
 
 for name, model in models.items():
-    model.fit(X_train, y_train)
-    yhat = pd.Series(model.predict(X_test), index=y_test.index, name=name)
+    Xtr = X_train_scaled if name in LINEAR_MODELS else X_train
+    Xte = X_test_scaled  if name in LINEAR_MODELS else X_test
+    model.fit(Xtr, y_train)
+    yhat = pd.Series(model.predict(Xte), index=y_test.index, name=name)
     preds[name] = yhat
     mse = mean_squared_error(y_test, yhat)
     r2  = r2_score(y_test, yhat)
@@ -338,7 +351,7 @@ tab2_lines += [
     r"\end{tabular}",
     r"\par\smallskip",
     r"\footnotesize\textit{Nota}: LASSO estimado com $\alpha=0{,}001$ (50.000 iterações máx.); Ridge com $\alpha=1{,}0$. "
-    r"Variáveis padronizadas internamente pelo scikit-learn (cada feature centrada na média de treino). "
+    r"Variáveis padronizadas (\textit{z-score}: centradas e escaladas pelo desvio-padrão) com parâmetros calibrados exclusivamente no conjunto de treino. "
     f"Período de treino: {_fmt_data_pt(y_train.index[0])} -- {_fmt_data_pt(y_train.index[-1])} ({_n_train} observações).",
     r"\end{table}",
 ]
