@@ -321,15 +321,17 @@ Três achados merecem destaque:
     contêm sinal explorável relevante sobre o nível do BVRP;
 
     \item \textbf{A variável de regime é o preditor mais robusto} em todos os
-    modelos. Nos modelos lineares, seu coeficiente é estável entre LASSO e Ridge,
-    enquanto o retorno diário — o outro preditor de peso — oscila conforme a
-    penalização, sinal de colinearidade que fragiliza sua interpretação isolada.
-    Na floresta aleatória, a importância SHAP aponta o regime como dominante isolado,
-    à frente de todos os demais. Essa convergência desloca a leitura do BVRP: seu
-    valor não está na previsão pontual do nível diário, mas na identificação do
-    \textit{estado} de mercado. Essa evidência motiva o condicionamento a regimes
-    explorado nos Capítulos~\ref{chap:estrategias} e~\ref{chap:regimes}, em vez da
-    previsão de nível.
+    modelos. Sob preditores padronizados, o coeficiente do regime de volatilidade
+    domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$
+    dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável
+    --- ausência de divergência que indica não haver colinearidade severa entre os
+    preditores retidos. Na floresta aleatória, a importância SHAP aponta o regime
+    como dominante isolado, à frente de todos os demais. Essa convergência entre
+    modelos lineares e não lineares desloca a leitura do BVRP: seu valor não está na
+    previsão pontual do nível diário, mas na identificação do \textit{estado} de
+    mercado. Essa evidência motiva o condicionamento a regimes explorado nos
+    Capítulos~\ref{chap:estrategias} e~\ref{chap:regimes}, em vez da previsão de
+    nível.
 \end{enumerate}
 
 % =========================================================
