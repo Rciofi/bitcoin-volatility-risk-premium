@@ -203,8 +203,12 @@ margem.
 % =========================================================
 
 Avaliam-se dois modelos baseados em árvores: floresta aleatória
-(\textit{Random Forest}) e \textit{Gradient Boosting}, ambos com hiperparâmetros
-selecionados por validação cruzada temporal.
+(\textit{Random Forest}) e \textit{Gradient Boosting}. A floresta aleatória usa
+300 árvores; o \textit{Gradient Boosting}, os hiperparâmetros padrão do
+\texttt{scikit-learn}. Em ambos, apenas a semente aleatória é fixada, para
+reprodutibilidade. Diferentemente dos modelos lineares regularizados, não se
+realiza busca de hiperparâmetros: o objetivo é avaliar o desempenho preditivo
+desses modelos em configuração convencional, não otimizá-los.
 
 \subsection{Resultados fora da amostra}
 \label{subsec:cap5_arvores_resultados}
