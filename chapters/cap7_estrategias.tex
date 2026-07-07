@@ -70,18 +70,14 @@ severas em ciclos de contração --- motiva o interesse por estratégias
 condicionais que busquem reduzir o risco de cauda sem abdicar integralmente
 dos ganhos do ativo.
 
-É importante notar que o subperíodo amostral em que o sinal BVRP
-está disponível (março de 2021 a março de 2026) abrange ciclos de
-mercado distintos: uma fase de forte desvalorização em 2022, quando o
-Bitcoin perdeu mais de 75\% do valor de pico, seguida de recuperação
-expressiva em 2023--2024, quando o ativo registrou retorno acumulado
-superior a 300\% e razão de Sharpe de 2{,}17 nesse intervalo
-específico, e uma fase de compressão de retornos em 2025--2026.
-A heterogeneidade temporal do subperíodo torna os resultados mais
-informativos do que uma janela puramente favorável: a estratégia
-condicional é avaliada em condições de mercado adversas, de recuperação
-e de lateralização, o que fortalece a interpretação do papel defensivo
-do sinal BVRP documentado na Seção~\ref{chap:resultados_ols}.
+É importante notar que o subperíodo amostral em que o sinal BVRP está disponível
+(março de 2021 a março de 2026) abrange ciclos de mercado distintos: uma fase de
+forte desvalorização em 2022, quando o Bitcoin perdeu mais de 75\% do valor de
+pico, seguida de recuperação expressiva em 2023--2024 e de uma fase de compressão
+de retornos em 2025--2026. A heterogeneidade temporal do subperíodo torna os
+resultados mais informativos do que uma janela puramente favorável: a estratégia
+condicional é avaliada em condições de mercado adversas, de recuperação e de
+lateralização, o que fortalece a interpretação do papel defensivo do sinal BVRP.
 
 % =========================================================
 \section{Estratégia Condicional ao BVRP (Quantil Superior)}
@@ -274,10 +270,15 @@ a regra condicional ao BVRP com limiar no quantil 80\%, mas a tomada de posiçã
 restrita aos dias pertencentes a cada regime.
 
 Essa decomposição é motivada pela evidência do Capítulo~\ref{chap:dados}, que
-documentou heterogeneidade temporal pronunciada no BVRP: em regimes de alta
-volatilidade realizada, a volatilidade implícita tende a ser inferior à realizada
-(BVRP médio negativo de $-4{,}6\%$ no regime de alta RV), ao passo que em regimes
-de baixa volatilidade realizada o BVRP médio é de $12{,}5\%$.
+documentou heterogeneidade temporal pronunciada no BVRP: o prêmio é negativo em
+todos os regimes de volatilidade realizada, mas sua magnitude varia
+sistematicamente com o estado do mercado. Em regimes de baixa e média
+volatilidade realizada, o BVRP médio é fortemente negativo ($-11{,}97\%$ e
+$-10{,}15\%$, respectivamente), refletindo um prêmio de seguro elevado --- a
+volatilidade implícita supera amplamente a realizada. Em regimes de alta
+volatilidade realizada, o prêmio se comprime em direção a zero ($-2{,}64\%$),
+pois a volatilidade efetivamente observada aproxima-se da antecipada pelo mercado
+de opções.
 
 A Tabela~\ref{tab:cap7_bvrp_regimes_perf} reporta as métricas de desempenho por
 regime, enquanto as Figuras~\ref{fig:cap7_bvrp_regimes_cumret}
