@@ -350,9 +350,13 @@ subperíodo ($-0{,}1740$), operando em apenas 22{,}5\% do tempo. O ganho
 concentra-se integralmente na redução do risco de cauda: o \textit{max
 drawdown} cai de $-77{,}98\%$ para $-38{,}28\%$, diferencial que permanece
 preservado após custos de 10~bps, confirmando o papel defensivo do sinal
-BVRP documentado nas seções anteriores. Esse resultado é a contrapartida operacional da evidência preditiva do
-Capítulo~\ref{chap:resultados_ols}, que documentou relação positiva e estatisticamente
-robusta entre BVRP e retornos em horizontes de 20 a 60 dias.
+BVRP documentado nas seções anteriores. Esse resultado é a contrapartida operacional da evidência do
+Capítulo~\ref{chap:resultados_ols}, que \emph{não} encontrou previsibilidade
+linear estatisticamente significativa do BVRP sobre os retornos futuros em
+nenhum horizonte (menor valor-$p$ de 0{,}241). A ausência de sinal direcional
+não impede, contudo, que o prêmio funcione como filtro de risco: o ganho da
+estratégia condicional está na redução do risco de cauda, não na previsão da
+direção dos retornos.
 
 \paragraph{Robustez ao longo dos quantis.} Todas as estratégias condicionais analisadas (quantis de 60\% a 90\%)
 apresentam \textit{max drawdown} substancialmente inferior ao compra e
@@ -364,11 +368,11 @@ reduzido.
 \paragraph{Dependência de regime.} A decomposição por regime de volatilidade
 realizada revela que a qualidade do sinal não é monotônica com o nível de estresse:
 o regime de volatilidade média é o mais favorável (Sharpe = 1{,}27), enquanto o
-regime de alta volatilidade produz resultados negativos. Esse achado não contradiz
-a evidência do Capítulo~\ref{chap:resultados_ols}, mas contextualiza-a: o efeito
-preditivo linear do BVRP sobre retornos futuros, positivo e moderado ($R^2 = 3{,}6\%$),
-mascara heterogeneidade de regime que só fica visível quando se condiciona
-explicitamente ao ambiente de volatilidade realizada.
+regime de alta volatilidade produz resultados negativos. Esse achado é coerente com
+a evidência do Capítulo~\ref{chap:resultados_ols}: a ausência de previsibilidade
+linear do BVRP sobre os retornos futuros não exclui que o prêmio carregue
+informação sobre o \emph{ambiente} de risco, capturável por condicionamento a
+regimes em vez de por regressão linear direta.
 
 \paragraph{Limitações.} As estratégias empregam limiares fixos estimados sobre a
 amostra disponível, o que não replica fielmente um ambiente de tomada de decisão
