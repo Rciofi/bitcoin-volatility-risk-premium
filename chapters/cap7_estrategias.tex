@@ -307,35 +307,28 @@ e~\ref{fig:cap7_bvrp_regimes_heatmap} apresentam o retorno acumulado e o
 \label{fig:cap7_bvrp_regimes_heatmap}
 \end{figure}
 
-Os resultados por regime revelam um padrão não monotônico e economicamente
-significativo. O regime de volatilidade \textbf{média} apresenta o melhor
-desempenho ajustado ao risco, com Sharpe de 1{,}27 e retorno anualizado de 22{,}0\%,
-concentrando 6{,}7\% do tempo total da amostra. Em contraste, o regime de
-\textbf{alta} volatilidade realizada exibe Sharpe de $-0{,}17$ e retorno
-levemente negativo ($-1{,}6\%$), apesar de concentrar apenas 2{,}1\% do tempo.
+Os resultados por regime devem ser lidos com cautela, pois a decomposição
+pulveriza a amostra: das observações com sinal ativo, apenas 23 caem no regime de
+baixa volatilidade realizada, 125 no de volatilidade média e 252 no de alta
+volatilidade. O regime de baixa volatilidade, em particular, não sustenta
+inferência estatística confiável sobre desempenho ajustado ao risco.
 
-Esse resultado tem interpretação econômica coerente. No regime de alta volatilidade
-realizada, o BVRP tende a ser negativo em média ($-4{,}6\%$), refletindo episódios
-em que a volatilidade efetivamente observada supera a antecipada pelo mercado de
-opções. Os raros episódios em que o BVRP supera o limiar do quantil 80\% nesse
-regime tendem a ocorrer em transições de estado turbulentas, onde o sinal é menos
-confiável e os retornos subsequentes mais ruidosos. Em contraste, no regime de
-volatilidade média, um BVRP elevado captura genuinamente estados de demanda
-persistente por proteção, mais informativos sobre a remuneração futura do risco.
+Com essa ressalva, o padrão observado é que nenhum dos três regimes gera
+desempenho ajustado ao risco positivo relevante. O regime de volatilidade média
+apresenta o Sharpe menos desfavorável (0{,}24, com retorno anualizado de 2{,}4\%
+sobre $N = 125$), enquanto os regimes de baixa e alta volatilidade exibem Sharpe
+negativo ($-0{,}64$ e $-0{,}21$, respectivamente). O regime de alta volatilidade,
+embora seja o de maior base amostral ($N = 252$), produz o segundo pior retorno
+($-4{,}6\%$), sugerindo que os episódios em que o BVRP supera o limiar nesse
+estado tendem a ocorrer em transições turbulentas, nas quais o sinal é menos
+confiável e os retornos subsequentes mais ruidosos.
 
-No regime de \textbf{baixa} volatilidade realizada, o Sharpe de 0{,}17 é positivo
-mas modesto. Nesse estado, o BVRP médio é elevado ($12{,}5\%$), mas a alta
-frequência de sinais ativos (11{,}2\% do tempo) combinada com retornos absolutos
-baixos sugere que o BVRP pode refletir, nesses períodos, um componente de
-\textit{risk aversion} que não necessariamente se materializa em retornos futuros
-elevados.
-
-Esse conjunto de resultados é consistente com a interpretação do BVRP como medida
-condicional da disposição dos agentes a pagar pelo seguro de volatilidade, cuja
-capacidade discriminatória é máxima quando o ambiente de risco é moderado e
-previsível. Em estados extremos --- seja de volatilidade muito baixa ou muito alta
---- o sinal perde precisão, seja por diluição informacional, seja por instabilidade
-de regime.
+Esse conjunto de resultados indica que o condicionamento adicional por regime de
+volatilidade realizada não fortalece o sinal do BVRP de forma robusta. A
+capacidade defensiva do prêmio, documentada nas seções anteriores, opera na
+redução do risco de cauda ao longo de toda a distribuição de estados, e não pela
+seleção de um regime de volatilidade particularmente favorável --- que os dados,
+nesta amostra, não identificam.
 
 % =========================================================
 \section{Resultados e implicações}
@@ -366,13 +359,15 @@ destaca-se por apresentar o Sharpe menos negativo entre as quatro estratégias
 reduzido.
 
 \paragraph{Dependência de regime.} A decomposição por regime de volatilidade
-realizada revela que a qualidade do sinal não é monotônica com o nível de estresse:
-o regime de volatilidade média é o mais favorável (Sharpe = 1{,}27), enquanto o
-regime de alta volatilidade produz resultados negativos. Esse achado é coerente com
-a evidência do Capítulo~\ref{chap:resultados_ols}: a ausência de previsibilidade
+realizada não identifica um estado particularmente favorável ao sinal: os três
+regimes exibem desempenho ajustado ao risco negativo ou próximo de zero (Sharpe
+de $-0{,}64$, $0{,}24$ e $-0{,}21$ para baixa, média e alta volatilidade), e a
+amostra por regime é pequena --- especialmente no regime de baixa volatilidade
+($N = 23$), que não sustenta inferência confiável. Esse achado é coerente com a
+evidência do Capítulo~\ref{chap:resultados_ols}: a ausência de previsibilidade
 linear do BVRP sobre os retornos futuros não exclui que o prêmio carregue
-informação sobre o \emph{ambiente} de risco, capturável por condicionamento a
-regimes em vez de por regressão linear direta.
+informação sobre o \emph{ambiente} de risco, mas essa informação não se traduz,
+nesta amostra, em ganho de desempenho por regime.
 
 \paragraph{Limitações.} As estratégias empregam limiares fixos estimados sobre a
 amostra disponível, o que não replica fielmente um ambiente de tomada de decisão
