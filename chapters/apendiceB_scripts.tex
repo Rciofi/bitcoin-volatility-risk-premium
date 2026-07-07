@@ -11,7 +11,7 @@ capítulos anteriores.
 Os códigos foram organizados em blocos temáticos: (i) importação de bibliotecas;
 (ii) construção das variáveis de volatilidade; (iii) retornos futuros; (iv) BVRP;
 (v) classificação de regimes; (vi) regressão por MQO com erros-padrão de Newey--West;
-e (vii) estimação dos quatro modelos de aprendizado de máquina com avaliação fora
+e (vii) estimação dos cinco modelos de aprendizado de máquina com avaliação fora
 da amostra. A implementação usa bibliotecas consolidadas em finanças quantitativas e
 aprendizado de máquina \citep{andersen2003realized, corsi2009har,
 breiman2001randomforest, friedman2001gradientboosting, Gu2020EmpiricalML}.
@@ -24,13 +24,13 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import stats
 
-from sklearn.linear_model import Lasso, Ridge
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.ensemble import (RandomForestRegressor,
                                GradientBoostingRegressor)
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
 
 import matplotlib.pyplot as plt
+import shap
 \end{verbatim}
 
 \section{Cálculo da volatilidade realizada (RV30)}
@@ -65,8 +65,8 @@ for h in [1, 5, 10, 20, 30]:
 
 As variáveis resultantes ($h \in \{1, 5, 10, 20, 30\}$ dias) são utilizadas
 nas análises econométricas e preditivas dos
-Capítulos~\ref{chap:resultados_ols}, \ref{chap:cap5_ml},
-\ref{chap:cap5_ml} e \ref{chap:regimes}.
+Capítulos~\ref{chap:resultados_ols}, \ref{chap:cap5_ml}
+e \ref{chap:regimes}.
 
 \section{Cálculo do BVRP}
 
@@ -80,16 +80,22 @@ df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
 
 \section{Classificação de regimes de volatilidade}
 
-Os regimes são definidos pelos percentis 25 e 75 da \texttt{rv\_30d},
-calculados sobre a amostra completa:
+Os regimes de volatilidade são definidos por quantis móveis (1/3 e 2/3) da
+\texttt{rv\_30d}, recalculados a cada instante $t$ com janela expansiva e
+período mínimo de 252 observações, de modo a usar apenas informação
+disponível até $t$ --- evitando viés de antecipação:
 
 \begin{verbatim}
-q25 = df["rv_30d"].quantile(0.25)   # 39,3% na amostra
-q75 = df["rv_30d"].quantile(0.75)   # 65,6% na amostra
+MIN_OBS = 252
+q_low  = df["rv_30d"].expanding(MIN_OBS).quantile(1/3)
+q_high = df["rv_30d"].expanding(MIN_OBS).quantile(2/3)
 
 df["regime"] = "media"
-df.loc[df["rv_30d"] <= q25, "regime"] = "baixa"
-df.loc[df["rv_30d"] >= q75, "regime"] = "alta"
+df.loc[df["rv_30d"] <= q_low,  "regime"] = "baixa"
+df.loc[df["rv_30d"] >= q_high, "regime"] = "alta"
+df["vrp_regime_num"] = df["regime"].map(
+    {"baixa": 0, "media": 1, "alta": 2}
+)
 
 # Indicadora binária usada nas regressões condicionais
 df["dummy_alta"] = (df["regime"] == "alta").astype(int)
@@ -138,101 +144,100 @@ def reg_condicional(df, h):
 
 \subsection{Preparação e divisão da amostra}
 
-Os quatro modelos são estimados com divisão temporal 70\,\%/30\,\% (treino/teste),
-preservando a ordem cronológica. A variável-alvo é o nível do BVRP
-(\texttt{vrp\_30d}):
+Os cinco modelos são estimados com divisão temporal 70\,\%/30\,\% (treino/teste),
+preservando a ordem cronológica. A variável-alvo é o BVRP do dia
+\emph{seguinte} ($t+1$), não o valor contemporâneo --- protocolo de
+\textit{forecasting} genuíno, e não de \textit{nowcasting}:
 
 \begin{verbatim}
 FEATURES = [
-    "ret", "ret_lag_1", "ret_lag_5", "ret_lag_20",
+    "ret", "month", "weekday", "is_month_start", "is_month_end",
+    "ret_lag_1", "ret_lag_5", "ret_lag_20",
     "d_iv_1d", "d_vrp_1d", "vrp_regime_num",
-    "month", "weekday",
 ]
-TARGET = "vrp_30d"
 
-data  = df[FEATURES + [TARGET]].dropna()
+y_level = df["vrp_30d"]          # nivel contemporaneo (usado no benchmark)
+y       = y_level.shift(-1)      # alvo: BVRP_{t+1}
+
+data  = pd.concat([y.rename("target"), df[FEATURES]], axis=1).dropna()
 split = int(0.7 * len(data))
 
 X_train = data[FEATURES].iloc[:split]
 X_test  = data[FEATURES].iloc[split:]
-y_train = data[TARGET].iloc[:split]
-y_test  = data[TARGET].iloc[split:]
+y_train = data["target"].iloc[:split]
+y_test  = data["target"].iloc[split:]
 \end{verbatim}
 
-\subsection{LASSO e Ridge}
+\subsection{MQO, Ridge e LASSO}
 
-Os modelos lineares regularizados requerem padronização dos preditores:
+O MQO (mínimos quadrados ordinários, sem regularização) serve de referência
+não penalizada; Ridge e LASSO introduzem regularização $\ell_2$ e $\ell_1$,
+respectivamente, sobre a mesma especificação:
 
 \begin{verbatim}
-scaler = StandardScaler()
-Xtr_s  = scaler.fit_transform(X_train)
-Xte_s  = scaler.transform(X_test)
+mqo   = LinearRegression().fit(X_train, y_train)
+lasso = Lasso(alpha=0.001, max_iter=50000).fit(X_train, y_train)
+ridge = Ridge(alpha=1.0).fit(X_train, y_train)
 
-lasso = Lasso(alpha=0.001, max_iter=50000).fit(Xtr_s, y_train)
-ridge = Ridge(alpha=1.0).fit(Xtr_s, y_train)
-
-pred_lasso = lasso.predict(Xte_s)
-pred_ridge = ridge.predict(Xte_s)
+pred_mqo   = mqo.predict(X_test)
+pred_lasso = lasso.predict(X_test)
+pred_ridge = ridge.predict(X_test)
 \end{verbatim}
 
 \subsection{Floresta aleatória e Gradient Boosting}
 
 Os modelos baseados em árvores operam diretamente sobre as variáveis não
-padronizadas:
+padronizadas, com hiperparâmetros fixados (floresta aleatória) ou padrão do
+\texttt{scikit-learn} (\textit{Gradient Boosting}):
 
 \begin{verbatim}
 rf = RandomForestRegressor(
     n_estimators=300,
-    max_depth=None,
     random_state=42,
 ).fit(X_train, y_train)
 
-gb = GradientBoostingRegressor(
-    n_estimators=300,
-    learning_rate=0.05,
-    max_depth=4,
-    random_state=42,
-).fit(X_train, y_train)
+gb = GradientBoostingRegressor(random_state=42).fit(X_train, y_train)
 
 pred_rf = rf.predict(X_test)
 pred_gb = gb.predict(X_test)
 \end{verbatim}
 
-\subsection{Avaliação fora da amostra}
+\subsection{Benchmarks e avaliação fora da amostra}
 
-O desempenho é comparado pelo $R^2$ fora da amostra e pela raiz do erro
-quadrático médio (RMSE), tomando a média histórica do período de treino como
-\textit{benchmark}:
+Dois benchmarks temporais são comparados aos modelos supervisionados: a
+persistência (previsão de $t+1$ pelo valor contemporâneo em $t$) e a média
+incondicional do período de treino:
 
 \begin{verbatim}
-benchmark = np.full(len(y_test), y_train.mean())
+bench_persist = y_level.loc[y_test.index]           # previsao = BVRP_t
+bench_media   = np.full(len(y_test), y_train.mean())
 
 def oos_metrics(y_true, y_pred, label):
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     r2   = r2_score(y_true, y_pred)
     print(f"{label:20s}  RMSE={rmse:.4f}  R2={r2:.4f}")
 
-oos_metrics(y_test, benchmark,  "Benchmark (media)")
-oos_metrics(y_test, pred_lasso, "LASSO")
-oos_metrics(y_test, pred_ridge, "Ridge")
-oos_metrics(y_test, pred_rf,    "Random Forest")
-oos_metrics(y_test, pred_gb,    "Gradient Boosting")
+oos_metrics(y_test, bench_persist, "Persistencia")
+oos_metrics(y_test, bench_media,   "Benchmark (media)")
+oos_metrics(y_test, pred_mqo,      "MQO")
+oos_metrics(y_test, pred_lasso,    "LASSO")
+oos_metrics(y_test, pred_ridge,    "Ridge")
+oos_metrics(y_test, pred_rf,       "Random Forest")
+oos_metrics(y_test, pred_gb,       "Gradient Boosting")
 \end{verbatim}
 
-\subsection{Importância das variáveis (floresta aleatória)}
+\subsection{Importância das variáveis (SHAP)}
 
-A importância relativa das variáveis é extraída diretamente do modelo e usada
-para identificar os preditores mais relevantes do BVRP:
+A importância das variáveis na floresta aleatória é avaliada por valores SHAP
+calculados no conjunto de teste --- métrica preferível à impureza média (MDI)
+por não ser enviesada em relação à cardinalidade das variáveis:
 
 \begin{verbatim}
-importances = pd.Series(
-    rf.feature_importances_,
-    index=FEATURES,
-).sort_values(ascending=False)
+explainer   = shap.TreeExplainer(rf)
+Xte_sample  = X_test.sample(n=200, random_state=42)
+shap_values = explainer.shap_values(Xte_sample, approximate=True)
 
-importances.plot(kind="barh")
-plt.xlabel("Importancia relativa")
-plt.tight_layout()
+shap.summary_plot(shap_values, Xte_sample, feature_names=FEATURES)
 \end{verbatim}
 
 \section{Limpeza e controle de qualidade dos dados}
@@ -253,13 +258,17 @@ computacionais da dissertação, permitindo replicar:
     \item a construção dos retornos futuros logarítmicos em cinco horizontes
           ($h \in \{1, 5, 10, 20, 30\}$ dias);
     \item a classificação das observações em regimes de baixa, média e alta
-          volatilidade realizada ($q_{25} = 39{,}3\%$; $q_{75} = 65{,}6\%$);
+          volatilidade realizada por quantis móveis (1/3 e 2/3) em janela
+          expansiva;
     \item as regressões por MQO com erros-padrão de Newey--West e os modelos
           condicionais com interação BVRP $\times$ regime;
-    \item a estimação dos quatro modelos supervisionados (LASSO, Ridge,
+    \item a estimação dos cinco modelos supervisionados (MQO, LASSO, Ridge,
           \textit{floresta aleatória}, \textit{Gradient Boosting}) com avaliação
           genuína fora da amostra (divisão 70\,\%/30\,\%).
 \end{itemize}
 
-Os scripts completos estão disponíveis no repositório da dissertação e podem
-ser estendidos para novos horizontes, conjuntos de variáveis ou algoritmos
+Os trechos apresentados são ilustrativos; os scripts completos, incluindo o
+\texttt{regenerate\_cap8.py} que gera as tabelas e figuras do
+Capítulo~\ref{chap:cap5_ml}, estão disponíveis no repositório GitHub da
+dissertação, fonte canônica do código, e podem ser estendidos para novos
+horizontes, conjuntos de variáveis ou algoritmos.
