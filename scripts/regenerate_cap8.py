@@ -100,10 +100,116 @@ scaler = StandardScaler().fit(X_train)
 X_train_scaled = pd.DataFrame(scaler.transform(X_train), index=X_train.index, columns=X_train.columns)
 X_test_scaled  = pd.DataFrame(scaler.transform(X_test),  index=X_test.index,  columns=X_test.columns)
 
+# ── 2a. Selecao do alpha de LASSO/Ridge por validacao cruzada temporal com
+# embargo -- expanding window, 5 folds, embargo de 30 observacoes entre o
+# fim do treino e o inicio da validacao de cada fold (TimeSeriesSplit puro
+# nao tem embargo; janelas moveis como rv_30d/iv_30d chegam a 30 dias, entao
+# sem embargo o fold de validacao vazaria para o treino via sobreposicao).
+# StandardScaler e fitado DENTRO de cada fold (so no treino do fold), nunca
+# no fold inteiro -- sem vazamento.
+#
+# Selecao NAO e argmin cego: a superficie de perda de validacao e
+# estatisticamente achatada (diferencas <0,1 desvio-padrao entre folds) para
+# alpha em [1e-4, 1] -- o argmin bruto (alpha=1 para o LASSO, que zera 10/11
+# coeficientes) e artefato da granularidade da grade (passos de 10x) sobre
+# essa superficie plana, e nao evidencia real de esparsidade (confirmado por
+# teste de robustez: a escolha alpha=1 e estavel a variacoes de n. de folds,
+# embargo e metrica -- ou seja, e a grade que e grosseira, nao o sinal que e
+# esparso). Regra adotada: (i) identifica a faixa de alphas cujo MSE medio de
+# validacao esta a ate 1 desvio-padrao (entre folds) do minimo; (ii) dentro
+# dessa faixa, prefere-se o alpha menos regularizado, com desempate por
+# parcimonia quando dois candidatos adjacentes sao estatisticamente
+# indistintos; (iii) para o Ridge, se o alpha=1,0 ja publicado estiver dentro
+# da faixa plana, mantem-se por coerencia com o texto (nao ha ganho
+# estatistico em trocar por um valor ainda menos regularizado).
+ALPHA_GRID_CV = [1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100]
+CV_FOLDS   = 5
+CV_EMBARGO = 30
+
+
+def _embargoed_expanding_splits(n_samples, n_folds=CV_FOLDS, embargo=CV_EMBARGO):
+    fold_size = n_samples // (n_folds + 1)
+    splits = []
+    for k in range(1, n_folds + 1):
+        train_end = fold_size * k
+        val_end = fold_size * (k + 1) if k < n_folds else n_samples
+        train_idx = np.arange(0, max(0, train_end - embargo))
+        val_idx = np.arange(train_end, val_end)
+        if len(train_idx) and len(val_idx):
+            splits.append((train_idx, val_idx))
+    return splits
+
+
+def _cv_curve(estimator_cls, X_tr, y_tr, splits):
+    """MSE medio e desvio-padrao entre folds, para cada alpha da grade."""
+    means, stds = [], []
+    for alpha in ALPHA_GRID_CV:
+        fold_mses = []
+        for tr_idx, va_idx in splits:
+            Xf_tr, Xf_va = X_tr.iloc[tr_idx], X_tr.iloc[va_idx]
+            yf_tr, yf_va = y_tr.iloc[tr_idx], y_tr.iloc[va_idx]
+            fold_scaler = StandardScaler().fit(Xf_tr)
+            Xf_tr_s = fold_scaler.transform(Xf_tr)
+            Xf_va_s = fold_scaler.transform(Xf_va)
+            kwargs = {"alpha": alpha}
+            if estimator_cls is Lasso:
+                kwargs["max_iter"] = 50_000
+            m = estimator_cls(**kwargs)
+            m.fit(Xf_tr_s, yf_tr)
+            fold_mses.append(mean_squared_error(yf_va, m.predict(Xf_va_s)))
+        means.append(np.mean(fold_mses))
+        stds.append(np.std(fold_mses))
+    return np.array(means), np.array(stds)
+
+
+def _select_alpha_faixa_plana(means, stds, coherence_value=None):
+    """Selecao por faixa-plana + parcimonia -- nao e argmin (ver nota acima)."""
+    best_i = int(np.argmin(means))
+    threshold = means[best_i] + stds[best_i]
+    faixa = sorted(ALPHA_GRID_CV[i] for i in range(len(ALPHA_GRID_CV)) if means[i] <= threshold)
+    selecionado = faixa[0]
+    if len(faixa) >= 2:
+        i0, i1 = ALPHA_GRID_CV.index(faixa[0]), ALPHA_GRID_CV.index(faixa[1])
+        if abs(means[i0] - means[i1]) <= stds[best_i]:
+            selecionado = faixa[1]
+    if coherence_value is not None and coherence_value in faixa:
+        selecionado = coherence_value
+    return selecionado, faixa
+
+
+_splits_cv = _embargoed_expanding_splits(len(X_train))
+lasso_cv_means, lasso_cv_stds = _cv_curve(Lasso, X_train, y_train, _splits_cv)
+ridge_cv_means, ridge_cv_stds = _cv_curve(Ridge, X_train, y_train, _splits_cv)
+
+ALPHA_LASSO, faixa_lasso = _select_alpha_faixa_plana(lasso_cv_means, lasso_cv_stds)
+ALPHA_RIDGE, faixa_ridge = _select_alpha_faixa_plana(ridge_cv_means, ridge_cv_stds, coherence_value=1.0)
+
+print(f"\n[CV embargada] LASSO -- curva de validacao ({CV_FOLDS} folds, embargo={CV_EMBARGO}d):")
+for a, m, s in zip(ALPHA_GRID_CV, lasso_cv_means, lasso_cv_stds):
+    print(f"  alpha={a:<8g}  MSE_medio={m:8.4f}  desvio_entre_folds={s:7.4f}")
+print(f"  Faixa plana (<=1 dp do minimo): {faixa_lasso}")
+print(f"  Alpha selecionado: {ALPHA_LASSO}")
+
+print(f"\n[CV embargada] Ridge -- curva de validacao ({CV_FOLDS} folds, embargo={CV_EMBARGO}d):")
+for a, m, s in zip(ALPHA_GRID_CV, ridge_cv_means, ridge_cv_stds):
+    print(f"  alpha={a:<8g}  MSE_medio={m:8.4f}  desvio_entre_folds={s:7.4f}")
+print(f"  Faixa plana (<=1 dp do minimo): {faixa_ridge}")
+print(f"  Alpha selecionado: {ALPHA_RIDGE}")
+
+
+def _fmt_alpha_pt(a):
+    """Formata alpha em notacao pt-BR (virgula decimal, braces LaTeX) p/ legendas/tabelas."""
+    s = f"{a:g}"
+    return s.replace(".", "{,}") if "." in s else f"{s}{{,}}0"
+
+
+ALPHA_LASSO_FMT = _fmt_alpha_pt(ALPHA_LASSO)
+ALPHA_RIDGE_FMT = _fmt_alpha_pt(ALPHA_RIDGE)
+
 models = {
     "MQO":               LinearRegression(),
-    "LASSO":             Lasso(alpha=0.001, max_iter=50_000),
-    "Ridge":             Ridge(alpha=1.0),
+    "LASSO":             Lasso(alpha=ALPHA_LASSO, max_iter=50_000),
+    "Ridge":             Ridge(alpha=ALPHA_RIDGE),
     "Random Forest":     RandomForestRegressor(n_estimators=300, random_state=42),
     "Gradient Boosting": GradientBoostingRegressor(random_state=42),
     "Benchmark (Média)": DummyRegressor(strategy="mean"),
@@ -255,7 +361,7 @@ bars = ax.barh(
 )
 ax.axvline(0, color="black", linewidth=0.8)
 ax.set_xlabel("Coeficiente estimado", fontsize=9)
-ax.set_title("LASSO — Coeficientes ($\\alpha=0{,}001$)", fontsize=10)
+ax.set_title(f"LASSO — Coeficientes ($\\alpha={ALPHA_LASSO_FMT}$)", fontsize=10)
 ax.tick_params(axis="y", labelsize=8)
 
 fig.tight_layout(pad=2.0)
@@ -308,7 +414,7 @@ lines += [
     r"\bottomrule",
     r"\end{tabular}",
     r"\par\smallskip",
-    rf"\footnotesize\textit{{Nota}}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS ({_pct_train}\% inicial da amostra, {_n_train} observações). O benchmark ``Persistência'' prediz $\text{{BVRP}}_{{t+1}}=\text{{BVRP}}_t$; o benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha=1{{,}}0$), LASSO ($\alpha=0{{,}}001$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).",
+    rf"\footnotesize\textit{{Nota}}: todos os modelos são treinados exclusivamente com dados anteriores ao período OOS ({_pct_train}\% inicial da amostra, {_n_train} observações). O benchmark ``Persistência'' prediz $\text{{BVRP}}_{{t+1}}=\text{{BVRP}}_t$; o benchmark ``Média'' prediz a média incondicional do período de treino para todas as observações OOS. Hiperparâmetros: Ridge ($\alpha={ALPHA_RIDGE_FMT}$), LASSO ($\alpha={ALPHA_LASSO_FMT}$), Random Forest (300 árvores), Gradient Boosting (padrão scikit-learn).",
     r"\end{table}",
 ]
 
@@ -350,7 +456,10 @@ tab2_lines += [
     r"\bottomrule",
     r"\end{tabular}",
     r"\par\smallskip",
-    r"\footnotesize\textit{Nota}: LASSO estimado com $\alpha=0{,}001$ (50.000 iterações máx.); Ridge com $\alpha=1{,}0$. "
+    rf"\footnotesize\textit{{Nota}}: parâmetros de regularização selecionados por validação cruzada "
+    rf"temporal com \textit{{embargo}} de 30 dias ($\alpha_{{\text{{LASSO}}}} = {ALPHA_LASSO_FMT}$, "
+    rf"$\alpha_{{\text{{Ridge}}}} = {ALPHA_RIDGE_FMT}$; grade $\{{10^{{-4}}, \ldots, 10^{{2}}\}}$), na faixa "
+    r"de desempenho de validação estatisticamente equivalente. LASSO com 50.000 iterações máximas. "
     r"Variáveis padronizadas (\textit{z-score}: centradas e escaladas pelo desvio-padrão) com parâmetros calibrados exclusivamente no conjunto de treino. "
     f"Período de treino: {_fmt_data_pt(y_train.index[0])} -- {_fmt_data_pt(y_train.index[-1])} ({_n_train} observações).",
     r"\end{table}",

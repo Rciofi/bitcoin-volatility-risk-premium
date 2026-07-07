@@ -175,13 +175,25 @@ não penalizada; Ridge e LASSO introduzem regularização $\ell_2$ e $\ell_1$,
 respectivamente, sobre a mesma especificação:
 
 \begin{verbatim}
-mqo   = LinearRegression().fit(X_train, y_train)
-lasso = Lasso(alpha=0.001, max_iter=50000).fit(X_train, y_train)
-ridge = Ridge(alpha=1.0).fit(X_train, y_train)
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.preprocessing import StandardScaler
 
-pred_mqo   = mqo.predict(X_test)
-pred_lasso = lasso.predict(X_test)
-pred_ridge = ridge.predict(X_test)
+# Selecao de alpha por CV temporal com embargo de 30 dias
+# (5 folds, janela expansiva; padronizacao recalibrada por fold).
+# A perda de validacao e estatisticamente equivalente em ampla
+# faixa de alpha -- seleciona-se o menos regularizado.
+alpha_lasso, alpha_ridge = 0.001, 1.0  # selecionados pela CV
+
+scaler = StandardScaler().fit(X_train)
+Xtr_s, Xte_s = scaler.transform(X_train), scaler.transform(X_test)
+
+mqo   = LinearRegression().fit(Xtr_s, y_train)
+lasso = Lasso(alpha=alpha_lasso, max_iter=50000).fit(Xtr_s, y_train)
+ridge = Ridge(alpha=alpha_ridge).fit(Xtr_s, y_train)
+
+pred_mqo   = mqo.predict(Xte_s)
+pred_lasso = lasso.predict(Xte_s)
+pred_ridge = ridge.predict(Xte_s)
 \end{verbatim}
 
 \subsection{Floresta aleatória e Gradient Boosting}

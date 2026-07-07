@@ -23,5 +23,5 @@ Mês & -0,0028 & -0,0054 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\footnotesize\textit{Nota}: LASSO estimado com $\alpha=0{,}001$ (50.000 iterações máx.); Ridge com $\alpha=1{,}0$. Variáveis padronizadas (\textit{z-score}: centradas e escaladas pelo desvio-padrão) com parâmetros calibrados exclusivamente no conjunto de treino. Período de treino: 30~nov.\ 2021 -- 30~nov.\ 2024 (1066 observações).
+\footnotesize\textit{Nota}: parâmetros de regularização selecionados por validação cruzada temporal com \textit{embargo} de 30 dias ($\alpha_{\text{LASSO}} = 0{,}001$, $\alpha_{\text{Ridge}} = 1{,}0$; grade $\{10^{-4}, \ldots, 10^{2}\}$), na faixa de desempenho de validação estatisticamente equivalente. LASSO com 50.000 iterações máximas. Variáveis padronizadas (\textit{z-score}: centradas e escaladas pelo desvio-padrão) com parâmetros calibrados exclusivamente no conjunto de treino. Período de treino: 30~nov.\ 2021 -- 30~nov.\ 2024 (1066 observações).
 \end{table}

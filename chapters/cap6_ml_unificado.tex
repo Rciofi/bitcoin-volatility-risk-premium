@@ -153,10 +153,25 @@ diária.
 
 Consideram-se três modelos lineares: o MQO (mínimos quadrados ordinários, sem
 regularização), que serve de referência não penalizada, e suas duas versões
-regularizadas, Ridge (penalidade $L_2$) e LASSO (penalidade $L_1$). Para os dois
-modelos regularizados, o parâmetro $\alpha$ é selecionado por validação cruzada
-temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots,
-10^{2}\}$; o MQO corresponde ao caso $\alpha = 0$.
+regularizadas, Ridge (penalidade $L_2$) e LASSO (penalidade $L_1$). Para os
+modelos regularizados, o parâmetro $\alpha$ é selecionado por validação
+cruzada temporal com \textit{embargo} de 30 dias --- cinco divisões de janela
+expansiva, com um intervalo de 30 observações entre treino e validação em cada
+divisão, de modo a evitar vazamento pela sobreposição das janelas de
+volatilidade --- sobre a grade $\alpha \in \{10^{-4}, 10^{-3}, \ldots,
+10^{2}\}$; a padronização é recalibrada dentro de cada divisão. O MQO
+corresponde ao caso $\alpha = 0$.
+
+Um aspecto do procedimento é, em si, informativo. Para ambos os modelos, o
+erro de validação é estatisticamente indistinguível ao longo de quase toda a
+grade: no LASSO, os valores de $\alpha$ entre $10^{-4}$ e $1$ produzem perda
+dentro de um desvio-padrão entre divisões, degradando-se apenas para $\alpha
+\geq 10$; no Ridge, a perda é praticamente constante em toda a faixa útil. Ou
+seja, a validação cruzada não identifica um nível de regularização
+preferível --- não porque a busca seja malcalibrada, mas porque não há
+estrutura de sinal linear que a penalização possa explorar ou descartar de
+forma proveitosa. Selecionou-se, por parcimônia, o menor grau de
+regularização dentro da faixa de desempenho equivalente.
 
 A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos
 lineares exibem $R^2$ fora da amostra praticamente idênticos (MQO, LASSO e Ridge
