@@ -24,10 +24,11 @@ relações não lineares ou variação temporal na relevância dos preditores
 Nesse contexto, técnicas de aprendizado de máquina oferecem um arcabouço mais
 flexível para modelar a dinâmica do BVRP. O objetivo deste capítulo é investigar se
 modelos supervisionados conseguem prever o BVRP fora da amostra de forma
-estatisticamente e economicamente relevante. Compara-se o desempenho de quatro
-classes de modelos — LASSO, Ridge, floresta aleatória e \textit{Gradient Boosting} —
-sob um protocolo rigoroso de avaliação temporal, tendo como referência principal
-o benchmark de persistência (previsão pelo último valor observado do BVRP),
+estatisticamente e economicamente relevante. Compara-se o desempenho de cinco
+modelos, organizados em duas famílias --- lineares (MQO, Ridge e LASSO) e
+baseados em árvores (floresta aleatória e \textit{Gradient Boosting}) --- sob um
+protocolo rigoroso de avaliação temporal, tendo como referência principal o
+benchmark de persistência (previsão pelo último valor observado do BVRP),
 particularmente exigente dada a forte autocorrelação da série em frequência diária.
 
 % =========================================================
@@ -146,20 +147,28 @@ autocorrelação temporal do BVRP é a principal fonte de previsibilidade em fre
 diária.
 
 % =========================================================
-\section{Modelos lineares regularizados}
+\section{Modelos lineares}
 \label{sec:cap5_lineares}
 % =========================================================
 
-Consideram-se três modelos lineares: MQO (sem regularização), Ridge (L2) e
-LASSO (L1). O parâmetro de regularização é selecionado por validação cruzada
-temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots, 10^{2}\}$.
-
+Consideram-se três modelos lineares: o MQO (mínimos quadrados ordinários, sem
+regularização), que serve de referência não penalizada, e suas duas versões
+regularizadas, Ridge (penalidade $L_2$) e LASSO (penalidade $L_1$). Para os dois
+modelos regularizados, o parâmetro $\alpha$ é selecionado por validação cruzada
+temporal, com busca em grade sobre $\alpha \in \{10^{-4}, 10^{-3}, \ldots,
+10^{2}\}$; o MQO corresponde ao caso $\alpha = 0$.
 
 A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos
-lineares exibem $R^2$ fora da amostra próximos entre si (LASSO 0,39, Ridge 0,39),
-superando com folga a média incondicional, mas ficando muito aquém do benchmark
-de persistência (0,94). A proximidade entre eles sugere baixa sensibilidade à
-escolha do tipo de regularização no problema analisado.
+exibem $R^2$ fora da amostra praticamente idênticos (MQO 0{,}388, LASSO 0{,}388,
+Ridge 0{,}390), superando com folga a média incondicional, mas ficando muito
+aquém do benchmark de persistência (0{,}937). A coincidência é reveladora: o MQO
+não penalizado alcança o mesmo desempenho preditivo que suas versões
+regularizadas, indicando que a regularização é praticamente imaterial neste
+problema. O gargalo, portanto, não é sobreajuste --- que a penalização
+corrigiria ---, mas a ausência de sinal linear explorável nos preditores. Ridge
+e LASSO redistribuem o peso entre os regressores (a Tabela~\ref{tab:cap8_coeficientes}
+mostra o encolhimento do coeficiente do retorno diário sob Ridge), mas essa
+redistribuição não se traduz em ganho fora da amostra.
 
 % (Tabela removida — pertence ao Cap. 5 OLS)
 
@@ -292,12 +301,12 @@ delimita com precisão onde reside a informação econômica do BVRP.
 Três achados merecem destaque:
 
 \begin{enumerate}
-    \item \textbf{Nenhum modelo supera a persistência.} Modelos lineares
-    ($R^2 \approx 0{,}39$) e baseados em árvores ($R^2 \approx 0{,}42$--$0{,}44$)
-    superam a média incondicional, mas ficam muito aquém do benchmark de último
-    valor. Como a matriz de preditores não contém $\text{BVRP}_t$, o exercício mede
-    a informação incremental das demais variáveis — que é limitada em horizonte de
-    um dia;
+    \item \textbf{Nenhum modelo supera a persistência.} Os três modelos lineares
+    --- incluindo o MQO não penalizado --- convergem para $R^2 \approx 0{,}39$, e os
+    baseados em árvores para $R^2 \approx 0{,}42\text{--}0{,}44$; todos superam muito
+    a média incondicional, mas ficam muito aquém do benchmark de último valor. Como
+    a matriz de preditores não contém $\text{BVRP}_t$, o exercício mede a informação
+    incremental das demais variáveis --- que é limitada em horizonte de um dia;
 
     \item \textbf{A não linearidade não resgata o desempenho.} Floresta aleatória e
     \textit{Gradient Boosting} não se distanciam materialmente dos modelos lineares,

@@ -257,14 +257,15 @@ mostram que modelos baseados em árvores, redes neurais e técnicas de regulariz
 são capazes de capturar relações não lineares e de alta dimensão entre
 características (\textit{features}) e retornos de ativos.
 
-Nesta dissertação, quatro classes de modelos supervisionados são empregadas:
-modelos lineares regularizados (LASSO e Ridge), que servem como referência
-intermediária entre MQO e abordagens não lineares; e métodos baseados em árvores
-(\textit{floresta aleatória} e \textit{Gradient Boosting}), utilizados pela capacidade
-de capturar não linearidades, interações entre variáveis e de quantificar a
-importância relativa de preditores como o BVRP em um ambiente multivariado.
+Nesta dissertação, cinco modelos supervisionados são empregados, organizados
+em duas famílias: modelos lineares --- MQO, Ridge e LASSO, em que os dois
+últimos introduzem regularização sobre a versão não penalizada ---; e métodos
+baseados em árvores (\textit{floresta aleatória} e \textit{Gradient Boosting}),
+utilizados pela capacidade de capturar não linearidades, interações entre
+variáveis e de quantificar a importância relativa de preditores como o BVRP em
+um ambiente multivariado.
 
-\subsection{Modelos lineares regularizados: LASSO e Ridge}
+\subsection{Modelos lineares: MQO, Ridge e LASSO}
 
 Técnicas de regularização linear introduzem penalidades sobre os coeficientes
 estimados com o objetivo de reduzir \textit{overfitting} e melhorar a
@@ -338,6 +339,6 @@ características distintivas destacam-se:
           de dimensionalidade moderada.
 \end{itemize}
 
-Os quatro modelos --- LASSO, Ridge, \textit{floresta aleatória} e \textit{Gradient
+Os cinco modelos --- MQO, LASSO, Ridge, \textit{floresta aleatória} e \textit{Gradient
 Boosting} --- são empregados nesta dissertação para avaliar se o BVRP e variáveis
 auxiliares possuem conteúdo informacional sobre retornos futuros do Bitcoin.
