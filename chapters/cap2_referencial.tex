@@ -325,20 +325,30 @@ independentes, o \textit{Gradient Boosting} realiza otimização sequencial sobr
 uma função de perda, resultando em maior sensibilidade a padrões sutis e
 relações não lineares.
 
-Nesta dissertação, utiliza-se a implementação XGBoost (\textit{eXtreme Gradient
-Boosting}), introduzida por \citet{chen2016xgboost}, que combina alto desempenho
-preditivo com regularização explícita e eficiência computacional. Entre suas
-características distintivas destacam-se:
+Nesta dissertação, utiliza-se a implementação de \textit{Gradient Boosting} da
+biblioteca \texttt{scikit-learn}, em sua configuração padrão. O algoritmo constrói
+árvores de decisão sequencialmente, cada uma corrigindo os erros residuais das
+anteriores por meio de descida de gradiente sobre uma função de perda
+\citep{friedman2001gradientboosting}. Diferentemente da floresta aleatória, que
+agrega árvores independentes por \textit{bagging}, o \textit{Gradient Boosting}
+realiza otimização sequencial, o que lhe confere maior sensibilidade a padrões
+sutis e relações não lineares. Os hiperparâmetros são mantidos nos valores
+padrão da biblioteca --- opção que privilegia a reprodutibilidade e uma
+avaliação em configuração convencional, em vez da otimização de desempenho,
+cujas implicações são discutidas no Capítulo~\ref{chap:cap5_ml}.
+
+Entre suas características, destacam-se:
 
 \begin{itemize}
     \item construção sequencial de árvores para correção iterativa dos resíduos;
-    \item regularização L1 e L2 integrada, controlando \textit{overfitting};
-    \item ajuste fino do viés e da variância por meio de hiperparâmetros como
-          profundidade máxima e taxa de aprendizado (\textit{learning rate});
-    \item implementação eficiente e paralelizável, adequada a séries temporais
-          de dimensionalidade moderada.
+    \item boa capacidade de capturar não linearidades e interações entre
+          variáveis;
+    \item sensibilidade a padrões sutis, superior à de métodos de agregação
+          independente como a floresta aleatória.
 \end{itemize}
 
-Os cinco modelos --- MQO, LASSO, Ridge, \textit{floresta aleatória} e \textit{Gradient
-Boosting} --- são empregados nesta dissertação para avaliar se o BVRP e variáveis
-auxiliares possuem conteúdo informacional sobre retornos futuros do Bitcoin.
+Os cinco modelos --- MQO, LASSO, Ridge, \textit{floresta aleatória} e
+\textit{Gradient Boosting} --- são empregados nesta dissertação para avaliar se o
+BVRP é previsível fora da amostra a partir de variáveis de volatilidade, retorno
+e estado de mercado, comparando modelos lineares e não lineares contra
+\textit{benchmarks} de referência.
