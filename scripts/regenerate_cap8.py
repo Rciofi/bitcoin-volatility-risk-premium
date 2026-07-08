@@ -296,6 +296,16 @@ shap.summary_plot(
     show=False, plot_type="dot",
     max_display=len(feat_labels),
 )
+# Traduz os rotulos hardcoded em ingles pelo shap.summary_plot
+_fig = plt.gcf()
+plt.gca().set_xlabel("Valor SHAP (impacto na previsão do modelo)", fontsize=10)
+# A colorbar e o ultimo eixo da figura no shap 0.52
+try:
+    _cb = _fig.axes[-1]
+    _cb.set_ylabel("Valor da variável", fontsize=9)
+    _cb.set_yticklabels(["Baixo", "Alto"])
+except Exception as _e:
+    print(f"  [aviso] nao foi possivel traduzir a colorbar do beeswarm: {_e}")
 plt.tight_layout()
 plt.savefig(str(OUT_FIGS / "fig_cap8_shap_beeswarm.png"), dpi=300, bbox_inches="tight")
 plt.close()
@@ -307,6 +317,8 @@ shap.summary_plot(
     show=False, plot_type="bar",
     max_display=len(feat_labels),
 )
+# O rotulo original em ingles e longo demais e sai cortado; troca por um curto
+plt.gca().set_xlabel("Impacto médio no modelo — média de |valor SHAP|", fontsize=10)
 plt.tight_layout()
 plt.savefig(str(OUT_FIGS / "fig_cap8_shap_bar.png"), dpi=300, bbox_inches="tight")
 plt.close()
