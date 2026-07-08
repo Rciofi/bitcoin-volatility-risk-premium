@@ -79,6 +79,8 @@ resultados mais informativos do que uma janela puramente favorável: a estratég
 condicional é avaliada em condições de mercado adversas, de recuperação e de
 lateralização, o que fortalece a interpretação do papel defensivo do sinal BVRP.
 
+Cabe explicitar, por essa razão, que a comparação entre a estratégia condicional e o compra e manutenção não é feita contra as métricas da Tabela~\ref{tab:cap7_bh_perf}. Os números acima descrevem o retorno passivo do Bitcoin ao longo de todo o histórico disponível e cumprem função de contextualização do ativo; compará-los diretamente com uma estratégia que opera apenas a partir do final de 2021 seria inadequado, pois os dois desempenhos se referem a janelas temporais distintas. A avaliação de desempenho relativo, reportada na Seção~\ref{sec:cap7_bvrp_q}, utiliza um segundo benchmark de compra e manutenção --- idêntico em construção, porém restrito ao mesmo período operacional da estratégia condicional: de 1\textsuperscript{o} de dezembro de 2021 a 3 de março de 2026 ($N = 1.523$), excluídos os 252 primeiros dias úteis da amostra, consumidos na calibração inicial do limiar expansivo. Nesse subperíodo, o compra e manutenção apresenta razão de Sharpe de $-0{,}17$ e max drawdown de $-78{,}0\%$, e é contra essa referência --- e não contra o retorno histórico de longo prazo --- que a estratégia condicional deve ser julgada.
+
 % =========================================================
 \section{Estratégia Condicional ao BVRP (Quantil Superior)}
 \label{sec:cap7_bvrp_q}
@@ -103,11 +105,7 @@ assimétrica, gerando assim janelas em que a relação risco--retorno do Bitcoin
 equilíbrio de longo prazo. Sob essa ótica, a estratégia não busca prever a direção dos
 retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
 
-A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia
-condicional ao BVRP. As Figuras~\ref{fig:cap7_bvrp_q_cumret}
-e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno
-acumulado da estratégia e sua comparação com o compra e manutenção no período amostral
-do BVRP (março de 2021 a março de 2026).
+A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia condicional ao BVRP, tendo como referência o compra e manutenção restrito ao mesmo período operacional (1\textsuperscript{o} de dezembro de 2021 a 3 de março de 2026, $N = 1.523$) --- o benchmark casado discutido na Seção~\ref{sec:cap7_bh}. As Figuras~\ref{fig:cap7_bvrp_q_cumret} e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno acumulado da estratégia e sua comparação com o compra e manutenção nesse mesmo período.
 
 \begin{table}[H]
 \centering
