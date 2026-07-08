@@ -32,7 +32,9 @@ matplotlib.rcParams.update({
 })
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_PATH = ROOT / "data" / "ml_dataset.csv"   # Tarefa 3/Passo 4: fonte canonica (1.755 obs)
+DATA_PATH = ROOT / "data" / "ml_dataset.csv"
+# amostra do Cap. 6: 1.524 obs (1.523 apos shift(-1)); menor que a canonica
+# (1.775) devido ao burn-in de 252 obs da variavel de regime
 OUT_FIGS  = ROOT / "figs" / "cap8"
 OUT_TABS  = ROOT / "tables" / "tab8"
 OUT_SHAP  = ROOT / "tables" / "cap8"   # [M1] CSV com shap_values
