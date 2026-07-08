@@ -146,12 +146,7 @@ Os resultados evidenciam que a estratégia condicional ao BVRP cumpre um papel
 predominantemente \textbf{defensivo}, não de geração de alfa. O Sharpe bruto
 ($-0{,}1953$) é ligeiramente inferior ao do compra e manutenção no mesmo
 subperíodo ($-0{,}1740$), reflexo de um ciclo desfavorável ao sinal no
-período 2025--2026 não capturado na janela amostral original. A redução do
-risco de cauda, contudo, é expressiva e estatisticamente robusta a custos:
-o \textit{max drawdown} cai de $-77{,}98\%$ (compra e manutenção) para
-$-38{,}28\%$ na estratégia bruta, diferencial que permanece integralmente
-preservado após os cenários de custo testados, dado que os custos afetam o
-nível dos retornos mas não a estrutura das perdas máximas. O Sortino ratio
+período 2025--2026 não capturado na janela amostral original. A redução do risco de cauda, contudo, é expressiva e robusta a custos: o \emph{max drawdown} cai de $-77{,}98\%$ (compra e manutenção) para $-38{,}28\%$ na estratégia bruta e, mesmo no cenário mais oneroso testado (10 bps por operação), permanece em $-42{,}24\%$ --- deterioração de cerca de 4 pontos percentuais que preserva a maior parte do diferencial de aproximadamente 40 pontos percentuais em relação ao compra e manutenção. O Sortino ratio
 bruto ($-0{,}0609$) é inferior ao do compra e manutenção ($0{,}1114$),
 confirmando que a vantagem da estratégia não reside na assimetria dos retornos
 em valor absoluto, mas exclusivamente na contenção das perdas extremas. Após
@@ -233,7 +228,7 @@ incorre em Sharpe ligeiramente mais negativo por concentrar exposição em
 estados de sinal extremo que tendem a ser seguidos por reversões. Todas as
 estratégias condicionais reduzem o \textit{max drawdown} entre 19 e 51
 pontos percentuais em relação ao compra e manutenção no mesmo subperíodo
-($-77{,}98\%$), resultado que permanece integralmente preservado após
+($-77{,}98\%$), resultado que se mantém em larga medida após
 custos de transação de 10~bps em todos os quantis.
 
 Sob a ótica econômica, esse padrão é coerente com a hipótese H3 formulada no
@@ -253,9 +248,7 @@ do estado da volatilidade implícita.
 
 Esta seção investiga a interação entre o BVRP e regimes de volatilidade realizada,
 avaliando se a eficácia do sinal depende do ambiente de risco prevalente no mercado.
-Os regimes são definidos a partir dos tercis da distribuição da volatilidade realizada
-de 30 dias ($\text{RV}_{30}$), classificando os dias em baixa ($\text{RV}_{30}$
-inferior a 41\%), média (41\%--51\%) e alta volatilidade (acima de 51\%). Mantém-se
+Os regimes são definidos a partir dos tercis da distribuição da volatilidade realizada de 30 dias ($\text{RV}_{30}$), classificando os dias em baixa ($\text{RV}_{30}$ inferior a 43,5\%), média (43,5\%--60,7\%) e alta volatilidade (acima de 60,7\%). Mantém-se
 a regra condicional ao BVRP com limiar no quantil 80\%, mas a tomada de posição é
 restrita aos dias pertencentes a cada regime.
 
@@ -360,11 +353,4 @@ linear do BVRP sobre os retornos futuros não exclui que o prêmio carregue
 informação sobre o \emph{ambiente} de risco, mas essa informação não se traduz,
 nesta amostra, em ganho de desempenho por regime.
 
-\paragraph{Limitações.} As estratégias empregam limiares fixos estimados sobre a
-amostra disponível, o que não replica fielmente um ambiente de tomada de decisão
-em tempo real com limiares expandindo recursivamente. Além disso, os resultados incorporam custos de transação unilaterais de até 10~bps por operação,
-mas não capturam fricções de liquidez intradiária, \textit{slippage} em períodos de
-baixa profundidade ou restrições de posicionamento, que podem reduzir os ganhos
-documentados em implementações reais. Esses aspectos constituem
-extensões naturais desta análise e são detalhados nas considerações finais da
-dissertação.
+\paragraph{Limitações.} A escolha do quantil de entrada é informada pelo conjunto de limiares testados (60\% a 90\%) sobre a amostra completa; embora o limiar seja recalculado em janela expansiva a cada instante, a seleção do percentil 80 como referência principal utiliza informação de todo o período, o que não replica integralmente a decisão de um operador em tempo real. Soma-se a isso o consumo dos 252 primeiros dias úteis na calibração inicial do limiar, que reduz a janela operacional efetiva. Além disso, os resultados incorporam custos de transação unilaterais de até 10 bps por operação, mas não capturam fricções de liquidez intradiária, \emph{slippage} em períodos de baixa profundidade ou restrições de posicionamento, que podem reduzir os ganhos documentados em implementações reais. Esses aspectos constituem extensões naturais desta análise e são detalhados nas considerações finais da dissertação.
