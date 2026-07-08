@@ -85,17 +85,7 @@ O limiar é recalculado em janela expansiva a cada instante $t$, utilizando apen
 a distribuição histórica do BVRP disponível até $t-1$, de modo que não existe
 um valor fixo único para o percentil 80 ao longo da amostra.
 
-A interpretação econômica é diretamente conectada à evidência do
-Capítulo~\ref{chap:resultados_ols}: valores elevados do BVRP refletem condições
-em que a volatilidade implícita está elevada vis-à-vis a volatilidade realizada,
-sugerindo maior prêmio requerido pelos agentes para carregar risco de volatilidade.
-A motivação para o uso do BVRP como sinal de intervalo de tempo não repousa em previsibilidade
-linear --- ausente nos dados, conforme demonstrado no Capítulo~\ref{chap:resultados_ols} ---,
-mas em uma hipótese de filtragem condicional: que estados de prêmio extremamente elevado em
-magnitude reflitam episódios em que o risco de volatilidade está sendo precificado de forma
-assimétrica, gerando assim janelas em que a relação risco--retorno do Bitcoin se desvia do
-equilíbrio de longo prazo. Sob essa ótica, a estratégia não busca prever a direção dos
-retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
+A interpretação econômica é diretamente conectada à evidência do Capítulo~\ref{chap:regimes}: valores elevados do BVRP --- isto é, próximos de zero ou positivos --- refletem condições em que a volatilidade realizada alcança ou supera a implícita, dissipando o prêmio de seguro embutido nos preços de opções. Esses estados concentram-se em regimes de alta volatilidade realizada, nos quais o BVRP médio é de aproximadamente $-2{,}64\%$, contra $-11{,}97\%$ em regimes de baixa volatilidade. A motivação para o uso do BVRP como sinal de posicionamento não repousa em previsibilidade linear --- ausente nos dados, conforme demonstrado no Capítulo~\ref{chap:resultados_ols} ---, mas em uma hipótese de filtragem condicional: que a dissipação do prêmio identifique episódios em que o mercado de opções deixou de precificar proteção de forma conservadora, sinalizando ambientes de risco distintos. Sob essa ótica, a estratégia não busca prever a direção dos retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
 
 A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia condicional ao BVRP, tendo como referência o compra e manutenção restrito ao mesmo período operacional (1\textsuperscript{o} de dezembro de 2021 a 3 de março de 2026, $N = 1.523$) --- o benchmark casado discutido na Seção~\ref{sec:cap7_bh}. As Figuras~\ref{fig:cap7_bvrp_q_cumret} e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno acumulado da estratégia e sua comparação com o compra e manutenção nesse mesmo período.
 
@@ -156,11 +146,7 @@ são interpretados como evidência de que o BVRP constitui um \textit{filtro
 de risco} economicamente relevante, cujo valor reside na exclusão de estados
 de mercado adversos, e não na antecipação da direção dos retornos.
 
-A interpretação desse resultado é coerente com o mecanismo documentado no
-Capítulo~\ref{chap:resultados_ols}: o BVRP elevado reflete estados em que o
-mercado de opções exige maior prêmio para assumir risco de volatilidade, o que
-tende a coincidir com janelas de recuperação e de melhor compensação pelo risco
-no mercado à vista.
+A interpretação desse resultado é coerente com a evidência do Capítulo~\ref{chap:regimes}: o BVRP elevado reflete estados em que a volatilidade realizada alcançou a implícita, tipicamente associados a episódios de estresse já materializado. Ao restringir a exposição a esses estados, a estratégia reduz o tempo investido nos períodos de calmaria que antecedem correções --- o que explica a contenção de perdas extremas sem ganho correspondente em retorno.
 
 % =========================================================
 \section{Análise de Robustez por Quantis do BVRP}
