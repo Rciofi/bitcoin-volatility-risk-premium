@@ -65,14 +65,16 @@ A análise das séries temporais das variáveis de interesse permite avaliar a
 dinâmica da volatilidade e do prêmio de risco ao longo do tempo, bem como
 identificar episódios de persistência e mudanças de comportamento associados a
 eventos relevantes do mercado de criptoativos. A
-Figura~\ref{fig:vrp_timeseries} apresenta a evolução temporal do prêmio de risco
-de volatilidade do Bitcoin ao longo da amostra.
+Figura~\ref{fig:vrp_timeseries} apresenta, em dois painéis com eixo temporal
+compartilhado, a evolução da volatilidade realizada e implícita de 30 dias
+(painel superior) e do prêmio de risco de volatilidade (BVRP) do Bitcoin
+(painel inferior), com anotações dos principais eventos de mercado do período.
 
 \IfFileExists{figs/cap3/vrp_timeseries.png}{
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figs/cap3/vrp_timeseries.png}
-    \caption{Evolução temporal do prêmio de risco de volatilidade do Bitcoin (BVRP)}
+    \caption{Evolução temporal das séries de volatilidade do Bitcoin. Painel (a): volatilidade realizada (RV30D) e volatilidade implícita (IV30D) sobrepostas; (b) prêmio de risco de volatilidade (BVRP = RV30D − IV30D). Anotações verticais: colapso do TerraUSD/LUNA (maio/2022), liquidação da Three Arrows Capital e suspensão de saques na Celsius (junho/2022), falência da FTX (novembro/2022), crise bancária dos Estados Unidos --- SVB e Signature (março/2023), e aprovação dos ETFs \textit{spot} de Bitcoin pela SEC (janeiro/2024).}
     \label{fig:vrp_timeseries}
 \end{figure}
 }{}

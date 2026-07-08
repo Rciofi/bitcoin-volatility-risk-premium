@@ -28,37 +28,60 @@ def main():
     os.makedirs(figs_dir, exist_ok=True)
 
     # ================================================
-    #  FIGURA 3.1 — SÉRIE TEMPORAL (eixo duplo)
+    #  FIGURA 3.1 — SÉRIE TEMPORAL (2 painéis com eventos)
     # ================================================
     plt.style.use("default")
-    fig, ax1 = plt.subplots(figsize=(12, 5))
-
-    ax1.plot(df["date"], df["rv_30d"],  color="steelblue",  linewidth=1.2,
-             label="Vol. Realizada 30D (RV30D)")
-    ax1.plot(df["date"], df["iv_30d"],  color="darkorange", linewidth=1.2,
-             label="Vol. Implícita 30D (IV30D – DVOL)")
-    ax1.set_xlabel("Data")
-    ax1.set_ylabel("Volatilidade (% a.a.)")
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
-    ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, ha="right")
-
-    ax2 = ax1.twinx()
-    ax2.plot(df["date"], df["vrp_30d"], color="steelblue", linewidth=1.0,
-             linestyle="--", alpha=0.7, label="VRP 30D (RV30D – IV30D)")
-    ax2.set_ylabel("VRP 30D (p.p. de vol.)")
-    ax2.axhline(0, color="gray", linewidth=0.7, linestyle=":")
-
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2,
-               loc="upper right", fontsize=8, framealpha=0.8)
-
-    ax1.grid(True, alpha=0.3)
-    fig.tight_layout()
-
     out1 = os.path.join(figs_dir, "vrp_timeseries.png")
-    fig.savefig(out1, dpi=300)
+
+    # === FIGURA 3.1 — SERIE TEMPORAL: 2 PAINEIS COM EVENTOS ===
+    eventos = [
+        ("2022-05-09", "LUNA"),
+        ("2022-06-13", "3AC/Celsius"),
+        ("2022-11-08", "FTX"),
+        ("2023-03-10", "Crise banc. EUA"),
+        ("2024-01-10", "ETF spot SEC"),
+    ]
+
+    fig, axes = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
+
+    # --- Painel (a): RV e IV sobrepostas ---
+    axes[0].plot(df["date"], df["rv_30d"], color="#1f4e79", linewidth=0.8,
+                 label="Volatilidade Realizada (RV30D)")
+    axes[0].plot(df["date"], df["iv_30d"], color="#c0392b", linewidth=0.8,
+                 label="Volatilidade Implícita (IV30D — DVOL Deribit)")
+    axes[0].set_ylabel("Volatilidade (% a.a.)")
+    axes[0].set_title("(a) Volatilidade realizada e implícita", loc="left", fontsize=10)
+    axes[0].legend(loc="upper right", fontsize=8)
+    axes[0].grid(True, alpha=0.3)
+
+    # --- Painel (b): BVRP ---
+    axes[1].plot(df["date"], df["vrp_30d"], color="#2e7d32", linewidth=0.8)
+    axes[1].axhline(0, color="gray", linestyle="--", linewidth=0.8)
+    axes[1].set_ylabel("BVRP 30D (p.p. de vol.)")
+    axes[1].set_title("(b) Prêmio de Risco de Volatilidade (BVRP = RV30D − IV30D)",
+                      loc="left", fontsize=10)
+    axes[1].grid(True, alpha=0.3)
+    axes[1].set_xlabel("Data")
+
+    # --- Anotacoes verticais de eventos (nos dois paineis) ---
+    # Altura do rotulo alternada (linha superior/inferior) para eventos
+    # proximos no tempo nao se sobreporem (ex.: LUNA e 3AC/Celsius, 5
+    # semanas de distancia).
+    for i, (data_ev, rotulo) in enumerate(eventos):
+        x = pd.to_datetime(data_ev)
+        for ax in axes:
+            ax.axvline(x, color="gray", linestyle=":", linewidth=0.7, alpha=0.7)
+        # rotulo so no painel de cima, perto do topo
+        ymin, ymax = axes[0].get_ylim()
+        y_offset = -4 if i % 2 == 0 else -20
+        axes[0].annotate(rotulo, xy=(x, ymax), xytext=(0, y_offset),
+                         textcoords="offset points", rotation=0, ha="center",
+                         va="top", fontsize=7,
+                         bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                   ec="gray", lw=0.4, alpha=0.85))
+
+    fig.tight_layout()
+    fig.savefig(out1, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"Figura salva em: {out1}")
 
