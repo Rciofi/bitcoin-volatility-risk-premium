@@ -61,7 +61,7 @@ def fmt_pct(ax, axis='y'):
 df_btc = pd.read_csv('data/btc_prices.csv', parse_dates=['date'])
 df_btc = df_btc.sort_values('date').reset_index(drop=True)
 df_btc['ret'] = df_btc['close'].pct_change()
-df_btc = df_btc[df_btc['date'] <= '2024-12-31'].dropna(subset=['ret'])
+df_btc = df_btc[df_btc['date'] <= '2026-03-03'].dropna(subset=['ret'])
 
 # Dataset BVRP (periodo consistente com cap5/cap6)
 df = pd.read_csv('data/vrp_with_regimes.csv', parse_dates=['date'])
@@ -107,7 +107,13 @@ ax.fill_between(df_btc['date'], 1, cum_bh, alpha=0.15, color=COLOR_BH)
 ax.axhline(1, color='black', lw=0.8, ls='--', alpha=0.5)
 ax.set_xlabel('Data')
 ax.set_ylabel('Retorno acumulado (base 1)')
-ax.set_title('Retorno acumulado — Buy-and-Hold (Bitcoin, ago 2017 – dez 2024)')
+_MESES_PT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+             'jul', 'ago', 'set', 'out', 'nov', 'dez']
+def _mes_ano_pt(ts):
+    return f"{_MESES_PT[ts.month - 1]} {ts.year}"
+_ini = _mes_ano_pt(df_btc['date'].min())
+_fim = _mes_ano_pt(df_btc['date'].max())
+ax.set_title(f'Retorno acumulado — Buy-and-Hold (Bitcoin, {_ini} – {_fim})')
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.1f}x'))
 fig.tight_layout()
 fig.savefig('figs/cap7/fig_7_01_cum_returns_buy_hold.png', dpi=DPI, bbox_inches='tight')

@@ -94,6 +94,11 @@ def _fmt(val, d=4):
 # ============================================================
 df_btc = pd.read_csv('data/btc_prices.csv', parse_dates=['date'])
 df_btc = df_btc.sort_values('date').reset_index(drop=True)
+# Trunca no cutoff canonico da dissertacao (mesma data de vrp_with_targets.csv).
+# btc_prices.csv se estende ate mai/2026; sem este corte a Tab 7.1 usaria ~2 meses
+# que nenhum outro capitulo enxerga.
+AMOSTRA_FIM_BTC = "2026-03-03"
+df_btc = df_btc[df_btc['date'] <= AMOSTRA_FIM_BTC].reset_index(drop=True)
 df_btc['ret'] = df_btc['close'].pct_change()
 df_btc = df_btc.dropna(subset=['ret'])
 
