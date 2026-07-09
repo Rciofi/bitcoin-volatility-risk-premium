@@ -52,12 +52,16 @@ Capítulo~\ref{chap:dados}, respeitando estritamente a informação disponível 
 tempo $t$, de modo a evitar viés de \textit{look-ahead}.
 
 A variável dependente principal é o retorno futuro do Bitcoin no mercado
-\textit{spot}, definido como o retorno logarítmico acumulado ao longo de um
+\textit{spot}, definido como o retorno simples acumulado ao longo de um
 horizonte de $h$ dias:
 \[
-R_{t+h} = \sum_{i=1}^{h} r_{t+i},
+R_{t+h} = \frac{P_{t+h}}{P_t} - 1,
 \]
-em que $r_t$ denota o retorno logarítmico diário e
+em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e $R_{t+h}$
+o retorno simples acumulado no horizonte de $h$ dias. Adota-se o retorno simples
+para a variável dependente por corresponder ao retorno efetivo de uma posição no
+ativo; a volatilidade realizada, por sua vez, é construída a partir de retornos
+logarítmicos diários, convenção padrão para agregação temporal de variância.
 $h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão.
 
 A principal variável explicativa é o prêmio de risco de volatilidade observado

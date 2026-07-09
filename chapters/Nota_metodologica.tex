@@ -43,7 +43,7 @@ no mercado à vista.
 
 Toda a modelagem preditiva utiliza estritamente informações disponíveis no
 instante de decisão $t$. Os retornos futuros
-$r_{t+h} = \ln(P_{t+h}) - \ln(P_t)$ são construídos com deslocamento negativo
+$R_{t+h} = P_{t+h}/P_t - 1$ são construídos com deslocamento negativo
 (\texttt{shift(-h)}), de modo que constituem a variável-alvo, nunca um preditor.
 Os preditores defasados são construídos com \texttt{shift(+1)} quando necessário.
 A divisão temporal treino/teste (70\,\%/30\,\%) preserva a ordenação

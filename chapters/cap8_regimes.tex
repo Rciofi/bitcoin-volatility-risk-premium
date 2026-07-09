@@ -152,13 +152,13 @@ Para avaliar se a interação entre o BVRP e o regime de volatilidade tem poder 
 incremental sobre os retornos futuros, estimam-se regressões condicionais da forma:
 
 \begin{equation}
-r_{t+h} = \alpha + \beta_1 \cdot \text{BVRP}_t
+R_{t+h} = \alpha + \beta_1 \cdot \text{BVRP}_t
           + \beta_2 \cdot D_t^{\text{alto}}
           + \beta_3 \cdot \left(\text{BVRP}_t \times D_t^{\text{alto}}\right) + \varepsilon_{t+h},
 \label{eq:cap9_reg_condicional}
 \end{equation}
 
-\noindent onde $r_{t+h}$ é o retorno logarítmico acumulado do Bitcoin de $t$ a $t+h$,
+\noindent onde $R_{t+h}$ é o retorno simples acumulado do Bitcoin de $t$ a $t+h$,
 $D_t^{\text{alto}}$ é uma variável indicadora igual a 1 quando o Bitcoin se encontra
 em regime de alta volatilidade ($\text{RV}_{30d} \geq q_{75}$), e
 $\text{BVRP}_t \times D_t^{\text{alto}}$ é o termo de interação entre o prêmio e

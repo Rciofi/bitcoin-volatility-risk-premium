@@ -30,17 +30,17 @@ econômica central dos achados.
 A especificação econométrica básica regride o retorno futuro do Bitcoin no
 horizonte $h$ contra o nível corrente do BVRP:
 \begin{equation}
-r_{t+h} = \alpha_h + \beta_h \cdot \text{BVRP}_t + \varepsilon_{t,h}
+R_{t+h} = \alpha_h + \beta_h \cdot \text{BVRP}_t + \varepsilon_{t,h}
 \label{eq:cap5-basico}
 \end{equation}
-onde $r_{t+h} = \ln(P_{t+h}) - \ln(P_t)$ é o retorno logarítmico acumulado em
+onde $R_{t+h} = P_{t+h}/P_t - 1$ é o retorno simples acumulado em
 $h$ dias e $\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}$ segue a
 convenção da literatura (negativo em média, ver
 Seção~\ref{sec:vrp-teorico}). Estimam-se seis horizontes
 $h \in \{1, 5, 10, 20, 30, 60\}$ dias, escolhidos para cobrir desde a
 resposta de curtíssimo prazo até o horizonte aproximadamente trimestral.
 
-Como os retornos $r_{t+h}$ são sobrepostos em janelas de $h$ dias, os resíduos
+Como os retornos $R_{t+h}$ são sobrepostos em janelas de $h$ dias, os resíduos
 exibem autocorrelação serial de ordem até $h-1$. Para obter inferência válida,
 todos os erros-padrão são calculados pelo estimador de Newey--West com
 defasagens iguais ao horizonte ($\text{maxlags} = h$), conforme recomendação
@@ -109,7 +109,7 @@ a operarem com magnitudes idênticas e sinais opostos. Uma especificação mais
 informativa decompõe o BVRP em seus dois componentes e examina se cada um
 carrega conteúdo informacional distinto:
 \begin{equation}
-r_{t+h} = \alpha_h + \beta_{1,h} \cdot \text{RV}_{30,t} + \beta_{2,h} \cdot \text{IV}_{30,t} + \varepsilon_{t,h}
+R_{t+h} = \alpha_h + \beta_{1,h} \cdot \text{RV}_{30,t} + \beta_{2,h} \cdot \text{IV}_{30,t} + \varepsilon_{t,h}
 \label{eq:cap5-rv-iv}
 \end{equation}
 
