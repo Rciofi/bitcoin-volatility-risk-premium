@@ -159,8 +159,13 @@ dentro de um desvio-padrão entre divisões, degradando-se apenas para $\alpha
 seja, a validação cruzada não identifica um nível de regularização
 preferível --- não porque a busca seja malcalibrada, mas porque não há
 estrutura de sinal linear que a penalização possa explorar ou descartar de
-forma proveitosa. Selecionou-se, por parcimônia, o menor grau de
-regularização dentro da faixa de desempenho equivalente.
+forma proveitosa. A regra de seleção adotada identifica a faixa de $\alpha$ cujo erro de
+validação está a menos de um desvio-padrão do mínimo e, dentro dela,
+prefere o menor grau de regularização --- exceto quando os dois
+candidatos menos regularizados são estatisticamente indistintos entre
+si, caso em que se opta pelo mais parcimonioso dos dois. Para o LASSO,
+esse desempate resulta em $\alpha = 0{,}001$; para o Ridge,
+$\alpha = 1{,}0$.
 
 A Tabela~\ref{tab:cap8_oos_performance} reporta o desempenho. Os três modelos
 lineares exibem $R^2$ fora da amostra praticamente idênticos (MQO, LASSO e Ridge
