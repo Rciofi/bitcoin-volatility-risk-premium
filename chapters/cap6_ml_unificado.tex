@@ -58,7 +58,7 @@ e \texttt{vrp\_30d}. As observações utilizadas neste capítulo compreendem o p
 de novembro de 2021 a março de 2026, totalizando 1.523 observações após a
 engenharia de variáveis e o alinhamento do alvo em $t+1$.\footnote{A amostra deste capítulo inicia-se em novembro
 de 2021, e não em março de 2021 como a amostra completa da dissertação (1.775
-observações). A diferença decorre da variável de regime de volatilidade, cujos
+observações). A diferença decorre da variável de regime do BVRP, cujos
 limiares são estimados por janela expansiva com período mínimo de 252 observações
 (Seção~\ref{subsec:cap5_features}); os primeiros 252 dias da série são consumidos
 nesse aquecimento e não dispõem de valor de regime válido. O horizonte final e as
@@ -180,7 +180,7 @@ A Tabela~\ref{tab:cap8_coeficientes} apresenta os coeficientes estimados pelo
 LASSO e pelo Ridge, ordenados pela magnitude absoluta e obtidos sobre preditores
 padronizados (\textit{z-score} calibrado no treino), o que torna as magnitudes
 diretamente comparáveis entre si. Um único preditor domina de forma inequívoca:
-o regime de volatilidade, com coeficiente de $\approx 9{,}2$ em ambos os modelos
+o regime do BVRP, com coeficiente de $\approx 9{,}2$ em ambos os modelos
 --- cerca de doze vezes o segundo colocado. Os demais preditores contribuem de
 forma marginal e homogênea: as variações diárias da IV e do BVRP ($\approx 0{,}77$),
 os retornos defasados em 5 e 20 dias e o retorno diário contemporâneo (todos
@@ -194,7 +194,7 @@ severa entre os preditores retidos: quando há redundância, LASSO e Ridge diver
 importante, o LASSO não zerou nenhum coeficiente sob $\alpha = 0{,}001$: todos os
 onze preditores sobrevivem à penalidade $L_1$, ainda que a maioria com peso
 pequeno. A estrutura linear identificada é, portanto, dominada por um único fator
---- o regime de volatilidade ---, leitura que a análise SHAP da
+--- o regime do BVRP ---, leitura que a análise SHAP da
 Seção~\ref{subsec:cap5_shap} (Figura~\ref{fig:cap5_shap_bar}) corrobora de forma
 independente, situando o mesmo regime como o preditor de maior impacto por ampla
 margem.
@@ -255,8 +255,7 @@ exPlanations}), métrica preferível à impureza média de redução (MDI) por s
 não enviesada em relação à cardinalidade das variáveis.\footnote{A importância
 por impureza (MDI) tende a superestimar variáveis contínuas de alta cardinalidade.
 Os valores SHAP eliminam esse viés ao atribuir a cada variável sua contribuição
-marginal média sobre a distribuição de todos os subconjuntos possíveis de preditores.
-Os gráficos de importância MDI são apresentados no Apêndice para referência.}
+marginal média sobre a distribuição de todos os subconjuntos possíveis de preditores.}
 
 \begin{figure}[H]
 \centering
@@ -287,11 +286,25 @@ na previsão.}
 \label{fig:cap5_shap_beeswarm}
 \end{figure}
 
-O regime de volatilidade emerge como o preditor de maior impacto, muito à frente de
-todas as demais variáveis, confirmando que a estrutura de regime — e não os retornos
-passados — domina a previsibilidade do BVRP. A variável de calendário mês e os
-retornos defasados em 20 e 5 dias ocupam as posições seguintes, enquanto as
-variações de IV e BVRP e as demais variáveis de calendário contribuem marginalmente.
+O regime do BVRP emerge como o preditor de maior impacto, muito à frente de
+todas as demais variáveis --- resultado consistente com o dos modelos lineares e
+com a dominância do \emph{benchmark} de persistência: é a variável que discretiza
+o prêmio corrente que concentra a capacidade preditiva, e não os retornos passados.
+A variável de calendário mês ocupa a segunda posição, seguida pelos retornos
+defasados em 20 e 5 dias; as variações de IV e BVRP e as demais variáveis de
+calendário contribuem marginalmente.
+
+Cabe reconciliar uma divergência aparente entre a Tabela~\ref{tab:cap8_coeficientes}
+e a Figura~\ref{fig:cap5_shap_bar}: nos modelos lineares o coeficiente do mês é
+praticamente nulo ($\approx -0{,}003$), enquanto na floresta aleatória a variável
+figura em segundo lugar. A explicação está na forma funcional. Sob padronização,
+o coeficiente linear do mês mede uma tendência monotônica ao longo do ano --- que
+não existe ---, ao passo que a floresta pode isolar efeitos de meses individuais
+por meio de partições sucessivas. A contribuição efetiva desses efeitos ao
+desempenho fora da amostra é, contudo, modesta: a floresta supera os modelos
+lineares em apenas $0{,}036$ de $R^2$ (0,424 contra 0,388). Com três anos de dados
+de treino, padrões mensais dificilmente se distinguem de variação amostral, e a
+leitura prudente é que esses efeitos têm alcance limitado fora do período estimado.
 
 % =========================================================
 \section{Comparação geral e síntese}
@@ -320,7 +333,10 @@ Três achados merecem destaque:
     indicando que interações e não linearidades entre os preditores disponíveis não
     contêm sinal explorável relevante sobre o nível do BVRP;
 
-    \item \textbf{O regime do BVRP concentra praticamente toda a capacidade preditiva.} Sob preditores padronizados, o coeficiente do regime domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$ dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável --- ausência de divergência que indica não haver colinearidade severa entre os preditores retidos. Na floresta aleatória, a importância SHAP aponta a mesma variável como dominante isolada. A convergência entre modelos lineares e não lineares é informativa, mas a leitura correta não é que o estado de mercado carregue informação especial: a variável de regime é uma discretização do próprio BVRP$_t$, e sua dominância confirma, por outro caminho, o que o \emph{benchmark} de persistência já indicava --- a informação sobre o prêmio de amanhã está essencialmente no prêmio de hoje. As demais variáveis contribuem de forma marginal e homogênea, sem que nenhuma se destaque. A dificuldade de prever o nível do BVRP além de sua própria persistência sugere que o valor prático do prêmio não está na previsão pontual, mas em seu uso como sinal condicionante --- hipótese explorada no Capítulo~\ref{chap:estrategias} e no Capítulo~\ref{chap:regimes}.
+    \item \textbf{O regime do BVRP concentra praticamente toda a capacidade preditiva.} Sob preditores padronizados, o coeficiente do regime domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$ dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável --- ausência de divergência que indica não haver colinearidade severa entre os preditores retidos. Na floresta aleatória, a importância SHAP aponta a mesma variável como dominante isolada. A convergência entre modelos lineares e não lineares é informativa, mas a leitura correta não é que o estado de mercado carregue informação especial: a variável de regime é uma discretização do próprio BVRP$_t$, e sua dominância confirma, por outro caminho, o que o \emph{benchmark} de persistência já indicava --- a informação sobre o prêmio de amanhã está essencialmente no prêmio de hoje. As demais variáveis contribuem de forma marginal nos modelos lineares; na floresta
+aleatória, a variável de calendário mês destaca-se em segundo lugar, embora com
+impacto muito inferior ao do regime e ganho fora da amostra modesto
+(Seção~\ref{subsec:cap5_shap}). A dificuldade de prever o nível do BVRP além de sua própria persistência sugere que o valor prático do prêmio não está na previsão pontual, mas em seu uso como sinal condicionante --- hipótese explorada no Capítulo~\ref{chap:estrategias} e no Capítulo~\ref{chap:regimes}.
 \end{enumerate}
 
 % =========================================================
@@ -334,7 +350,7 @@ elas residem no \textit{estado} de mercado, não na previsão pontual.
 
 As previsões do BVRP podem ser utilizadas como insumo adicional para alocação dinâmica de risco: valores previstos elevados --- isto é, próximos de zero --- sinalizam ambientes em que o prêmio de seguro embutido nas opções encontra-se dissipado, com a volatilidade realizada alcançando a implícita, situação tipicamente associada a períodos de estresse. Em contraste, previsões fortemente negativas indicam ambientes de calmaria, nos quais o prêmio pago pelos compradores de proteção é mais elevado.
 
-A dominância do regime de volatilidade como preditor sugere que estratégias de
+A dominância do regime do BVRP como preditor sugere que estratégias de
 filtragem por regime — em vez de previsões pontuais do nível do BVRP — podem
 ser mais eficazes na prática. Essa hipótese é avaliada diretamente no
 Capítulo~\ref{chap:estrategias}, que analisa a utilidade econômica do BVRP em
