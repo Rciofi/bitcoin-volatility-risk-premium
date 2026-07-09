@@ -4,15 +4,24 @@
 \section{Motivação e Objetivo do Capítulo}
 \label{sec:cap9_motivacao}
 
-Os capítulos anteriores estabeleceram que o Prêmio de Risco de Volatilidade do Bitcoin
-(BVRP) é negativo em média (aproximadamente $-8{,}25$ p.p.) --- consistente com um
-prêmio de seguro pago pelos compradores de opções --- e exibe dinâmica condicional ao
-regime de volatilidade, ainda que sua capacidade preditiva linear sobre retornos
-futuros seja estatisticamente fraca nos horizontes testados. Contudo, os resultados empíricos sugerem
-heterogeneidade importante: a relação entre o BVRP e os retornos futuros não é constante
-ao longo do tempo, e sua magnitude depende do ambiente de volatilidade vigente.
+Os capítulos anteriores estabeleceram que o Prêmio de Risco de
+Volatilidade do Bitcoin (BVRP) é negativo em média (aproximadamente
+$-8{,}25$ p.p.) --- consistente com um prêmio de seguro pago pelos
+compradores de opções --- e que sua capacidade preditiva linear sobre
+retornos futuros é estatisticamente nula nos horizontes testados. A
+magnitude do prêmio, contudo, não é homogênea ao longo do tempo: os
+resultados descritivos sugerem que ela depende do ambiente de
+volatilidade vigente, questão que este capítulo investiga
+sistematicamente.
 
-Essa heterogeneidade já se manifestava nos resultados do Capítulo~\ref{chap:cap5_ml}: a variável que classifica o prêmio corrente em faixas concentra praticamente toda a capacidade preditiva dos modelos supervisionados, indicando que é o nível do BVRP --- e não variáveis auxiliares de retorno ou calendário --- que carrega informação sobre sua trajetória. Resta investigar se esse nível também se relaciona com os retornos futuros do Bitcoin de forma condicional ao ambiente de volatilidade, questão que este capítulo trata diretamente.
+O Capítulo~\ref{chap:cap5_ml} estabeleceu que a dinâmica do próprio
+BVRP não é previsível além de sua persistência: a variável que
+discretiza o prêmio corrente concentra praticamente toda a capacidade
+preditiva dos modelos supervisionados, enquanto retornos defasados e
+calendário contribuem de forma marginal. Resta investigar uma questão
+distinta: se o nível do prêmio se relaciona com os retornos futuros do
+Bitcoin de forma condicional ao ambiente de volatilidade --- questão
+que este capítulo trata diretamente.
 
 O objetivo deste capítulo é analisar o comportamento do BVRP em diferentes ambientes
 de volatilidade. Especificamente, busca-se: (i) caracterizar estatisticamente os
@@ -112,17 +121,45 @@ para cada combinação de regime e horizonte de previsão.
 \input{tables/cap9/tab_cap9_03_retornos_regimes}
 
 O padrão é monotônico e economicamente relevante: em todos os horizontes avaliados
-(1, 5, 10, 20 e 30 dias), o retorno futuro médio é maior no regime de baixa
+(1, 5, 10, 20, 30 e 60 dias), o retorno futuro médio é maior no regime de baixa
 volatilidade do que no regime de alta. Para horizontes curtos (1 dia), as diferenças
-são pequenas e potencialmente ruídosas. Para horizontes mais longos (20 e 30 dias),
-a diferença se torna economicamente substancial: no regime de baixa volatilidade,
-o retorno médio acumulado em 30 dias é de 4,86\%, ao passo que no regime de alta
-volatilidade é de apenas $0{,}06\%$.
+são pequenas e potencialmente ruídosas. A partir de 20 dias, a diferença torna-se economicamente substancial: em
+$h=30$, o retorno médio acumulado é de $4{,}86\%$ no regime de baixa
+volatilidade contra $0{,}06\%$ no de alta; em $h=60$, de $8{,}30\%$ contra
+$3{,}18\%$. A significância estatística dessas diferenças é examinada na
+seção seguinte.
 
 \subsection{Testes de Significância Estatística}
 \label{sec:cap9_ttest}
 
-A Tabela~\ref{tab:cap9_ttest} reporta os testes $t$ para diferenças nas médias de retornos futuros entre os regimes de baixa e alta volatilidade, com correção de Welch para variâncias desiguais. Os resultados estabelecem que diferenças estatisticamente significativas entre regimes emergem apenas a partir do horizonte de $20$ dias: $p = 0{,}0097$ em $h = 20$ e $p = 0{,}0001$ em $h = 30$. Em horizontes curtos --- $h \in \{1, 5, 10\}$ ---, as diferenças entre regimes não atingem significância convencional (valores-$p$ entre $0{,}1598$ e $0{,}8215$).
+A Tabela~\ref{tab:cap9_ttest} reporta os testes de diferença de médias
+entre os regimes de baixa e alta volatilidade sob quatro critérios de
+inferência. O teste $t$ de Welch, aplicado à amostra sobreposta,
+indicaria diferenças significativas a partir de $h = 20$ dias
+($p = 0{,}0097$ em $h=20$; $p = 0{,}0001$ em $h=30$; $p = 0{,}0024$ em
+$h=60$), significância que sobrevive à correção de Benjamini--Hochberg
+para os seis horizontes testados. Esse critério, contudo, é inadequado:
+a correção de Welch acomoda variâncias desiguais entre grupos, mas não
+a autocorrelação induzida pela sobreposição das janelas de retorno --- em
+$h=30$, duas observações consecutivas compartilham 29 dos 30 dias que
+compõem o retorno acumulado.
+
+Duas correções apropriadas conduzem à mesma conclusão. A regressão do
+retorno futuro contra uma \textit{dummy} de regime com erros-padrão HAC
+(Newey--West, $\text{maxlags}=h$) preserva a amostra completa
+($N = 1.775$) e reproduz exatamente as mesmas diferenças pontuais, mas
+não identifica significância em nenhum horizonte (menor valor-$p$ de
+$0{,}356$, em $h=30$). A reamostragem em janelas não sobrepostas ---
+procedimento análogo ao adotado no apêndice deste capítulo --- corrobora
+o resultado (valores-$p$ medianos entre $0{,}508$ e $0{,}822$).
+
+\textbf{A diferença de retornos futuros entre regimes não é
+estatisticamente distinguível de zero sob inferência válida.} O ponto
+estimado é economicamente expressivo --- $4{,}80$ pontos percentuais em
+$h=30$, favoráveis ao regime de baixa volatilidade --- mas a amostra
+contém apenas cerca de 59 janelas independentes de 30 dias em cinco
+anos, precisão insuficiente para estabelecer o efeito. Trata-se de
+limitação de potência amostral, não de evidência de ausência de efeito.
 
 \input{tables/cap9/tab_cap9_04_ttest}
 
@@ -168,9 +205,10 @@ Os resultados da Tabela~\ref{tab:cap9_regressoes} revelam que nenhum dos coefici
 
 Individualmente, o coeficiente $\hat{\beta}_1$ (BVRP) apresenta sinal positivo em todos os horizontes a partir de 5 dias --- e é essencialmente nulo em 1 dia ---, mas não é estatisticamente significativo em nenhum deles ($|t|\leq 1{,}43$). Controlando pelo regime, portanto, o nível do BVRP não prediz de forma confiável os retornos futuros do Bitcoin, resultado coerente com a fraca previsibilidade direcional estabelecida no Capítulo~\ref{chap:resultados_ols}. O sinal positivo, ainda que sem significância, aponta no máximo para uma associação tênue --- insuficiente para sustentar qualquer interpretação preditiva robusta.
 
-O coeficiente $\hat{\beta}_2$ (\emph{dummy} de alta volatilidade) é negativo em todos os horizontes, confirmando o padrão identificado no teste~$t$: períodos de alta volatilidade estão associados a retornos futuros menores. O coeficiente $\hat{\beta}_3$ (interação BVRP\,$\times$\,alta vol) é negativo em todos os horizontes e atinge significância marginal (10\%) apenas em 20 dias ($\hat{\beta}_3 = -0{,}0029$; $t = -1{,}93$). O sinal negativo indica que, dentro do regime de alta volatilidade, a inclinação total do BVRP sobre os retornos ($\hat{\beta}_1 + \hat{\beta}_3$) torna-se negativa, invertendo a associação positiva observada fora desse regime; a evidência, contudo, é fraca --- restrita a um único horizonte e ao nível de 10\% --- e não sustenta conclusões firmes.
-
-A fraca significância estatística dos coeficientes de interesse nas regressões individuais não contradiz os resultados do teste~$t$: as regressões condicionais testam efeitos marginais conjuntos (BVRP e regime de forma simultânea), enquanto o teste~$t$ compara médias incondicionais por regime. A multicolinearidade entre o BVRP e a \emph{dummy} de regime --- dado que o prêmio médio é correlacionado com o regime, como demonstrado na Seção~\ref{sec:cap9_bvrp_regimes} --- pode atenuar a significância individual dos coeficientes mesmo quando os efeitos de regime são economicamente relevantes.
+O coeficiente $\hat{\beta}_2$ (\emph{dummy} de alta volatilidade) é
+negativo em todos os horizontes, na mesma direção da diferença de médias
+reportada na Seção~\ref{sec:cap9_ttest}, mas igualmente sem significância
+estatística. O coeficiente $\hat{\beta}_3$ (interação BVRP\,$\times$\,alta vol) é negativo em todos os horizontes e atinge significância marginal (10\%) apenas em 20 dias ($\hat{\beta}_3 = -0{,}0029$; $t = -1{,}93$). O sinal negativo indica que, dentro do regime de alta volatilidade, a inclinação total do BVRP sobre os retornos ($\hat{\beta}_1 + \hat{\beta}_3$) torna-se negativa, invertendo a associação positiva observada fora desse regime; a evidência, contudo, é fraca --- restrita a um único horizonte e ao nível de 10\% --- e não sustenta conclusões firmes.
 
 A Figura~\ref{fig:cap9_scatter_bvrp_ret} apresenta diagramas de dispersão do BVRP
 versus retorno futuro, desagregados por regime, para os horizontes de 5, 10 e 20 dias.
@@ -214,16 +252,36 @@ Cabe notar que a ausência de assimetria por sinal não exclui formas mais sutis
 \section{Síntese das evidências sobre regimes}
 \label{sec:cap9_sintese}
 
-Os resultados deste capítulo estabelecem três conclusões empíricas sobre a heterogeneidade do BVRP por regime de volatilidade realizada:
+Os resultados deste capítulo estabelecem quatro conclusões empíricas sobre a heterogeneidade do BVRP por regime de volatilidade realizada:
 
 \paragraph{Achado 1 --- Dissipação do prêmio em regimes de estresse.} O BVRP médio varia de forma sistemática entre regimes: $-13{,}20$ p.p. em baixa volatilidade, $-10{,}24$ p.p. em média volatilidade, e $+0{,}66$ p.p. em alta volatilidade. A magnitude do prêmio de seguro, portanto, não é constante --- ela se concentra em períodos de calmaria e praticamente desaparece em períodos de estresse, quando a volatilidade realizada alcança ou supera a implícita.
 
-\paragraph{Achado 2 --- Significância estatística apenas em horizontes médios.} Diferenças de retorno futuro entre regimes de baixa e alta volatilidade atingem significância estatística apenas a partir de $h = 20$ dias ($p = 0{,}0097$) e tornam-se mais robustas em $h = 30$ dias ($p = 0{,}0001$). Em horizontes curtos ($h \leq 10$), os valores-$p$ situam-se entre $0{,}16$ e $0{,}82$, indicando que o efeito de regime não opera em frequências de curtíssimo prazo.
+\paragraph{Achado 2 --- Ausência de diferença estatisticamente
+significativa nos retornos futuros entre regimes.} Os retornos futuros
+médios são sistematicamente maiores no regime de baixa volatilidade, com
+diferença que cresce com o horizonte e atinge $4{,}80$ pontos
+percentuais em $h=30$. Sob inferência robusta à sobreposição das janelas
+(Newey--West sobre a amostra completa; reamostragem não sobreposta),
+contudo, nenhum horizonte alcança significância convencional. O efeito
+de regime sobre retornos futuros, se existe, não é identificável com a
+precisão que esta amostra permite.
 
-\paragraph{Achado 3 --- Heterogeneidade como motivação para modelos não lineares.} A combinação de prêmio condicionalmente variável, dispersão dramaticamente maior em estresse e significância restrita a horizontes médios sugere que a relação entre BVRP e dinâmica futura do Bitcoin é estruturalmente não linear. Esse achado motiva diretamente o uso de modelos não paramétricos (Capítulo~\ref{chap:cap5_ml}), nos quais a variável de regime do BVRP emerge como o preditor dominante --- confirmação independente da hipótese H4 formulada no Capítulo~\ref{chap:introducao}.
+\paragraph{Achado 3 --- Heterogeneidade do prêmio, não dos retornos.} A
+variação sistemática do BVRP entre regimes (Achado 1), combinada à
+dispersão dramaticamente maior sob estresse, caracteriza o prêmio como
+estruturalmente condicional ao ambiente de volatilidade. Essa
+heterogeneidade é uma propriedade do prêmio em si --- mensurada
+contemporaneamente, sem sobreposição de janelas --- e não se estende à
+sua relação com retornos futuros, que permanece estatisticamente
+indistinguível de zero (Achado 2). A hipótese H4, formulada no
+Capítulo~\ref{chap:introducao}, é confirmada nessa dimensão: o prêmio
+varia com o estado do mercado. A investigação de modelos não
+paramétricos (Capítulo~\ref{chap:cap5_ml}) responde a uma questão
+distinta --- se a dinâmica do próprio BVRP é previsível fora da amostra
+--- e conclui que não, além de sua própria persistência.
 
 
-\paragraph{Achado 4 --- Ausência de leverage effect.} A análise condicional ao sinal do retorno corrente (Seção~\ref{sec:cap9_sinal_retorno}) estabelece que o BVRP do Bitcoin não exibe assimetria estatisticamente significativa em função da direção do movimento recente de preço, em contraste com o \textit{leverage effect} documentado em mercados de equity. Esse resultado adiciona dimensão complementar à evidência de heterogeneidade condicional: o prêmio de risco de variância é estruturalmente sensível ao \textit{nível} de volatilidade realizada (Achados 1 a 3), mas não ao \textit{sinal} do retorno corrente.
+\paragraph{Achado 4 --- Ausência de leverage effect.} A análise condicional ao sinal do retorno corrente (Seção~\ref{sec:cap9_sinal_retorno}) estabelece que o BVRP do Bitcoin não exibe assimetria estatisticamente significativa em função da direção do movimento recente de preço, em contraste com o \textit{leverage effect} documentado em mercados de equity. Esse resultado adiciona dimensão complementar à evidência de heterogeneidade condicional: o prêmio de risco de variância é estruturalmente sensível ao \textit{nível} de volatilidade realizada (Achados 1 e 3), mas não ao \textit{sinal} do retorno corrente.
 
 \paragraph{Limitação --- quebra estrutural associada aos ETFs \textit{spot}.} A aprovação dos ETFs \textit{spot} de Bitcoin pela SEC em janeiro de 2024 ocorreu dentro do período amostral desta dissertação e introduziu canal institucional regulado de exposição ao Bitcoin que pode ter alterado a dinâmica de demanda por proteção via opções, e consequentemente o comportamento do BVRP. A análise principal trata a amostra como bloco único, hipótese que se justifica pela transição gradual do mercado, mas que pode ser testada formalmente em extensões futuras por meio de procedimentos como os testes de Chow, CUSUM ou janelas móveis de regressão centradas em torno da data da aprovação. Adicionalmente, a estimação separada dos parâmetros para os subperíodos pré-ETF (mar/2021 a jan/2024) e pós-ETF (jan/2024 a mar/2026) permitiria avaliar se o sinal e a magnitude do prêmio de seguro se modificaram de forma sistemática após o ingresso institucional pleno.
 

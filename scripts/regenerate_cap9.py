@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
 matplotlib.rcParams.update({
     "font.family": "serif",
@@ -40,7 +41,7 @@ OUT_TABS = ROOT / "tables" / "cap9"
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
 
-HORIZONS = [1, 5, 10, 20, 30]
+HORIZONS = [1, 5, 10, 20, 30, 60]
 REGIMES = ["Baixa volatilidade", "Média volatilidade", "Alta volatilidade"]
 COLORS = {"Baixa volatilidade": "#2e75b6", "Média volatilidade": "#70ad47", "Alta volatilidade": "#c00000"}
 
@@ -87,6 +88,33 @@ def stars(p):
 def fmt_br(x, decimals=4):
     """Formata número com vírgula decimal (padrão ABNT)."""
     return f"{x:.{decimals}f}".replace(".", ",")
+
+
+def p_nw(df, h, col_ret, col_regime="regime_vol"):
+    """Regressao do retorno futuro contra dummy de regime (Alta vs Baixa),
+    amostra completa, erro-padrao HAC (Newey-West) com maxlags=h.
+    Retorna (p-valor, coeficiente) da dummy."""
+    sub = df[df[col_regime].isin(["Baixa volatilidade", "Alta volatilidade"])]
+    y = sub[col_ret]
+    X = sm.add_constant((sub[col_regime] == "Alta volatilidade").astype(float))
+    res = sm.OLS(y, X).fit(cov_type="HAC", cov_kwds={"maxlags": h})
+    return float(res.pvalues.iloc[1]), float(res.params.iloc[1])
+
+
+def p_nao_sobreposto(df, h, col_ret, col_regime="regime_vol"):
+    """Mediana do p-valor (Welch) sobre h subamostras de fase j=0..h-1,
+    cada uma com observacoes espacadas em h dias (nao sobrepostas)."""
+    p_vals = []
+    for j in range(h):
+        sub = df.iloc[j::h]
+        alta = sub.loc[sub[col_regime] == "Alta volatilidade", col_ret].dropna()
+        baixa = sub.loc[sub[col_regime] == "Baixa volatilidade", col_ret].dropna()
+        if len(alta) >= 5 and len(baixa) >= 5:
+            _, p_j = stats.ttest_ind(alta, baixa, equal_var=False)
+            p_vals.append(p_j)
+    if len(p_vals) == 0:
+        return np.nan, 0
+    return float(np.median(p_vals)), len(p_vals)
 
 
 # ── 3. Tab 9.1 — Frequência dos regimes ──────────────────────────────────────
@@ -179,10 +207,23 @@ for h in HORIZONS:
     alta = df.loc[df["regime_vol"] == "Alta volatilidade", col].dropna()
     baixa = df.loc[df["regime_vol"] == "Baixa volatilidade", col].dropna()
     t_stat, p_val = stats.ttest_ind(alta, baixa, equal_var=False)
+    p_ns, n_fases = p_nao_sobreposto(df, h, col)
+    p_nw_val, coef_nw = p_nw(df, h, col)
     test_rows.append({
         "h": h, "media_alta": alta.mean(), "media_baixa": baixa.mean(),
         "dif": alta.mean() - baixa.mean(), "t": t_stat, "p": p_val,
+        "p_ns": p_ns, "n_fases": n_fases, "p_nw": p_nw_val, "coef_nw": coef_nw,
     })
+
+_, p_fdr_arr, _, _ = multipletests([r["p"] for r in test_rows], method="fdr_bh")
+for r, p_fdr in zip(test_rows, p_fdr_arr):
+    r["p_fdr"] = p_fdr
+
+print("\n[Tab 9.4] p bruto, p (FDR), p (NW) e p (nao sobreposto, mediana de N fases):")
+for r in test_rows:
+    print(f"  h={r['h']:<3d} p={r['p']:.4f}  p_fdr={r['p_fdr']:.4f}  "
+          f"p_nw={r['p_nw']:.4f} (coef_nw={r['coef_nw']*100:.4f}%)  "
+          f"p_ns={r['p_ns']:.4f} (N_fases={r['n_fases']})")
 
 lines = [
     r"\begin{table}[H]",
@@ -190,22 +231,29 @@ lines = [
     r"\small",
     r"\caption{Teste $t$ de Welch: diferença de retornos futuros entre regimes de alta e baixa volatilidade.}",
     r"\label{tab:cap9_ttest}",
-    r"\begin{tabular}{lrrrrc}",
+    r"\begin{tabular}{lrrrrcccc}",
     r"\toprule",
-    r"Horizonte & Média Alta Vol & Média Baixa Vol & Diferença & $t$-stat & $p$-valor \\",
+    r"Horizonte & Média Alta Vol & Média Baixa Vol & Diferença & $t$-stat & $p$-valor & $p$ (FDR) & $p$ (NW) & $p$ (não sobrep.) \\",
     r"\midrule",
 ]
 for r in test_rows:
     sig = stars(r["p"])
     lines.append(
         f"{r['h']}d & {fmt_br(r['media_alta']*100)} & {fmt_br(r['media_baixa']*100)} "
-        f"& {fmt_br(r['dif']*100)} & {fmt_br(r['t'])} & {fmt_br(r['p'])}{sig} \\\\"
+        f"& {fmt_br(r['dif']*100)} & {fmt_br(r['t'])} & {fmt_br(r['p'])}{sig} "
+        f"& {fmt_br(r['p_fdr'])} & {fmt_br(r['p_nw'])} & {fmt_br(r['p_ns'])} \\\\"
     )
 lines += [
     r"\bottomrule",
     r"\end{tabular}",
     r"\par\smallskip",
-    r"\footnotesize\textit{Nota}: Retornos expressos em \%. *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$.",
+    r"\footnotesize\textit{Nota}: Retornos expressos em \%. *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$ (estrelas ancoradas no $p$-valor bruto). "
+    r"$p$ (FDR): correção de Benjamini--Hochberg sobre os "
+    + str(len(HORIZONS))
+    + r" horizontes testados. $p$ (NW): regressão do retorno futuro contra dummy de regime "
+      r"(alta vs.\ baixa volatilidade), amostra completa, erro-padrão HAC (Newey--West) com "
+      r"$\text{maxlags}=h$. $p$ (não sobrep.): mediana do $p$-valor de Welch sobre subamostras "
+      r"não sobrepostas (fases $j=0,\ldots,h-1$, espaçadas em $h$ dias).",
     r"\end{table}",
 ]
 (OUT_TABS / "tab_cap9_04_ttest.tex").write_text("\n".join(lines), encoding="utf-8")
