@@ -146,8 +146,10 @@ compõem o retorno acumulado.
 
 Duas correções apropriadas conduzem à mesma conclusão. A regressão do
 retorno futuro contra uma \textit{dummy} de regime com erros-padrão HAC
-(Newey--West, $\text{maxlags}=h$) preserva a amostra completa
-($N = 1.775$) e reproduz exatamente as mesmas diferenças pontuais, mas
+(Newey--West, $\text{maxlags}=h$) utiliza todas as observações dos dois
+regimes contrastados ($N = 888$; o regime intermediário é excluído,
+como no teste de Welch) e reproduz exatamente as mesmas diferenças
+pontuais, mas
 não identifica significância em nenhum horizonte (menor valor-$p$ de
 $0{,}356$, em $h=30$). A reamostragem em janelas não sobrepostas ---
 procedimento análogo ao adotado no apêndice deste capítulo --- corrobora
@@ -163,7 +165,19 @@ limitação de potência amostral, não de evidência de ausência de efeito.
 
 \input{tables/cap9/tab_cap9_04_ttest}
 
-A direção do efeito, contudo, contraria a intuição clássica. Conforme reportado na Tabela~\ref{tab:cap9_retornos_regimes}, retornos médios em horizontes longos são \emph{maiores} no regime de baixa volatilidade ($4{,}86\%$ em $h = 30$) do que no regime de alta volatilidade ($0{,}06\%$ em $h = 30$). Esse padrão sugere que os retornos do Bitcoin tendem a se concentrar em períodos de baixa volatilidade, momento em que o prêmio de seguro precificado nas opções é mais elevado. A interpretação econômica é coerente com a lógica de aversão ao risco: investidores exigem prêmio maior de proteção justamente nos períodos em que o mercado, no agregado, oferece retornos superiores --- relação que não pode ser explorada por estratégias lineares simples, dada a fraca previsibilidade documentada no Capítulo~\ref{chap:resultados_ols}.
+A direção do padrão, ainda que não estabelecida estatisticamente,
+merece registro por contrariar a intuição clássica. Conforme reportado
+na Tabela~\ref{tab:cap9_retornos_regimes}, os retornos médios em
+horizontes longos são \emph{maiores} no regime de baixa volatilidade
+($4{,}86\%$ em $h = 30$) do que no regime de alta volatilidade
+($0{,}06\%$ em $h = 30$). Esse padrão sugere que os retornos do Bitcoin
+tendem a se concentrar em períodos de baixa volatilidade, momento em que
+o prêmio de seguro precificado nas opções é mais elevado. A leitura
+econômica seria coerente com a lógica de aversão ao risco: investidores
+exigiriam prêmio maior de proteção justamente nos períodos em que o
+mercado, no agregado, oferece retornos superiores. A precisão amostral
+disponível, contudo, não permite distinguir essa hipótese de variação
+aleatória.
 
 A Figura~\ref{fig:cap9_boxplot_ret_regimes} ilustra as distribuições condicionais
 dos retornos futuros para os horizontes de 5, 10 e 20 dias.
@@ -220,7 +234,8 @@ versus retorno futuro, desagregados por regime, para os horizontes de 5, 10 e 20
 A linha tracejada representa a linha de tendência linear incondicional para toda
 a amostra. A separação vertical entre os pontos dos regimes de alta (vermelho) e
 baixa (azul) volatilidade torna-se progressivamente mais pronunciada com o horizonte,
-consistente com os resultados do teste $t$.}
+ainda que a diferença não seja estatisticamente significativa
+sob inferência robusta à sobreposição.}
 \label{fig:cap9_scatter_bvrp_ret}
 \end{figure}
 

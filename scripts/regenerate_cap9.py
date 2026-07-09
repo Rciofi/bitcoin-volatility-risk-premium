@@ -229,8 +229,9 @@ lines = [
     r"\begin{table}[H]",
     r"\centering",
     r"\small",
-    r"\caption{Teste $t$ de Welch: diferença de retornos futuros entre regimes de alta e baixa volatilidade.}",
+    r"\caption{Diferença de retornos futuros entre regimes de alta e baixa volatilidade, sob quatro critérios de inferência.}",
     r"\label{tab:cap9_ttest}",
+    r"\resizebox{\textwidth}{!}{%",
     r"\begin{tabular}{lrrrrcccc}",
     r"\toprule",
     r"Horizonte & Média Alta Vol & Média Baixa Vol & Diferença & $t$-stat & $p$-valor & $p$ (FDR) & $p$ (NW) & $p$ (não sobrep.) \\",
@@ -246,13 +247,14 @@ for r in test_rows:
 lines += [
     r"\bottomrule",
     r"\end{tabular}",
+    r"}",
     r"\par\smallskip",
     r"\footnotesize\textit{Nota}: Retornos expressos em \%. *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$ (estrelas ancoradas no $p$-valor bruto). "
     r"$p$ (FDR): correção de Benjamini--Hochberg sobre os "
     + str(len(HORIZONS))
-    + r" horizontes testados. $p$ (NW): regressão do retorno futuro contra dummy de regime "
-      r"(alta vs.\ baixa volatilidade), amostra completa, erro-padrão HAC (Newey--West) com "
-      r"$\text{maxlags}=h$. $p$ (não sobrep.): mediana do $p$-valor de Welch sobre subamostras "
+    + r" horizontes testados. $p$ (NW): regressão do retorno futuro contra dummy de regime, "
+      r"sobre as observações dos regimes de alta e baixa volatilidade ($N=888$), erro-padrão "
+      r"HAC (Newey--West) com $\text{maxlags}=h$. $p$ (não sobrep.): mediana do $p$-valor de Welch sobre subamostras "
       r"não sobrepostas (fases $j=0,\ldots,h-1$, espaçadas em $h$ dias).",
     r"\end{table}",
 ]
