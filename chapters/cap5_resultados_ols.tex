@@ -1,8 +1,12 @@
 ﻿\chapter{Evidência econométrica: BVRP e retornos futuros}
 \label{chap:resultados_ols}
-Este capítulo investiga, por meio de regressões econométricas com erros-padrão
-robustos, em que medida o BVRP carrega informação sobre os retornos futuros
-do Bitcoin. A análise emprega o estimador de Mínimos Quadrados Ordinários
+Este capítulo estabelece dois resultados. Em primeiro lugar, testa
+formalmente a existência do prêmio de risco de volatilidade (H1),
+verificando se sua média amostral difere de zero sob inferência robusta à
+autocorrelação. Em segundo lugar, investiga, por meio de regressões
+econométricas com erros-padrão robustos, em que medida o BVRP carrega
+informação sobre os retornos futuros do Bitcoin (H2). A análise emprega o
+estimador de Mínimos Quadrados Ordinários
 (MQO) com correção de Newey--West para autocorrelação e heterocedasticidade,
 calibrada com defasagens iguais ao horizonte de previsão ($\text{maxlags} = h$)
 --- especificação consistente com a presença de retornos sobrepostos. Como
@@ -11,7 +15,9 @@ reamostragem em blocos (\textit{Moving Block Bootstrap}), procedimento não
 paramétrico que dispensa hipóteses assintóticas e é particularmente adequado
 a séries persistentes, como o BVRP.
 
-O capítulo está organizado da seguinte forma. A Seção~\ref{sec:cap5-motivacao}
+O capítulo está organizado da seguinte forma. A Seção~\ref{sec:cap5-h1}
+testa formalmente a existência do prêmio (H1) por meio da média amostral do
+BVRP. A Seção~\ref{sec:cap5-motivacao}
 motiva a investigação econométrica e formaliza a especificação básica. A
 Seção~\ref{sec:cap5-univariado} reporta os resultados do modelo univariado em
 seis horizontes de previsão. A Seção~\ref{sec:cap5-rv-iv} apresenta a
@@ -21,6 +27,46 @@ colinearidade perfeita por construção. A Seção~\ref{sec:cap5-robustez}
 confirma os resultados por meio de bootstrap em blocos e correção para
 múltiplos testes. A Seção~\ref{sec:cap5-implicacoes} discute a implicação
 econômica central dos achados.
+
+% =========================================================
+\section{Existência do prêmio: teste da hipótese H1}
+\label{sec:cap5-h1}
+% =========================================================
+
+Antes de investigar o conteúdo preditivo do BVRP, esta seção estabelece
+formalmente sua existência como prêmio de risco. A hipótese H1 postula que
+o BVRP é sistematicamente diferente de zero e, em particular, negativo ---
+condição necessária para a interpretação de prêmio de seguro pago pelos
+compradores de opções.
+
+O teste consiste em uma regressão do BVRP contra uma constante,
+$\text{BVRP}_t = \mu + \varepsilon_t$, com teste da hipótese nula
+$H_0: \mu = 0$. Dada a elevada autocorrelação da série
+(Capítulo~\ref{chap:referencial}), o erro-padrão convencional subestima
+severamente a variância da média amostral: a inferência é conduzida com
+erros-padrão HAC (Newey--West), adotando 30 defasagens --- horizonte a
+partir do qual a autocorrelação do BVRP torna-se praticamente nula. Essa
+escolha é conservadora: a regra de referência de Newey--West para uma
+amostra de 1.775 observações sugeriria aproximadamente 8 defasagens, de
+modo que a especificação adotada infla o erro-padrão além do necessário.
+
+A Tabela~\ref{tab:cap5-h1-teste-media} reporta os resultados.
+
+\IfFileExists{tables/cap5/tab_cap5_h1_teste_media.tex}{
+  \input{tables/cap5/tab_cap5_h1_teste_media}
+}{}
+
+A média amostral do BVRP é de $-8{,}25$ p.p., com erro-padrão HAC de
+$1{,}29$ p.p. --- 4,2 vezes superior ao erro-padrão convencional
+($0{,}30$ p.p.), o que ilustra a magnitude da correção necessária. A
+estatística $t$ resultante é de $-6{,}41$, com valor-$p$ da ordem de
+$10^{-10}$. A hipótese nula de prêmio nulo é rejeitada com ampla margem,
+mesmo sob a especificação conservadora de 30 defasagens.
+
+\textbf{H1 é confirmada:} o prêmio de risco de volatilidade do Bitcoin
+existe, é negativo e é estatisticamente robusto. Este resultado independe
+de qualquer especificação preditiva e constitui a base sobre a qual as
+demais hipóteses são investigadas.
 
 % =========================================================
 \section{Motivação e especificação básica}
@@ -240,8 +286,9 @@ de 1 a 60 dias.
 
 A interpretação econômica desse achado merece três observações. Em primeiro
 lugar, a ausência de previsibilidade linear não invalida a existência do
-BVRP como variável economicamente relevante: o Capítulo~\ref{chap:dados}
-documenta média negativa de aproximadamente $-8{,}25$ p.p., consistente com
+BVRP como variável economicamente relevante: a Seção~\ref{sec:cap5-h1}
+estabelece média negativa de $-8{,}25$ p.p., estatisticamente significativa
+sob inferência HAC, consistente com
 a interpretação clássica de prêmio de risco de volatilidade capturado pelos
 vendedores de volatilidade (e pago pelos compradores de opções que buscam
 proteção). O que os resultados deste capítulo estabelecem é que esse prêmio,
