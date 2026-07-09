@@ -102,7 +102,7 @@ print("Escrevendo tabela: tables/cap5/tab_cap5_h1_teste_media.tex")
 print("=" * 70)
 p_hac_exp = int(np.floor(np.log10(p_hac)))
 p_hac_mantissa = p_hac / (10 ** p_hac_exp)
-p_hac_latex = r"${:.2f} \times 10^{{{}}}$".format(p_hac_mantissa, p_hac_exp).replace(".", "{,}")
+p_hac_latex = r"${:.2f} \times 10^{{{}}}$".format(p_hac_mantissa, p_hac_exp)
 
 lines = [
     r"\begin{table}[H]",
