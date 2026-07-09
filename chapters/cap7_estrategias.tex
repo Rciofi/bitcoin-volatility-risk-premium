@@ -85,7 +85,7 @@ O limiar é recalculado em janela expansiva a cada instante $t$, utilizando apen
 a distribuição histórica do BVRP disponível até $t-1$, de modo que não existe
 um valor fixo único para o percentil 80 ao longo da amostra.
 
-A interpretação econômica é diretamente conectada à evidência do Capítulo~\ref{chap:regimes}: valores elevados do BVRP --- isto é, próximos de zero ou positivos --- refletem condições em que a volatilidade realizada alcança ou supera a implícita, dissipando o prêmio de seguro embutido nos preços de opções. Esses estados concentram-se em regimes de alta volatilidade realizada, nos quais o BVRP médio é de aproximadamente $-2{,}64\%$, contra $-11{,}97\%$ em regimes de baixa volatilidade. A motivação para o uso do BVRP como sinal de posicionamento não repousa em previsibilidade linear --- ausente nos dados, conforme demonstrado no Capítulo~\ref{chap:resultados_ols} ---, mas em uma hipótese de filtragem condicional: que a dissipação do prêmio identifique episódios em que o mercado de opções deixou de precificar proteção de forma conservadora, sinalizando ambientes de risco distintos. Sob essa ótica, a estratégia não busca prever a direção dos retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
+A interpretação econômica é diretamente conectada à evidência do Capítulo~\ref{chap:regimes}: valores elevados do BVRP --- isto é, próximos de zero ou positivos --- refletem condições em que a volatilidade realizada alcança ou supera a implícita, dissipando o prêmio de seguro embutido nos preços de opções. Esses estados concentram-se em regimes de alta volatilidade realizada, nos quais o BVRP médio é de aproximadamente $+0{,}66$ p.p., contra $-13{,}20$ p.p. em regimes de baixa volatilidade. A motivação para o uso do BVRP como sinal de posicionamento não repousa em previsibilidade linear --- ausente nos dados, conforme demonstrado no Capítulo~\ref{chap:resultados_ols} ---, mas em uma hipótese de filtragem condicional: que a dissipação do prêmio identifique episódios em que o mercado de opções deixou de precificar proteção de forma conservadora, sinalizando ambientes de risco distintos. Sob essa ótica, a estratégia não busca prever a direção dos retornos, mas \textit{selecionar} estados de mercado com perfil de risco favorável.
 
 A Tabela~\ref{tab:cap7_bvrp_q_perf} reporta as métricas de desempenho da estratégia condicional ao BVRP, tendo como referência o compra e manutenção restrito ao mesmo período operacional (1\textsuperscript{o} de dezembro de 2021 a 3 de março de 2026, $N = 1.523$) --- o benchmark casado discutido na Seção~\ref{sec:cap7_bh}. As Figuras~\ref{fig:cap7_bvrp_q_cumret} e~\ref{fig:cap7_bh_vs_bvrp_q_cumret} apresentam, respectivamente, o retorno acumulado da estratégia e sua comparação com o compra e manutenção nesse mesmo período.
 
@@ -245,16 +245,17 @@ Os regimes são definidos a partir dos tercis da distribuição da volatilidade 
 a regra condicional ao BVRP com limiar no quantil 80\%, mas a tomada de posição é
 restrita aos dias pertencentes a cada regime.
 
-Essa decomposição é motivada pela evidência do Capítulo~\ref{chap:dados}, que
-documentou heterogeneidade temporal pronunciada no BVRP: o prêmio é negativo em
-todos os regimes de volatilidade realizada, mas sua magnitude varia
+Essa decomposição é motivada pela evidência do Capítulo~\ref{chap:regimes}, que
+documentou heterogeneidade pronunciada no BVRP: a magnitude do prêmio varia
 sistematicamente com o estado do mercado. Em regimes de baixa e média
-volatilidade realizada, o BVRP médio é fortemente negativo ($-11{,}97\%$ e
-$-10{,}15\%$, respectivamente), refletindo um prêmio de seguro elevado --- a
+volatilidade realizada, o BVRP médio é fortemente negativo ($-13{,}20$ p.p. e
+$-10{,}24$ p.p., respectivamente), refletindo um prêmio de seguro elevado --- a
 volatilidade implícita supera amplamente a realizada. Em regimes de alta
-volatilidade realizada, o prêmio se comprime em direção a zero ($-2{,}64\%$),
-pois a volatilidade efetivamente observada aproxima-se da antecipada pelo mercado
-de opções.
+volatilidade realizada, o prêmio desaparece e torna-se marginalmente positivo
+($+0{,}66$ p.p.), pois a volatilidade efetivamente observada supera a
+antecipada pelo mercado de opções. A partição adotada nesta seção utiliza
+tercis de RV, e não os quartis do Capítulo~\ref{chap:regimes}; os limiares
+diferem, mas o padrão qualitativo é o mesmo.
 
 A Tabela~\ref{tab:cap7_bvrp_regimes_perf} reporta as métricas de desempenho por
 regime, enquanto as Figuras~\ref{fig:cap7_bvrp_regimes_cumret}
