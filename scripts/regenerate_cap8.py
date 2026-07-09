@@ -65,7 +65,7 @@ FEATURE_LABELS = {
     "ret_lag_20":     "Retorno defasado (20d)",
     "d_iv_1d":        "Variação da IV (1d)",
     "d_vrp_1d":       "Variação do BVRP (1d)",
-    "vrp_regime_num": "Regime de volatilidade",
+    "vrp_regime_num": "Regime do BVRP",
 }
 
 df = pd.read_csv(DATA_PATH, parse_dates=["date"]).sort_values("date").set_index("date")

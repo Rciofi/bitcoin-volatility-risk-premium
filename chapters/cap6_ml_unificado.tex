@@ -76,14 +76,10 @@ todas medidas em $t$ para garantir o protocolo estritamente \textit{ex ante}:
 \begin{itemize}
     \item \textbf{Variação de volatilidade e prêmio:} variação diária da IV
     (\texttt{d\_iv\_1d}) e variação diária do BVRP (\texttt{d\_vrp\_1d}). O nível
-    de \texttt{rv\_30d} e \texttt{iv\_30d}, bem como o valor contemporâneo do
-    BVRP, \textbf{não} entram como regressores — apenas suas variações de um dia;
+    de \texttt{rv\_30d} e \texttt{iv\_30d} \textbf{não} entra como regressor --- apenas suas variações de um dia;
     \item \textbf{Retorno:} retorno diário corrente e retornos defasados em
     $h \in \{1, 5, 20\}$ dias;
-    \item \textbf{Regime de volatilidade:} variável categórica construída com janela
-    expansiva (quantis $1/3$ e $2/3$ recalculados a cada $t$ usando apenas
-    dados até $t$, com período mínimo de 252 observações), evitando viés de
-    antecipação;
+    \item \textbf{Regime do BVRP:} variável categórica que classifica o prêmio corrente em três faixas (baixa, média e alta), com limiares dados pelos quantis $1/3$ e $2/3$ da distribuição histórica do próprio BVRP, recalculados a cada $t$ com janela expansiva e período mínimo de 252 observações --- utilizando, portanto, apenas informação disponível até $t$;
     \item \textbf{Variáveis de calendário:} dia da semana, mês, indicadores de início
     e fim de mês.
 \end{itemize}
@@ -94,7 +90,7 @@ não estacionário) foi substituída por retornos e variações, eliminando o co
 $I(1)$ identificado nos testes de raiz unitária do Capítulo~\ref{chap:dados}.
 Note-se que \texttt{rv\_30d} e \texttt{iv\_30d} em nível também foram excluídos do
 vetor de regressores, para evitar redundância direta com a variável-alvo
-($\text{BVRP} = \text{RV} - \text{IV}$).
+($\text{BVRP} = \text{RV} - \text{IV}$). Cabe explicitar, contudo, que o prêmio corrente integra o vetor de preditores de duas formas indiretas: por sua variação diária (\texttt{d\_vrp\_1d}) e pela variável categórica de regime, que o discretiza em três faixas. O que não integra a matriz é o \emph{nível contínuo} de BVRP$_t$ --- exatamente o valor utilizado pelo \emph{benchmark} de persistência. Essa distinção é central para a interpretação dos resultados: os modelos dispõem de uma representação grosseira do prêmio corrente, mas não de seu valor pontual.
 
 \subsection{Protocolo de avaliação fora da amostra}
 \label{subsec:cap5_protocolo}
@@ -228,14 +224,7 @@ amostra em torno de 0,42 a 0,44 (floresta aleatória 0,42, \textit{Gradient Boos
 persistência. Nenhuma família de modelos supervisionados se aproxima da referência
 de último valor.
 
-Esse resultado tem explicação direta e verificável: a matriz de preditores não inclui
-o valor contemporâneo do BVRP ($\text{BVRP}_t$), apenas variáveis de volatilidade,
-retorno e calendário observadas em $t$. Como o benchmark de persistência é exatamente
-$\text{BVRP}_t$, os modelos competem sem acesso ao único regressor que replicaria
-trivialmente a referência. O que os modelos capturam, portanto, é a informação
-\textit{incremental} sobre o BVRP futuro contida nas demais variáveis — e essa
-informação, isoladamente, explica menos da metade da variância que a própria
-persistência da série.
+Esse resultado tem explicação direta e verificável, e ela reside na granularidade da informação disponível a cada abordagem. O \emph{benchmark} de persistência utiliza o valor contínuo de BVRP$_t$. Os modelos supervisionados acessam o prêmio corrente apenas de forma indireta: por sua variação diária e pela variável de regime, que o discretiza em três faixas. A comparação, portanto, não opõe modelos com informação a modelos sem informação --- ela mede quanto da previsibilidade sobrevive à categorização do preditor mais relevante. A resposta é: menos da metade. Nenhuma das demais variáveis --- retornos defasados, variação da IV, calendário --- recupera o que a discretização descarta.
 
 \input{tables/tab8/tab8_oos_performance}
 
@@ -324,26 +313,14 @@ Três achados merecem destaque:
     --- incluindo o MQO não penalizado --- convergem para $R^2 \approx 0{,}39$, e os
     baseados em árvores para $R^2 \approx 0{,}42\text{--}0{,}44$; todos superam muito
     a média incondicional, mas ficam muito aquém do benchmark de último valor. Como
-    a matriz de preditores não contém $\text{BVRP}_t$, o exercício mede a informação
-    incremental das demais variáveis --- que é limitada em horizonte de um dia;
+    a matriz contém o prêmio corrente apenas em forma discretizada e em variação, o exercício mede quanto da previsibilidade sobrevive quando o nível contínuo de BVRP$_t$ é substituído por uma representação categórica --- e a resposta é: menos da metade;
 
     \item \textbf{A não linearidade não resgata o desempenho.} Floresta aleatória e
     \textit{Gradient Boosting} não se distanciam materialmente dos modelos lineares,
     indicando que interações e não linearidades entre os preditores disponíveis não
     contêm sinal explorável relevante sobre o nível do BVRP;
 
-    \item \textbf{A variável de regime é o preditor mais robusto} em todos os
-    modelos. Sob preditores padronizados, o coeficiente do regime de volatilidade
-    domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$
-    dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável
-    --- ausência de divergência que indica não haver colinearidade severa entre os
-    preditores retidos. Na floresta aleatória, a importância SHAP aponta o regime
-    como dominante isolado, à frente de todos os demais. Essa convergência entre
-    modelos lineares e não lineares desloca a leitura do BVRP: seu valor não está na
-    previsão pontual do nível diário, mas na identificação do \textit{estado} de
-    mercado. Essa evidência motiva o condicionamento a regimes explorado nos
-    Capítulos~\ref{chap:estrategias} e~\ref{chap:regimes}, em vez da previsão de
-    nível.
+    \item \textbf{O regime do BVRP concentra praticamente toda a capacidade preditiva.} Sob preditores padronizados, o coeficiente do regime domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$ dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável --- ausência de divergência que indica não haver colinearidade severa entre os preditores retidos. Na floresta aleatória, a importância SHAP aponta a mesma variável como dominante isolada. A convergência entre modelos lineares e não lineares é informativa, mas a leitura correta não é que o estado de mercado carregue informação especial: a variável de regime é uma discretização do próprio BVRP$_t$, e sua dominância confirma, por outro caminho, o que o \emph{benchmark} de persistência já indicava --- a informação sobre o prêmio de amanhã está essencialmente no prêmio de hoje. As demais variáveis contribuem de forma marginal e homogênea, sem que nenhuma se destaque. A dificuldade de prever o nível do BVRP além de sua própria persistência sugere que o valor prático do prêmio não está na previsão pontual, mas em seu uso como sinal condicionante --- hipótese explorada no Capítulo~\ref{chap:estrategias} e no Capítulo~\ref{chap:regimes}.
 \end{enumerate}
 
 % =========================================================

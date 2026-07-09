@@ -12,11 +12,7 @@ futuros seja estatisticamente fraca nos horizontes testados. Contudo, os resulta
 heterogeneidade importante: a relação entre o BVRP e os retornos futuros não é constante
 ao longo do tempo, e sua magnitude depende do ambiente de volatilidade vigente.
 
-O indicador de regime de volatilidade realizada figurou como o preditor de maior
-importância no modelo de \textit{floresta aleatória} do Capítulo~\ref{chap:cap5_ml},
-respondendo por aproximadamente 69\% da importância total. Isso motiva a investigação
-direta da dependência entre o nível do BVRP, o regime de volatilidade
-vigente e a relação condicional do prêmio com os retornos futuros do Bitcoin.
+Essa heterogeneidade já se manifestava nos resultados do Capítulo~\ref{chap:cap5_ml}: a variável que classifica o prêmio corrente em faixas concentra praticamente toda a capacidade preditiva dos modelos supervisionados, indicando que é o nível do BVRP --- e não variáveis auxiliares de retorno ou calendário --- que carrega informação sobre sua trajetória. Resta investigar se esse nível também se relaciona com os retornos futuros do Bitcoin de forma condicional ao ambiente de volatilidade, questão que este capítulo trata diretamente.
 
 O objetivo deste capítulo é analisar o comportamento do BVRP em diferentes ambientes
 de volatilidade. Especificamente, busca-se: (i) caracterizar estatisticamente os
