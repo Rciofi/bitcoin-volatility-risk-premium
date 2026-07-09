@@ -253,6 +253,7 @@ for q in [0.60, 0.70, 0.80, 0.90]:
     sr_q = sig_q * df['ret']
     r_q, v_q, s_q, m_q = perf(sr_q)
     sortino_q = sortino_ratio(sr_q)
+    to_q = float(sig_q.diff().abs().mean())
     ti_q = float(sig_q.mean())
     qval = int(q * 100)
 
@@ -263,25 +264,25 @@ for q in [0.60, 0.70, 0.80, 0.90]:
         sharpe_q[cost_bp] = s_c
 
     q_label = "q{}\\%".format(qval)
-    rows3.append((q_label, r_q, v_q, sharpe_q[0], sharpe_q[5], sharpe_q[10], m_q, sortino_q, ti_q))
+    rows3.append((q_label, r_q, v_q, sharpe_q[0], sharpe_q[5], sharpe_q[10], m_q, sortino_q, to_q, ti_q))
     daily_series[f'sr_q{qval}'] = sr_q.values
     print("  q{}: Ret={:.4f}, Vol={:.4f}, Sharpe={:.4f}, Sortino={}, MDD={:.4f}, Tempo={:.4f}".format(
         qval, r_q, v_q, s_q, _fmt(sortino_q), m_q, ti_q))
 
 lines3 = [
-    r"\begin{tabular}{lrrrrrrrr}",
+    r"\begin{tabular}{lrrrrrrrrr}",
     r"\toprule",
-    r"Estrat\'egia & Ret.\ Anual & Vol.\ Anual & Sharpe & Sharpe & Sharpe & Max & Sortino & \%\ Tempo \\",
-    r" &  &  & (bruto) & (5\,bps) & (10\,bps) & Drawdown & (bruto) &  \\",
+    r"Estrat\'egia & Ret.\ Anual & Vol.\ Anual & Sharpe & Sharpe & Sharpe & Max & Sortino & Turnover & \%\ Tempo \\",
+    r" &  &  & (bruto) & (5\,bps) & (10\,bps) & Drawdown & (bruto) &  &  \\",
     r"\midrule",
 ]
 for row in rows3:
-    lines3.append("{} & {:.4f} & {:.4f} & {} & {} & {} & {:.4f} & {} & {:.4f} {}".format(
+    lines3.append("{} & {:.4f} & {:.4f} & {} & {} & {} & {:.4f} & {} & {:.4f} & {:.4f} {}".format(
         row[0], row[1], row[2],
         _fmt(row[3]), _fmt(row[4]), _fmt(row[5]),
-        row[6], _fmt(row[7]), row[8], _NL))
+        row[6], _fmt(row[7]), row[8], row[9], _NL))
 lines3.append(r"\midrule")
-lines3.append("Buy \\& Hold & {:.4f} & {:.4f} & {:.4f} & -- & -- & {:.4f} & {} & 1.0000 {}".format(
+lines3.append("Buy \\& Hold & {:.4f} & {:.4f} & {:.4f} & -- & -- & {:.4f} & {} & -- & 1.0000 {}".format(
     r_bh2, v_bh2, s_bh2, m_bh2, _fmt(sortino_bh2), _NL))
 lines3 += [r"\bottomrule", r"\end{tabular}"]
 with open('tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-8') as fh:
@@ -293,7 +294,7 @@ print("Tabela 3 salva: tables/tab7/tab7_3_perf_bvrp_multi_quantile.tex")
 # mesma fonte (evita divergencia como a do look-ahead bias corrigido em c02e22a).
 pd.DataFrame(rows3, columns=[
     "quantil", "ret_anual", "vol_anual", "sharpe_bruto", "sharpe_5bps",
-    "sharpe_10bps", "max_drawdown", "sortino", "pct_tempo",
+    "sharpe_10bps", "max_drawdown", "sortino", "turnover", "pct_tempo",
 ]).to_csv('tables/cap7/perf_multi_quantile_cap7.csv', index=False)
 print("CSV salvo: tables/cap7/perf_multi_quantile_cap7.csv")
 
