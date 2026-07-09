@@ -32,7 +32,8 @@ estão formalmente enunciadas no Capítulo~\ref{chap:introducao}
 (Seção~\ref{sec:cap1-hipoteses}). Para fins de operacionalização, cada uma
 é testada por procedimentos específicos detalhados nas seções seguintes:
 H1~(existência do prêmio) é avaliada por teste~$t$ sobre a média amostral
-do BVRP; H2~(previsibilidade linear) é avaliada por regressões MQO com
+do BVRP, com erro-padrão HAC (Newey--West, 30 defasagens) para acomodar a
+persistência da série (Seção~\ref{sec:cap5-h1}); H2~(previsibilidade linear) é avaliada por regressões MQO com
 erros-padrão HAC (Newey--West, $\text{maxlags} = h$) em múltiplos horizontes;
 H3~(utilidade econômica) é avaliada por estratégias condicionais baseadas em
 quantis do BVRP; e H4~(heterogeneidade condicional e não linearidade) é

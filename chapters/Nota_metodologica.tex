@@ -91,11 +91,13 @@ As principais limitações do estudo são:
     a liquidez de uma única plataforma, o que pode introduzir vieses de
     precificação em períodos de baixa liquidez.
 
-    \item \textbf{Custos de transação}: as estratégias do
-    Capítulo~\ref{chap:estrategias} não incorporam custos de transação,
-    \textit{slippage} ou restrições de alavancagem. Os retornos reportados são
-    brutos e devem ser interpretados como limites superiores do desempenho
-    líquido.
+    \item \textbf{Fricções de mercado}: as estratégias do
+    Capítulo~\ref{chap:estrategias} incorporam custos de transação
+    unilaterais de até 10~bps por operação, mas não capturam
+    \textit{slippage} em períodos de baixa profundidade, restrições de
+    alavancagem ou fricções de liquidez intradiária. Nessa dimensão, os
+    resultados devem ser interpretados como limites superiores do
+    desempenho líquido.
 
     \item \textbf{Regimes definidos ex-post}: os quantis de classificação de
     regime são calculados sobre a amostra completa, de modo que a análise de
