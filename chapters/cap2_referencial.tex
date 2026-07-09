@@ -236,8 +236,8 @@ sentimento de mercado. Regimes típicos incluem:
           preço e menor demanda por proteção;
     \item \textbf{regime de alta volatilidade}: movimentos abruptos, liquidações
           em cascata e aumento expressivo do custo de \textit{hedge};
-    \item \textbf{regime de transição}: aumento gradual da incerteza, com elevação
-          progressiva de IV e RV.
+    \item \textbf{regime de volatilidade média}: estados intermediários, com
+          elevação gradual da incerteza e aumento progressivo de IV e RV.
 \end{enumerate}
 
 Mesmo sem a implementação explícita de modelos de mudança de regime, como
@@ -326,16 +326,11 @@ uma função de perda, resultando em maior sensibilidade a padrões sutis e
 relações não lineares.
 
 Nesta dissertação, utiliza-se a implementação de \textit{Gradient Boosting} da
-biblioteca \texttt{scikit-learn}, em sua configuração padrão. O algoritmo constrói
-árvores de decisão sequencialmente, cada uma corrigindo os erros residuais das
-anteriores por meio de descida de gradiente sobre uma função de perda
-\citep{friedman2001gradientboosting}. Diferentemente da floresta aleatória, que
-agrega árvores independentes por \textit{bagging}, o \textit{Gradient Boosting}
-realiza otimização sequencial, o que lhe confere maior sensibilidade a padrões
-sutis e relações não lineares. Os hiperparâmetros são mantidos nos valores
-padrão da biblioteca --- opção que privilegia a reprodutibilidade e uma
-avaliação em configuração convencional, em vez da otimização de desempenho,
-cujas implicações são discutidas no Capítulo~\ref{chap:cap5_ml}.
+biblioteca \texttt{scikit-learn}, em sua configuração padrão. Os
+hiperparâmetros são mantidos nos valores padrão da biblioteca --- opção que
+privilegia a reprodutibilidade e uma avaliação em configuração convencional,
+em vez da otimização de desempenho, cujas implicações são discutidas no
+Capítulo~\ref{chap:cap5_ml}.
 
 Entre suas características, destacam-se:
 

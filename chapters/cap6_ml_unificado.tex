@@ -60,7 +60,7 @@ engenharia de variáveis e o alinhamento do alvo em $t+1$.\footnote{A amostra de
 de 2021, e não em março de 2021 como a amostra completa da dissertação (1.775
 observações). A diferença decorre da variável de regime do BVRP, cujos
 limiares são estimados por janela expansiva com período mínimo de 252 observações
-(Seção~\ref{subsec:cap5_features}); os primeiros 252 dias da série são consumidos
+(Seção~\ref{subsec:cap5_features}); os primeiros 251 dias da série são consumidos
 nesse aquecimento e não dispõem de valor de regime válido. O horizonte final e as
 últimas observações preservam o alinhamento com o alvo em $t+1$.}
 
@@ -344,17 +344,18 @@ impacto muito inferior ao do regime e ganho fora da amostra modesto
 \label{sec:cap5_implicacoes}
 % =========================================================
 
-Embora nenhum modelo supervisionado supere o benchmark de persistência na previsão
-do nível do BVRP, a estrutura identificada tem implicações práticas relevantes — e
-elas residem no \textit{estado} de mercado, não na previsão pontual.
+Embora nenhum modelo supervisionado supere o benchmark de persistência na
+previsão do nível do BVRP, a estrutura identificada tem implicações práticas
+relevantes --- e elas residem no uso do prêmio corrente como sinal
+condicionante, não na previsão pontual de seu valor futuro.
 
-As previsões do BVRP podem ser utilizadas como insumo adicional para alocação dinâmica de risco: valores previstos elevados --- isto é, próximos de zero --- sinalizam ambientes em que o prêmio de seguro embutido nas opções encontra-se dissipado, com a volatilidade realizada alcançando a implícita, situação tipicamente associada a períodos de estresse. Em contraste, previsões fortemente negativas indicam ambientes de calmaria, nos quais o prêmio pago pelos compradores de proteção é mais elevado.
+O prêmio corrente pode ser utilizado como insumo para alocação dinâmica de risco: valores elevados do BVRP --- isto é, próximos de zero --- sinalizam ambientes em que o prêmio de seguro embutido nas opções encontra-se dissipado, com a volatilidade realizada alcançando a implícita, situação tipicamente associada a períodos de estresse. Em contraste, valores fortemente negativos indicam ambientes de calmaria, nos quais o prêmio pago pelos compradores de proteção é mais elevado.
 
-A dominância do regime do BVRP como preditor sugere que estratégias de
-filtragem por regime — em vez de previsões pontuais do nível do BVRP — podem
-ser mais eficazes na prática. Essa hipótese é avaliada diretamente no
-Capítulo~\ref{chap:estrategias}, que analisa a utilidade econômica do BVRP em
-estratégias condicionais de negociação.
+A dominância da variável que discretiza o prêmio corrente sugere que o valor
+prático do BVRP está em seu uso como filtro de estado --- classificando o
+prêmio observado em faixas --- e não na previsão pontual de seu nível futuro.
+Essa hipótese é avaliada diretamente no Capítulo~\ref{chap:estrategias}, que
+condiciona a exposição a quantis extremos do BVRP corrente.
 
 Por fim, cabe ressaltar que os resultados deste capítulo são condicionados à
 amostra disponível (1.523 observações, nov.~2021–mar.~2026) e ao horizonte de
