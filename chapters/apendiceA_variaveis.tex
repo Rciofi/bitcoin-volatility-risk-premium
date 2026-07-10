@@ -121,14 +121,16 @@ simples acumulados no horizonte $h$:
 R_{t+h} = \frac{P_{t+h}}{P_t} - 1.
 \]
 
-Em particular, são utilizados os seguintes horizontes $h \in \{1, 5, 10, 20, 30\}$:
+Em particular, são utilizados os seguintes horizontes
+$h \in \{1, 5, 10, 20, 30, 60\}$:
 
 \begin{align*}
 R_{t+1}  &= \frac{P_{t+1}}{P_t}  - 1, \\
 R_{t+5}  &= \frac{P_{t+5}}{P_t}  - 1, \\
 R_{t+10} &= \frac{P_{t+10}}{P_t} - 1, \\
 R_{t+20} &= \frac{P_{t+20}}{P_t} - 1, \\
-R_{t+30} &= \frac{P_{t+30}}{P_t} - 1.
+R_{t+30} &= \frac{P_{t+30}}{P_t} - 1, \\
+R_{t+60} &= \frac{P_{t+60}}{P_t} - 1.
 \end{align*}
 
 Os horizontes escolhidos capturam diferentes janelas de
@@ -155,11 +157,42 @@ o horizonte de previsão, conforme discutido nos
 Capítulos~\ref{chap:resultados_ols}
 e~\ref{chap:regimes}.
 
-\section{Classificação de regimes de volatilidade}
+\section{Classificação de regimes}
 
-O Capítulo~\ref{chap:regimes} classifica cada observação em um de três regimes
-mutuamente exclusivos com base nos quantis da $RV_{30,t}$ calculados sobre a
-amostra completa:
+A dissertação emprega duas classificações de regime, com propósitos
+distintos.
+
+\subsection{Regime do BVRP (preditor dos modelos de aprendizado de máquina)}
+
+A variável \texttt{vrp\_regime\_num}, empregada como preditor no
+Capítulo~\ref{chap:cap5_ml}, discretiza o \emph{próprio} $\text{BVRP}_t$
+em tercis:
+\[
+\text{Regime}_t =
+\begin{cases}
+\text{Baixo}, & \text{BVRP}_t \leq q_{1/3,t}, \\
+\text{Médio}, & q_{1/3,t} < \text{BVRP}_t \leq q_{2/3,t}, \\
+\text{Alto},  & \text{BVRP}_t > q_{2/3,t},
+\end{cases}
+\]
+em que $q_{1/3,t}$ e $q_{2/3,t}$ são os quantis $1/3$ e $2/3$ da
+distribuição do BVRP \emph{disponível até $t$}, recalculados a cada
+instante por janela expansiva com período mínimo de 252 observações. As
+observações do período de aquecimento, para as quais os quantis ainda não
+estão definidos, permanecem sem classificação --- o que explica a amostra
+reduzida do Capítulo~\ref{chap:cap5_ml} (1.523 observações, contra 1.775
+da amostra completa).
+
+Essa construção é central para a interpretação dos resultados: por ser uma
+discretização do prêmio corrente, sua dominância como preditor não indica
+que variáveis de estado de mercado carreguem informação especial, mas que a
+informação sobre o BVRP futuro reside em seu valor presente.
+
+\subsection{Regime de volatilidade realizada (análise condicional)}
+
+O Capítulo~\ref{chap:regimes} classifica cada observação em um de três
+regimes mutuamente exclusivos com base nos quantis da $RV_{30,t}$
+calculados sobre a amostra completa:
 
 \begin{itemize}
     \item \textbf{Baixa volatilidade}: $RV_{30,t} \leq q_{25}(RV_{30})$;
@@ -167,21 +200,25 @@ amostra completa:
     \item \textbf{Alta volatilidade}: $RV_{30,t} \geq q_{75}(RV_{30})$.
 \end{itemize}
 
-Na amostra de abril de 2021 a abril de 2026 ($N = 1.775$), os limiares estimados
-são $q_{25} = 39{,}3\%$ e $q_{75} = 65{,}6\%$ (em base anualizada), resultando em
-444 observações em cada regime extremo e 888 no regime intermediário.
+Na amostra de março de 2021 a março de 2026 ($N = 1.775$), os limiares
+estimados são $q_{25} = 39{,}3\%$ e $q_{75} = 65{,}6\%$ (em base
+anualizada), resultando em 444 observações em cada regime extremo e 887
+no regime intermediário.
 
 A variável indicadora de alta volatilidade $D_t^{\text{alto}}$ é definida como:
 \[
 D_t^{\text{alto}} = \mathbf{1}\!\left\{RV_{30,t} \geq q_{75}(RV_{30})\right\},
 \]
-sendo utilizada tanto nas estratégias condicionais do
-Capítulo~\ref{chap:estrategias} quanto nos termos de interação das regressões
-do Capítulo~\ref{chap:regimes}:
+sendo utilizada nos termos de interação das regressões condicionais do
+Capítulo~\ref{chap:regimes}:
 \[
 R_{t+h} = \alpha + \beta_1\,\text{BVRP}_t + \beta_2\,D_t^{\text{alto}}
           + \beta_3\,(\text{BVRP}_t \times D_t^{\text{alto}}) + \varepsilon_{t+h}.
 \]
+
+O Capítulo~\ref{chap:estrategias} adota ainda uma terceira partição, por
+tercis da $RV_{30,t}$ (limiares de $43{,}5\%$ e $60{,}7\%$), restrita à
+decomposição das estratégias condicionais por regime.
 
 \section{Defasagem das variáveis e prevenção de \textit{look-ahead bias}}
 
