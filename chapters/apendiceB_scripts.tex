@@ -82,26 +82,63 @@ df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
 
 \section{Classificação de regimes de volatilidade}
 
-Os regimes de volatilidade são definidos por quantis móveis (1/3 e 2/3) da
-\texttt{rv\_30d}, recalculados a cada instante $t$ com janela expansiva e
-período mínimo de 252 observações, de modo a usar apenas informação
-disponível até $t$ --- evitando viés de antecipação:
+A dissertação emprega duas classificações de regime, com propósitos
+distintos. A primeira, utilizada como preditor nos modelos de aprendizado
+de máquina do Capítulo~\ref{chap:cap5_ml}, discretiza o \emph{próprio
+BVRP} em tercis, com limiares recalculados a cada instante $t$ por janela
+expansiva e período mínimo de 252 observações --- de modo a utilizar
+apenas informação disponível até $t$
+(\texttt{code/analyze\_vrp\_regimes.py}):
 
 \begin{verbatim}
-MIN_OBS = 252
-q_low  = df["rv_30d"].expanding(MIN_OBS).quantile(1/3)
-q_high = df["rv_30d"].expanding(MIN_OBS).quantile(2/3)
+def classify_regime(vrp, q1, q2):
+    if vrp <= q1:
+        return "Baixo"
+    elif vrp <= q2:
+        return "Médio"
+    else:
+        return "Alto"
 
-df["regime"] = "media"
-df.loc[df["rv_30d"] <= q_low,  "regime"] = "baixa"
-df.loc[df["rv_30d"] >= q_high, "regime"] = "alta"
-df["vrp_regime_num"] = df["regime"].map(
-    {"baixa": 0, "media": 1, "alta": 2}
-)
+MIN_PERIODS_REGIME = 252
 
-# Indicadora binária usada nas regressões condicionais
-df["dummy_alta"] = (df["regime"] == "alta").astype(int)
+q1_series = df["vrp_30d"].expanding(min_periods=MIN_PERIODS_REGIME).quantile(1/3)
+q2_series = df["vrp_30d"].expanding(min_periods=MIN_PERIODS_REGIME).quantile(2/3)
+
+df["vrp_regime"] = [
+    classify_regime(v, r1, r2) if pd.notna(r1) else np.nan
+    for v, r1, r2 in zip(df["vrp_30d"], q1_series, q2_series)
+]
+
+# Mapeamento para uso como preditor (code/build_ml_dataset.py)
+regime_map = {"Baixo": 0, "Médio": 1, "Alto": 2}
+df["vrp_regime_num"] = df["vrp_regime"].map(regime_map)
 \end{verbatim}
+
+As observações do período de aquecimento --- para as quais os quantis
+expansivos ainda não estão definidos --- permanecem sem classificação e
+são descartadas na construção do conjunto de modelagem, o que explica a
+amostra reduzida do Capítulo~\ref{chap:cap5_ml}.
+
+A segunda classificação, utilizada no Capítulo~\ref{chap:regimes},
+particiona a \emph{volatilidade realizada} em quartis sobre a amostra
+completa, definindo os regimes de baixa, média e alta volatilidade e a
+indicadora usada nas regressões condicionais
+(\texttt{scripts/regenerate\_cap9.py}):
+
+\begin{verbatim}
+q25 = df["rv_30d"].quantile(0.25)
+q75 = df["rv_30d"].quantile(0.75)
+
+df["regime_vol"] = "Média volatilidade"
+df.loc[df["rv_30d"] <= q25, "regime_vol"] = "Baixa volatilidade"
+df.loc[df["rv_30d"] >= q75, "regime_vol"] = "Alta volatilidade"
+
+df["dummy_alta_vol"] = (df["regime_vol"] == "Alta volatilidade").astype(int)
+\end{verbatim}
+
+O Capítulo~\ref{chap:estrategias} adota ainda uma terceira partição, por
+tercis da volatilidade realizada, restrita à decomposição das estratégias
+por regime.
 
 \section{Regressão por MQO com erros-padrão de Newey--West}
 
@@ -183,7 +220,10 @@ from sklearn.preprocessing import StandardScaler
 # Selecao de alpha por CV temporal com embargo de 30 dias
 # (5 folds, janela expansiva; padronizacao recalibrada por fold).
 # A perda de validacao e estatisticamente equivalente em ampla
-# faixa de alpha -- seleciona-se o menos regularizado.
+# faixa de alpha. Regra: dentro da faixa a menos de um desvio-padrao
+# do minimo, prefere-se o menos regularizado -- exceto quando os dois
+# candidatos menos regularizados sao indistintos, caso em que se opta
+# pelo mais parcimonioso dos dois.
 alpha_lasso, alpha_ridge = 0.001, 1.0  # selecionados pela CV
 
 scaler = StandardScaler().fit(X_train)
