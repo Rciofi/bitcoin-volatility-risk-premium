@@ -107,16 +107,18 @@ O \textit{pipeline} segue a seguinte ordem de execução:
           \texttt{data/vrp\_with\_targets.csv}, utilizado nas análises dos
           Capítulos~\ref{chap:resultados_ols} e~\ref{chap:estrategias}.
 
+    \item \textbf{Execução sequencial}: \texttt{code/run\_all.py} encadeia as
+          etapas 1 a 3 --- coleta, construção do BVRP e geração das
+          variáveis-alvo --- em uma única chamada. Os scripts de regime e de
+          \textit{features} (etapa 4) são executados separadamente, na ordem
+          indicada.
+
     \item \textbf{Regimes e \textit{features}}:
           \texttt{code/analyze\_vrp\_regimes.py} classifica o BVRP em tercis
           por janela expansiva, gerando \texttt{data/vrp\_with\_regimes.csv};
           \texttt{code/build\_ml\_dataset.py} constrói, a partir dele, as
           \textit{features} dos modelos supervisionados em
           \texttt{data/ml\_dataset.csv} (Capítulo~\ref{chap:cap5_ml}).
-
-    \item \textbf{Execução sequencial}: \texttt{code/run\_all.py} encadeia as
-          etapas de coleta, construção do BVRP e geração das variáveis-alvo
-          em uma única chamada, garantindo a ordem correta.
 
     \item \textbf{Regeneração por capítulo}: cada script em \texttt{scripts/}
           lê os datasets finais de \texttt{data/} e regenera todas as figuras

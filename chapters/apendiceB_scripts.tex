@@ -73,8 +73,8 @@ e \ref{chap:regimes}.
 \section{Cálculo do BVRP}
 
 O prêmio de risco de volatilidade é a diferença entre volatilidade realizada e
-implícita, ambas anualizadas em base de 30 dias (convenção RV $-$ IV,
-Decisão~1 --- Fase~0):
+implícita, ambas anualizadas em base de 30 dias (convenção
+$\text{RV} - \text{IV}$, conforme a Seção~\ref{sec:vrp-teorico}):
 
 \begin{verbatim}
 df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
@@ -178,6 +178,10 @@ def reg_condicional(df, h):
     return model.fit(cov_type="HAC",
                      cov_kwds={"maxlags": h})
 \end{verbatim}
+
+A coluna \texttt{dummy\_alta\_vol} utilizada acima é construída pela
+classificação de regime de volatilidade realizada apresentada na seção
+anterior.
 
 \section{Modelos de aprendizado de máquina}
 
