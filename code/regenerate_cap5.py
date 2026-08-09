@@ -429,7 +429,7 @@ ax.axhline(0, color="gray", linewidth=0.8, linestyle="--")
 ax.set_xticks(HORIZONS)
 ax.set_xlabel("Horizonte $h$ (dias)")
 ax.set_ylabel("Coeficiente x100")
-ax.set_title("Coeficientes de RV e IV por horizonte --- OLS E1 (HAC)\n"
+ax.set_title("Coeficientes de RV e IV por horizonte — MQO E1 (HAC)\n"
              "(teste: $\\hat{\\beta}_{RV} \\approx -\\hat{\\beta}_{IV}$?)")
 ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
