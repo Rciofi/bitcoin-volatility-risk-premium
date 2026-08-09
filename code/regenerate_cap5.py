@@ -275,7 +275,7 @@ print(rv_iv.to_string(index=False))
 tab_basic = TABS / "tab_ols_basico_multihoriz.tex"
 tab_basic.write_text(r"""\begin{table}[H]
 \centering
-\caption{Resultados OLS (HAC) do BVRP para múltiplos horizontes de previsão.}
+\caption{Resultados MQO (HAC) do BVRP para múltiplos horizontes de previsão.}
 \label{tab:ols_basico_multihoriz}
 \footnotesize
 \begin{adjustbox}{max width=\textwidth}
