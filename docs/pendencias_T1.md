@@ -156,3 +156,48 @@ variáveis explicativas; nenhuma outra coluna prospectiva.
 | Variáveis de **calendário** (`month`, `weekday`, `is_month_start`, `is_month_end`) ficaram de fora: não constam do T4. **Possível teste de robustez.** | T5/T7 (robustez) |
 | Variáveis de **regime** (`vrp_regime_num`, tercis da amostra inteira) ficaram de fora. | **T9** |
 | **Candidata para o T5** (não criada): `vh_90d − vh_30d`, a inclinação da estrutura a termo da volatilidade histórica. | **T5** |
+
+## 7. T8 — janela de estimação e divisão treino/teste (`code/split_utils.py`)
+
+Testes em `code/test_split_utils.py` (verificador de embargo independente, sobre as datas;
+controle positivo com divisões sem embargo).
+
+| Decisão | Valor | Tarefa |
+|---|---|---|
+| **Embargo** | treino da origem t: s ≤ t − h (h = 30 no Cap. 5; h = horizonte do retorno, até 60, nos Caps. 6 e 7); vale para toda data de teste u ≥ t | T5, T10, T11 |
+| **Janela** | **expansiva** (principal; N pequeno) e **móvel** de tamanho fixo (robustez) | C4.2 |
+| **Primeira janela de estimação** | **730 obs. (2 anos): 22/04/2021 a 21/04/2023**, igual para todos os capítulos; o **T9 calcula o corte dos regimes só com ela** | **T9** |
+| **Primeira origem** | **20/06/2023** para todos os h (t0 = 730 − 1 + 60): mesmo período fora da amostra (988 datas, até 03/03/2026) nos Caps. 5 a 7. No Cap. 5 (h = 30), o treino da 1ª origem na janela expansiva tem 760 obs. (até 21/05/2023) | C4.2 |
+| **Janela móvel** | 730 obs.; com h < 60 ela já começa deslizada na 1ª origem (começa em 60 − h) | C4.2 |
+| **Reestimação** | a cada **30 dias**: 33 origens; o modelo da origem t prevê de t até a véspera da próxima origem | T7 (custo das árvores) |
+| **Validação cruzada do T7** | 5 dobras expansivas dentro do treino de cada origem, com o **mesmo embargo** (treino da dobra: s ≤ v − h, v = início da validação) | **T7** |
+
+**Decisões confirmadas pelo autor:** (i) mesma primeira origem (20/06/2023,
+`h_primeira_origem = 60`) para todos os capítulos — além da comparabilidade, o regressor do
+Cap. 6 é o BVRP previsto no Cap. 5, então as duas séries precisam cobrir o mesmo período fora
+da amostra; (ii) primeira janela de 730 obs., janela móvel de 730 e reestimação a cada 30 dias.
+
+| Pendência para as próximas tarefas | Tarefa |
+|---|---|
+| O BVRP previsto é um **regressor gerado** (Pagan, 1984). O bootstrap em bloco deve **reestimar o modelo do Cap. 5 dentro de cada reamostragem**, para incorporar essa incerteza no erro-padrão. | **T10** |
+| As 988 previsões fora da amostra têm alvos de 30 dias sobrepostos (~33 observações independentes). Testes de comparação de previsões (**Diebold–Mariano, Clark–West**) devem usar **HAC com h+1 defasagens, via `hac_utils`**. | **T5** |
+
+### 7.1 Inventário das divisões treino/teste dos scripts antigos (para o texto do C4.2)
+
+| Script | Dados | Alvo | Divisão | Datas | Embargo treino → teste | Validação interna | No LaTeX? |
+|---|---|---|---|---|---|---|---|
+| `scripts/regenerate_cap8.py` (Tabs. 8.1–8.2, SHAP) | `ml_dataset.csv` (1.524 obs. na versão publicada; 1.555 depois do T0) | BVRP retrospectivo em t+1 | **70/30, uma única divisão fixa**, sem reestimação | publicado: treino 30/11/2021 a 30/11/2024 (1.066); teste 01/12/2024 a 02/03/2026 (457) | **não** | 5 dobras expansivas com embargo de 30 obs. (seleção de α) | **sim** (Cap. 6 unificado, "Protocolo de avaliação fora da amostra": "divisão temporal 70%/30%") |
+| `code/train_linear_cap6.py` | `ml_dataset.csv` | `ret_fut_1d` | 70/30 fixa | ~nov/2021 a nov/2024 / dez/2024 a mar/2026 | não | `TimeSeriesSplit(5, gap=30)` | não |
+| `scripts/regenerate_cap6_scatter.py` (Figs. 6.11/6.12) | `bvrp_ml_target_fut_1d.csv` | BVRP em t+1 | **70/15/15** (treino/validação/teste) fixa | a partir de 24/03/2021 | não | busca do XGBoost no bloco de validação | não |
+| `chapters/Cap6_ML.ipynb` (legado) | `bvrp_with_targets.csv` (623 obs., 27/02/2023 a 11/12/2024) | `bvrp_fut_1d` | 70/15/15 fixa | treino até 07/06/2024; validação até 08/09/2024 | não | bloco de validação | versão antiga do Cap. 6 |
+| `chapters/cap8_ml/cap8_ml_bvrp_oos.ipynb` (legado) | `ml_dataset.csv` | BVRP | 70/30 fixa | — | não | — | versão antiga do Cap. 8 |
+| `code/train_ml_baseline.py`, `code/train_xgboost.py` | `ml_dataset.csv` | `ret_fut_5d` | **80/20** fixa | — | não | nenhuma | não |
+| `code/train_rf_gridsearch.py` | `ml_dataset.csv` | `ret_fut_5d` | 80/20 fixa | — | não | `TimeSeriesSplit(5)` **sem** gap | não |
+| `code/regenerate_cap5.py`, `scripts/regenerate_cap9.py` | `vrp_with_targets.csv` / `vrp_with_regimes.csv` | retornos futuros | **amostra inteira** (regressões dentro da amostra) | — | — | — | sim |
+| `scripts/regenerate_cap7.py`, `code/analyze_vrp_regimes.py` | `vrp_with_regimes.csv` / `vrp_with_targets.csv` | — | limiar em janela expansiva com mínimo de 252 obs. (não é treino/teste) | — | — | — | sim |
+
+**Para o texto (C4.2) — dizer explicitamente:** nenhuma divisão antiga tinha embargo entre treino
+e teste nem reestimação; todas eram uma única divisão fixa por proporção (70/30, 70/15/15 ou 80/20).
+**O Cap. 8 publicado usava uma única divisão 70/30, sem intervalo entre treino e teste.** O protocolo
+novo (T8) substitui isso por origens com reestimação a cada 30 dias, janela expansiva e embargo
+s ≤ t − h.
