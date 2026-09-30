@@ -1,0 +1,30 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Teste de H1 --- média do BVRP nas definições prospectiva e retrospectiva (proxy).}
+\label{tab:h1-teste-media}
+\begin{tabular}{lrr}
+\toprule
+ & BVRP prospectivo & BVRP retrospectivo (proxy) \\
+\midrule
+\multicolumn{3}{l}{\textit{Amostra completa, erro-padrão HAC (Newey--West, 31 defasagens)}} \\
+N & $1{.}806$ & $1{.}806$ \\
+Média (p.p.) & $-8{,}76$ & $-8{,}63$ \\
+Erro-padrão HAC & $1{,}703$ & $1{,}181$ \\
+Estatística $t$ & $-5{,}15$ & $-7{,}31$ \\
+Valor-$p$ & $2{,}65 \times 10^{-7}$ & $2{,}71 \times 10^{-13}$ \\
+IC de 95\% & $[-12{,}10;\ -5{,}43]$ & $[-10{,}95;\ -6{,}32]$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Amostra sem sobreposição (uma observação a cada 30 dias), teste $t$ simples}} \\
+N & $61$ & $61$ \\
+Média (p.p.) & $-10{,}64$ & $-10{,}18$ \\
+Erro-padrão & $2{,}479$ & $1{,}517$ \\
+Estatística $t$ & $-4{,}29$ & $-6{,}71$ \\
+Valor-$p$ & $6{,}58 \times 10^{-5}$ & $7{,}71 \times 10^{-9}$ \\
+IC de 95\% & $[-15{,}60;\ -5{,}68]$ & $[-13{,}22;\ -7{,}15]$ \\
+$t$ nos 30 pontos de partida (mín.; mediana; máx.) & $-4{,}55;\ -3{,}86;\ -3{,}26$ & $-7{,}81;\ -5{,}69;\ -4{,}12$ \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: período 24/03/2021 a 03/03/2026. BVRP prospectivo: $\text{RV}_{t+1:t+30} - \text{IV}_t$; retrospectivo (proxy): $\text{RV}_{t-29:t} - \text{IV}_t$. Painel superior: média estimada por MQO numa constante; erro-padrão HAC de Newey--West (núcleo de Bartlett, pesos $1 - j/(L+1)$, $L = h+1 = 31$), sem correção de amostra pequena; valor-$p$ e intervalo de confiança pela distribuição normal. Painel inferior: observações espaçadas em 30 dias, a partir da primeira data da amostra (janelas da RV sem sobreposição); valor-$p$ e intervalo de confiança pela distribuição $t$ de Student com $N-1$ graus de liberdade. A última linha resume a estatística $t$ nos 30 pontos de partida possíveis.
+\end{table}

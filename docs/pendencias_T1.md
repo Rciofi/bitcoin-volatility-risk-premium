@@ -73,11 +73,37 @@ Onde o plano atual e a Fase 0 divergem, vale o plano (reunião de 29/09/2026).
 | 3 | `scripts/regenerate_cap6_scatter.py:31` | `close` (I(1)) como feature | E3: eliminar `close` | T4: **transformar** variáveis não estacionárias (ex.: diferenças) em vez de eliminá-las | **T4** |
 | 4 | `scripts/regenerate_cap7.py:180` | custos de 0/5/10 bps | E6: 10/30 bps | A1: "manter os custos de transação" | **A1** (confirmar se os cenários mudam) |
 | 5 | `scripts/regenerate_cap7.py:100`, `scripts/regenerate_cap7_figs.py:64`, `code/plot_vrp_timeseries.py:23` | data final da amostra fixa em `"2026-03-03"` (continua correta depois do T0, mas é frágil) | Decisão 2 | — | sem tarefa própria; tratar quando o script for tocado (A1, T1) |
-| 6 | `scripts/test_h1_bvrp_mean.py:55` | HAC com 30 defasagens fixas | IC5: lag = h | T3: **h+1** defasagens | **T2 / T3** (C3.3 e C6.8: o H1 vira parágrafo, sem tabela) |
+| 6 | `scripts/test_h1_bvrp_mean.py:55` | HAC com 30 defasagens fixas | IC5: lag = h | T3: **h+1** defasagens | **resolvido no T2** (maxlags = 31; sensibilidade 7/30/60/90). O texto: C3.3 e C6.8 (o H1 vira parágrafo, sem tabela) |
 | 7 | `code/regenerate_cap5.py:53`, `scripts/regenerate_cap9.py:100,274` | HAC com `maxlags=h` | IC5: lag = h | T3: **h+1** | **T3** |
 | 8 | `code/bvrp_ml_csv.py/plot_vrp_histograms.py:42,73` | rótulo "IV30D – RV30D" (sinal antigo); script legado | E0 | — | fora do plano: candidato a descarte |
 
-## 4. Texto (não é código)
+## 4. Regra de defasagens do HAC no statsmodels (para o T3 e o C4.4)
+
+Identificada no T2 (statsmodels 0.14.6, `regression/linear_model.py` e
+`stats/sandwich_covariance.py`), para `OLS(...).fit(cov_type="HAC", cov_kwds={"maxlags": L})`:
+
+| Item | Regra |
+|---|---|
+| Núcleo | Bartlett (`weights_bartlett`, padrão) |
+| Pesos | $w_j = 1 - j/(L+1)$, $j = 0, \ldots, L$ — convenção de **Newey e West (1987)**; a mesma do `newey, lag(L)` do Stata |
+| Significado de `maxlags = L` | maior defasagem incluída na janela do núcleo (a defasagem $L+1$ tem peso zero) |
+| Texto ↔ código | "**h+1 defasagens**" no texto corresponde a `maxlags = h+1` no código (h = 30 → 31) |
+| Correção de amostra pequena | **não aplicada** (`use_correction=False` é o padrão para `cov_type="HAC"`) |
+| Distribuição de referência | **normal** (`use_t=False` no resultado): valor-$p$ e intervalo de confiança pela normal, não pela $t$ |
+| Regra automática (se `maxlags` for omitido) | $L = \lfloor 4(T/100)^{2/9} \rfloor$ (Newey e West, 1994); para $T = 1.806$, $L = 7$ |
+
+Observação para o C4.4: com o núcleo de Bartlett e $L = 31$, a defasagem 29 (a última com
+sobreposição mecânica das janelas de 30 dias) recebe peso de apenas $1 - 29/32 \approx 0{,}09$.
+O T2 reporta a sensibilidade a $L$ = 7, 30, 31, 60 e 90.
+
+**Para o texto do C4.4 (resultado do T2, BVRP prospectivo, N = 1.806):** com a regra
+automática do pacote ($L = 7$), a estatística $t$ seria **−8,10**, contra **−5,15** com
+$L = h+1 = 31$ — o padrão do software subestima o erro-padrão numa série com
+autocorrelação de 1ª ordem de 0,96, o que justifica usar $h+1$ em vez do padrão.
+E o erro-padrão praticamente estabiliza a partir de $L = 30$: 1,70 com $L = 30$/31,
+1,77 com $L = 60$ e 1,78 com $L = 90$ (a conclusão não muda em nenhuma janela).
+
+## 5. Texto (não é código)
 
 | Item | Tarefa |
 |---|---|
