@@ -201,3 +201,53 @@ e teste nem reestimação; todas eram uma única divisão fixa por proporção (
 **O Cap. 8 publicado usava uma única divisão 70/30, sem intervalo entre treino e teste.** O protocolo
 novo (T8) substitui isso por origens com reestimação a cada 30 dias, janela expansiva e embargo
 s ≤ t − h.
+
+## 8. T6 — diagnóstico da Figura 6.1 (previsão do LASSO)
+
+Script: `code/diagnostico_T6.py` (reproduz `regenerate_cap8.py` na versão `1e1f146`, com os
+dados daquele commit; confere os coeficientes da Tab. 6.1 e os R² da Tab. 6.2). Saídas em
+`outputs/T6/`. Nenhum script antigo alterado. A imagem da Figura 6.1 no PDF anotado é idêntica,
+pixel a pixel, à gerada por `1e1f146`.
+
+**Sintomas** (PDF anotado, p. 58: *"parece estar sempre indicando BVRP negativo… tem certamente
+algo errado"*; reunião, 1:15: *"o laranja… nunca vai para cima… não sobe do 0"*).
+
+**Causa confirmada — hipótese (b):** o nível do prêmio em t (`vrp_30d`) estava **excluído** das
+variáveis (`COLS_EXCLUIR` continha o próprio alvo), assim como `rv_30d` e `iv_30d`. A única
+informação de nível era `vrp_regime_num`, o tercil do próprio BVRP em t (3 valores), com
+coeficiente 9,18 por desvio-padrão, 12 vezes o segundo maior. A previsão era, na prática,
+intercepto (−7,85) + 9,18 × regime padronizado: **três patamares (~−24, ~−11, ~+1), com teto
+em ~+3,9**. Nos 100 dias de teste com BVRP realizado positivo (média +12,9; máximo +31,7), a
+previsão média foi +0,6.
+
+**Hipótese (a) descartada:** o alvo era o nível (não a variação), havia intercepto e o LASSO
+(α = 0,001) manteve 11 de 11 coeficientes.
+
+| Variante (LASSO, α = 0,001; divisão 70/30 original) | Média | Mín. | Máx. | % neg. | R² fora da amostra | Média nos 100 dias realizados > 0 |
+|---|---|---|---|---|---|---|
+| Realizado (BVRP retrospectivo em t+1) | −4,25 | −22,53 | 31,66 | 78,1% | — | +12,9 |
+| (A) original: com regime, sem BVRP defasado | −7,62 | −25,91 | 3,85 | 62,8% | 0,388 | +0,6 |
+| (B) sem regime e sem BVRP defasado | −7,79 | −15,45 | 6,13 | **99,8%** | −0,094 | −6,7 |
+| (C) com `vrp_30d` em t contínuo, sem regime | −4,41 | −21,66 | 29,72 | 78,6% | **0,945** | +11,2 |
+| Persistência pura (`vrp_30d` em t) | −4,29 | −22,53 | 31,66 | 78,1% | 0,937 | +12,0 |
+
+- **"Sempre negativa"** vale literalmente para a variante (B): sem nenhuma informação de nível, a
+  previsão colapsa na média do treino (−7,8) e é negativa em 99,8% dos dias. Em (A), o regime
+  cria o patamar de cima (~0), que é o que o Prof. Marcelo viu como "fica no 0".
+- Com o nível contínuo (C), as previsões acompanham os dias positivos e o R² sobe de 0,388 para
+  0,945, só pouco acima da persistência (0,937).
+- **Regime:** `vrp_regime_num` coincide 100% com tercis em **janela expansiva** (mín. 252 obs.)
+  e 80% com tercis da amostra inteira. **Não houve vazamento do período de teste pelo regime**; o
+  defeito é o nível do prêmio entrar só discretizado.
+- **LASSO × MQO:** com 11 variáveis e α = 0,001, a regularização praticamente não atua:
+  diferença máxima entre as previsões de 0,012 (A), 0,010 (B) e 0,026 (C) p.p., correlação 1,000
+  (C5.2).
+
+**Lições para o T5:**
+
+| Lição | Tarefa |
+|---|---|
+| O **nível da proxy (`vrp_30d` em t) deve entrar como variável contínua** (já está em `ml_dataset_T4.csv`). | **T5** |
+| **Nada de regime discretizado com cortes da amostra inteira**; o T9 refaz os regimes sem vazamento (corte só com a primeira janela de estimação do T8). Mesmo sem vazamento, um regime discretizado não substitui o nível contínuo. | **T5, T9** |
+| **α do LASSO escolhido por validação cruzada embargada** (`split_utils.divisoes_validacao_cruzada`) e a **comparação LASSO × MQO reportada** (diferença máxima e correlação das previsões). | **T5, T7** (C5.2) |
+| O alvo antigo era o BVRP **retrospectivo em t+1**, quase igual ao de t (autocorrelação ≈ 0,94); por isso a persistência tinha R² de 0,937. O alvo novo (`alvo_bvrp_30d_fut`) não tem essa propriedade (correlação com a proxy de −0,02), e o benchmark de persistência precisa ser redefinido (seção 2.1). | **T5** |

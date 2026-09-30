@@ -1,0 +1,4 @@
+variante,n_variaveis,lasso_coef_nao_nulos,max_dif_abs_lasso_mqo,corr_lasso_mqo
+A_original,11,11,0.01205178662976536,0.9999999590277621
+B_sem_regime,10,10,0.010463831514915256,0.9999997193923102
+C_nivel_continuo,11,11,0.02563688974304945,0.9999999421644549
