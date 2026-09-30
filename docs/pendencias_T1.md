@@ -74,7 +74,7 @@ Onde o plano atual e a Fase 0 divergem, vale o plano (reunião de 29/09/2026).
 | 4 | `scripts/regenerate_cap7.py:180` | custos de 0/5/10 bps | E6: 10/30 bps | A1: "manter os custos de transação" | **A1** (confirmar se os cenários mudam) |
 | 5 | `scripts/regenerate_cap7.py:100`, `scripts/regenerate_cap7_figs.py:64`, `code/plot_vrp_timeseries.py:23` | data final da amostra fixa em `"2026-03-03"` (continua correta depois do T0, mas é frágil) | Decisão 2 | — | sem tarefa própria; tratar quando o script for tocado (A1, T1) |
 | 6 | `scripts/test_h1_bvrp_mean.py:55` | HAC com 30 defasagens fixas | IC5: lag = h | T3: **h+1** defasagens | **resolvido no T2** (maxlags = 31; sensibilidade 7/30/60/90). O texto: C3.3 e C6.8 (o H1 vira parágrafo, sem tabela) |
-| 7 | `code/regenerate_cap5.py:53`, `scripts/regenerate_cap9.py:100,274` | HAC com `maxlags=h` | IC5: lag = h | T3: **h+1** | **T3** |
+| 7 | `code/regenerate_cap5.py:53`, `scripts/regenerate_cap9.py:100,274` | HAC com `maxlags=h` | IC5: lag = h | T3: **h+1** | **T10 / T11** (o T3 criou a função `mqo_newey_west`; ver seção 4.1) |
 | 8 | `code/bvrp_ml_csv.py/plot_vrp_histograms.py:42,73` | rótulo "IV30D – RV30D" (sinal antigo); script legado | E0 | — | fora do plano: candidato a descarte |
 
 ## 4. Regra de defasagens do HAC no statsmodels (para o T3 e o C4.4)
@@ -103,6 +103,28 @@ autocorrelação de 1ª ordem de 0,96, o que justifica usar $h+1$ em vez do padr
 E o erro-padrão praticamente estabiliza a partir de $L = 30$: 1,70 com $L = 30$/31,
 1,77 com $L = 60$ e 1,78 com $L = 90$ (a conclusão não muda em nenhuma janela).
 
+### 4.1 Função única e inventário dos scripts com HAC (T3)
+
+A partir do T3, toda regressão nova com erro-padrão HAC usa
+`code/hac_utils.py::mqo_newey_west(y, X, h=...)`, que fixa a convenção da tabela acima
+(Bartlett, `maxlags = h+1`, sem correção de amostra pequena, inferência pela normal).
+Análises de sensibilidade a L usam `sensibilidade_defasagens(y, X, lags=[...])`, com a
+mesma convenção; o resultado principal sempre sai de `mqo_newey_west`.
+Testes em `code/test_hac_utils.py`. Os scripts antigos **não** foram ajustados: serão
+refeitos nas tarefas indicadas.
+
+| Arquivo : linha | Regressão | `maxlags` atual | Saída (no LaTeX?) | Tarefa |
+|---|---|---|---|---|
+| `scripts/test_h1_bvrp_mean.py` | teste H1 (média na constante) | h+1 = 31; sensibilidade 7/30/60/90 | `outputs/T2/` | **migrado no T3** para `mqo_newey_west` |
+| `code/regenerate_cap5.py:50-53` (chamadas em `:64`, `:252`, `:374`) | `ret_fut_h` ~ BVRP (proxy); `ret_fut_h` ~ RV + IV; reta da figura com h = 30 | **h** (1, 5, 10, 20, 30, 60); 30 na figura | `tab_ols_basico_multihoriz`, `tab_ols_rv_iv_multihoriz`, figuras do Cap. 5 (sim) | **T10** |
+| `code/analyze_magnitude_bvrp.py:33, 54` (chamadas em `:56`, `:109`) | \|ret_fut_30d\| ~ BVRP; \|ret_fut_30d\| ~ RV + IV | **30** fixo (h = 30) | console | **T10** |
+| `scripts/regenerate_cap9.py:100` (`p_nw`) | `ret_fut_h` ~ dummy de regime (Tab. 9.4) | **h** | `tab_cap9_04_ttest` (sim) | **T11** (com T9) |
+| `scripts/regenerate_cap9.py:274` | `ret_fut_h` ~ BVRP + dummy + interação (Tab. 9.5) | **h** | `tab_cap9_05_regressoes` (sim) | **T11** (com T9) |
+| `code/test_log_transform_cap5.py:22, 40` | transformações de y (arcsinh, log, \|y\|) | **30** fixo | figura de teste em `figs/cap5` (não) | **candidato a descarte** — só marcado, nada apagado (usa `dataset_bvrp_with_skew.csv`, arquivado e incompatível; ver docstring de `analyze_magnitude_bvrp.py`) |
+| `code/cap5_ols_vrp.ipynb` (`run_ols_hac`) | notebook original do Cap. 5 | **5** fixo | substituído por `regenerate_cap5.py` | **candidato a descarte** — só marcado, nada apagado |
+
+Os scripts de estratégias (A1: `regenerate_cap7.py`, `scripts/cap7/`) não usam HAC.
+
 ## 5. Texto (não é código)
 
 | Item | Tarefa |
@@ -110,5 +132,6 @@ E o erro-padrão praticamente estabiliza a partir de $L = 30$: 1,70 com $L = 30$
 | A nota da Tab. 3.1 descreve a RV como "desvio padrão anualizado". O código (correto, padrão da literatura) usa a raiz da média dos retornos quadráticos, sem subtrair a média. **Manter o código; corrigir o texto.** O plano também pede chamar a medida de **volatilidade histórica** (janela móvel de h dias) e explicar a diferença para a volatilidade realizada. | **C2.4**, F7 |
 | O texto usa N = 1.775 em vários lugares; depois do T0 o N de referência é **1.806** (24/03/2021 a 03/03/2026). | Fase 2 (C3 e seguintes) |
 | **Cap. 3 — artefatos do buraco de mar/2023 (T0).** Eram artefatos: (i) o máximo do retorno diário da Tab. 3.1 (0,2066 em 01/04/2023, na verdade um retorno de 32 dias; o novo máximo é 0,1353, em 28/02/2022); (ii) o máximo do BVRP (32,49 em 14/04/2023; o novo é 31,66, em 14/02/2026); (iii) o prêmio positivo de abril/2023 (BVRP médio +28,2 → −4,6; RV média 84,1 → 51,3). Qualquer menção a esses episódios no texto deve ser revista, assim como descrições da cauda direita do BVRP (p95 15,96 → 11,71; assimetria 0,609 → 0,383). | **C3** (reescrita do Cap. 3; ver também C3.1, distribuição bimodal) |
+| **Cap. 6 novo (atual Cap. 5) — defasagens do HAC.** As tabelas publicadas do Cap. 5 (`tab_ols_basico_multihoriz`, `tab_ols_rv_iv_multihoriz`, `tab_bootstrap_ci`) usavam `maxlags = h`, e não h+1; as notas dizem "$h$ defasagens". Na reescrita, as tabelas refeitas no T10 usarão h+1 (`mqo_newey_west`) e o texto deve dizer "h+1 defasagens" (C4.4), sem comparar diretamente com os números antigos. | **C6** (com T10 e C4.4) |
 | A Tab. 3.2 publicada não é reproduzível bit a bit (só o ADF do BVRP bate; as conclusões batem). O novo `code/build_desc_stats_T1.py` passa a ser o gerador. | T1 |
 | C3.2 pede nota de que 2026 é ano incompleto "(dados até julho/agosto)"; a amostra de referência termina em **03/03/2026** (os dados brutos vão até 02/05/2026). Conferir a data na legenda. | **C3.2** |

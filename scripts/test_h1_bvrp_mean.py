@@ -11,9 +11,11 @@ Testes:
      maxlags = h+1 = 31 (principal; h = 30 pela sobreposicao das janelas, +1
      conforme o T3). Sensibilidade: maxlags = 7 (regra automatica do pacote,
      floor(4(T/100)^(2/9))), 30 (valor anterior), 60 e 90.
-     Convencao do statsmodels: nucleo de Bartlett, pesos w_j = 1 - j/(L+1),
-     L = maior defasagem incluida (Newey e West, 1987); sem correcao de
-     amostra pequena; p-valor e IC pela distribuicao NORMAL.
+     Principal com code/hac_utils.mqo_newey_west(h=30); sensibilidade com
+     code/hac_utils.sensibilidade_defasagens (T3). Convencao fixa nas duas:
+     nucleo de Bartlett, pesos w_j = 1 - j/(L+1), L = maxlags = maior
+     defasagem incluida (Newey e West, 1987); sem correcao de amostra
+     pequena; p-valor e IC pela distribuicao NORMAL.
   2. Robustez: amostra sem sobreposicao (uma observacao a cada 30 dias),
      teste t simples com distribuicao t de Student com N-1 graus de
      liberdade. Principal: comeca na primeira data da amostra; tambem roda
@@ -29,10 +31,10 @@ Uso:  python scripts/test_h1_bvrp_mean.py --out-dir outputs/T2
 
 import argparse
 import os
+import sys
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 from scipy import stats
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.stattools import acf
@@ -40,13 +42,17 @@ from statsmodels.tsa.stattools import acf
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(ROOT, "data", "vrp_with_targets.csv")
 
+sys.path.insert(0, os.path.join(ROOT, "code"))
+from hac_utils import maxlags_para_horizonte, mqo_newey_west, sensibilidade_defasagens  # noqa: E402
+
 DEFS = {
     "bvrp_30d_fut": "BVRP prospectivo",
     "vrp_30d":      "BVRP retrospectivo (proxy)",
 }
 H = 30                              # janela da RV (dias)
-MAXLAGS_PRINCIPAL = H + 1           # T3: h+1
-MAXLAGS_SENS = [7, 30, 31, 60, 90]  # 7 = regra automatica do pacote para T = 1.806
+MAXLAGS_PRINCIPAL = maxlags_para_horizonte(H)  # T3: h+1 = 31
+LAGS_SENS = [7, 30, 60, 90]         # so sensibilidade; 7 = regra automatica do pacote
+MAXLAGS_SENS = sorted(LAGS_SENS + [MAXLAGS_PRINCIPAL])  # ordem das linhas nas saidas
 PASSO = H                           # amostra sem sobreposicao: uma obs a cada 30 dias
 LAGS_ACF = [1, 5, 10, 20, 25, 29, 30, 31, 35, 40, 60]
 LAGS_LB = [1, 5, 10, 20, 30]
@@ -63,13 +69,11 @@ Z975 = stats.norm.ppf(0.975)
 # ---------------------------------------------------------------------------
 # Testes
 # ---------------------------------------------------------------------------
-def teste_hac(x, maxlags):
-    """Media por MQO numa constante; EP HAC (Bartlett), p e IC pela normal."""
-    res = sm.OLS(x, np.ones((len(x), 1))).fit(cov_type="HAC", cov_kwds={"maxlags": maxlags})
-    assert res.use_t is False  # convencao do pacote: inferencia pela normal
-    m, se = float(res.params[0]), float(res.bse[0])
-    return {"N": len(x), "media": m, "ep": se, "t": float(res.tvalues[0]),
-            "p": float(res.pvalues[0]), "ic_inf": m - Z975 * se, "ic_sup": m + Z975 * se}
+def resumo_hac(res, x):
+    """Resume a media (MQO numa constante) com EP HAC; p e IC pela normal."""
+    m, se = float(res.params.iloc[0]), float(res.bse.iloc[0])
+    return {"N": len(x), "media": m, "ep": se, "t": float(res.tvalues.iloc[0]),
+            "p": float(res.pvalues.iloc[0]), "ic_inf": m - Z975 * se, "ic_sup": m + Z975 * se}
 
 
 def teste_t_simples(x):
@@ -122,9 +126,11 @@ def main():
     rows_hac = []
     for col, label in DEFS.items():
         x = df[col].dropna().to_numpy()
+        fits = sensibilidade_defasagens(x, lags=LAGS_SENS)
+        fits[MAXLAGS_PRINCIPAL] = mqo_newey_west(x, h=H)
         for L in MAXLAGS_SENS:
             rows_hac.append({"definicao": col, "rotulo": label, "maxlags": L,
-                             "principal": L == MAXLAGS_PRINCIPAL, **teste_hac(x, L)})
+                             "principal": L == MAXLAGS_PRINCIPAL, **resumo_hac(fits[L], x)})
     hac = pd.DataFrame(rows_hac)
     hac.to_csv(os.path.join(out_dir, "h1_hac.csv"), index=False)
 
