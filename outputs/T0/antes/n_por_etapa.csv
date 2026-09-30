@@ -1,0 +1,7 @@
+etapa,arquivo,N,data_inicial,data_final,dias_corridos,dias_faltando
+preços BTC brutos,btc_prices.csv,3150,2017-08-17,2026-05-02,3181,31
+DVOL bruto,dvol_30d_full.csv,1866,2021-03-24,2026-05-02,1866,0
+merge preço x DVOL,vrp_30d_dataset.csv,1835,2021-03-24,2026-05-02,1866,31
+após corte h=60 (referência),vrp_with_targets.csv,1775,2021-03-24,2026-03-03,1806,31
+com coluna de regime,vrp_with_regimes.csv,1775,2021-03-24,2026-03-03,1806,31
+dataset de AM (burn-in de regime),ml_dataset.csv,1524,2021-11-30,2026-03-03,1555,31

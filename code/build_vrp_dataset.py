@@ -3,6 +3,28 @@ import numpy as np
 import pandas as pd
 
 
+def check_daily_continuity(dates, name):
+    """
+    Interrompe o pipeline se faltar alguma data (ou houver data duplicada) na serie diaria.
+    A RV usa rolling(30) sobre LINHAS: um buraco no calendario vira silenciosamente
+    um retorno de varios dias e janelas que misturam periodos (ex.: mar/2023, T0).
+    """
+    d = pd.to_datetime(pd.Series(dates)).sort_values().reset_index(drop=True)
+    dups = d[d.duplicated()].dt.date.unique().tolist()
+    missing = pd.date_range(d.min(), d.max(), freq="D").difference(d)
+    if dups or len(missing):
+        blocos = []
+        if len(missing):
+            s = pd.Series(missing)
+            for _, b in s.groupby((s.diff().dt.days != 1).cumsum()):
+                blocos.append(f"{b.min().date()} a {b.max().date()} ({len(b)} dias)")
+        raise ValueError(
+            f"{name}: serie diaria descontinua -- faltando: {blocos or 'nenhuma'}; "
+            f"duplicadas: {dups or 'nenhuma'}. Corrija os dados brutos antes de rodar o pipeline."
+        )
+    print(f"  {name}: continuidade diaria OK ({len(d)} dias, {d.min().date()} a {d.max().date()})")
+
+
 def load_btc_prices(base_dir: str) -> pd.DataFrame:
     """
     Lê btc_prices.csv (Binance), ajusta datas, calcula retornos e RV30D.
@@ -23,6 +45,7 @@ def load_btc_prices(base_dir: str) -> pd.DataFrame:
     # Converte datas e ordena
     df["date"] = pd.to_datetime(df["date"]).dt.date
     df = df.sort_values("date").reset_index(drop=True)
+    check_daily_continuity(df["date"], "btc_prices.csv")
 
     # Retorno logarítmico diário
     df["close"] = df["close"].astype(float)
@@ -73,6 +96,7 @@ def load_dvol(base_dir: str) -> pd.DataFrame:
     df_iv["iv_30d"] = df_iv["close"].astype(float)
 
     df_iv = df_iv[["date", "iv_30d"]].sort_values("date").reset_index(drop=True)
+    check_daily_continuity(df_iv["date"], "dvol_30d_full.csv")
 
     return df_iv
 
@@ -101,6 +125,7 @@ def build_vrp_dataset():
     # 3) Faz o merge por data (inner -> período em comum)
     print("Fazendo merge entre preços (com RV30D) e IV30D (DVOL)...")
     df = pd.merge(df_price, df_iv, on="date", how="inner")
+    check_daily_continuity(df["date"], "merge preço x DVOL")
 
     # 4) Calcula BVRP 30D = RV30D - IV30D  (Decisão 1 — Fase 0: sinal correto per literatura)
     df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]

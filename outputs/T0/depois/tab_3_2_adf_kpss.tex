@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação. Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade. Período: mar.\ 2021 -- mar.\ 2026 ($N = 1{.}806$ observações diárias).}
+\label{tab:adf_kpss}
+\begin{tabular}{lrrrrl}
+\toprule
+Variável & \multicolumn{2}{c}{ADF} & \multicolumn{2}{c}{KPSS} & Conclusão \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & Estat. & $p$-valor & Estat. & $p$-valor & \\
+\midrule
+Preço (\textit{close}) & $-1,06$ & $0,730$ & $4,30$ & ${\leq}0{,}01$ & I(1) \\
+Retorno diário & $-7,83$ & $< 0{,}001$ & $0,22$ & ${\geq}0{,}10$ & I(0) \\
+RV 30d & $-4,08$ & $0,001$ & $2,46$ & ${\leq}0{,}01$ & Longa memória \\
+IV 30d & $-2,72$ & $0,071$ & $4,41$ & ${\leq}0{,}01$ & Longa memória \\
+BVRP & $-6,65$ & $< 0{,}001$ & $1,19$ & ${\leq}0{,}01$ & Longa memória \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: ADF com seleção de defasagens por AIC; KPSS com constante e defasagens automáticas. \textit{Longa memória}: ADF rejeita (ou está na fronteira) e KPSS rejeita a estacionariedade.
+\end{table}

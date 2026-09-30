@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Estatísticas descritivas das variáveis principais.
+Período: mar.\ 2021 -- mar.\ 2026 ($N=1{.}775$ observações diárias).
+BVRP e volatilidades em pontos percentuais anualizados;
+retorno diário em fração decimal.
+Curtose reportada como excesso (Fisher): distribuição normal $= 0$.}
+\label{tab:cap3_desc_stats}
+\resizebox{\textwidth}{!}{\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Variável & Média & D.P. & Mín. & p5 & p25 & p75 & p95 & Máx. & Assim. & Curtose \\
+\midrule
+BVRP (p.p.) & -8,25 & 12,78 & -43,28 & -28,26 & -16,35 & -2,19 & 15,96 & 32,49 & 0,609 & 0,908 \\
+RV 30d (p.p.) & 53,71 & 19,54 & 16,61 & 26,61 & 39,28 & 65,63 & 86,54 & 121,98 & 0,745 & 0,376 \\
+IV 30d (p.p.) & 61,96 & 18,84 & 32,38 & 37,61 & 47,92 & 75,18 & 95,08 & 156,20 & 0,811 & 0,357 \\
+Retorno diário & 0,0001 & 0,0299 & -0,1670 & -0,0470 & -0,0131 & 0,0138 & 0,0460 & 0,2066 & -0,099 & 4,867 \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\footnotesize\textit{Nota}: RV 30d calculada como raiz da média dos retornos logarítmicos diários quadráticos nos 30 dias anteriores a $t$, anualizada ($\times\sqrt{365}$). IV 30d: índice DVOL da Deribit.
+\end{table}
