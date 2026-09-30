@@ -69,7 +69,11 @@ def main():
     # SALVAR RESULTADO
     # =====================
     # Remove close (serie I(1)) do CSV de saida — nao deve ser usada como feature (E3)
-    cols_drop = [c for c in ["close"] if c in df_clean.columns]
+    # Remove tambem as colunas prospectivas do T1 (RV de t+1 a t+30): conhecidas
+    # so em t+30. regenerate_cap8.py usa como feature toda coluna fora de
+    # COLS_EXCLUIR, entao elas vazariam dados do futuro sem aviso. O alvo
+    # prospectivo entra no dataset de AM no T5, de forma explicita.
+    cols_drop = [c for c in ["close", "rv_30d_fut", "bvrp_30d_fut"] if c in df_clean.columns]
     df_out = df_clean.drop(columns=cols_drop)
     out_path = os.path.join(base_dir, "data", "ml_dataset.csv")
     df_out.to_csv(out_path, index=False)

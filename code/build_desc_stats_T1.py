@@ -6,7 +6,10 @@ comparativa das definicoes do BVRP, SEM sobrescrever tables/ (sincronizado
 com o Overleaf). Todas as saidas vao para --out-dir.
 
 Criado no T0/T1 do plano de revisao (set/2026): as Tabs. 3.1 e 3.2 nao
-tinham gerador versionado.
+tinham gerador versionado. A partir do T1, as duas definicoes do BVRP saem
+lado a lado: prospectiva (bvrp_30d_fut, RV de t+1 a t+30 - IV_t) e
+retrospectiva (vrp_30d, proxy; RV de t-29 a t - IV_t). So entram as colunas
+presentes no dataset, entao o script continua rodando sobre dados pre-T1.
 
 Convencoes (conferidas contra a Tab. 3.1 publicada, reproduzida exatamente):
   - retorno diario = coluna `ret` (log-retorno), em fracao decimal
@@ -45,16 +48,19 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 
 # Definicoes do BVRP comparadas lado a lado. So entram as colunas presentes
-# no dataset -- a lista cobre a definicao atual e as do T1.
+# no dataset.
 BVRP_DEFS = {
-    "vrp_30d": "BVRP (p.p.)",
+    "bvrp_30d_fut": "BVRP prospectivo (p.p.)",
+    "vrp_30d":      "BVRP retrospectivo, proxy (p.p.)",
 }
 
-# Linhas da Tab. 3.1, na ordem da tabela publicada: (coluna, rotulo, casas decimais)
+# Demais linhas da Tab. 3.1: (coluna, rotulo, casas decimais). So entram as
+# colunas presentes no dataset.
 VOL_ROWS = [
-    ("rv_30d", "RV 30d (p.p.)", 2),
-    ("iv_30d", "IV 30d (p.p.)", 2),
-    ("ret",    "Retorno diário", 4),
+    ("rv_30d_fut", "RV 30d prospectiva (p.p.)", 2),
+    ("rv_30d",     "RV 30d retrospectiva (p.p.)", 2),
+    ("iv_30d",     "IV 30d (p.p.)", 2),
+    ("ret",        "Retorno diário", 4),
 ]
 
 ADF_LABELS = {
@@ -73,6 +79,11 @@ _MESES = ["jan.", "fev.", "mar.", "abr.", "mai.", "jun.",
 # ---------------------------------------------------------------------------
 def fmt_br(x, d):
     return f"{x:.{d}f}".replace(".", ",")
+
+
+def fmt_m(x, d):
+    """Número para modo matemático: vírgula decimal protegida ({,}) sem espaço."""
+    return fmt_br(x, d).replace(",", "{,}")
 
 
 def fmt_n(n):
@@ -140,6 +151,8 @@ def tab_3_1(df, out_dir, bvrp_cols):
         rows.append({"Variável": BVRP_DEFS[col], "coluna": col, **r})
         tex_rows.append((BVRP_DEFS[col], r, 2))
     for col, label, d in VOL_ROWS:
+        if col not in df.columns:
+            continue
         r = desc_row(df[col])
         rows.append({"Variável": label, "coluna": col, **r})
         tex_rows.append((label, r, d))
@@ -172,8 +185,12 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\end{tabular}}",
         r"\par\smallskip",
         r"\footnotesize\textit{Nota}: RV 30d calculada como raiz da média dos retornos logarítmicos"
-        r" diários quadráticos nos 30 dias anteriores a $t$, anualizada ($\times\sqrt{365}$)."
-        r" IV 30d: índice DVOL da Deribit.",
+        r" diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os retornos de"
+        r" $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$."
+        r" IV 30d: índice DVOL da Deribit, observado em $t$."
+        + (r" BVRP prospectivo: $\text{BVRP}_{t+1:t+30\,|\,t} = \text{RV}_{t+1:t+30} - \text{IV}_t$;"
+           r" BVRP retrospectivo (proxy): $\text{RV}_{t-29:t} - \text{IV}_t$."
+           if "bvrp_30d_fut" in bvrp_cols else ""),
         r"\end{table}",
     ]
     with open(os.path.join(out_dir, "tab_3_1_desc_stats.tex"), "w", encoding="utf-8") as f:
@@ -185,8 +202,9 @@ def tab_3_2(df, out_dir, bvrp_cols):
     if "close" in df.columns:
         series.append(("close", r"Preço (\textit{close})", df["close"]))
     series.append(("ret", "Retorno diário", df["ret"]))
-    series.append(("rv_30d", "RV 30d", df["rv_30d"]))
-    series.append(("iv_30d", "IV 30d", df["iv_30d"]))
+    for col, label, _ in VOL_ROWS:
+        if col in df.columns and col != "ret":
+            series.append((col, label.replace(" (p.p.)", ""), df[col]))
     for col in bvrp_cols:
         series.append((col, BVRP_DEFS[col].replace(" (p.p.)", ""), df[col]))
 
@@ -195,15 +213,15 @@ def tab_3_2(df, out_dir, bvrp_cols):
         a, ap, k, kp, concl = adf_kpss_row(s)
         rows.append({"variavel": col, "adf_stat": a, "adf_p": ap,
                      "kpss_stat": k, "kpss_p": kp, "classificacao": concl})
-        ap_s = r"$< 0{,}001$" if ap < 0.001 else f"${fmt_br(ap, 3)}$"
+        ap_s = r"$< 0{,}001$" if ap < 0.001 else f"${fmt_m(ap, 3)}$"
         if kp <= 0.01:
             kp_s = r"${\leq}0{,}01$"
         elif kp >= 0.10:
             kp_s = r"${\geq}0{,}10$"
         else:
-            kp_s = f"${fmt_br(kp, 3)}$"
+            kp_s = f"${fmt_m(kp, 3)}$"
         lines_body.append(
-            f"{label} & ${fmt_br(a, 2)}$ & {ap_s} & ${fmt_br(k, 2)}$ & {kp_s} & {ADF_LABELS[concl]} \\\\")
+            f"{label} & ${fmt_m(a, 2)}$ & {ap_s} & ${fmt_m(k, 2)}$ & {kp_s} & {ADF_LABELS[concl]} \\\\")
 
     pd.DataFrame(rows).to_csv(os.path.join(out_dir, "tab_3_2_adf_kpss.csv"), index=False)
 

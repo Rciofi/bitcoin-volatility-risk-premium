@@ -27,7 +27,8 @@ def check_daily_continuity(dates, name):
 
 def load_btc_prices(base_dir: str) -> pd.DataFrame:
     """
-    Lê btc_prices.csv (Binance), ajusta datas, calcula retornos e RV30D.
+    Lê btc_prices.csv (Binance), ajusta datas, calcula retornos, RV30D
+    retrospectiva (proxy) e RV30D prospectiva (T1).
     Espera arquivo em: data/btc_prices.csv, com colunas: date, close.
     """
     price_path = os.path.join(base_dir, "data", "btc_prices.csv")
@@ -56,9 +57,24 @@ def load_btc_prices(base_dir: str) -> pd.DataFrame:
     # ===================================================
     window = 30
 
+    # RV retrospectiva: retornos de t-29 a t. Informação disponível em t;
+    # a partir do T1 é a PROXY do prêmio esperado (passeio aleatório sem deriva).
     df["rv_30d"] = (
         (df["ret"] ** 2)
         .rolling(window=window)
+        .mean()
+        * 365
+    ) ** 0.5 * 100
+
+    # RV prospectiva (T1): mesma fórmula, retornos de t+1 a t+30 -- só é
+    # conhecida em t+30. Calculada na série longa de preços, antes do merge,
+    # com janela para frente sobre ret deslocado em 1 dia; as últimas 30
+    # linhas ficam NaN. Por construção rv_30d_fut(t) = rv_30d(t+30), conferido
+    # em code/test_T1_alinhamento.py.
+    fwd = pd.api.indexers.FixedForwardWindowIndexer(window_size=window)
+    df["rv_30d_fut"] = (
+        (df["ret"].shift(-1) ** 2)
+        .rolling(window=fwd, min_periods=window)
         .mean()
         * 365
     ) ** 0.5 * 100
@@ -106,9 +122,10 @@ def build_vrp_dataset():
     Constrói o dataset consolidado de VRP 30D:
 
     - Lê preços do BTC (Binance) e DVOL 30D (Deribit)
-    - Calcula RV30D (realized vol 30 dias, anualizada)
+    - Calcula RV30D (realized vol 30 dias, anualizada), retrospectiva e prospectiva
     - Faz merge por data
-    - Calcula VRP30D = RV30D - IV30D
+    - Calcula VRP30D = RV30D - IV30D (proxy retrospectiva)
+    - Calcula BVRP30D_FUT = RV30D_FUT - IV30D (definição prospectiva, T1)
     - Salva em data/vrp_30d_dataset.csv
     - Gera estatísticas descritivas de RV30D, IV30D e VRP30D
     """
@@ -127,8 +144,15 @@ def build_vrp_dataset():
     df = pd.merge(df_price, df_iv, on="date", how="inner")
     check_daily_continuity(df["date"], "merge preço x DVOL")
 
-    # 4) Calcula BVRP 30D = RV30D - IV30D  (Decisão 1 — Fase 0: sinal correto per literatura)
+    # 4) BVRP 30D.
+    # vrp_30d: RV(t-29 a t) - IV_t -- PROXY retrospectiva, informação disponível
+    #   em t. Mantida com o nome e o significado antigos de propósito: os scripts
+    #   que a leem como regressor/sinal em t (docs/pendencias_T1.md, seção 1)
+    #   continuam sem vazar dados do futuro até migrarem no T5/T10.
+    # bvrp_30d_fut: RV(t+1 a t+30) - IV_t -- definição prospectiva do BVRP
+    #   (reunião de 29/09/2026, T1). NÃO usar como informação disponível em t.
     df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
+    df["bvrp_30d_fut"] = df["rv_30d_fut"] - df["iv_30d"]
 
     # Ordena e limpa colunas
     df = df.sort_values("date").reset_index(drop=True)
@@ -138,9 +162,11 @@ def build_vrp_dataset():
         "date",
         "close",      # preço BTC
         "ret",        # retorno diário
-        "rv_30d",     # realized vol 30D (% a.a.)
-        "iv_30d",     # implied vol 30D (DVOL, % a.a.)
-        "vrp_30d",    # BVRP 30D = RV - IV  (negativo em média: mercado paga prêmio de seguro)
+        "rv_30d",       # realized vol 30D retrospectiva, t-29 a t (% a.a.) -- proxy
+        "iv_30d",       # implied vol 30D (DVOL, % a.a.)
+        "vrp_30d",      # BVRP proxy = RV retrospectiva - IV (disponível em t)
+        "rv_30d_fut",   # realized vol 30D prospectiva, t+1 a t+30 (% a.a.) -- T1
+        "bvrp_30d_fut", # BVRP prospectivo = RV prospectiva - IV (conhecido só em t+30)
     ]
     cols_order = [c for c in cols_order if c in df.columns]
     df = df[cols_order]
