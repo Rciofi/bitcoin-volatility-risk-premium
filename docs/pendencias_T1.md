@@ -29,7 +29,7 @@ Depois do T1, as tabelas e figuras abaixo ficam **inválidas** até serem refeit
 | 4 | `code/plot_vrp_vs_return.py:71-87` | dispersão BVRP × `ret_fut_20d` | `figs/cap3/vrp_vs_return_20d.png` (sim) | alta | **T10 / T12**; ver também C3.4 |
 | 5 | `scripts/regenerate_cap7.py:139, 252, 312`; `scripts/cap7/strategy_vrp_quantile.py:25` | sinal de estratégia com `vrp_30d.shift(1)`: o BVRP de t−1 contém retornos até t+29 | Tabs. 7.2–7.4 e Figs. 7.2–7.5 (sim) | crítica | **A1** (apêndice, D2) |
 | 6 | `code/analyze_vrp_regimes.py:52-58` | regime pelos tercis do BVRP → `vrp_regime` | `data/vrp_with_regimes.csv` | alta | **T9** (D4: dois regimes, corte sem look-ahead) |
-| 7 | `code/build_ml_dataset.py:44, 51` | features `d_vrp_1d = vrp_30d.diff()` e `vrp_regime_num` | `data/ml_dataset.csv` | alta | **T4 / T5** (T4: justificar ou incluir a variação do prêmio) |
+| 7 | `code/build_ml_dataset.py:44, 51` | features `d_vrp_1d = vrp_30d.diff()` e `vrp_regime_num` | `data/ml_dataset.csv` | alta | **T5** — o T4 criou um dataset novo (`data/ml_dataset_T4.csv`, seção 6) com `d_vrp_1d` só da proxy e sem regime; `ml_dataset.csv` e este script ficam intactos para os scripts antigos |
 | 8 | `scripts/regenerate_cap8.py:46, 78-79` | alvo `vrp_30d.shift(-1)`; features `d_vrp_1d`, `vrp_regime_num` | Tabs. 8.1–8.2, Figs. SHAP (sim; novo Cap. 5) | alta; o alvo "t+1" precisa ser redefinido | **T5** (com T6, T7, T8 e C5.1) |
 | 9 | `code/train_linear_cap6.py:44, 49, 54` | features `vrp_30d`, `d_vrp_1d`, `vrp_regime_num` → `ret_fut_1d` | `chapters/cap6_ml/tables/*.csv` (não) | alta | **candidato a descarte — decidir no T7** (saída não usada no LaTeX) |
 | 10 | `code/train_ml_baseline.py:37`, `code/train_rf_gridsearch.py:25`, `code/train_xgboost.py:32` | feature `vrp_30d` → `ret_fut_5d` | `data/*feature_importance.csv` (não) | legado | **candidatos a descarte — decidir no T7** |
@@ -135,3 +135,24 @@ Os scripts de estratégias (A1: `regenerate_cap7.py`, `scripts/cap7/`) não usam
 | **Cap. 6 novo (atual Cap. 5) — defasagens do HAC.** As tabelas publicadas do Cap. 5 (`tab_ols_basico_multihoriz`, `tab_ols_rv_iv_multihoriz`, `tab_bootstrap_ci`) usavam `maxlags = h`, e não h+1; as notas dizem "$h$ defasagens". Na reescrita, as tabelas refeitas no T10 usarão h+1 (`mqo_newey_west`) e o texto deve dizer "h+1 defasagens" (C4.4), sem comparar diretamente com os números antigos. | **C6** (com T10 e C4.4) |
 | A Tab. 3.2 publicada não é reproduzível bit a bit (só o ADF do BVRP bate; as conclusões batem). O novo `code/build_desc_stats_T1.py` passa a ser o gerador. | T1 |
 | C3.2 pede nota de que 2026 é ano incompleto "(dados até julho/agosto)"; a amostra de referência termina em **03/03/2026** (os dados brutos vão até 02/05/2026). Conferir a data na legenda. | **C3.2** |
+
+## 6. T4 — variáveis explicativas (`data/ml_dataset_T4.csv`)
+
+Gerado por `code/build_ml_dataset_T4.py`; teste de vazamento em `code/test_T4_vazamento.py`
+(dados brutos cortados em t para 29 datas; controle positivo). Dicionário de variáveis,
+ADF/KPSS e descritivas em `outputs/T4/`. O dataset tem o alvo `alvo_bvrp_30d_fut` e 16
+variáveis explicativas; nenhuma outra coluna prospectiva.
+
+| Decisão / pendência | Tarefa |
+|---|---|
+| **"Médias" no plano** ("volatilidade histórica de 1, 5, 30, 60 e 90 dias, médias e IV") foi interpretado como médias móveis da IV e do preço, **transformadas** (`iv_menos_ma5d`, `iv_menos_ma30d`, `log_close_ma30d`), porque as médias em nível são I(1). **Interpretação a confirmar com o Prof. Marcelo.** | T4 → reunião |
+| Texto do Cap. 5 novo: `vh_1d`, `vh_5d` e `vh_30d` seguem a estrutura do modelo HAR de **Corsi (2009)** (volatilidade diária, semanal e mensal). | C5 |
+| **Critério de transformação (revisado):** transformar o que tem **evidência robusta de raiz unitária** — log do preço (`close` → `ret_1d`, `ret_acum_*`, `log_close_ma30d`) e médias móveis da IV em nível (→ `iv_menos_ma5d`, `iv_menos_ma30d`); **manter em nível as volatilidades persistentes, mesmo com ADF na fronteira**. Caso concreto: `vh_90d` passa de "longa memória" (ADF p = 0,089, N = 1.806) para "I(1)" (p = 0,194, N = 1.777) com a retirada de só 29 observações; a janela de 90 dias compartilha 89 de 90 dias entre observações vizinhas, o que gera persistência mecânica e reduz o poder do ADF. Isso não é evidência robusta de raiz unitária. `vh_90d` e `iv_30d` (p = 0,078) ficam classificadas como "longa memória (ADF instável/na fronteira)", em nível; o dicionário de `outputs/T4/` mostra a classe do teste e a classificação adotada. | T4 (C4) |
+| **Colinearidade exata:** `vrp_30d = vh_30d − iv_30d`. As três ficam no dataset, mas **não podem entrar juntas num MQO**; cada script de modelo escolhe duas. | T5, T10 |
+| `rv_30d` **não** entra no dataset novo: é idêntica a `vh_30d`, e o texto vai usar "volatilidade histórica". | C2.4 |
+| Variação do prêmio: `d_vrp_1d` usa só a **proxy** (`vrp_30d`); a variação do prospectivo usaria retornos até t+29. | T5 |
+| **Dois N de referência:** **1.806** (descritivo: Cap. 3 e teste H1, 24/03/2021 a 03/03/2026) e **1.777** (modelagem: Caps. 5 a 7, 22/04/2021 a 03/03/2026). A diferença (29 obs.) vem do início do DVOL: `iv_menos_ma30d` exige 30 dias de IV. **O Cap. 4 deve explicar a diferença.** | C4.2 |
+| **Corte de h = 60 também no Cap. 5.** A amostra de modelagem mantém o corte de h = 60 (termina em 03/03/2026), embora o alvo prospectivo do Cap. 5 precise só de 30 dias à frente (permitiria ir até 02/04/2026). Justificativa: **uma única amostra de modelagem (N = 1.777) para os Caps. 5 a 7**, o que torna os resultados comparáveis entre capítulos. Explicar no Cap. 4. | C4.2 |
+| Variáveis de **calendário** (`month`, `weekday`, `is_month_start`, `is_month_end`) ficaram de fora: não constam do T4. **Possível teste de robustez.** | T5/T7 (robustez) |
+| Variáveis de **regime** (`vrp_regime_num`, tercis da amostra inteira) ficaram de fora. | **T9** |
+| **Candidata para o T5** (não criada): `vh_90d − vh_30d`, a inclinação da estrutura a termo da volatilidade histórica. | **T5** |
