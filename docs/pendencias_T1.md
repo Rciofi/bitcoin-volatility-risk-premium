@@ -49,6 +49,19 @@ da amostra não fique abaixo do benchmark de persistência (0,94).
 | `scripts/regenerate_cap6_scatter.py:30` | alvo `bvrp_fut_1d` (Figs. 6.11/6.12, fora do LaTeX) | T5 |
 | `chapters/Cap6_ML.ipynb` (seção 2.4.2; L1362) | persistência e `bvrp_fut_1d` no notebook legado | T5 (legado) |
 
+### 2.1 Proxy × prêmio prospectivo: correlação ≈ 0 (achado do passo 5 do T1)
+
+Na amostra de referência (N = 1.806), a correlação entre `bvrp_30d_fut`
+(RV(t+1 a t+30) − IV_t) e `vrp_30d` (RV(t−29 a t) − IV_t) **na mesma data t** é
+**−0,02**. Os extremos não coincidem: no mínimo do prospectivo (13/11/2022,
+−75,83) o proxy era −26,84; no máximo do proxy (14/02/2026, +31,66) o
+prospectivo era −0,68.
+
+| Consequência | Tarefa |
+|---|---|
+| O critério do T5 ("R² dentro da amostra ≥ 0,94, benchmark de persistência") foi definido para o **alvo antigo** (BVRP retrospectivo, autocorrelação ≈ 0,94). Com o alvo prospectivo, ele precisa ser redefinido — inclusive qual é o benchmark de persistência viável em t, já que o BVRP prospectivo de t só é conhecido em t+30. **Decisão pendente com o Prof. Marcelo.** | **T5** |
+| A proxy (passeio aleatório sem deriva) aproxima a **expectativa** do prêmio, E(RV_{t+1:t+30} \| I_t) − IV_t, e não sua **realização**. A correlação ≈ 0 com o prêmio realizado não invalida a proxy, mas o texto não pode apresentá-la como aproximação do BVRP realizado. | **C2.5 / C4.5** |
+
 ## 3. Outros conflitos com a Fase 0
 
 Onde o plano atual e a Fase 0 divergem, vale o plano (reunião de 29/09/2026).
