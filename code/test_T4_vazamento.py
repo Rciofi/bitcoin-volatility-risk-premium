@@ -12,8 +12,9 @@ seria diferente -- o item 3 confirma que o teste detecta esse caso.
 Confere também:
   - as colunas do dataset são exatamente date, o alvo e as variáveis previstas;
   - nenhuma coluna prospectiva além do alvo (nome com "fut", rv_30d, rv_30d_fut);
-  - N = 1.777, de 22/04/2021 a 03/03/2026, sem NaN;
-  - vrp_30d == vh_30d - iv_30d (colinearidade exata documentada).
+  - N = 1.776, de 23/04/2021 a 03/03/2026, sem NaN;
+  - vrp_30d == vh_30d - iv_30d (colinearidade exata documentada);
+  - bvrp_realizado_defasado(t) == alvo de t-30 (o prêmio que se realiza em t).
 
 Uso:  python code/test_T4_vazamento.py   (sai com código 1 se algo falhar)
 """
@@ -29,8 +30,8 @@ from build_ml_dataset_T4 import ALVO, FEATURES, carregar_brutos, construir_featu
 ROOT = Path(__file__).resolve().parent.parent
 N_SORTEIO = 25
 SEMENTE = 20260930
-DATAS_LIMITE = ["2021-04-22", "2023-03-10", "2023-04-30", "2026-03-03"]  # 1ª data, SVB, fim do mês que era buraco, última
-N_ESPERADO = 1777
+DATAS_LIMITE = ["2021-04-23", "2023-03-10", "2023-04-30", "2026-03-03"]  # 1ª data, SVB, fim do mês que era buraco, última
+N_ESPERADO = 1776
 TOL = 1e-12
 
 falhas = []
@@ -51,6 +52,10 @@ check(not proib, f"sem colunas prospectivas além do alvo {proib or ''}")
 check(len(ds) == N_ESPERADO, f"N = {len(ds)} (esperado {N_ESPERADO}); {ds.index.min().date()} a {ds.index.max().date()}")
 check(not ds.isna().any().any(), "sem NaN")
 check(float((ds.vrp_30d - (ds.vh_30d - ds.iv_30d)).abs().max()) < 1e-9, "vrp_30d == vh_30d - iv_30d")
+alvo_t30 = ds[ALVO].shift(30)  # série diária contínua: 30 linhas = 30 dias
+m30 = alvo_t30.notna()
+check(float((ds.loc[m30, "bvrp_realizado_defasado"] - alvo_t30[m30]).abs().max()) < 1e-9,
+      f"bvrp_realizado_defasado(t) == alvo(t-30) em {int(m30.sum())} datas")
 
 print(f"2) Vazamento: dados brutos cortados em t ({N_SORTEIO} datas sorteadas + {len(DATAS_LIMITE)} datas-limite)")
 precos, dvol = carregar_brutos()

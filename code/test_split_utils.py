@@ -12,10 +12,10 @@ Confere, para h em {1, 5, 10, 20, 30, 60} e janela expansiva e móvel:
      cobrindo todo o período fora da amostra;
   3. expansiva: treinos começam na 1ª data e crescem estritamente;
      móvel: todos os treinos com o mesmo tamanho;
-  4. primeira janela: 730 obs., 22/04/2021 a 21/04/2023, igual em todas as
+  4. primeira janela: 730 obs., 23/04/2021 a 22/04/2023, igual em todas as
      combinações e inteiramente conhecida na primeira origem (max <= t0 - h);
      na expansiva, contida no treino da primeira origem; primeira origem em
-     20/06/2023 para todos os h;
+     21/06/2023 para todos os h;
   5. validação cruzada do T7: mesmo embargo entre treino e validação da
      dobra, dobras dentro do treino da origem, sem interseção;
   6. controle positivo: divisões sem embargo (geradas com h = 0) e uma
@@ -48,7 +48,7 @@ def check(cond, msg):
 
 datas = pd.to_datetime(pd.read_csv(ROOT / "data" / "ml_dataset_T4.csv", usecols=["date"])["date"]).to_numpy()
 N = len(datas)
-check(N == 1777 and bool(np.all(np.diff(datas).astype("timedelta64[D]").astype(int) == 1)),
+check(N == 1776 and bool(np.all(np.diff(datas).astype("timedelta64[D]").astype(int) == 1)),
       f"ml_dataset_T4.csv: N = {N}, datas diárias contínuas")
 um_dia = np.timedelta64(1, "D")
 
@@ -90,10 +90,10 @@ print("4) Primeira janela e primeira origem")
 pj = [d.primeira_janela for d in divs.values()]
 d30 = divs[("expansiva", 30)]
 check(all(np.array_equal(p, pj[0]) for p in pj), "primeira janela idêntica em todas as combinações")
-check(len(pj[0]) == 730 and str(datas[pj[0][0]])[:10] == "2021-04-22" and str(datas[pj[0][-1]])[:10] == "2023-04-21",
+check(len(pj[0]) == 730 and str(datas[pj[0][0]])[:10] == "2021-04-23" and str(datas[pj[0][-1]])[:10] == "2023-04-22",
       f"primeira janela: {len(pj[0])} obs., {str(datas[pj[0][0]])[:10]} a {str(datas[pj[0][-1]])[:10]}")
 t0s = {str(datas[d.primeira_origem])[:10] for d in divs.values()}
-check(t0s == {"2023-06-20"}, f"primeira origem igual para todos os h: {sorted(t0s)}")
+check(t0s == {"2023-06-21"}, f"primeira origem igual para todos os h: {sorted(t0s)}")
 # O T9 precisa que a primeira janela inteira já seja conhecida na 1ª origem
 # (alvos realizados): max(primeira janela) <= t0 - h, em todas as combinações.
 check(all(datas[d.primeira_janela].max() <= datas[d.primeira_origem] - d.h * um_dia for d in divs.values()),

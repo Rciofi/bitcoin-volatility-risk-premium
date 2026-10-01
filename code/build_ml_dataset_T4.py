@@ -23,6 +23,10 @@ Variáveis (decisões do T4 em docs/pendencias_T1.md, seção 6):
     ret_acum_30d, log_close_ma30d = log(close / média móvel de 30 dias)
   Prêmio (sempre a PROXY retrospectiva, nunca o prospectivo):
     vrp_30d = vh_30d - iv_30d, d_vrp_1d
+  BVRP realizado defasado (T5): bvrp_realizado_defasado(t) = vh_30d(t) -
+    iv_30d(t-30), o prêmio prospectivo de t-30, que se realiza em t. Usa só
+    retornos até t e a IV de 30 dias antes; é igual a vrp_30d(t) + (iv(t) -
+    iv(t-30)).
   ATENÇÃO: vrp_30d = vh_30d - iv_30d exatamente; as três não podem entrar
   juntas num MQO.
 
@@ -34,8 +38,8 @@ outputs/T4/dicionario_adf_kpss_T4.csv.
 
 Amostra: datas de data/vrp_with_targets.csv (referência, N = 1.806, já com o
 corte de h = 60) em que todas as variáveis existem. A perda vem só do início
-do DVOL (24/03/2021): iv_menos_ma30d exige 30 dias de IV -> N = 1.777, a
-partir de 22/04/2021.
+do DVOL (24/03/2021): bvrp_realizado_defasado exige a IV de t-30, que existe
+a partir de 23/04/2021 -> N = 1.776, de 23/04/2021 a 03/03/2026.
 
 Uso:  python code/build_ml_dataset_T4.py
 """
@@ -76,6 +80,8 @@ DICIONARIO = {
     "log_close_ma30d": ("log(close_t / média(close))", "[t-29, t]", "preços até t", "preço relativo à média móvel (close é I(1))"),
     "vrp_30d":         ("vh_30d - iv_30d (proxy retrospectiva)", "[t-29, t]", "retornos e IV até t", "nível (longa memória)"),
     "d_vrp_1d":        ("vrp_30d_t - vrp_30d_{t-1} (proxy)", "[t-30, t]", "proxy até t; nunca o prospectivo", "diferença"),
+    "bvrp_realizado_defasado": ("vh_30d_t - IV_{t-30} = vrp_30d_t + (IV_t - IV_{t-30})", "[t-29, t] e IV em t-30",
+                                "alvo de t-30, realizado em t: retornos até t e IV de 30 dias antes", "nível"),
 }
 FEATURES = list(DICIONARIO)
 
@@ -127,10 +133,12 @@ def construir_features(precos, dvol):
     g["d_iv_5d"] = iv.diff(5)
     g["iv_menos_ma5d"] = iv - iv.rolling(5).mean()
     g["iv_menos_ma30d"] = iv - iv.rolling(30).mean()
+    g["_iv_t_menos_30"] = iv.shift(30)  # auxiliar: IV de 30 dias antes (DVOL contínuo)
 
     x = f.join(g, how="inner")
     x["vrp_30d"] = x["vh_30d"] - x["iv_30d"]
     x["d_vrp_1d"] = x["vrp_30d"].diff(1)
+    x["bvrp_realizado_defasado"] = x["vh_30d"] - x["_iv_t_menos_30"]
     return x[FEATURES]
 
 
@@ -147,6 +155,12 @@ def main():
     for a, b in [("vh_30d", "rv_30d"), ("iv_30d", "iv_30d"), ("vrp_30d", "vrp_30d")]:
         dif = (comum[a] - ref[b]).abs().max()
         assert dif < 1e-9, f"{a} difere de {b} do pipeline (máx {dif})"
+
+    # bvrp_realizado_defasado(t) deve ser exatamente o alvo de t-30 (série contínua)
+    alvo_t_menos_30 = ref["bvrp_30d_fut"].shift(30)
+    ok = comum["bvrp_realizado_defasado"].notna() & alvo_t_menos_30.notna()
+    dif = (comum.loc[ok, "bvrp_realizado_defasado"] - alvo_t_menos_30[ok]).abs().max()
+    assert dif < 1e-9, f"bvrp_realizado_defasado difere do alvo de t-30 (máx {dif})"
 
     df = comum.copy()
     df.insert(0, ALVO, ref["bvrp_30d_fut"])

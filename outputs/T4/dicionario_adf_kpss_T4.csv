@@ -1,18 +1,19 @@
 variavel,formula,janela,disponivel_em_t,adf_stat,adf_p,kpss_stat,kpss_p,classe_teste,classificacao_adotada,transformacao
-alvo_bvrp_30d_fut,RV(t+1..t+30) - IV_t,"[t+1, t+30]",NÃO: conhecido só em t+30 (é o alvo),-7.252389808762402,1.7661988449905723e-10,0.7221650867141582,0.01153044666234925,persistente,persistente,nível
-vh_1d,sqrt(365·r_t²)·100 = |r_t|·sqrt(365)·100,"[t, t]",só r_t,-5.753352990197828,5.896401764323821e-07,2.3743407492400044,0.01,persistente,persistente,nível (longa memória)
-vh_5d,sqrt(365·média(r²))·100,"[t-4, t]",retornos até t,-5.694895853549263,7.915480218789697e-07,2.2215123585334666,0.01,persistente,persistente,nível (longa memória)
-vh_30d,sqrt(365·média(r²))·100 (= rv_30d),"[t-29, t]",retornos até t,-4.005410920894256,0.0013824416061001235,2.4008886114024324,0.01,persistente,persistente,nível (longa memória)
-vh_60d,sqrt(365·média(r²))·100,"[t-59, t]",retornos até t,-3.0518730970691497,0.030325941179283753,3.301918363395905,0.01,persistente,persistente,nível (longa memória)
-vh_90d,sqrt(365·média(r²))·100,"[t-89, t]",retornos até t,-2.2350393880636186,0.19377478417137334,3.7736160254830233,0.01,I(1),longa memória (ADF instável/na fronteira),nível
-iv_30d,DVOL_t,t,DVOL observado no fim de t,-2.677351593615859,0.07804009664860226,4.261238575527483,0.01,persistente,longa memória (ADF instável/na fronteira),nível
-d_iv_1d,IV_t - IV_{t-1},"[t-1, t]",IV até t,-12.597796041700038,1.7631177261467395e-23,0.02271678704518641,0.1,I(0),I(0),diferença
-d_iv_5d,IV_t - IV_{t-5},"[t-5, t]",IV até t,-10.294880101581253,3.492253811698052e-18,0.02211025187341212,0.1,I(0),I(0),diferença
-iv_menos_ma5d,IV_t - média(IV),"[t-4, t]",IV até t,-12.148476769945152,1.5904056686756622e-22,0.018784795985154798,0.1,I(0),I(0),desvio da média móvel (média em nível é I(1))
-iv_menos_ma30d,IV_t - média(IV),"[t-29, t]",IV até t,-9.833618152111471,4.961782977766204e-17,0.04105779287300141,0.1,I(0),I(0),desvio da média móvel (média em nível é I(1))
-ret_1d,log(close_t / close_{t-1}),"[t-1, t]",preços até t,-7.869418875804027,5.031682161787724e-12,0.22177452778461348,0.1,I(0),I(0),log-diferença de close (I(1))
-ret_acum_5d,soma de r,"[t-4, t]",retornos até t,-6.867887886866125,1.5422919017823216e-09,0.24231453097755382,0.1,I(0),I(0),soma de log-diferenças
-ret_acum_30d,soma de r,"[t-29, t]",retornos até t,-7.130490320963551,3.5282184863427983e-10,0.3371612092554675,0.1,I(0),I(0),soma de log-diferenças
-log_close_ma30d,log(close_t / média(close)),"[t-29, t]",preços até t,-5.84371134514063,3.725762786898493e-07,0.33284057331650224,0.1,I(0),I(0),preço relativo à média móvel (close é I(1))
-vrp_30d,vh_30d - iv_30d (proxy retrospectiva),"[t-29, t]",retornos e IV até t,-6.568314643150501,8.053958799305622e-09,1.0794354044090082,0.01,persistente,persistente,nível (longa memória)
-d_vrp_1d,vrp_30d_t - vrp_30d_{t-1} (proxy),"[t-30, t]",proxy até t; nunca o prospectivo,-10.635431070996283,5.086825402160147e-19,0.01573035919708238,0.1,I(0),I(0),diferença
+alvo_bvrp_30d_fut,RV(t+1..t+30) - IV_t,"[t+1, t+30]",NÃO: conhecido só em t+30 (é o alvo),-7.26718440959994,1.6234636564947978e-10,0.7333747280605922,0.010511388358127979,persistente,persistente,nível
+vh_1d,sqrt(365·r_t²)·100 = |r_t|·sqrt(365)·100,"[t, t]",só r_t,-5.677257908809587,8.647545005018174e-07,2.3592778525949667,0.01,persistente,persistente,nível (longa memória)
+vh_5d,sqrt(365·média(r²))·100,"[t-4, t]",retornos até t,-5.668193750171667,9.049056358029509e-07,2.213869805784599,0.01,persistente,persistente,nível (longa memória)
+vh_30d,sqrt(365·média(r²))·100 (= rv_30d),"[t-29, t]",retornos até t,-4.265675597373081,0.0005090991538172855,2.4005403485492645,0.01,persistente,persistente,nível (longa memória)
+vh_60d,sqrt(365·média(r²))·100,"[t-59, t]",retornos até t,-3.0800518635981042,0.028065095238492183,3.297076482909059,0.01,persistente,persistente,nível (longa memória)
+vh_90d,sqrt(365·média(r²))·100,"[t-89, t]",retornos até t,-2.2445355396962534,0.19048030725902254,3.9006529157851566,0.01,I(1),longa memória (ADF instável/na fronteira),nível
+iv_30d,DVOL_t,t,DVOL observado no fim de t,-2.642878510526761,0.08445495279199439,4.254534398514607,0.01,persistente,longa memória (ADF instável/na fronteira),nível
+d_iv_1d,IV_t - IV_{t-1},"[t-1, t]",IV até t,-12.50145430205351,2.800591103897732e-23,0.024971374347009665,0.1,I(0),I(0),diferença
+d_iv_5d,IV_t - IV_{t-5},"[t-5, t]",IV até t,-10.148066287315647,8.08673515680483e-18,0.023183785990400746,0.1,I(0),I(0),diferença
+iv_menos_ma5d,IV_t - média(IV),"[t-4, t]",IV até t,-12.540268322399264,2.3228658721567957e-23,0.01924619841702318,0.1,I(0),I(0),desvio da média móvel (média em nível é I(1))
+iv_menos_ma30d,IV_t - média(IV),"[t-29, t]",IV até t,-9.814069838905526,5.557624524829928e-17,0.04128500198379705,0.1,I(0),I(0),desvio da média móvel (média em nível é I(1))
+ret_1d,log(close_t / close_{t-1}),"[t-1, t]",preços até t,-7.9262568736912,3.6120503951278734e-12,0.21060678478105352,0.1,I(0),I(0),log-diferença de close (I(1))
+ret_acum_5d,soma de r,"[t-4, t]",retornos até t,-6.901040322744192,1.2818607880840623e-09,0.2334748776295019,0.1,I(0),I(0),soma de log-diferenças
+ret_acum_30d,soma de r,"[t-29, t]",retornos até t,-7.103115362897935,4.1189046971779047e-10,0.33660684241827044,0.1,I(0),I(0),soma de log-diferenças
+log_close_ma30d,log(close_t / média(close)),"[t-29, t]",preços até t,-5.920378244053243,2.5147104055126013e-07,0.3300347000959716,0.1,I(0),I(0),preço relativo à média móvel (close é I(1))
+vrp_30d,vh_30d - iv_30d (proxy retrospectiva),"[t-29, t]",retornos e IV até t,-6.577505929072964,7.659701594384904e-09,1.0716981906846315,0.01,persistente,persistente,nível (longa memória)
+d_vrp_1d,vrp_30d_t - vrp_30d_{t-1} (proxy),"[t-30, t]",proxy até t; nunca o prospectivo,-10.626246070272,5.355843170892693e-19,0.015487196129726322,0.1,I(0),I(0),diferença
+bvrp_realizado_defasado,vh_30d_t - IV_{t-30} = vrp_30d_t + (IV_t - IV_{t-30}),"[t-29, t] e IV em t-30","alvo de t-30, realizado em t: retornos até t e IV de 30 dias antes",-6.938265346409588,1.0410015699645507e-09,0.6458494002420806,0.018468236341629037,persistente,persistente,nível

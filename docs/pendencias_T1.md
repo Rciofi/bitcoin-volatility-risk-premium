@@ -51,6 +51,8 @@ da amostra não fique abaixo do benchmark de persistência (0,94).
 
 ### 2.1 Proxy × prêmio prospectivo: correlação ≈ 0 (achado do passo 5 do T1)
 
+> **Respondido no T5 (decisão nossa, a validar com o Prof. Marcelo):** a "persistência viável em t" para o alvo prospectivo é `bvrp_realizado_defasado(t) = vh_30d(t) − iv_30d(t−30)`, o prêmio de t−30, que se realiza em t. Ele entra como variável explicativa em todos os modelos e como terceiro modelo de referência. Ver seção 9.
+
 Na amostra de referência (N = 1.806), a correlação entre `bvrp_30d_fut`
 (RV(t+1 a t+30) − IV_t) e `vrp_30d` (RV(t−29 a t) − IV_t) **na mesma data t** é
 **−0,02**. Os extremos não coincidem: no mínimo do prospectivo (13/11/2022,
@@ -140,8 +142,9 @@ Os scripts de estratégias (A1: `regenerate_cap7.py`, `scripts/cap7/`) não usam
 
 Gerado por `code/build_ml_dataset_T4.py`; teste de vazamento em `code/test_T4_vazamento.py`
 (dados brutos cortados em t para 29 datas; controle positivo). Dicionário de variáveis,
-ADF/KPSS e descritivas em `outputs/T4/`. O dataset tem o alvo `alvo_bvrp_30d_fut` e 16
-variáveis explicativas; nenhuma outra coluna prospectiva.
+ADF/KPSS e descritivas em `outputs/T4/`. O dataset tem o alvo `alvo_bvrp_30d_fut` e **17**
+variáveis explicativas (16 do T4 + `bvrp_realizado_defasado`, acrescentada no T5); nenhuma
+outra coluna prospectiva.
 
 | Decisão / pendência | Tarefa |
 |---|---|
@@ -151,10 +154,11 @@ variáveis explicativas; nenhuma outra coluna prospectiva.
 | **Colinearidade exata:** `vrp_30d = vh_30d − iv_30d`. As três ficam no dataset, mas **não podem entrar juntas num MQO**; cada script de modelo escolhe duas. | T5, T10 |
 | `rv_30d` **não** entra no dataset novo: é idêntica a `vh_30d`, e o texto vai usar "volatilidade histórica". | C2.4 |
 | Variação do prêmio: `d_vrp_1d` usa só a **proxy** (`vrp_30d`); a variação do prospectivo usaria retornos até t+29. | T5 |
-| **Dois N de referência:** **1.806** (descritivo: Cap. 3 e teste H1, 24/03/2021 a 03/03/2026) e **1.777** (modelagem: Caps. 5 a 7, 22/04/2021 a 03/03/2026). A diferença (29 obs.) vem do início do DVOL: `iv_menos_ma30d` exige 30 dias de IV. **O Cap. 4 deve explicar a diferença.** | C4.2 |
-| **Corte de h = 60 também no Cap. 5.** A amostra de modelagem mantém o corte de h = 60 (termina em 03/03/2026), embora o alvo prospectivo do Cap. 5 precise só de 30 dias à frente (permitiria ir até 02/04/2026). Justificativa: **uma única amostra de modelagem (N = 1.777) para os Caps. 5 a 7**, o que torna os resultados comparáveis entre capítulos. Explicar no Cap. 4. | C4.2 |
+| **Dois N de referência:** **1.806** (descritivo: Cap. 3 e teste H1, 24/03/2021 a 03/03/2026) e **1.776** (modelagem: Caps. 5 a 7, **23/04/2021** a 03/03/2026). A diferença (30 obs.) vem do início do DVOL (24/03/2021): `bvrp_realizado_defasado` exige a IV de t−30 (antes do T5 eram 1.777, a partir de 22/04/2021, limitados por `iv_menos_ma30d`). **O Cap. 4 deve explicar a diferença.** | C4.2 |
+| **Corte de h = 60 também no Cap. 5.** A amostra de modelagem mantém o corte de h = 60 (termina em 03/03/2026), embora o alvo prospectivo do Cap. 5 precise só de 30 dias à frente (permitiria ir até 02/04/2026). Justificativa: **uma única amostra de modelagem (N = 1.776) para os Caps. 5 a 7**, o que torna os resultados comparáveis entre capítulos. Explicar no Cap. 4. | C4.2 |
 | Variáveis de **calendário** (`month`, `weekday`, `is_month_start`, `is_month_end`) ficaram de fora: não constam do T4. **Possível teste de robustez.** | T5/T7 (robustez) |
 | Variáveis de **regime** (`vrp_regime_num`, tercis da amostra inteira) ficaram de fora. | **T9** |
+| **Variável acrescentada no T5:** `bvrp_realizado_defasado(t) = vh_30d(t) − iv_30d(t−30)`, o BVRP prospectivo de t−30, realizado em t (confere com o alvo de t−30 em todas as datas). **Para o texto:** ela é igual a `vrp_30d(t)` mais a variação da IV em 30 dias, `iv(t) − iv(t−30)`. | T5, C5 |
 | **Candidata para o T5** (não criada): `vh_90d − vh_30d`, a inclinação da estrutura a termo da volatilidade histórica. | **T5** |
 
 ## 7. T8 — janela de estimação e divisão treino/teste (`code/split_utils.py`)
@@ -166,13 +170,13 @@ controle positivo com divisões sem embargo).
 |---|---|---|
 | **Embargo** | treino da origem t: s ≤ t − h (h = 30 no Cap. 5; h = horizonte do retorno, até 60, nos Caps. 6 e 7); vale para toda data de teste u ≥ t | T5, T10, T11 |
 | **Janela** | **expansiva** (principal; N pequeno) e **móvel** de tamanho fixo (robustez) | C4.2 |
-| **Primeira janela de estimação** | **730 obs. (2 anos): 22/04/2021 a 21/04/2023**, igual para todos os capítulos; o **T9 calcula o corte dos regimes só com ela** | **T9** |
-| **Primeira origem** | **20/06/2023** para todos os h (t0 = 730 − 1 + 60): mesmo período fora da amostra (988 datas, até 03/03/2026) nos Caps. 5 a 7. No Cap. 5 (h = 30), o treino da 1ª origem na janela expansiva tem 760 obs. (até 21/05/2023) | C4.2 |
+| **Primeira janela de estimação** | **730 obs. (2 anos): 23/04/2021 a 22/04/2023** (era 22/04 a 21/04 antes do T5), igual para todos os capítulos; o **T9 calcula o corte dos regimes só com ela** | **T9** |
+| **Primeira origem** | **21/06/2023** para todos os h (t0 = 730 − 1 + 60): mesmo período fora da amostra (**987** datas, até 03/03/2026) nos Caps. 5 a 7. No Cap. 5 (h = 30), o treino da 1ª origem na janela expansiva tem 760 obs. (até 22/05/2023). Antes do T5: 20/06/2023 e 988 datas | C4.2 |
 | **Janela móvel** | 730 obs.; com h < 60 ela já começa deslizada na 1ª origem (começa em 60 − h) | C4.2 |
 | **Reestimação** | a cada **30 dias**: 33 origens; o modelo da origem t prevê de t até a véspera da próxima origem | T7 (custo das árvores) |
 | **Validação cruzada do T7** | 5 dobras expansivas dentro do treino de cada origem, com o **mesmo embargo** (treino da dobra: s ≤ v − h, v = início da validação) | **T7** |
 
-**Decisões confirmadas pelo autor:** (i) mesma primeira origem (20/06/2023,
+**Decisões confirmadas pelo autor:** (i) mesma primeira origem (21/06/2023 depois do T5,
 `h_primeira_origem = 60`) para todos os capítulos — além da comparabilidade, o regressor do
 Cap. 6 é o BVRP previsto no Cap. 5, então as duas séries precisam cobrir o mesmo período fora
 da amostra; (ii) primeira janela de 730 obs., janela móvel de 730 e reestimação a cada 30 dias.
@@ -180,7 +184,7 @@ da amostra; (ii) primeira janela de 730 obs., janela móvel de 730 e reestimaç�
 | Pendência para as próximas tarefas | Tarefa |
 |---|---|
 | O BVRP previsto é um **regressor gerado** (Pagan, 1984). O bootstrap em bloco deve **reestimar o modelo do Cap. 5 dentro de cada reamostragem**, para incorporar essa incerteza no erro-padrão. | **T10** |
-| As 988 previsões fora da amostra têm alvos de 30 dias sobrepostos (~33 observações independentes). Testes de comparação de previsões (**Diebold–Mariano, Clark–West**) devem usar **HAC com h+1 defasagens, via `hac_utils`**. | **T5** |
+| As 987 previsões fora da amostra têm alvos de 30 dias sobrepostos (~33 observações independentes). Testes de comparação de previsões (**Diebold–Mariano, Clark–West**) devem usar **HAC com h+1 defasagens, via `hac_utils`**. | **T5** |
 
 ### 7.1 Inventário das divisões treino/teste dos scripts antigos (para o texto do C4.2)
 
@@ -251,3 +255,60 @@ previsão média foi +0,6.
 | **Nada de regime discretizado com cortes da amostra inteira**; o T9 refaz os regimes sem vazamento (corte só com a primeira janela de estimação do T8). Mesmo sem vazamento, um regime discretizado não substitui o nível contínuo. | **T5, T9** |
 | **α do LASSO escolhido por validação cruzada embargada** (`split_utils.divisoes_validacao_cruzada`) e a **comparação LASSO × MQO reportada** (diferença máxima e correlação das previsões). | **T5, T7** (C5.2) |
 | O alvo antigo era o BVRP **retrospectivo em t+1**, quase igual ao de t (autocorrelação ≈ 0,94); por isso a persistência tinha R² de 0,937. O alvo novo (`alvo_bvrp_30d_fut`) não tem essa propriedade (correlação com a proxy de −0,02), e o benchmark de persistência precisa ser redefinido (seção 2.1). | **T5** |
+
+## 9. T5 e T7 — previsão do BVRP prospectivo e ajuste das árvores
+
+Script: `code/previsao_bvrp_T5.py`; métricas em `code/avaliacao_utils.py`; testes em
+`code/test_T5.py`. Previsões em `data/previsoes_bvrp_T5.csv` (date, origem, janela, modelo,
+previsao; **sem o alvo**, que vira regressor no T10); tabelas e figuras em `outputs/T5/`.
+
+**Critério de avaliação — decisão nossa, a validar com o Prof. Marcelo.** O critério do plano
+("R² dentro da amostra ≥ 0,94, persistência") foi definido para o alvo antigo (retrospectivo em
+t+1) e não se aplica ao alvo prospectivo. Adotado:
+- **principal:** R² fora da amostra contra a **média histórica** (Campbell e Thompson, 2008),
+  calculada só com alvos conhecidos em cada origem (s ≤ t − 30);
+- **secundários:** R² contra a **proxy retrospectiva** (`vrp_30d` em t) e contra a
+  **persistência viável** (`bvrp_realizado_defasado` em t, responde à seção 2.1);
+- **testes:** Clark–West contra a média histórica (unilateral) e Diebold–Mariano entre todos os
+  pares, com HAC de h+1 = 31 defasagens via `hac_utils`. 987 previsões com alvos sobrepostos
+  equivalem a ~33 observações independentes: pouco poder;
+- o modelo de referência é um parâmetro (`--referencia`).
+
+| Decisão | Valor |
+|---|---|
+| Variáveis | lineares (MQO, Ridge, LASSO): 16 (todas menos `vh_30d`, pela colinearidade exata); árvores (floresta aleatória, XGBoost): 17 |
+| Hiperparâmetros | em **cada reestimação** (33 origens), por validação cruzada embargada (5 dobras, treino da dobra com s ≤ v − 30), menor MSE médio. Ridge: α em 15 pontos de 10⁻³ a 10⁴; LASSO: 13 pontos de 10⁻³ a 10¹; floresta: 500 árvores × `max_depth` {3, 6, sem limite} × `min_samples_leaf` {5, 20, 50} × `max_features` {1/3, 1} (18); XGBoost: `n_estimators` {200, 500} × `learning_rate` {0,03; 0,1} × `max_depth` {2, 4} × `min_child_weight` {1, 10}, `subsample` = `colsample_bytree` = 0,8 (16) |
+| Placebo | alvo embaralhado dentro do treino de cada origem: **10 permutações nas árvores** (hiperparâmetros da rodada principal) e **200 nos lineares** (α reescolhido). **Só como verificação de vazamento**, com o critério **mediana do R² placebo ≤ 0** em cada modelo. Uma permutação só era frágil (no teste de fumaça, com 60 obs., os lineares deram +0,03 por acaso). **Não é teste de significância:** permutações independentes destroem a autocorrelação dos alvos de 30 dias sobrepostos, e a distribuição placebo fica estreita demais; além disso, 10 permutações não dão resolução abaixo de ~0,09. **A significância vem do Clark–West e do Diebold–Mariano com HAC.** |
+| Robustez | janela móvel de 730, com o mesmo ajuste |
+| Grades (2ª rodada) | Na 1ª rodada, o escolhido caía no limite da grade (LASSO em α = 10; floresta e XGBoost no canto mais regularizado). As grades foram estendidas: Ridge até 10⁵; LASSO até 10²; floresta com profundidade {1, 2, 3, 6, sem limite}, folha mínima {5, 20, 50, 100, 200} e `max_features` {0,2; 1/3; 1} (75 combinações); XGBoost com `n_estimators` {50, 100, 200, 500}, `learning_rate` {0,01; 0,03; 0,1}, `max_depth` {1, 2, 4} e `min_child_weight` {1, 10} (72). A validação cruzada das árvores passou a distribuir os ajustes (combinação × dobra) entre os núcleos, com o mesmo resultado |
+
+### 9.1 Resultados (2ª rodada, grades estendidas; 987 previsões, 21/06/2023 a 03/03/2026)
+
+| Modelo | R² vs. média (expansiva) | R² vs. média (móvel) | CW p (expansiva) | DM p vs. média (expansiva) | R² dentro da amostra | % negativas | Média nos 290 dias com realizado > 0 |
+|---|---|---|---|---|---|---|---|
+| Ridge | **0,223** | 0,095 | 0,0005 | 0,042 | 0,21 | 93% | −5,1 |
+| Floresta aleatória | 0,143 | 0,073 | 0,0008 | 0,051 | 0,19 | 100% | −6,8 |
+| LASSO | 0,123 | 0,039 | 0,016 | 0,071 | 0,09 | 100% | −8,7 |
+| XGBoost | 0,100 | 0,066 | 0,0033 | 0,064 | 0,16 | 100% | −8,5 |
+| MQO | 0,097 | −0,037 | 0,0007 | 0,517 | 0,29 | 73% | −2,3 |
+| Persistência viável | −1,003 | −1,197 | 0,53 | — (pior que a média) | — | 70% | −9,9 |
+| Proxy retrospectiva | −0,506 | −0,652 | 0,23 | — (pior que a média) | — | 78% | −8,5 |
+
+Realizado fora da amostra: média −5,3; positivo em 290 de 987 dias (29%).
+
+| Achado | Tarefa |
+|---|---|
+| **Comparação múltipla (5 modelos contra a média; Bonferroni, limite 0,05/5 = 0,01).** Clark–West: sobrevivem Ridge, floresta aleatória, XGBoost e MQO (não o LASSO, p = 0,016), nas duas janelas. Diebold–Mariano: **nenhum sobrevive** (o menor é o do Ridge, p = 0,042). **O texto do Cap. 5 deve apoiar a conclusão principal no Clark–West, mencionando a correção.** Ressalva: o CW ajusta pelo ruído de estimação a favor do modelo maior e pode ser significante mesmo com R² fora da amostra negativo (MQO na móvel: R² = −0,037, CW p = 0,004); e 987 previsões com alvos sobrepostos equivalem a ~33 observações independentes. | **C5**, T5 |
+| **XGBoost: o sobreajuste da 1ª rodada (R² dentro da amostra 0,67, fora −0,08) vinha da grade truncada.** Com a grade estendida, a validação cruzada escolhe árvores de profundidade 1 com taxa de 0,01, e a distância some (0,16 dentro, 0,10 fora). Registrar no texto que a grade inicial não permitia regularização suficiente. | **C5**, T7 |
+| **LASSO × MQO: regularização efetiva** (diferença máxima de 25,4 p.p. e correlação de 0,34 entre as previsões, janela expansiva), ao contrário do T6. No limite, o LASSO **zera todos os coeficientes e prevê exatamente a média histórica** em 12 das 33 origens (26 de 33 na móvel) — daí 100% de previsões negativas e R² idêntico nas duas rodadas. | **C5.2** |
+| **Nenhum modelo antecipa os episódios positivos** (ex.: fev/2026, +45). Nos 290 dias com prêmio positivo, todas as previsões médias são negativas (−2,3 a −8,7). As previsões **encolhem para a média por baixa previsibilidade, não por erro de especificação** (diferente do T6). | **C5**, F2 |
+| **Limites da grade depois da extensão:** Ridge e LASSO escolhem valores interiores (0 origens nos limites). As árvores continuam no limite de **menor capacidade**: floresta com profundidade 1 em 33/33 origens (25/33 na móvel); XGBoost com taxa 0,01 em 33/33, 50 árvores em 22/33 e profundidade 1 em 28/33. Esse limite é estrutural: árvores de profundidade 1 com encolhimento máximo já se aproximam da média histórica (desvio-padrão das previsões de 2,0–2,3 contra 4,5 do Ridge); estender mais só aproximaria da média. É evidência de **sinal não linear fraco**. | **T7**, **T11**, C5 |
+| As referências ingênuas são piores que a média: persistência viável (R² −1,00) e proxy (−0,51), coerente com a correlação ≈ 0 da seção 2.1. | C5, C2.5 |
+| Placebo (verificação de vazamento): medianas entre −0,016 e 0,000 em todos os modelos. | T5 |
+
+### 9.2 Decisões para os capítulos seguintes (fixadas antes de ver os resultados do T10/T11)
+
+| Decisão | Tarefa |
+|---|---|
+| **Previsão que alimenta os capítulos seguintes**, escolhida agora para evitar escolher o modelo depois de ver os resultados: **T10** usa o **Ridge** como principal e a **floresta aleatória** como robustez; **T11** usa a **floresta aleatória** como principal (o plano pede árvore) e o **Ridge** como robustez. Fonte: `data/previsoes_bvrp_T5.csv`, janela expansiva. | **T10**, **T11** |
+| **Forma do BVRP previsto no T11.** O plano define BVRP previsto = f(variáveis) − IV, isto é, prever a RV futura e subtrair a IV conhecida em t. O T5 previu o BVRP diretamente. No MQO as duas formas são equivalentes (com `iv_30d` entre os regressores, a regressão de RV − IV só desloca em 1 o coeficiente da IV); no Ridge e nas árvores, não (a penalidade e as quebras atuam sobre alvos diferentes). **O T11 deve testar as duas.** | **T11** |

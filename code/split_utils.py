@@ -8,15 +8,15 @@ porque o alvo de s (que olha h dias à frente) só é conhecido em s + h.
   - h = horizonte do retorno nos Caps. 6 e 7 (até 60).
 
 Desenho (docs/pendencias_T1.md, seção 7):
-  - Janela EXPANSIVA como principal (N = 1.777 é pequeno); MÓVEL, de tamanho
+  - Janela EXPANSIVA como principal (N = 1.776 é pequeno); MÓVEL, de tamanho
     fixo, como teste de robustez.
   - Primeira janela de estimação: as n_inicial primeiras observações
-    (padrão 730 = 2 anos: 22/04/2021 a 21/04/2023 em ml_dataset_T4.csv).
+    (padrão 730 = 2 anos: 23/04/2021 a 22/04/2023 em ml_dataset_T4.csv).
     É devolvida como objeto próprio porque o T9 calcula o corte dos regimes
     só com ela. Ela é a mesma para todos os capítulos.
   - Primeira origem: t0 = n_inicial - 1 + h_primeira_origem. Com o padrão
     h_primeira_origem = 60 (maior horizonte do plano), o período fora da
-    amostra é o mesmo nos Caps. 5 a 7 (começa em 20/06/2023).
+    amostra é o mesmo nos Caps. 5 a 7 (começa em 21/06/2023).
   - Reestimação a cada `freq` dias (padrão 30): o modelo estimado na origem
     t prevê as datas t, t+1, ..., até a véspera da próxima origem, sempre com
     as variáveis explicativas da própria data. Como s <= t - h <= u - h para

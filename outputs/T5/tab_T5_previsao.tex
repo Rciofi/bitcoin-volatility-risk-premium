@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Previsão do BVRP prospectivo fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026).}
+\label{tab:T5-previsao}
+\begin{tabular}{lrrrrrr}
+\toprule
+Modelo & $R^2$ vs. média & $R^2$ vs. persist. & RMSE & MAE & CW ($p$) & $R^2$ dentro \\
+\midrule
+Média histórica & -- & 0{,}501 & 14{,}71 & 10{,}41 & -- & -- \\
+Proxy retrospectiva & $-$0{,}506 & 0{,}248 & 18{,}05 & 14{,}09 & 0{,}226 & -- \\
+Persistência viável & $-$1{,}003 & -- & 20{,}82 & 16{,}12 & 0{,}525 & -- \\
+MQO & 0{,}097 & 0{,}549 & 13{,}98 & 10{,}92 & 0{,}001 & 0{,}291 \\
+Ridge & 0{,}223 & 0{,}612 & 12{,}97 & 9{,}80 & 0{,}001 & 0{,}211 \\
+LASSO & 0{,}123 & 0{,}562 & 13{,}78 & 10{,}23 & 0{,}016 & 0{,}088 \\
+Floresta aleatória & 0{,}143 & 0{,}572 & 13{,}62 & 10{,}06 & 0{,}001 & 0{,}194 \\
+XGBoost & 0{,}100 & 0{,}550 & 13{,}96 & 10{,}32 & 0{,}003 & 0{,}156 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize\textit{Nota}: $R^2$ fora da amostra $= 1 - \text{SSE}_{\text{modelo}}/\text{SSE}_{\text{referência}}$; média histórica calculada só com alvos conhecidos em cada origem ($s \leq t - 30$). CW: Clark--West contra a média histórica, unilateral, HAC com $h+1 = 31$ defasagens. $R^2$ dentro da amostra: média entre as 33 reestimações.
+\end{table}
