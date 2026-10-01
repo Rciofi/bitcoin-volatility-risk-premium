@@ -397,3 +397,132 @@ esperança"*). Conclusões iguais com o corte fixo e o expansivo. (C7, T10, T11)
 | **T10 (linear):** retorno ~ BVRP previsto, com a dummy `regime_alta_fixo` e a interação BVRP previsto × regime; robustez com `regime_alta_expansivo`. O regime é conhecido em t (corte da 1ª janela; `vh_30d` de t). | **T10** |
 | **T11 (árvore):** a árvore escolhe os cortes sozinha (C5.6, C7.1): entra `vh_30d` (e as demais volatilidades), **não** a dummy; robustez acrescentando `regime_alta_fixo`. Comparar os cortes escolhidos pela árvore com 37,3. | **T11** |
 | Nada de regime calculado na amostra inteira (anotações das p. 76 e 82: *"look-ahead bias"*). | T10, T11, A1 |
+
+## 11. T10 e T12 — retorno futuro sobre o BVRP previsto e dispersão do Cap. 3
+
+Código: `code/retorno_bvrp_T10.py` (saídas em `outputs/T10/`), `code/plot_vrp_vs_return_T12.py`
+(saídas em `outputs/T12/`), testes em `code/test_T10.py`. Nada em `figs/` ou `tables/`.
+
+**Especificações (T10).** Amostra: as 987 datas fora da amostra do T5 (21/06/2023 a 03/03/2026,
+janela expansiva). Horizontes h = 1, 5, 10, 20, 30, 60; EP de Newey–West com h+1 defasagens
+(`hac_utils`); limite de Bonferroni 0,05/6 = 0,0083.
+1. Principal: ret_fut_h ~ BVRP previsto. Regressor do Ridge (principal) e da floresta aleatória
+   (robustez), como fixado na seção 9.2 antes de ver os resultados.
+2. Componentes (C6.5): ret_fut_h ~ `vh_30d` + `iv_30d`, teste de b1 + b2 = 0.
+3. Regime (T9): ret_fut_h ~ BVRP previsto + D + D × BVRP previsto, D = `regime_alta_fixo`
+   (corte de 37,3); robustez com `regime_alta_expansivo`; Wald conjunto de D e da interação.
+4. Comparação com o publicado: ret_fut_h ~ `vrp_30d` (N = 1.806), maxlags = h (como nas tabelas
+   do Cap. 5) contra h+1 (T3).
+
+### 11.1 Regressor gerado: bootstrap em blocos em dois níveis
+
+- **Desenho abandonado (registrar no Cap. 6, nota metodológica).** O primeiro desenho reamostrava
+  a série inteira em blocos e aplicava as origens de previsão por posição. Com isso, as "datas
+  fora da amostra" de cada reamostragem misturavam épocas, e o bootstrap estimava outro
+  parâmetro: a média dos β* ficou perto de zero, e o IC não continha β̂ em nenhuma das 24
+  combinações (6 horizontes × 4 variantes) do teste de fumaça.
+- **Desenho adotado.** 1º nível (incerteza do regressor gerado, Pagan, 1984): em cada uma das
+  33 origens, o 1º estágio é reestimado num treino reamostrado em blocos **dentro** da janela de
+  treino da própria origem (posições 0 a t − 30: embargo exato) e prevê as datas reais de teste.
+  2º nível (incerteza amostral): os 987 pares (previsão reestimada, retorno) são reamostrados
+  em blocos dentro do período fora da amostra, e β_h é reestimado.
+- **Principal:** Ridge com o α de cada origem do T5 **fixo**, bloco de 60, B = 999. Sensibilidade:
+  α fixo com blocos de 30 e 90 (B = 999); α **reescolhido** por validação cruzada embargada em
+  cada treino reamostrado (B = 999); floresta aleatória com os hiperparâmetros de cada origem do
+  T5 fixos (bloco de 60, B = 199). Contraprova: só o 2º nível, com as previsões originais
+  fixas (B = 999). Sementes fixas (`SEMENTE = 20261001`, combinada com bloco e reamostragem).
+- **Por que o α reescolhido não é o principal (mecanismo da distorção).** No bootstrap em
+  blocos, blocos repetidos podem cair no treino e na validação da mesma dobra; a validação
+  cruzada passa então a favorecer α menores (menos regularização), e a previsão fica mais
+  ruidosa. É uma distorção do **procedimento**, não incerteza real da seleção de α. No teste de
+  fumaça, a razão média dos β*/β̂ foi ~0,3–0,4 com α reescolhido, contra ~0,6–0,7 com α fixo.
+- **Inferência, para cada h (escala coerente, decidida após a rodada completa; ver 11.4):**
+  λ = β̄*/β̂ (atenuação); EP corrigido = EP_boot / λ; teste de H0: β = 0 por
+  β̂ / (EP_boot / λ), equivalente a β̄* / EP_boot (normal); IC principal β̂ ± 1,96 × EP_boot / λ,
+  coerente com o teste. Ao lado: EP HAC (ignora o 1º estágio), EP só do 2º nível e as razões
+  entre os EPs (CSV). IC básico (2β̂ − q97,5; 2β̂ − q2,5) como complemento — ele se refere à
+  relação **corrigida da atenuação**, não a β̂; viés (β̄* − β̂). Na contraprova só do 2º nível
+  não há 1º estágio, e o EP não é corrigido.
+- **Atenuação.** A reestimação do 1º estágio acrescenta ruído à previsão e atenua β no 2º
+  estágio (erro nas variáveis); a contraprova só do 2º nível é centrada em β̂, e com os dois
+  níveis a média dos β* fica entre 0 e β̂ (testes 6a e 6b de `test_T10.py`). **Para o texto do
+  Cap. 6:** o β estimado com o BVRP previsto é uma estimativa **conservadora (atenuada)** da
+  relação entre o prêmio prospectivo e o retorno futuro.
+
+### 11.2 Ressalvas para o texto do Cap. 6
+
+- **Junções dos blocos:** nas fronteiras entre blocos concatenados, a ordem temporal deixa de
+  valer (limitação padrão do bootstrap em blocos móveis).
+- **Poucos blocos no 2º nível:** 987 datas em blocos de 60 são ~16 blocos; os intervalos por
+  percentis são grosseiros, por isso o EP HAC é reportado ao lado e o IC principal usa o EP.
+- **Poder baixo nos horizontes longos:** em h = 60 há só ~16 períodos não sobrepostos na amostra
+  fora da amostra; "não significante" nesses horizontes **não** é evidência de ausência de
+  relação.
+- **Comparações múltiplas:** 6 horizontes; reportar quais sobrevivem a Bonferroni (0,0083).
+- **Tabelas publicadas do Cap. 5:** usavam maxlags = h; `publicado_h_vs_h1_T10.csv` mostra o
+  efeito de passar a h+1 (T3) nos mesmos dados (N = 1.806, proxy `vrp_30d`).
+
+### 11.3 T12 — dispersão BVRP × retorno de 30 dias
+
+`outputs/T12/fig_T12_vrp_vs_ret30d.png` substitui, para o Cap. 3, `figs/cap3/vrp_vs_return_20d.png`
+(h = 20 → h = 30, horizonte do BVRP). Figura **descritiva**: proxy `vrp_30d` (conhecida em t),
+amostra descritiva N = 1.806; reta de MQO com β, EP HAC (31 defasagens), p e R² na legenda, no
+lugar da correlação simples do script antigo (`code/plot_vrp_vs_return.py`, não alterado). A troca
+do arquivo em `figs/` e a legenda no .tex ficam para quando o Cap. 3 for reescrito (sincronizado
+com o Overleaf). (C3, T12)
+
+### 11.4 Resultados do T10
+
+Rodada completa (B = 999 no Ridge, 199 na floresta; 987 datas, 21/06/2023 a 03/03/2026;
+`test_T10.py`: todos os testes passaram). β em pontos percentuais de retorno por p.p. de BVRP
+previsto (β × 100 dos CSVs).
+
+**Principal (Ridge, α fixo, bloco de 60; teste na escala coerente):**
+
+| h | β | EP HAC | p HAC | EP só 2º nível | EP boot bruto | λ = β̄*/β̂ | EP corrigido (EP/λ) | p boot | IC 95% | fração β* ≥ 0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | −0,045 | 0,018 | 0,011 | 0,015 | 0,013 | 0,59 | 0,022 | 0,043 | [−0,089; −0,001] | 0,012 |
+| 5 | −0,144 | 0,064 | 0,025 | 0,063 | 0,056 | 0,68 | 0,082 | 0,080 | [−0,306; 0,017] | 0,034 |
+| 10 | −0,250 | 0,114 | 0,029 | 0,132 | 0,117 | 0,64 | 0,182 | 0,170 | [−0,606; 0,107] | 0,074 |
+| 20 | −0,459 | 0,230 | 0,046 | 0,285 | 0,249 | 0,63 | 0,392 | 0,242 | [−1,228; 0,310] | 0,099 |
+| 30 | −0,586 | 0,347 | 0,091 | 0,435 | 0,379 | 0,67 | 0,570 | 0,303 | [−1,703; 0,530] | 0,135 |
+| 60 | −1,433 | 0,654 | 0,029 | 0,817 | 0,688 | 0,70 | 0,979 | 0,143 | [−3,352; 0,485] | 0,057 |
+
+- **Por que o teste β̂ / EP_boot foi trocado.** Com os dois níveis, os β* encolhem para zero
+  (λ ≈ 0,6–0,7) e a dispersão encolhe junto: o EP bruto em dois níveis saiu 11–16% **menor**
+  que o EP só do 2º nível, embora o 1º nível acrescente incerteza (o coeficiente de variação,
+  EP/|β̄*|, é maior). O teste β̂ / EP_boot misturava escalas — β̂ não atenuado sobre EP
+  atenuado — e dava p pequenos demais (h = 1: 0,0007, "sobrevivendo" a Bonferroni; h = 5:
+  0,0097). Na escala coerente, o EP corrigido fica 1,20–1,49 vez o EP só do 2º nível e
+  1,25–1,71 vez o EP HAC (teste 6c de `test_T10.py`: EP corrigido > EP só do 2º nível em todo h).
+- **Sinal:** β < 0 em todos os horizontes e nos dois modelos (Ridge e floresta).
+- **Significância:** p boot de 0,043 (h = 1) a 0,30; só h = 1 abaixo de 0,05, e **nenhum
+  horizonte sobrevive a Bonferroni** (0,0083). HAC: p de 0,011 a 0,091, também nenhum.
+  Sensibilidade (p boot): blocos de 30, 0,042–0,20; de 90, 0,050–0,42; α reescolhido,
+  0,068–0,57; floresta, 0,50–0,84. Só a contraprova, que ignora o 1º estágio, tem h = 1 abaixo
+  de 0,0083 (p = 0,0025).
+- **Atenuação:** λ de 0,59 a 0,70 (blocos de 30: 0,72–0,83; de 90: 0,50–0,62; α reescolhido:
+  0,27–0,43; floresta: 0,34–0,53). Contraprova só do 2º nível centrada (razão 0,90–1,09;
+  |β̄* − β̂| < 0,5 EP em todos os h).
+- **Conclusão para o Cap. 6:** sinal negativo estável em todos os horizontes e nos dois
+  modelos, mas nenhum horizonte sobrevive a Bonferroni; **a versão linear não prevê os retornos
+  de forma robusta**.
+- **Para o texto (interpretação do sinal):** com BVRP = RV − IV, β < 0 equivale a "prêmio de
+  variância maior (IV acima da RV futura) → retorno futuro maior", a mesma direção de
+  Bollerslev, Tauchen e Zhou (2009). Aqui a evidência é **fraca** (só h = 1 com p < 0,05, sem
+  sobreviver a Bonferroni).
+- **Floresta (robustez):** mesmo sinal em todos os h, β de magnitude parecida, mas p HAC entre
+  0,15 e 0,61.
+- **Componentes:** b_vh + b_iv = 0 só é rejeitado em h = 1 (p = 0,039); nos demais, p ≥ 0,18.
+- **Regime (corte fixo):** no regime de baixa volatilidade (31% das datas), a inclinação é mais
+  negativa (h = 30: −2,92 p.p./p.p., p = 0,005); a interação é positiva (p < 0,05 de h = 10 a 60),
+  e no regime de alta a inclinação fica perto de zero (h = 30: −0,34). Wald conjunto (D e
+  interação): p < 0,05 só em h = 60 (0,035). **Com o corte expansivo, não se sustenta:** interação
+  com p ≥ 0,06 e Wald com p ≥ 0,16. **Para o texto:** a diferença entre regimes é frágil (some
+  com o corte expansivo) e deve ser apresentada como **sugestiva**, não como resultado.
+- **Publicado (proxy `vrp_30d`, N = 1.806):** β ≈ 0 em todos os h (p de 0,17 a 0,93). Passar de
+  maxlags = h para h+1 muda o EP em −3% a +1%: irrelevante aqui. A proxy na amostra inteira não
+  mostra a relação que o BVRP previsto mostra fora da amostra; a comparação mistura amostra
+  (1.806 × 987 datas) e regressor (proxy × previsão).
+- **T12:** β = 0,088 p.p. de retorno de 30 dias por p.p. de proxy (EP HAC 0,119; p = 0,46;
+  R² = 0,004), N = 1.806.
