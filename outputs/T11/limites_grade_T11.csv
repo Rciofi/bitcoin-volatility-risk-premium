@@ -1,0 +1,12 @@
+janela,modelo,hiperparametro,n_origens,menor_valor_grade,n_no_menor,maior_valor_grade,n_no_maior,rotulo
+expansiva,Ridge,alpha,33,0.001,0,100000.0,0,Ridge
+movel,Ridge,alpha,33,0.001,1,100000.0,13,Ridge
+expansiva,floresta_aleatoria,max_depth,33,1.0,7,,0,floresta_aleatoria
+expansiva,floresta_aleatoria,min_samples_leaf,33,5.0,0,200.0,2,floresta_aleatoria
+expansiva,floresta_aleatoria,max_features,33,0.2,5,1.0,10,floresta_aleatoria
+movel,floresta_aleatoria,max_depth,33,1.0,12,,1,floresta_aleatoria
+movel,floresta_aleatoria,min_samples_leaf,33,5.0,1,200.0,6,floresta_aleatoria
+movel,floresta_aleatoria,max_features,33,0.2,11,1.0,14,floresta_aleatoria
+expansiva,floresta_aleatoria,max_depth,33,1.0,7,,0,floresta_aleatoria_com_regime
+expansiva,floresta_aleatoria,min_samples_leaf,33,5.0,0,200.0,2,floresta_aleatoria_com_regime
+expansiva,floresta_aleatoria,max_features,33,0.2,6,1.0,10,floresta_aleatoria_com_regime

@@ -526,3 +526,154 @@ previsto (β × 100 dos CSVs).
   (1.806 × 987 datas) e regressor (proxy × previsão).
 - **T12:** β = 0,088 p.p. de retorno de 30 dias por p.p. de proxy (EP HAC 0,119; p = 0,46;
   R² = 0,004), N = 1.806.
+
+## 12. T11 — BVRP previsto e retornos, versão não linear (modelo único em árvore)
+
+Código: `code/retorno_bvrp_T11.py` (saídas em `outputs/T11/`; previsões da forma f(variáveis) − IV em
+`data/previsoes_bvrp_T11.csv`), testes em `code/test_T11.py`. O código e as saídas do T5 e do T10 não
+foram alterados. Decisões abaixo **registradas antes de rodar** (01/10/2026).
+
+**Leituras do "modelo único em árvore"**
+
+| Leitura | Papel | Base |
+|---|---|---|
+| **A:** ret_fut_h(t) = a + β_h · BVRP_previsto(t) + e, com BVRP_previsto(t) = f(variáveis em t) − IV(t) e f = floresta aleatória | **Principal** (Cap. 7) | Fórmula da anotação da p. 75 (*"retorno(t+h) = beta·BVRP(t) + erro(t+h), em que BVRP(t) = função(todos os preditores) − IV… RF ou XGBoost"*) e estrutura **D1** fechada na reunião (1:19–1:21: prever o BVRP e depois testar se o BVRP previsto prevê o retorno; *"linearmente não prevê; se eu fizer não linear…"*) |
+| **B:** ret_fut_h(t) = g_h(variáveis em t), floresta direto no retorno, por horizonte | **Complemento**, sem bootstrap: R² fora da amostra contra a média histórica, Clark–West com HAC h+1 e placebo de vazamento | Reunião, 1:17:29 (*"é retorno como função, essa função é dada pela árvore… de todas aquelas variáveis lá e deixa ele escolher onde é que está tendo quebra"*) e 1:18:42 (crítica ao caminho "prevê retorno → prevê BVRP → volta ao retorno") |
+
+"Único", na leitura A: um só modelo de árvore com todas as volatilidades substitui o aparato do antigo
+Cap. 8 (quantil q75, dummy, interações); as quebras são escolhidas na previsão do BVRP (C7.1).
+
+**Decisões**
+
+| Decisão | Valor |
+|---|---|
+| Forma principal do BVRP previsto no retorno | **f(variáveis) − IV**: a floresta prevê `rv_30d_fut` = RV(t+1 a t+30) = alvo + `iv_30d` (= `vh_30d` de t+30) e subtrai a `iv_30d` de t. **Forma direta** (a floresta prevê o BVRP, como no T5) **como robustez**. Ridge nas duas formas como robustez (seção 9.2). Fixado antes de ver qualquer resultado do T11 |
+| Previsão da RV | mesmas 33 origens, embargo s ≤ t − 30, validação cruzada embargada em cada reestimação, grades estendidas (floresta 75, Ridge 17); janela expansiva (principal) e móvel de 730; métricas do T5. Referência adicional **"média da RV − IV"** (média histórica da RV menos a IV de t): mede quanto do desempenho da forma f(variáveis) − IV vem só da IV |
+| Placebo da forma f(variáveis) − IV | **no espaço da RV** (R² da RV prevista contra a média histórica da RV): no espaço do BVRP, até uma previsão sem informação (constante − IV) carrega a IV, e o R² placebo poderia ser positivo sem vazamento. Critério: mediana ≤ 0,01 (10 permutações na floresta, 200 no Ridge; ver a mudança de critério abaixo) |
+| Robustez (seção 10) | floresta f(variáveis) − IV com `regime_alta_fixo` como variável adicional (expansiva) |
+| Retorno | 987 datas; h = 1, 5, 10, 20, 30, 60; inferência do T10 (EP HAC h+1; bootstrap em dois níveis com hiperparâmetros fixos por origem, bloco de 60; escala coerente; contraprova só do 2º nível; Bonferroni 0,0083). **Mesmas reamostragens em todos os horizontes e nos quatro regressores** (semente do T10; o Ridge direto reproduz as réplicas do T10) |
+| B | 999 por regressor (bloco de 60); blocos de 30 e 90 com B = 199 só no principal. **B = 499 no principal se a validação cruzada escolher `max_features` = 1 em ≥ 11 das 33 origens** (cada ajuste fica ~4× mais caro) |
+| **Teste F (principal): F2**, H0: β_h = 0 para todo h | Wald com a covariância dos β* na escala coerente: W = β̂′(Λ⁻¹Σ*Λ⁻¹)⁻¹β̂ = β̄*′Σ*⁻¹β̄* ~ χ²(6), F = W/6 (análogo multivariado do z = β̄*/EP_boot do T10). Complementos: **max-\|t\|** do bootstrap (p ajustado por horizonte, leva em conta a correlação entre os h; responde às comparações múltiplas) e **versão HAC** empilhada (escores conjuntos, Newey–West com 61 defasagens; ignora o 1º estágio). Reportar o **número de condição** e a **matriz de correlação** dos β* (horizontes sobrepostos: Σ* perto de singular, e o Wald pode rejeitar por contrastes entre horizontes) |
+| Teste F (complemento): F1 | anotação da p. 82, por h: ret ~ BVRP previsto + D + D × BVRP previsto, Wald dos 3 coeficientes (e dos 2 de regime), HAC h+1, corte fixo e expansivo (sem look-ahead) |
+| F2 no T10 | aplicado às réplicas gravadas do T10 (sem recalcular), saída em `outputs/T11/` |
+| Quebras (C7.1) | importância por impureza (média das 33 origens) e por permutação fora da amostra; dependência parcial do BVRP previsto em `vh_30d` e `iv_30d`, padrão e **coerente** (recalcula `vrp_30d` = `vh_30d` − `iv_30d`, identidade exata nos dados; `iv_menos_ma*` não são recalculadas — ressalva); limiares escolhidos pelas árvores em `vh_30d`, `vh_60d`, `vh_90d` e `vrp_30d`, ponderados pela redução de impureza, contra o corte do T9 (37,3) e a faixa do corte expansivo |
+
+**Mudança do critério do placebo (fixada em 01/10/2026, antes da rodada completa).** Em todos os
+placebos do T11 (leitura A, no espaço da RV, e leitura B), o critério passa de "mediana do R² placebo
+≤ 0" para **"mediana ≤ 0,01"** (`TOL_PLACEBO` em `retorno_bvrp_T11.py`).
+- **Motivo:** com o alvo embaralhado, a floresta colapsa na média histórica, e o R² placebo fica
+  centrado em zero; o critério "≤ 0" passa a falhar por acaso. No teste de fumaça (2 permutações),
+  a leitura B teve mediana positiva em 4 dos 6 horizontes (+0,001 a +0,006). **Diagnóstico com
+  20 permutações** (h = 1, 20, 60): medianas de 0,0000, −0,0010 e +0,0006, com ~50% das permutações
+  positivas (0,50; 0,40; 0,55) e magnitude abaixo de 0,001 — distribuição centrada em zero, sem
+  sinal de vazamento. Um vazamento real daria R² placebo claramente positivo (os modelos do T5
+  tiveram R² de 0,10 a 0,22); a tolerância de 1% da variância separa os dois casos.
+- **O placebo serve só para detectar vazamento.** Na leitura B, a evidência de previsibilidade vem
+  do **Clark–West** (HAC h+1) e do **R² fora da amostra contra a média histórica**, não do placebo.
+  O embargo da leitura B é verificado à parte (`test_T11.py`, testes 3 e 7).
+- **O T5 passou no critério antigo, mais rígido** (medianas entre −0,016 e 0,000), e **não é refeito**.
+
+### 12.1 Resultados do T11
+
+Rodada completa de 01/10/2026 (10:16 a 16:06; B = 999 por regressor e B = 199 nos blocos de 30 e
+90; 987 datas, 21/06/2023 a 03/03/2026). `test_T11.py`: todos os 28 testes passaram
+(`outputs/T11/log_test_T11.txt`); o Ridge direto reproduz exatamente as 999 réplicas e o resumo do
+T10. A validação cruzada escolheu `max_features` = 1 em 10 das 33 origens (abaixo do limite de 11):
+B = 999 no principal. β em pontos percentuais de retorno por p.p. de BVRP previsto (β × 100 dos CSVs).
+
+> **Conclusão para o Cap. 7: a versão não linear não prevê o retorno.** Na forma principal
+> (floresta, f(variáveis) − IV), β ≈ 0 em todos os horizontes (−0,006 a +0,070; p HAC de 0,55 a
+> 0,94; R² ≈ 0) e o teste conjunto nos 6 horizontes não rejeita (**F2: χ²(6) = 1,45, p = 0,96**;
+> blocos de 30 e 90: 0,95 e 0,96; max-|t|: 0,79; HAC empilhado: 0,93). Na leitura B (floresta
+> direto no retorno), **nenhum horizonte é significante no Clark–West** (p de 0,11 a 0,94).
+
+**Previsão do BVRP: forma direta × f(variáveis) − IV** (janela expansiva; móvel entre parênteses)
+
+| Modelo | R² vs. média | CW p | % negativas | Média nos dias com BVRP > 0 |
+|---|---|---|---|---|
+| Ridge direto (T5) | 0,223 (0,095) | 0,001 | 93% | −5,1 |
+| Floresta direta (T5) | 0,143 (0,073) | 0,001 | 100% | −6,8 |
+| **Floresta f(variáveis) − IV (principal)** | **0,009** (−0,069) | < 0,001 | 67% | −0,8 |
+| Floresta f(variáveis) − IV com `regime_alta_fixo` | −0,041 | 0,001 | 68% | −1,2 |
+| Ridge f(variáveis) − IV | −0,073 (−0,047) | 0,001 | 63% | +0,7 |
+| Média da RV − IV (só a IV) | −0,588 (−0,268) | < 0,001 | 25% | +9,8 |
+
+- **A forma f(variáveis) − IV prevê o BVRP pior que a direta porque impõe coeficiente −1 à IV.** A
+  referência "média da RV − IV" (só a IV, com peso 1) tem R² de −0,59: a IV com coeficiente
+  unitário é uma previsão ruim da RV futura; na forma direta, o modelo aprende um efeito da IV
+  encolhido. Diebold–Mariano direta × f(variáveis) − IV: floresta p = 0,28; Ridge p = 0,063.
+- **A forma principal foi fixada antes dos resultados** (seção 12) e **a conclusão sobre os retornos
+  não muda com nenhuma das formas** nem dos modelos (tabela abaixo e F2).
+- A dummy de regime como variável adicional piora a previsão (DM p = 0,005 contra a floresta sem
+  ela). A floresta para a RV escolhe árvores mais profundas que no T5 (profundidade 6 em 13 origens,
+  1 em 7). Placebo (espaço da RV): medianas de 0,001 (floresta) e 0,000 (Ridge).
+
+**Retorno sobre o BVRP previsto** (p HAC, h+1)
+
+| h | Principal: β (p) | Floresta direta: β (p) | Ridge f(variáveis) − IV: p | Ridge direto (T10): β (p) |
+|---|---|---|---|---|
+| 1 | −0,006 (0,55) | −0,057 (0,15) | 0,12 | −0,045 (0,011) |
+| 5 | −0,006 (0,87) | −0,113 (0,34) | 0,40 | −0,144 (0,025) |
+| 10 | +0,005 (0,94) | −0,142 (0,49) | 0,58 | −0,250 (0,029) |
+| 20 | +0,030 (0,83) | −0,294 (0,49) | 0,88 | −0,459 (0,046) |
+| 30 | +0,070 (0,74) | −0,357 (0,61) | 0,90 | −0,586 (0,091) |
+| 60 | −0,076 (0,84) | −1,235 (0,33) | 0,90 | −1,433 (0,028) |
+
+- **Instabilidade de λ com β̂ ≈ 0.** Na forma principal, λ = β̄*/β̂ fica instável e chega a ser
+  negativo (ex.: −0,35 em h = 10, bloco de 60); o EP corrigido EP_boot/λ fica indefinido (NaN no
+  CSV) em parte dos horizontes. **Nesses casos, reportar o EP HAC e o F2**, que, escrito como
+  β̄*′Σ*⁻¹β̄*, continua definido. A correção de escala do T10 pressupõe β̂ longe de zero. (C7, C6)
+
+**Teste conjunto nos 6 horizontes (F2)**
+
+| Regressor | Wald, dois níveis (p) | max-\|t\| (p global) | HAC empilhado (p) | Só 2º nível (p) |
+|---|---|---|---|---|
+| **Floresta f(variáveis) − IV** | **0,96** | 0,79 | 0,93 | 0,95 |
+| Floresta direta | 0,98 | 0,71 | 0,23 | 0,51 |
+| Ridge f(variáveis) − IV | 0,62 | 0,38 | 0,23 | 0,39 |
+| **Ridge direto (= T10)** | **0,37** | 0,115 | **0,019** | **0,032** |
+
+- **Para o Cap. 6 (T10):** o F2 do T10 **só rejeita ignorando o 1º estágio** (HAC empilhado 0,019;
+  só 2º nível 0,032) e **não rejeita com ele** (0,37; blocos de 30 e 90: 0,21 e 0,27; α
+  reescolhido: 0,67) — ilustração direta do problema do regressor gerado (Pagan, 1984). Por
+  horizonte, o max-|t| dá p ajustado de 0,115 em h = 1 (Bonferroni: 0,26; sem correção: 0,043):
+  menos conservador que Bonferroni, mas nenhum horizonte abaixo de 0,05. Saídas:
+  `outputs/T11/teste_conjunto_T10.csv` e `max_t_por_horizonte_T10.csv`. (C6)
+- **Condicionamento:** correlação entre os β* de horizontes vizinhos de 0,8 a 0,97; número de
+  condição de 245 a 840; menor autovalor ≈ 0,01 (horizontes sobrepostos). Matrizes em
+  `correlacao_betas_T11.csv` e `correlacao_betas_T10.csv`.
+
+**F1 (anotação da p. 82):** Wald de 3 coeficientes (BVRP previsto, D, D × BVRP previsto) por h. No
+principal, p de 0,36 a 0,89 (corte fixo) e de 0,42 a 0,73 (expansivo). Nos quatro regressores,
+**3 de 48 células abaixo de 0,0083, sem padrão** (Ridge direto em h = 60: 0,004 fixo e 0,006
+expansivo; floresta direta, expansivo, h = 20: 0,006, mas 0,06 com o corte fixo). **A diferença por
+regime é sugestiva e frágil**, como no T10 (seção 11.4). (C7.4)
+
+**Como a árvore escolhe as quebras (C7.1)**
+
+- **Forma direta:** `vh_30d` é a variável mais importante (ΔEQM por permutação 4,5), depois
+  `vh_90d`; a floresta corta `vh_30d` entre 55 e 58 (mediana ponderada 56,1), com 0% da redução de
+  impureza entre 35 e 40. Dependência parcial plana abaixo de ~54, caindo 1 a 3 p.p. acima de 55
+  (BVRP previsto mais negativo na alta volatilidade).
+- **Forma f(variáveis) − IV:** a previsão é dominada pela IV (inclinação −1 por construção) e por
+  `vrp_30d`; dentro do modelo da RV, a redução de impureza se concentra em `vh_90d` (cortes em
+  61–63) e `vh_60d` (~63). `vh_30d` responde por 6% da redução de impureza (usada em 23 das 33
+  origens), cortada em 45–49 (mediana ponderada 48,5; 1% entre 35 e 40); o maior salto da
+  dependência parcial varia de 26 a 50 entre as origens (mediana 45).
+- **Para o texto do C7.1:** **as árvores cortam a volatilidade entre 45 e 58, não em 37,3**, na ponta
+  de cima ou acima da faixa do corte expansivo (27 a 51), e **preferem `vh_60d` e `vh_90d`** à de 30
+  dias — "a árvore vai escolher qual é a volatilidade que importa" (reunião, 1:13:02). Figuras:
+  `fig_T11_cortes.png`, `fig_T11_dependencia_parcial.png`, `fig_T11_dependencia_parcial_2d.png`,
+  `fig_T11_importancia.png`.
+
+**Leitura B (floresta direto no retorno)**
+
+| h | 1 | 5 | 10 | 20 | 30 | 60 |
+|---|---|---|---|---|---|---|
+| R² vs. média | 0,001 | −0,001 | 0,000 | 0,021 | −0,075 | −0,358 |
+| Clark–West p | 0,13 | 0,19 | 0,20 | 0,11 | 0,20 | 0,94 |
+| R² dentro da amostra (média) | 0,02 | 0,03 | 0,04 | 0,07 | 0,15 | 0,39 |
+
+Nenhum horizonte sobrevive a Bonferroni; em h = 60 a floresta erra mais que a média (DM p = 0,014).
+O R² dentro da amostra cresce com h (sobreajuste aos alvos sobrepostos), e fora da amostra vira
+negativo. Placebo: medianas de −0,006 a 0,002.

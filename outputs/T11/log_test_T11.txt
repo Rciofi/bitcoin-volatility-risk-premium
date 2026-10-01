@@ -1,0 +1,39 @@
+1) Identidade da RV futura
+  OK    rv_30d_fut = vh_30d(t+30) em 1746 datas (dif. máx. 7.7e-13)
+2) Equivalência das formas no MQO
+  OK    MQO: f(variáveis) − IV = forma direta do T5 (dif. máx. 1.1e-13)
+3) Embargo
+  OK    Ridge, expansiva: 987 previsões, origem a 0–29 dias, treino termina em origem − 30
+  OK    Ridge, movel: 987 previsões, origem a 0–29 dias, treino termina em origem − 30
+  OK    floresta_aleatoria, expansiva: 987 previsões, origem a 0–29 dias, treino termina em origem − 30
+  OK    floresta_aleatoria, movel: 987 previsões, origem a 0–29 dias, treino termina em origem − 30
+  OK    floresta_aleatoria_com_regime, expansiva: 987 previsões, origem a 0–29 dias, treino termina em origem − 30
+  OK    leitura B, h = 1: 987 previsões, treino termina em origem − 1
+  OK    leitura B, h = 5: 987 previsões, treino termina em origem − 5
+  OK    leitura B, h = 10: 987 previsões, treino termina em origem − 10
+  OK    leitura B, h = 20: 987 previsões, treino termina em origem − 20
+  OK    leitura B, h = 30: 987 previsões, treino termina em origem − 30
+  OK    leitura B, h = 60: 987 previsões, treino termina em origem − 60
+4) Fidelidade do primeiro estágio (forma f(variáveis) − IV)
+  OK    floresta_aleatoria: reproduz as previsões gravadas (dif. máx. 3.2e-14)
+  OK    Ridge: reproduz as previsões gravadas (dif. máx. 3.6e-15)
+5) Mesmas reamostragens do T10
+  OK    Ridge direto, dois_niveis: 999 réplicas idênticas às do T10 (Ridge_alpha_fixo)
+  OK    Ridge direto, so_segundo_nivel: 999 réplicas idênticas às do T10 (Ridge_so_segundo_nivel)
+  OK    β̂ do Ridge direto = T10
+  OK    resumo do Ridge direto (B = 999) igual ao do T10
+6) Teste conjunto
+  OK    (a) forma coerente = forma com Λ (W = 5.495)
+  OK    (b) com 1 horizonte, W = z²
+  OK    (c) tamanho a 5% sob H0 (400 simulações): Wald 0.055, max-|t| 0.043
+  OK    (d) HAC empilhado, 1 horizonte e maxlags h+1: EP = hac_utils.mqo_newey_west, em todo h
+7) Leitura B: média histórica embargada
+  OK    média histórica = média de ret_fut_h com s <= t − h (h = 1, 30, 60; 4 origens cada)
+8) Saídas
+  (info) réplicas: Ridge_direto/dois_niveis/60: 999; Ridge_direto/so_segundo_nivel/60: 999; Ridge_rv_menos_iv/dois_niveis/60: 999; Ridge_rv_menos_iv/so_segundo_nivel/60: 999; floresta_direta/dois_niveis/60: 999; floresta_direta/so_segundo_nivel/60: 999; floresta_rv_menos_iv/dois_niveis/30: 199; floresta_rv_menos_iv/dois_niveis/60: 999; floresta_rv_menos_iv/dois_niveis/90: 199; floresta_rv_menos_iv/so_segundo_nivel/60: 999
+  OK    bootstrap para os quatro regressores
+  OK    teste conjunto do T10: 6 variantes
+  OK    placebo (espaço da RV): mediana do R² <= 0.01 em Ridge (0.000), floresta_aleatoria (0.001)
+  OK    placebo da leitura B: mediana <= 0.01 em todo h (1: -0.003, 5: -0.003, 10: 0.002, 20: -0.003, 30: -0.003, 60: -0.006)
+
+RESULTADO: TODOS OS TESTES PASSARAM
