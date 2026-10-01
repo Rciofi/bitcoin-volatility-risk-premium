@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Do Cap. 7 publicado ao apêndice: comprado/neutro, quantil 80\%, uma mudança por etapa.}
+\label{tab:A1-decomposicao}
+\begin{tabular}{lrrrrrrrrrrr}
+\toprule
+Etapa & Dias & Ret. anual (\%) & Sharpe geom. & Sharpe & Sharpe (10) & Sortino & DD máx. (\%) & Tempo (\%) & C\&M Sharpe geom. & C\&M Sharpe & C\&M DD (\%) \\
+\midrule
+0. Publicado (Tabs. 7.2 e 7.2b) & -- & $-$4{,}7 & $-$0{,}20 & -- & -- & $-$0{,}06 & $-$38{,}3 & 22{,}5 & $-$0{,}17 & -- & $-$78{,}0 \\
+1. Réplica: código antigo, dados pré-T0 & 1.775 & $-$4{,}7 & $-$0{,}20 & $-$0{,}08 & $-$0{,}17 & $-$0{,}06 & $-$38{,}3 & 22{,}5 & $-$0{,}17 & 0{,}08 & $-$78{,}0 \\
+2. Código antigo, dados pós-T0 & 1.806 & $-$2{,}4 & $-$0{,}11 & 0{,}01 & $-$0{,}09 & 0{,}00 & $-$39{,}7 & 22{,}6 & $-$0{,}17 & 0{,}08 & $-$78{,}0 \\
+3. Código antigo, pós-T0, retorno simples no lugar do log-retorno & 1.806 & 0{,}2 & 0{,}01 & 0{,}12 & 0{,}03 & 0{,}09 & $-$36{,}4 & 22{,}6 & 0{,}08 & 0{,}34 & $-$72{,}4 \\
+4. Regra nova: avaliação sem os dias de burn-in, drawdown desde 1 & 1.554 & 0{,}2 & 0{,}01 & 0{,}13 & 0{,}03 & 0{,}10 & $-$36{,}4 & 26{,}3 & 0{,}08 & 0{,}34 & $-$72{,}4 \\
+5. Proxy só nas datas do Ridge (ponte) & 735 & $-$2{,}2 & $-$0{,}10 & 0{,}02 & $-$0{,}08 & 0{,}01 & $-$27{,}3 & 25{,}2 & 0{,}19 & 0{,}43 & $-$49{,}5 \\
+6. Ridge do T5 (principal) & 735 & $-$9{,}3 & $-$0{,}36 & $-$0{,}25 & $-$0{,}35 & $-$0{,}24 & $-$28{,}2 & 41{,}0 & 0{,}19 & 0{,}43 & $-$49{,}5 \\
+7. Ridge do T5, Sortino usual (desvio abaixo de zero, todos os dias) & 735 & $-$9{,}3 & $-$0{,}36 & $-$0{,}25 & $-$0{,}35 & $-$0{,}36 & $-$28{,}2 & 41{,}0 & 0{,}19 & 0{,}43 & $-$49{,}5 \\
+\bottomrule
+\end{tabular}
+
+\par\smallskip\parbox{\linewidth}{\footnotesize Sharpe geom.: retorno anualizado / volatilidade (fórmula do publicado). Sharpe: aritmético. C\&M: compra e manutenção no mesmo período. Nas etapas 0 a 2, as métricas da estratégia incluem os 252 dias de burn-in (posição zero), como no código antigo; a partir da 3, não. Até a etapa 2, o log-retorno era composto como retorno simples (código antigo); a 3 troca só isso. Sortino: fórmula do publicado (desvio-padrão só dos retornos negativos) nas etapas 0 a 6; na 7, desvio abaixo de zero sobre todos os dias.}
+\end{table}

@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Robustez: burn-in, proxy retrospectiva e ponte (quantil 80\%).}
+\label{tab:A1-robustez}
+\begin{tabular}{lllrrrrrr}
+\toprule
+Sinal & Período & Dias & Regra & Sharpe (0) & Sharpe (10) & Sharpe (30) & DD máx. (\%) & Tempo posic. (\%) \\
+\midrule
+Ridge (T5), burn-in 252 & 27/02/2024--02/03/2026 & 735 & Comprado/neutro & $-$0{,}25 & $-$0{,}35 & $-$0{,}55 & $-$28{,}2 & 41{,}0 \\
+ &  &  & Vendido/neutro & 0{,}25 & 0{,}16 & $-$0{,}04 & $-$39{,}9 & 41{,}0 \\
+ &  &  & Compra e manutenção & 0{,}43 & -- & -- & $-$49{,}5 & 100{,}0 \\
+\midrule
+Ridge (T5), burn-in 126 & 24/10/2023--02/03/2026 & 861 & Comprado/neutro & $-$0{,}23 & $-$0{,}32 & $-$0{,}50 & $-$28{,}2 & 35{,}0 \\
+ &  &  & Vendido/neutro & 0{,}23 & 0{,}15 & $-$0{,}03 & $-$39{,}9 & 35{,}0 \\
+ &  &  & Compra e manutenção & 0{,}85 & -- & -- & $-$49{,}5 & 100{,}0 \\
+\midrule
+Proxy, amostra completa & 30/11/2021--02/03/2026 & 1.554 & Comprado/neutro & 0{,}13 & 0{,}03 & $-$0{,}17 & $-$36{,}4 & 26{,}3 \\
+ &  &  & Vendido/neutro & $-$0{,}13 & $-$0{,}23 & $-$0{,}44 & $-$49{,}0 & 26{,}3 \\
+ &  &  & Compra e manutenção & 0{,}34 & -- & -- & $-$72{,}4 & 100{,}0 \\
+\midrule
+Proxy, datas do Ridge & 27/02/2024--02/03/2026 & 735 & Comprado/neutro & 0{,}02 & $-$0{,}08 & $-$0{,}26 & $-$27{,}3 & 25{,}2 \\
+ &  &  & Vendido/neutro & $-$0{,}02 & $-$0{,}11 & $-$0{,}30 & $-$33{,}3 & 25{,}2 \\
+ &  &  & Compra e manutenção & 0{,}43 & -- & -- & $-$49{,}5 & 100{,}0 \\
+\bottomrule
+\end{tabular}
+
+\par\smallskip\parbox{\linewidth}{\footnotesize Posição definida com informação até o fim de $t$, aplicada ao retorno de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe aritmético (média $\times$ 365 / desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino com o desvio abaixo de zero, $\sqrt{\text{média}(\min(r, 0)^2)}$ sobre todos os dias, anualizado. Com sinal alto, a regra vendida/neutra é a espelho da comprada/neutra. A proxy é $\text{vrp\_30d} = \text{RV}(t-29 \text{ a } t) - \text{IV}_t$, conhecida em $t$; na ponte, o limiar da proxy usa o histórico desde 2021 e a avaliação usa as datas do Ridge.}
+\end{table}

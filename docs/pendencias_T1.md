@@ -27,7 +27,7 @@ Depois do T1, as tabelas e figuras abaixo ficam **inválidas** até serem refeit
 | 2 | `code/analyze_magnitude_bvrp.py:56,93` | regressor em \|ret_fut_30d\| | console | crítica: correlação mecânica (mesma janela) | **T10** |
 | 3 | `scripts/regenerate_cap9.py:270-273, 414` | regressor BVRP + dummy + interação (Tab. 9.5); reta da Fig. 9.5 | `tab_cap9_05_regressoes`, `fig_cap9_05` (sim) | crítica | **T9 / T11** (C7.1: o modelo único em árvore substitui os regimes construídos à mão) |
 | 4 | `code/plot_vrp_vs_return.py:71-87` | dispersão BVRP × `ret_fut_20d` | `figs/cap3/vrp_vs_return_20d.png` (sim) | alta | **T10 / T12**; ver também C3.4 |
-| 5 | `scripts/regenerate_cap7.py:139, 252, 312`; `scripts/cap7/strategy_vrp_quantile.py:25` | sinal de estratégia com `vrp_30d.shift(1)`: o BVRP de t−1 contém retornos até t+29 | Tabs. 7.2–7.4 e Figs. 7.2–7.5 (sim) | crítica | **A1** (apêndice, D2) |
+| 5 | `scripts/regenerate_cap7.py:139, 252, 312`; `scripts/cap7/strategy_vrp_quantile.py:25` | sinal de estratégia com `vrp_30d.shift(1)`. **Corrigido no A1: não há vazamento.** `vrp_30d` continua sendo a proxy retrospectiva, RV(t−29 a t) − IV_t, conhecida em t (o T1 criou `bvrp_30d_fut` em coluna separada), e `sinal(t−1) × ret(t)` equivale a "posição no fim de t rende t+1" (`test_A1.py`, teste 8). A redação anterior ("o BVRP de t−1 contém retornos até t+29") só valeria se a coluna tivesse sido redefinida. O único look-ahead do Cap. 7 era o `qcut` da Tab. 7.4 (seção 3, item 2) | Tabs. 7.2–7.4 e Figs. 7.2–7.5 (sim) | nenhuma (era a proxy) | **A1** (apêndice, D2): sinal principal passa a ser o BVRP previsto (Ridge do T5); a regra antiga com a proxy fica como robustez. Ver seção 13 |
 | 6 | `code/analyze_vrp_regimes.py:52-58` | regime pelos tercis do BVRP → `vrp_regime` | `data/vrp_with_regimes.csv` | alta | **T9** (D4: dois regimes, corte sem look-ahead) |
 | 7 | `code/build_ml_dataset.py:44, 51` | features `d_vrp_1d = vrp_30d.diff()` e `vrp_regime_num` | `data/ml_dataset.csv` | alta | **T5** — o T4 criou um dataset novo (`data/ml_dataset_T4.csv`, seção 6) com `d_vrp_1d` só da proxy e sem regime; `ml_dataset.csv` e este script ficam intactos para os scripts antigos |
 | 8 | `scripts/regenerate_cap8.py:46, 78-79` | alvo `vrp_30d.shift(-1)`; features `d_vrp_1d`, `vrp_regime_num` | Tabs. 8.1–8.2, Figs. SHAP (sim; novo Cap. 5) | alta; o alvo "t+1" precisa ser redefinido | **T5** (com T6, T7, T8 e C5.1) |
@@ -71,10 +71,10 @@ Onde o plano atual e a Fase 0 divergem, vale o plano (reunião de 29/09/2026).
 | # | Arquivo : linha | Conflito | Fase 0 | Plano atual | Tarefa |
 |---|---|---|---|---|---|
 | 1 | `scripts/regenerate_cap9.py:62-63` | q25/q75 da RV calculados na amostra inteira (três regimes) | E4: janela expansiva | D4: **dois** regimes; T9: corte calculado só com a primeira janela de estimação (~20 no histograma) | **T9** |
-| 2 | `scripts/regenerate_cap7.py:306` (e `regenerate_cap7_figs.py:72`) | `pd.qcut` na amostra inteira para o regime de RV da estratégia: look-ahead mesmo na definição antiga | E4 | A1: sinal por quantis em janela expansiva, sem look-ahead | **A1** |
+| 2 | `scripts/regenerate_cap7.py:306` (e `regenerate_cap7_figs.py:72`) | `pd.qcut` na amostra inteira para o regime de RV da estratégia: look-ahead mesmo na definição antiga | E4 | A1: sinal por quantis em janela expansiva, sem look-ahead | **resolvido no A1**: regime do T9 (`regime_alta_fixo`, corte de 37,3, vigente em t), só a partir de 21/06/2023 |
 | 3 | `scripts/regenerate_cap6_scatter.py:31` | `close` (I(1)) como feature | E3: eliminar `close` | T4: **transformar** variáveis não estacionárias (ex.: diferenças) em vez de eliminá-las | **T4** |
-| 4 | `scripts/regenerate_cap7.py:180` | custos de 0/5/10 bps | E6: 10/30 bps | A1: "manter os custos de transação" | **A1** (confirmar se os cenários mudam) |
-| 5 | `scripts/regenerate_cap7.py:100`, `scripts/regenerate_cap7_figs.py:64`, `code/plot_vrp_timeseries.py:23` | data final da amostra fixa em `"2026-03-03"` (continua correta depois do T0, mas é frágil) | Decisão 2 | — | sem tarefa própria; tratar quando o script for tocado (A1, T1) |
+| 4 | `scripts/regenerate_cap7.py:180` | custos de 0/5/10 bps | E6: 10/30 bps | A1: "manter os custos de transação" | **resolvido no A1**: 0, 10 e 30 bps unilaterais sobre \|Δposição\| |
+| 5 | `scripts/regenerate_cap7.py:100`, `scripts/regenerate_cap7_figs.py:64`, `code/plot_vrp_timeseries.py:23` | data final da amostra fixa em `"2026-03-03"` (continua correta depois do T0, mas é frágil) | Decisão 2 | — | sem tarefa própria; tratar quando o script for tocado (T1). **A1:** `code/estrategias_A1.py` lê o fim da amostra de `vrp_with_targets.csv`; os scripts antigos do Cap. 7 ficam como estão |
 | 6 | `scripts/test_h1_bvrp_mean.py:55` | HAC com 30 defasagens fixas | IC5: lag = h | T3: **h+1** defasagens | **resolvido no T2** (maxlags = 31; sensibilidade 7/30/60/90). O texto: C3.3 e C6.8 (o H1 vira parágrafo, sem tabela) |
 | 7 | `code/regenerate_cap5.py:53`, `scripts/regenerate_cap9.py:100,274` | HAC com `maxlags=h` | IC5: lag = h | T3: **h+1** | **T10 / T11** (o T3 criou a função `mqo_newey_west`; ver seção 4.1) |
 | 8 | `code/bvrp_ml_csv.py/plot_vrp_histograms.py:42,73` | rótulo "IV30D – RV30D" (sinal antigo); script legado | E0 | — | fora do plano: candidato a descarte |
@@ -677,3 +677,140 @@ regime é sugestiva e frágil**, como no T10 (seção 11.4). (C7.4)
 Nenhum horizonte sobrevive a Bonferroni; em h = 60 a floresta erra mais que a média (DM p = 0,014).
 O R² dentro da amostra cresce com h (sobreajuste aos alvos sobrepostos), e fora da amostra vira
 negativo. Placebo: medianas de −0,006 a 0,002.
+
+## 13. A1 — estratégias de negociação do apêndice (antigo Cap. 7)
+
+Script: `code/estrategias_A1.py`; testes: `code/test_A1.py`; saídas em `outputs/A1/`. Os scripts
+antigos (`scripts/regenerate_cap7.py`, `scripts/regenerate_cap7_figs.py`, `scripts/cap7/`) e as
+pastas `figs/` e `tables/` não foram alterados.
+
+**Desenho (fixado antes dos resultados):**
+
+| Item | Decisão |
+|---|---|
+| Sinal principal | BVRP previsto pelo Ridge do T5, janela expansiva (987 datas, 21/06/2023 a 03/03/2026), por coerência com o Cap. 6 |
+| Robustez | proxy `vrp_30d` (conhecida em t) na amostra completa — é a regra publicada |
+| Ponte | proxy avaliada nas datas do Ridge (limiar com o histórico desde 2021): separa o efeito do sinal do efeito do período |
+| Limiar | q(t) = quantil q de {sinal_s : s ≤ t} (t entra, pois é conhecido no fim de t); q = 60, 70, 80 e 90% (80% de referência) |
+| Burn-in | 252 observações do sinal (principal); 126 como sensibilidade no Ridge. **Com 252, a negociação efetiva com o Ridge dura 735 dias (27/02/2024 a 02/03/2026)**; com 126, 861 dias |
+| Alinhamento | a posição de t rende close(t+1)/close(t) − 1; a posição de 03/03/2026 é descartada (retorno fora da amostra) |
+| Direções | **as duas são reportadas**: comprado/neutro com sinal alto (regra publicada) e vendido/neutro com sinal alto, ambas com 0, 10 e 30 bps |
+| Regimes | `regime_alta_fixo` do T9 (corte de 37,3, vigente em t), só a partir de 21/06/2023; a estratégia fica neutra no outro regime |
+| Métricas | Sharpe **aritmético** (principal); o geométrico do publicado só nas decomposições. Drawdown a partir do valor inicial 1. Compra e manutenção sem custo; fora do regime, a estratégia fica neutra |
+| Sortino (**mudança no A1**) | nas tabelas finais (principal, quantis, robustez, regimes e compra e manutenção), a definição usual: média × 365 / (√média(min(r, 0)²) × √365), com o desvio abaixo de zero calculado sobre **todos** os dias. O publicado usava o desvio-padrão só dos retornos negativos (em torno da média deles), que ignora os dias sem perda e mede a dispersão das perdas, não o tamanho delas. Nas decomposições, a fórmula antiga vale até a penúltima etapa, e a troca é a última etapa (q80: etapa 7; compra e manutenção: etapa 4) |
+| Comparação | decomposição em etapas, cada uma mudando uma coisa: publicado → réplica com dados pré-T0 (`git show 11a364f^`, reproduz os 100 números das Tabs. 7.1–7.4) → dados pós-T0 → retorno simples no lugar do log-retorno (achado abaixo) → avaliação sem os dias de burn-in → ponte → Ridge → Sortino usual. A Tab. 7.1 (compra e manutenção desde 2017) também é refeita, com a decomposição pré/pós-T0 |
+
+**Ligação com o T10 (para o texto do apêndice, A3):** o β do retorno futuro sobre o BVRP previsto é
+negativo em todos os horizontes (seção 11.4; h = 1: −0,045 p.p. por p.p., p boot 0,043, sem
+sobreviver a Bonferroni). BVRP previsto alto → retorno futuro menor: é isso que produz Sharpes
+negativos na regra comprada/neutra, e a vendida/neutra é a sua espelho (Sharpe bruto com o sinal
+trocado). **As duas direções são reportadas para não escolher a direção depois dos resultados**; a
+fragilidade do β no T10 vale igualmente para qualquer ganho da vendida.
+
+**Achado do mapeamento:** as Tabs. 7.1–7.4 publicadas são de antes do T0 (N = 1.775, com o buraco de
+mar/2023) e incluíam os 252 dias de burn-in (posição zero) nas métricas da estratégia, mas não nas do
+compra e manutenção "casado" (N = 1.523). As duas coisas entram como etapas da decomposição.
+
+**Achado do passo 3 (log-retorno composto como simples):** a coluna `ret` de `vrp_with_regimes.csv`
+é o **log-retorno** (`code/build_vrp_dataset.py:53`), e `scripts/regenerate_cap7.py` (e
+`regenerate_cap7_figs.py`) a compunha como retorno simples — `(1 + r).prod()`, `(1 + r).cumprod()` e
+custos subtraídos de r. Isso puxa para baixo o retorno anualizado e aprofunda o drawdown de todas as
+séries das Tabs. 7.2–7.4 e das Figs. 7.2–7.5. A Tab. 7.1 não é afetada (usa `pct_change` de
+`btc_prices.csv`). Só os scripts do Cap. 7 fazem isso (busca por `(1 + ret...` em `*.py`). O A1 usa
+close(t+1)/close(t) − 1, e a troca entra como etapa 3 da decomposição (`test_A1.py` confirma que,
+com expm1(ret), o código antigo fora do burn-in reproduz os 1.554 retornos novos da proxy).
+
+### 13.1 Resultados do A1
+
+Rodada de 01/10/2026; `test_A1.py`: 29 verificações, todas passaram. Valores sem custo, salvo
+indicação; Sharpe aritmético; Sortino usual.
+
+**Principal — Ridge, q80, 27/02/2024 a 02/03/2026 (735 dias):**
+
+| Regra | Ret. anual | Vol. | Sharpe 0 / 10 / 30 bps | Sortino | DD máx. | Giro (op./ano) | Tempo posic. |
+|---|---|---|---|---|---|---|---|
+| Comprado/neutro | −9,3% | 25,5% | −0,25 / −0,35 / −0,55 | −0,36 | −28,2% | 24,8 (50 op.) | 41,0% |
+| Vendido/neutro | +3,3% | 25,5% | +0,25 / +0,16 / −0,04 | +0,36 | −39,9% | 24,8 (50 op.) | 41,0% |
+| Compra e manutenção | +9,4% | 49,2% | 0,43 | 0,64 | −49,5% | — | 100% |
+
+- **A3 / T10:** a comprada tem Sharpe negativo em todos os quantis e custos; a vendida, positivo
+  sem custo em todos os quantis (q60 0,14; q70 0,34; q80 0,25; q90 0,39), coerente com o β < 0 do
+  T10. Mas **nenhuma das duas supera o compra e manutenção** no mesmo período (Sharpe 0,43), e a
+  vendida q80 zera com 30 bps (−0,04); só q70 e q90 ficam positivas com 30 bps (0,09 e 0,05). O
+  único ganho é de risco: drawdown de −28% (comprada) contra −50%, com 41% do tempo posicionado.
+- **Burn-in 126 (861 dias, desde 24/10/2023):** mesmo quadro — comprada q80 −0,24; vendida +0,24
+  (−0,03 com 30 bps); compra e manutenção 0,85 (o período extra é de alta).
+
+**Robustez — proxy `vrp_30d`, q80:**
+
+| Variante | Dias | Comprado 0 / 10 / 30 | Vendido 0 / 10 / 30 | C&M Sharpe | DD comprado / C&M |
+|---|---|---|---|---|---|
+| Amostra completa (30/11/2021 a 02/03/2026) | 1.554 | 0,13 / 0,03 / −0,17 | −0,13 / −0,23 / −0,44 | 0,34 | −36,4% / −72,4% |
+| Ponte (datas do Ridge) | 735 | 0,02 / −0,08 / −0,26 | −0,02 / −0,11 / −0,30 | 0,43 | −27,3% / −49,5% |
+
+- Com a proxy, a direção se inverte em relação ao Ridge (comprada levemente positiva na amostra
+  completa), mas o Sharpe fica abaixo do compra e manutenção e some com custos. **Nas mesmas datas,
+  a diferença Ridge × proxy (−0,25 × +0,02 na comprada) é do sinal, não do período.**
+
+**Regimes do T9 (q80, desde 21/06/2023):**
+
+- Ridge: alta volatilidade, 80 dias posicionados, comprada 0,20 (−0,36 com 30 bps); baixa
+  volatilidade, 221 dias, comprada −0,45 e vendida +0,45 (+0,31 com 30 bps). O compra e manutenção
+  no regime de baixa tem Sharpe −0,45: a vendida no regime de baixa só reflete que o BTC caiu
+  nesses dias, e o sinal fica alto em quase todos eles (221 de 227).
+- Proxy: **nenhum dia** com sinal alto no regime de baixa (proxy = RV − IV muito negativa quando a
+  RV é baixa, mecanicamente abaixo do q80); no regime de alta, 238 dias, comprada 0,23.
+- Na Tab. 7.4 antiga, só o look-ahead do `qcut` não muda o quadro (tercis pós-T0 com retorno
+  simples: Sharpe geom. −0,56 / 0,24 / −0,02); a troca é de desenho (3 tercis → 2 regimes do T9).
+
+**Decomposição (comprado/neutro, q80; Sharpe geométrico | aritmético; C&M ao lado):**
+
+| Etapa | Sharpe geom. | Sharpe | DD máx. | C&M Sharpe geom. | C&M DD |
+|---|---|---|---|---|---|
+| 0. Publicado | −0,195 | — | −38,3% | −0,174 | −78,0% |
+| 1. Réplica, dados pré-T0 | −0,195 | −0,081 | −38,3% | −0,174 | −78,0% |
+| 2. Dados pós-T0 | −0,106 | 0,007 | −39,7% | −0,173 | −78,0% |
+| 3. Retorno simples no lugar do log-retorno | 0,007 | 0,121 | −36,4% | 0,084 | −72,4% |
+| 4. Sem os dias de burn-in, DD desde 1 | 0,007 | 0,131 | −36,4% | 0,084 | −72,4% |
+| 5. Ponte (datas do Ridge) | −0,096 | 0,016 | −27,3% | 0,191 | −49,5% |
+| 6. Ridge (principal) | −0,364 | −0,254 | −28,2% | 0,191 | −49,5% |
+| 7. Sortino usual | (Sortino −0,238 → −0,363) | | | | |
+
+- **O que mudou pelo T0:** etapa 2 (Sharpe geom. −0,195 → −0,106; 99 → 107 operações).
+- **O que mudou pelo log-retorno:** etapa 3 — a maior mudança da proxy. O compra e manutenção
+  "casado" do publicado (Sharpe −0,17, DD −78%) era artefato da composição do log-retorno; com
+  retorno simples, Sharpe geom. 0,08 (aritmético 0,34) e DD −72%. **A frase do texto antigo de que
+  a estratégia tem Sharpe "ligeiramente inferior" a um compra e manutenção negativo deixa de valer:
+  o compra e manutenção é positivo e melhor que a estratégia em Sharpe.** A redução de drawdown
+  (−36% × −72%) sobrevive.
+- **Look-ahead:** a regra do q80 não tinha (etapas 2 → 4 só mudam a avaliação); o `qcut` da Tab. 7.4
+  sim, e saiu com os regimes do T9.
+- **Nova definição:** o BVRP prospectivo não pode ser sinal; o sinal passa a ser o Ridge (etapas 5 →
+  6): Sharpe 0,02 → −0,25 na comprada, nas mesmas datas.
+
+**Compra e manutenção, 17/08/2017 a 03/03/2026 (Tab. 7.1):** o T0 quase não mexe. Pré-T0 → pós-T0:
+ret. anual 38,7% → 38,3%; vol. 68,7% → 68,3%; Sharpe geom. 0,563 → 0,560 (aritmético 0,82); DD
+−83,2% nos dois; Sortino antigo 1,11 → 1,10, usual 1,20. O maior retorno diário era o de 32 dias
+(23,0% em 01/04/2023); depois do T0, é 22,5% (07/12/2017). Num histórico de 3.120 dias, um retorno
+de 32 dias pesa pouco; o efeito do T0 aparece nas séries curtas do BVRP, não aqui.
+
+**Para o texto do apêndice (A2–A4):** análise exploratória, sem alfa: nenhuma regra supera o compra e
+manutenção em Sharpe em nenhum período testado; a direção que "funciona" depende do sinal (Ridge:
+vendida; proxy: comprada, fraca) e desaparece com 30 bps na q80; o que se mantém é a menor exposição
+(drawdown menor por ficar fora 60–75% do tempo), não informação sobre a direção dos retornos.
+
+### 13.2 Varredura: log-retorno composto como simples fora do Cap. 7 (01/10/2026)
+
+Busca em `code/`, `scripts/` (`*.py`) e nos notebooks versionados por composição de retornos
+(`cumprod`, `.prod(`, `(1 + ...ret`) e por todo leitor da coluna `ret` (log-retorno de
+`build_vrp_dataset.py:53`). **Só o Cap. 7 antigo compõe `ret` como retorno simples.**
+
+| Onde | Retorno usado | Composição? | Situação |
+|---|---|---|---|
+| `scripts/regenerate_cap7.py`, `scripts/regenerate_cap7_figs.py`, `chapters/Cap7_Estratégia.ipynb` | `ret` (log) | sim, `(1 + r)` | **erro**; substituídos pelo A1 (scripts antigos intactos) |
+| `code/retorno_bvrp_T10.py`, `code/retorno_bvrp_T11.py` (e `regenerate_cap5.py`, `plot_vrp_vs_return_T12.py`, `analyze_magnitude_bvrp.py`) | `ret_fut_h` = close(t+h)/close(t) − 1, **simples** (`build_targets.py:28-33`) | não; regressando de MQO/árvores | correto |
+| `code/estrategias_A1.py` | close(t+1)/close(t) − 1, simples | sim, `(1 + r)` | correto (a réplica usa `ret` só para reproduzir o publicado e para a etapa 3) |
+| `code/build_ml_dataset_T4.py` | log de `close` | `ret_acum_5d/30d` = soma de log-retornos | correto (log-retorno acumulado) |
+| `code/build_ml_dataset.py` (legado) | `ret` (log) | `ret_lag_5/20` = soma | correto |
+| `code/analyze_bvrp_by_return_sign.py` | `ret` (log) | não; só o sinal | correto (o sinal não muda) |
+| `code/build_desc_stats_T1.py:204` | `ret` (log) | não; estatísticas descritivas | correto, mas **a Tab. 3.1 descreve o log-retorno**: o texto deve dizer "log-retorno diário" (C3) |

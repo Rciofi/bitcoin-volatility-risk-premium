@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Estratégias por regime de volatilidade do T9 (quantil 80\%, a partir de 21/06/2023).}
+\label{tab:A1-regimes}
+\begin{tabular}{lllrrrrr}
+\toprule
+Sinal & Regime & Regra & Dias posic. & Ret. anual (\%) & Sharpe (0) & Sharpe (30) & DD máx. (\%) \\
+\midrule
+Ridge (T5) & Baixa volatilidade & Comprado/neutro & 221 & $-$11{,}0 & $-$0{,}45 & $-$0{,}60 & $-$21{,}4 \\
+ &  & Vendido/neutro & 221 & 7{,}6 & 0{,}45 & 0{,}31 & $-$22{,}3 \\
+ & Alta volatilidade & Comprado/neutro & 80 & 1{,}9 & 0{,}20 & $-$0{,}36 & $-$12{,}6 \\
+ &  & Vendido/neutro & 80 & $-$4{,}0 & $-$0{,}20 & $-$0{,}76 & $-$28{,}4 \\
+\midrule
+Proxy & Baixa volatilidade & Comprado/neutro & 0 & 0{,}0 & -- & -- & 0{,}0 \\
+ &  & Vendido/neutro & 0 & 0{,}0 & -- & -- & 0{,}0 \\
+ & Alta volatilidade & Comprado/neutro & 238 & 2{,}7 & 0{,}23 & $-$0{,}08 & $-$27{,}3 \\
+ &  & Vendido/neutro & 238 & $-$7{,}0 & $-$0{,}23 & $-$0{,}55 & $-$33{,}3 \\
+\bottomrule
+\end{tabular}
+
+\par\smallskip\parbox{\linewidth}{\footnotesize Posição definida com informação até o fim de $t$, aplicada ao retorno de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe aritmético (média $\times$ 365 / desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino com o desvio abaixo de zero, $\sqrt{\text{média}(\min(r, 0)^2)}$ sobre todos os dias, anualizado. Com sinal alto, a regra vendida/neutra é a espelho da comprada/neutra. Regime de alta se $\text{vh\_30d}(t) > 37{,}3$ (corte do T9, estimado na 1ª janela, até 22/04/2023); a estratégia fica neutra nos dias do outro regime. A proxy só é avaliada a partir de 21/06/2023.}
+\end{table}
