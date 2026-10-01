@@ -312,3 +312,88 @@ Realizado fora da amostra: média −5,3; positivo em 290 de 987 dias (29%).
 |---|---|
 | **Previsão que alimenta os capítulos seguintes**, escolhida agora para evitar escolher o modelo depois de ver os resultados: **T10** usa o **Ridge** como principal e a **floresta aleatória** como robustez; **T11** usa a **floresta aleatória** como principal (o plano pede árvore) e o **Ridge** como robustez. Fonte: `data/previsoes_bvrp_T5.csv`, janela expansiva. | **T10**, **T11** |
 | **Forma do BVRP previsto no T11.** O plano define BVRP previsto = f(variáveis) − IV, isto é, prever a RV futura e subtrair a IV conhecida em t. O T5 previu o BVRP diretamente. No MQO as duas formas são equivalentes (com `iv_30d` entre os regressores, a regressão de RV − IV só desloca em 1 o coeficiente da IV); no Ridge e nas árvores, não (a penalidade e as quebras atuam sobre alvos diferentes). **O T11 deve testar as duas.** | **T11** |
+
+## 10. T9 — regimes sem look-ahead
+
+Scripts: `code/regimes_T9.py` (corte e regimes), `code/interacao_regime_T9.py` (teste F e
+avaliação fora da amostra) e `code/test_regimes_T9.py`. Regimes em `data/regimes_T9.csv`
+(`ml_dataset_T4.csv` intacto); cortes, figuras e resultados em `outputs/T9/`.
+
+> **DESTAQUE — comunicar ao Prof. Marcelo junto com os resultados.** A bimodalidade do BVRP na
+> Fig. 3.2 (anotações da p. 36: *"claramente bimodal"*, *"moda local na cauda positiva"*; reunião,
+> 43:56–44:26: *"você vai precisar de 1 negócio acima de 20"*) era **em boa parte artefato do buraco
+> de março/2023** corrigido no T0: a antimoda em +20,2 (o "~20" do plano) e a moda em +27 vinham
+> de abril/2023 — **30 das 73 datas com BVRP > 20 eram de abril/2023**. **Depois do T0, a
+> distribuição do BVRP é unimodal** (moda em −9 na amostra; em −17 na 1ª janela).
+> **Consequência para o C3.1:** a evidência de dois regimes passa a ser a **bimodalidade da RV de
+> 30 dias** (Fig. 8.2, p. 77, *"olha aqui a bimodalidade novamente"*), não a do BVRP.
+> Figura: `outputs/T9/fig_T9_bimodalidade_bvrp.png`.
+
+| Decisão | Valor | Tarefa |
+|---|---|---|
+| Variável de regime | **RV de 30 dias (`vh_30d`)**, conhecida em t; dois regimes (D4): alta se `vh_30d` > corte | T9 |
+| Corte (principal) | **mistura de duas normais em log(RV), estimada só na 1ª janela** (23/04/2021 a 22/04/2023), convergida; **corte fixo de 37,3% a.a.** para toda a amostra | T9 |
+| Corte (robustez) | o mesmo método reestimado em cada origem do `split_utils` (janela expansiva), só com dados até a origem | T9 |
+| Busca do corte | ponto em que a posteriori do componente de alta passa de 1/2: a maior raiz crescente da quadrática de igual posteriori (o componente baixo domina entre as raízes) | T9 |
+
+**Erro corrigido no próprio T9 (registrar):** o corte de **47,4** proposto no passo 1 vinha de uma
+estimação interrompida — com a tolerância padrão do scikit-learn (`tol` = 10⁻³), a mistura parava
+após **7 iterações**, com log-verossimilhança **−154,9**, contra **−134,2** da solução convergida
+(77 iterações; mesma solução em todas as sementes). **Correção:** `tol` = 10⁻⁸, 10 inicializações,
+`max_iter` = 10.000 e `assert converged_` em toda estimação, inclusive nas origens; o teste
+automático confere a estabilidade entre sementes (diferença < 0,1) e a coincidência com a antimoda.
+
+**Para o texto:** o corte de **37,3** coincide com a **antimoda da densidade de núcleo da 1ª janela
+(37,5)** — dois métodos independentes. O componente baixo é um grupo de dias calmos (média de
+31,2% a.a., peso 0,08 na mistura). O regime de baixa tem **9,0% das datas da 1ª janela e 31,4% das
+datas fora da amostra** (o peso da mistura, 0,08, é a fração estimada; 9,0% é a fração observada
+abaixo do corte), coerente com a queda da volatilidade do bitcoin a partir de 2023.
+
+**Corte expansivo (robustez) — instável:** começa em 36,8 (21/06/2023), oscila entre 32 e 43 até
+o fim de 2024, **salta entre ~29 e ~51 entre fev. e jul./2025** (a mistura troca de solução: o peso
+do componente baixo pula de ~0,10 para ~0,49) e cai para **~27** a partir de out./2025, quando o
+componente baixo vira um pico estreito em ~26% a.a. À medida que a volatilidade cai, a RV deixa
+de ser claramente bimodal na amostra expansiva. Isso reforça o corte fixo da 1ª janela como
+principal. Figura: `outputs/T9/fig_T9_cortes_por_origem.png`.
+
+**Para o texto do Cap. 7:** a instabilidade do corte expansivo a partir de fevereiro/2025 indica
+que a **bimodalidade da RV perde nitidez com a queda de volatilidade do bitcoin**: a estrutura de
+dois regimes é clara em 2021–2024 e enfraquece depois. Isso reforça o corte fixo como principal, e
+as conclusões (teste F e Ridge) não mudam com o corte expansivo. (C7)
+
+### 10.1 Resultados do T9
+
+**Corte:** 37,30% a.a. (mistura de duas normais em log(RV), 1ª janela, convergida: médias 31,2 e
+66,7% a.a., pesos 0,08 e 0,92); antimoda da densidade de núcleo: 37,47; idêntico em 6 sementes.
+
+| Regime de alta volatilidade (`vh_30d` > 37,3) | 1ª janela | Fora da amostra | Amostra inteira |
+|---|---|---|---|
+| Fração de dias | 91,0% | 68,6% | 77,8% |
+
+**Teste F das interações** (MQO com X + D + D·X, 16 + 1 + 16 regressores; Wald com HAC de 31
+defasagens via `hac_utils`; N = 1.776):
+
+| Corte | H0 | χ² (q) | p | R² dentro da amostra |
+|---|---|---|---|---|
+| Fixo | 16 interações = 0 | 94,9 (16) | 3×10⁻¹³ | 0,328 |
+| Fixo | interações + dummy = 0 | 94,9 (17) | 8×10⁻¹³ | 0,328 |
+| Expansivo | 16 interações = 0 | 85,6 (16) | 2×10⁻¹¹ | 0,318 |
+| Expansivo | interações + dummy = 0 | 87,0 (17) | 2×10⁻¹¹ | 0,318 |
+
+**Fora da amostra** (987 previsões, mesmas origens do T5, janela expansiva):
+
+| Modelo | R² vs. média, sem regime (T5) | Com regime (fixo) | Com regime (expansivo) | DM vs. sem regime: p (fixo) | CW vs. média: p (fixo) |
+|---|---|---|---|---|---|
+| Ridge | 0,223 | 0,229 | 0,227 | 0,81 | 0,0002 |
+| MQO | 0,097 | −0,174 | −0,165 | 0,21 | 0,0005 |
+
+**Leitura:** as interações regime × variáveis são muito significantes **dentro** da amostra, mas
+**não melhoram a previsão fora dela**: no Ridge, +0,006 no R² (DM p = 0,81); no MQO, com 33
+regressores, pioram (sobreajuste). Coerente com a anotação da p. 82 (*"teste-F … sem muita
+esperança"*). Conclusões iguais com o corte fixo e o expansivo. (C7, T10, T11)
+
+| Como a variável de regime entra nas próximas tarefas (proposta, a validar) | Tarefa |
+|---|---|
+| **T10 (linear):** retorno ~ BVRP previsto, com a dummy `regime_alta_fixo` e a interação BVRP previsto × regime; robustez com `regime_alta_expansivo`. O regime é conhecido em t (corte da 1ª janela; `vh_30d` de t). | **T10** |
+| **T11 (árvore):** a árvore escolhe os cortes sozinha (C5.6, C7.1): entra `vh_30d` (e as demais volatilidades), **não** a dummy; robustez acrescentando `regime_alta_fixo`. Comparar os cortes escolhidos pela árvore com 37,3. | **T11** |
+| Nada de regime calculado na amostra inteira (anotações das p. 76 e 82: *"look-ahead bias"*). | T10, T11, A1 |
