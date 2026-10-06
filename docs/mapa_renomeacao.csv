@@ -210,3 +210,9 @@ rotulo,tab:cap7_bvrp_regimes_perf,tab:estr-regimes
 rotulo,fig:cap7_bvrp_regimes_cumret,fig:estr-regimes
 rotulo,fig:cap7_bvrp_regimes_heatmap,fig:estr-regimes-mapa
 rotulo,sec:cap7_sintese,sec:estr-sintese
+legado,figs/previsao_bvrp/fig_oos_prediction.png,archive/figs/previsao_bvrp/fig_oos_prediction.png
+legado,figs/previsao_bvrp/fig_shap_bar.png,archive/figs/previsao_bvrp/fig_shap_bar.png
+legado,figs/previsao_bvrp/fig_shap_beeswarm.png,archive/figs/previsao_bvrp/fig_shap_beeswarm.png
+legado,tables/previsao_bvrp/tab_coeficientes.tex,archive/tables/previsao_bvrp/tab_coeficientes.tex
+legado,tables/previsao_bvrp/tab_oos_performance.tex,archive/tables/previsao_bvrp/tab_oos_performance.tex
+legado,tables/previsao_bvrp/shap_values_rf.csv,archive/tables/previsao_bvrp/shap_values_rf.csv

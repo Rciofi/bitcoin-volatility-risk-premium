@@ -1,369 +1,257 @@
-﻿%% ============================================================
-%% Capítulo 5 — Previsão do BVRP com Aprendizado de Máquina
-%% Fusão dos anteriores Cap. 6 (cap6_ml.tex) e Cap. 8 (Cap8_ML_BVRP.tex)
-%% Gerado em 15/05/2026 — Fase 5.2 da revisão
-%% ============================================================
-
-\chapter{Previsão do Prêmio de Risco de Volatilidade com Aprendizado de Máquina}
+\chapter{Previsão do prêmio de risco de volatilidade}
 \label{chap:previsao_bvrp}
 
+Este capítulo prevê o BVRP fora da amostra, apenas com a informação disponível
+em $t$. A previsão é necessária porque a versão do prêmio conhecida em $t$, a
+$\text{BVRP}^{\text{proxy}}$, tem correlação de $-0{,}02$ com o BVRP na mesma
+data (Seção~\ref{sec:met-variaveis}): a hipótese de passeio aleatório sem
+deriva para a volatilidade histórica aproxima mal a realização do prêmio. O
+BVRP previsto aqui é o regressor dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear}.
+
+Na janela expansiva, os cinco modelos superam a média histórica fora da
+amostra. O melhor, o Ridge,
+reduz o erro quadrático em 22\%, e o teste de \citet{clark2007approximately}
+rejeita a igualdade com a média para quatro dos cinco modelos, mesmo com a
+correção de Bonferroni. A previsibilidade, porém, é modesta: o teste de
+\citet{diebold1995comparing} não rejeita depois da correção, as previsões ficam
+próximas da média e nenhum modelo antecipa os episódios de prêmio positivo. As
+duas referências ingênuas, a proxy e o prêmio realizado defasado, erram mais
+que a média. A relação entre as variáveis e o prêmio muda com o regime de
+volatilidade dentro da amostra, primeira evidência de não linearidade, mas
+essa mudança não melhora a previsão fora dela.
+
 % =========================================================
-\section{Motivação e objetivo}
-\label{sec:prev-motivacao}
-% =========================================================
+\section{Alvo e informação disponível}
+\label{sec:prev-alvo}
 
-Os resultados econométricos apresentados no Capítulo~\ref{chap:retornos_linear} estabelecem que o Prêmio de Risco de Volatilidade do Bitcoin (BVRP) não exibe capacidade preditiva linear estatisticamente significativa sobre os retornos futuros em nenhum dos horizontes testados, com o menor valor-$p$ atingindo 0,241. Essa ausência de previsibilidade linear, contudo, não encerra a investigação: ela é compatível tanto com a hipótese de que o prêmio não carrega conteúdo informacional quanto com a hipótese de que esse conteúdo se manifesta por meio de relações que a especificação linear não captura --- interações entre múltiplas variáveis, não linearidades ou variação temporal na relevância dos preditores (\textit{state dependence}), características comuns em mercados de criptoativos. Distinguir entre essas duas possibilidades exige um arcabouço de modelagem que não imponha \textit{a priori} a forma funcional da relação.
-
-Nesse contexto, técnicas de aprendizado de máquina oferecem um instrumental mais
-flexível para modelar a dinâmica do BVRP. O objetivo deste capítulo é investigar se
-modelos supervisionados conseguem prever o BVRP fora da amostra de forma
-estatisticamente e economicamente relevante. Compara-se o desempenho de cinco
-modelos, organizados em duas famílias --- lineares (MQO, Ridge e LASSO) e
-baseados em árvores (floresta aleatória e \textit{Gradient Boosting}) --- sob um
-protocolo rigoroso de avaliação temporal, tendo como referência principal o
-benchmark de persistência (previsão pelo último valor observado do BVRP),
-particularmente exigente dada a forte autocorrelação da série em frequência diária.
-
-% =========================================================
-\section{Desenho experimental}
-\label{sec:prev-desenho}
-% =========================================================
-
-\subsection{Formulação do problema preditivo}
-\label{subsec:prev-problema}
-
-O problema preditivo consiste em estimar o valor futuro do BVRP em horizonte de
-um dia à frente ($t+1$), utilizando exclusivamente informação disponível até $t$.
-A variável-alvo é definida como:
+O alvo é o prêmio da janela de 30 dias que começa no dia seguinte à previsão:
 \begin{equation}
-\text{BVRP}_{t} = \text{RV}_{t-29:t}^{(30)} - \text{IV}_{t}^{(30)},
-\label{eq:prev-bvrp-def}
+\text{BVRP}_{t+1:t+30\,|\,t} = \text{VH}_{t+1:t+30} - \text{IV}_t = f(X_t) + u_t,
+\label{eq:prev-alvo}
 \end{equation}
-em que $\text{RV}_{t-29:t}^{(30)}$ é a volatilidade realizada retrospectiva de 30 dias
-(calculada sobre os 30 dias anteriores a $t$, inclusive) e $\text{IV}_{t}^{(30)}$ é
-o índice DVOL observado em $t$. Ambas as medidas estão expressas em base anualizada
-e em pontos percentuais.
+em que $X_t$ reúne as variáveis explicativas conhecidas no fim do dia $t$
+(Seção~\ref{sec:prev-variaveis}). O índice $t+1:t+30\,|\,t$ separa a janela da
+volatilidade histórica e a data da informação. Trata-se do mesmo
+$\text{BVRP}_t$ dos capítulos anteriores, sem deslocamento para $t+1$: a
+previsão feita em $t$ é comparada com o prêmio cuja IV é a de $t$, e não com o
+prêmio de $t+1$. A equação~\eqref{eq:prev-alvo} é a
+equação~\eqref{eq:met-previsao-bvrp} com a janela explícita; no restante do
+texto, escreve-se $\text{BVRP}_t$.
 
-A tarefa de previsão é:
-\begin{equation}
-\widehat{\text{BVRP}}_{t+1} = f\!\left(\mathbf{X}_t\right),
-\end{equation}
-em que $\mathbf{X}_t$ denota o vetor de variáveis explicativas observadas em $t$
-e $f(\cdot)$ representa a função estimada pelo modelo supervisionado.
-
-
-O conjunto de dados possui frequência diária e contém as variáveis
-\texttt{date}, \texttt{close}, \texttt{ret}, \texttt{rv\_30d}, \texttt{iv\_30d}
-e \texttt{vrp\_30d}. As observações utilizadas neste capítulo compreendem o período
-de novembro de 2021 a março de 2026, totalizando 1.523 observações após a
-engenharia de variáveis e o alinhamento do alvo em $t+1$.\footnote{A amostra deste capítulo inicia-se em novembro
-de 2021, e não em março de 2021 como a amostra completa da dissertação (1.775
-observações). A diferença decorre da variável de regime do BVRP, cujos
-limiares são estimados por janela expansiva com período mínimo de 252 observações
-(Seção~\ref{subsec:prev-variaveis}); os primeiros 251 dias da série são consumidos
-nesse aquecimento e não dispõem de valor de regime válido. O horizonte final e as
-últimas observações preservam o alinhamento com o alvo em $t+1$.}
-
-As validações indicam ausência de datas duplicadas e de valores ausentes nas
-variáveis críticas para a modelagem.
-
-\subsection{Variáveis explicativas}
-\label{subsec:prev-variaveis}
-
-O vetor $\mathbf{X}_t$ inclui variáveis de volatilidade, retorno e calendário,
-todas medidas em $t$ para garantir o protocolo estritamente \textit{ex ante}:
-
-\begin{itemize}
-    \item \textbf{Variação de volatilidade e prêmio:} variação diária da IV
-    (\texttt{d\_iv\_1d}) e variação diária do BVRP (\texttt{d\_vrp\_1d}). O nível
-    de \texttt{rv\_30d} e \texttt{iv\_30d} \textbf{não} entra como regressor --- apenas suas variações de um dia;
-    \item \textbf{Retorno:} retorno diário corrente e retornos defasados em
-    $h \in \{1, 5, 20\}$ dias;
-    \item \textbf{Regime do BVRP:} variável categórica que classifica o prêmio corrente em três faixas (baixa, média e alta), com limiares dados pelos quantis $1/3$ e $2/3$ da distribuição histórica do próprio BVRP, recalculados a cada $t$ com janela expansiva e período mínimo de 252 observações --- utilizando, portanto, apenas informação disponível até $t$;
-    \item \textbf{Variáveis de calendário:} dia da semana, mês, indicadores de início
-    e fim de mês.
-\end{itemize}
-
-O vetor final possui 11 variáveis. Séries com prefixo \texttt{ret\_fut\_} não são
-utilizadas como entradas dos modelos. A variável \texttt{close} (preço em nível,
-não estacionário) foi substituída por retornos e variações, eliminando o componente
-$I(1)$ identificado nos testes de raiz unitária do Capítulo~\ref{chap:dados}.
-Note-se que \texttt{rv\_30d} e \texttt{iv\_30d} em nível também foram excluídos do
-vetor de regressores, para evitar redundância direta com a variável-alvo
-($\text{BVRP} = \text{RV} - \text{IV}$). Cabe explicitar, contudo, que o prêmio corrente integra o vetor de preditores de duas formas indiretas: por sua variação diária (\texttt{d\_vrp\_1d}) e pela variável categórica de regime, que o discretiza em três faixas. O que não integra a matriz é o \emph{nível contínuo} de BVRP$_t$ --- exatamente o valor utilizado pelo \emph{benchmark} de persistência. Essa distinção é central para a interpretação dos resultados: os modelos dispõem de uma representação grosseira do prêmio corrente, mas não de seu valor pontual.
-
-\subsection{Protocolo de avaliação fora da amostra}
-\label{subsec:prev-protocolo}
-
-Adota-se divisão temporal das observações em proporção 70\%/30\%:
-
-\begin{itemize}
-    \item \textbf{Treino:} 70\% iniciais (1.066 observações; nov.~2021\,–\,nov.~2024);
-    \item \textbf{Teste:} 30\% finais (457 observações; dez.~2024\,–\,mar.~2026).
-\end{itemize}
-
-A padronização (\textit{z-score}) é calibrada exclusivamente no conjunto de
-treinamento e aplicada ao conjunto de teste sem reestimação, evitando vazamento
-de informação. As métricas de avaliação são $R^2$ fora da amostra, RMSE e MAE.
-
-O modelo de referência (\textit{benchmark}) é o \textbf{último valor observado}:
-\begin{equation}
-\widehat{\text{BVRP}}_{t+1}^{\text{ref}} = \text{BVRP}_t.
-\label{eq:prev-persistencia}
-\end{equation}
-Esse benchmark é extremamente competitivo: dada a elevada persistência do BVRP em
-frequência diária, prever o valor de amanhã pelo valor de hoje explica sozinho
-$R^2 = 0{,}9365$ da variância fora da amostra. Ganhos dos modelos supervisionados
-devem, portanto, ser interpretados \textit{relativamente} a essa referência, e não
-contra um benchmark trivial como a média incondicional.
+Como o alvo de $s$ só se realiza em $s+30$, o modelo da origem $t$ usa apenas
+as datas $s \le t - 30$. As previsões cobrem 987 datas, de 21/06/2023 a
+03/03/2026, em 33 origens com reestimação a cada 30 dias; o treino tem de 760
+observações, na primeira origem, a 1.720, na última (janela expansiva). A
+janela móvel, de 730 observações, serve de teste de robustez
+(Seção~\ref{sec:met-amostras}).
 
 % =========================================================
-\section{Modelos de referência}
-\label{sec:prev-referencias}
-% =========================================================
+\section{Variáveis explicativas}
+\label{sec:prev-variaveis}
 
-Estabelecem-se dois pontos de referência. O primeiro é o benchmark de
-persistência (Equação~\ref{eq:prev-persistencia}), que prevê o BVRP de $t+1$ pelo valor
-observado em $t$. O segundo é a média incondicional do conjunto de treinamento,
-incluída apenas para fixar o piso de desempenho: um modelo que não supere a média
-não capturou estrutura alguma.
+A Tabela~\ref{tab:prev-dicionario} lista as 17 variáveis explicativas, em
+quatro grupos. As volatilidades históricas de 1, 5 e 30 dias seguem a estrutura
+do modelo HAR de \citet{corsi2009har}, com componentes diário, semanal e
+mensal; as de 60 e 90 dias estendem essa estrutura para horizontes mais
+longos. A IV entra em nível, em variação de 1 e 5 dias e como desvio em relação
+às médias móveis de 5 e 30 dias. O preço entra por log-retornos de 1, 5 e 30
+dias e pela razão com a média móvel de 30 dias. O último grupo traz a proxy, sua
+variação diária e o prêmio realizado defasado, $\text{BVRP}_{t-30} =
+\text{VH}_{t-29:t} - \text{IV}_{t-30}$, o prêmio mais recente já realizado em
+$t$. Ele é igual à proxy mais a variação da IV em 30 dias,
+$\text{IV}_t - \text{IV}_{t-30}$.
 
-A comparação sistemática entre benchmarks e modelos é reportada de forma unificada
-na Tabela~\ref{tab:prev-desempenho} (Seção~\ref{subsec:prev-arvores-resultados}),
-que apresenta todos os modelos e as duas referências avaliados no mesmo conjunto de
-teste. O benchmark de persistência domina todas as especificações, confirmando que a
-autocorrelação temporal do BVRP é a principal fonte de previsibilidade em frequência
-diária.
+O tratamento segue os testes de raiz unitária. O preço e as médias móveis da IV,
+com evidência robusta de raiz unitária, entram transformados. As volatilidades
+entram em nível, mesmo quando o teste ADF fica na fronteira, como na
+volatilidade histórica de 90 dias ($p = 0{,}19$) e na IV ($p = 0{,}08$): em
+janelas móveis longas, observações vizinhas compartilham quase todos os
+retornos (89 de 90 dias), o que gera persistência mecânica e reduz o poder do
+teste. Como $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$,
+os modelos lineares excluem a volatilidade histórica de 30 dias; as árvores
+usam as 17 variáveis.
 
-% =========================================================
-\section{Modelos lineares}
-\label{sec:prev-lineares}
-% =========================================================
+As variáveis já trazem não linearidade em relação aos retornos diários. A
+volatilidade histórica é a raiz da média dos retornos ao quadrado; a de 1 dia
+é o valor absoluto do retorno. Os modelos lineares, portanto, são lineares nas
+variáveis construídas, e não nos retornos.
 
-Consideram-se três modelos lineares: o MQO (mínimos quadrados ordinários, sem
-regularização), que serve de referência não penalizada, e suas duas versões
-regularizadas, Ridge (penalidade $L_2$) e LASSO (penalidade $L_1$). Para os
-modelos regularizados, o parâmetro $\alpha$ é selecionado por validação
-cruzada temporal com \textit{embargo} de 30 dias --- cinco divisões de janela
-expansiva, com um intervalo de 30 observações entre treino e validação em cada
-divisão, de modo a evitar vazamento pela sobreposição das janelas de
-volatilidade --- sobre a grade $\alpha \in \{10^{-4}, 10^{-3}, \ldots,
-10^{2}\}$; a padronização é recalibrada dentro de cada divisão. O MQO
-corresponde ao caso $\alpha = 0$.
-
-Um aspecto do procedimento é, em si, informativo. Para ambos os modelos, o
-erro de validação é estatisticamente indistinguível ao longo de quase toda a
-grade: no LASSO, os valores de $\alpha$ entre $10^{-4}$ e $1$ produzem perda
-dentro de um desvio-padrão entre divisões, degradando-se apenas para $\alpha
-\geq 10$; no Ridge, a perda é praticamente constante em toda a faixa útil. Ou
-seja, a validação cruzada não identifica um nível de regularização
-preferível --- não porque a busca seja malcalibrada, mas porque não há
-estrutura de sinal linear que a penalização possa explorar ou descartar de
-forma proveitosa. A regra de seleção adotada identifica a faixa de $\alpha$ cujo erro de
-validação está a menos de um desvio-padrão do mínimo e, dentro dela,
-prefere o menor grau de regularização --- exceto quando os dois
-candidatos menos regularizados são estatisticamente indistintos entre
-si, caso em que se opta pelo mais parcimonioso dos dois. Para o LASSO,
-esse desempate resulta em $\alpha = 0{,}001$; para o Ridge,
-$\alpha = 1{,}0$.
-
-A Tabela~\ref{tab:prev-desempenho} reporta o desempenho. Os três modelos
-lineares exibem $R^2$ fora da amostra praticamente idênticos (MQO, LASSO e Ridge
-convergem para $\approx 0{,}388$), superando com folga a média incondicional, mas
-ficando muito aquém do benchmark de persistência (0{,}937). A coincidência é
-reveladora: o MQO não penalizado alcança exatamente o mesmo desempenho preditivo
-que suas versões regularizadas, indicando que a regularização é imaterial neste
-problema. O gargalo, portanto, não é sobreajuste --- que a penalização
-corrigiria ---, mas a ausência de sinal linear explorável nos preditores.
-
-% (Tabela removida — pertence ao Cap. 5 OLS)
-
-\subsection{Resultados e interpretação dos modelos lineares}
-\label{subsec:prev-coeficientes}
-
-A Tabela~\ref{tab:prev-coeficientes} apresenta os coeficientes estimados pelo
-LASSO e pelo Ridge, ordenados pela magnitude absoluta e obtidos sobre preditores
-padronizados (\textit{z-score} calibrado no treino), o que torna as magnitudes
-diretamente comparáveis entre si. Um único preditor domina de forma inequívoca:
-o regime do BVRP, com coeficiente de $\approx 9{,}2$ em ambos os modelos
---- cerca de doze vezes o segundo colocado. Os demais preditores contribuem de
-forma marginal e homogênea: as variações diárias da IV e do BVRP ($\approx 0{,}77$),
-os retornos defasados em 5 e 20 dias e o retorno diário contemporâneo (todos
-entre $0{,}44$ e $0{,}56$), e as variáveis de calendário com peso próximo de zero.
-
-Dois aspectos merecem destaque. Primeiro, a quase perfeita coincidência entre os
-coeficientes do LASSO e do Ridge --- variável a variável, os dois modelos
-atribuem pesos praticamente idênticos --- indica ausência de colinearidade
-severa entre os preditores retidos: quando há redundância, LASSO e Ridge divergem
-(o primeiro concentra, o segundo distribui), e aqui não divergem. Segundo, e mais
-importante, o LASSO não zerou nenhum coeficiente sob $\alpha = 0{,}001$: todos os
-onze preditores sobrevivem à penalidade $L_1$, ainda que a maioria com peso
-pequeno. A estrutura linear identificada é, portanto, dominada por um único fator
---- o regime do BVRP ---, leitura que a análise SHAP da
-Seção~\ref{subsec:prev-shap} (Figura~\ref{fig:prev-shap-barras}) corrobora de forma
-independente, situando o mesmo regime como o preditor de maior impacto por ampla
-margem.
-
-\input{tables/previsao_bvrp/tab_coeficientes}
+\input{tables/previsao_bvrp/tab_dicionario}
 
 % =========================================================
-\section{Modelos baseados em árvores}
-\label{sec:prev-arvores}
+\section{Modelos e hiperparâmetros}
+\label{sec:prev-modelos}
+
+A dissertação compara cinco modelos para $f$ na
+equação~\eqref{eq:prev-alvo}: o MQO; o Ridge \citep{hoerl1970ridge} e o LASSO
+\citep{tibshirani1996lasso}, que penalizam os coeficientes do MQO; a floresta
+aleatória \citep{breiman2001randomforest}, com 500 árvores; e o XGBoost
+\citep{chen2016xgboost}. Os três modelos lineares usam as variáveis
+padronizadas com a média e o desvio-padrão do treino de cada origem.
+
+Os hiperparâmetros são escolhidos em cada uma das 33 reestimações, por
+validação cruzada embargada \citep{lopezdeprado2018advances}: cinco dobras
+expansivas dentro do treino da origem, em que o treino da dobra termina 30 dias
+antes do início da validação, para que nenhum alvo de treino se sobreponha aos
+de validação. Escolhe-se a combinação de menor erro quadrático médio nas
+dobras. A Tabela~\ref{tab:prev-hiperparametros} mostra as grades e as escolhas.
+
+No Ridge e no LASSO, a penalidade escolhida fica sempre no interior da grade. O
+LASSO zera todos os coeficientes em 12 das 33 origens; nelas, prevê
+exatamente a média histórica do treino. As árvores ficam no extremo de menor
+capacidade: a floresta usa árvores de profundidade 1 em todas as origens, e o
+XGBoost usa a menor taxa de aprendizagem em todas, profundidade 1 em 28 e o
+menor número de árvores em 22. Esse limite não é uma deficiência da grade.
+Árvores de um único corte, com aprendizagem lenta, já produzem previsões
+próximas da média histórica: o desvio-padrão das previsões fora da amostra é de
+2,3 p.p. na floresta e de 2,0 p.p. no XGBoost, contra 4,5 p.p. no Ridge.
+Ampliar a grade nessa direção só aproximaria mais as previsões da média. A
+validação cruzada prefere, assim, as configurações menos flexíveis da grade,
+sinal de que a estrutura não linear que as árvores conseguem extrair é fraca.
+
+\input{tables/previsao_bvrp/tab_hiperparametros}
+
 % =========================================================
+\section{Desempenho fora da amostra}
+\label{sec:prev-resultados}
 
-Avaliam-se dois modelos baseados em árvores: floresta aleatória
-(\textit{Random Forest}) e \textit{Gradient Boosting}. A floresta aleatória usa
-300 árvores; o \textit{Gradient Boosting}, os hiperparâmetros padrão do
-\texttt{scikit-learn}. Em ambos, apenas a semente aleatória é fixada, para
-reprodutibilidade. Diferentemente dos modelos lineares regularizados, não se
-realiza busca de hiperparâmetros: o objetivo é avaliar o desempenho preditivo
-desses modelos em configuração convencional, não otimizá-los.
+A Tabela~\ref{tab:prev-resultados} resume o desempenho; a
+Seção~\ref{sec:met-avaliacao} define as métricas e os testes. Na janela
+expansiva, todos os modelos têm $R^2_{\text{fora}}$ positivo: 0,223 no Ridge,
+0,143 na floresta aleatória, 0,123 no LASSO, 0,100 no XGBoost e 0,097 no MQO.
+As duas referências ingênuas erram mais que a média histórica: a proxy tem
+$R^2_{\text{fora}} = -0{,}51$, e o prêmio realizado defasado, $-1{,}00$. O
+prêmio dos 30 dias anteriores, sozinho, informa pouco sobre o dos 30 dias
+seguintes.
 
-\subsection{Resultados fora da amostra}
-\label{subsec:prev-arvores-resultados}
+\input{tables/previsao_bvrp/tab_resultados}
 
-A Tabela~\ref{tab:prev-desempenho} reporta o desempenho comparativo de todos
-os modelos e benchmarks. Os modelos baseados em árvores alcançam $R^2$ fora da
-amostra em torno de 0,42 a 0,44 (floresta aleatória 0,42, \textit{Gradient Boosting}
-0,44), ligeiramente acima dos lineares, mas igualmente distantes do benchmark de
-persistência. Nenhuma família de modelos supervisionados se aproxima da referência
-de último valor.
+O teste de Clark--West contra a média histórica rejeita a igualdade para o
+Ridge ($p = 0{,}0005$), o MQO ($0{,}0007$), a floresta ($0{,}0008$) e o XGBoost
+($0{,}003$), todos abaixo do limite de Bonferroni para cinco modelos,
+$0{,}05/5 = 0{,}01$; o LASSO ($p = 0{,}016$) não passa pela correção. O teste
+de Diebold--Mariano, bilateral, é mais exigente: o menor valor-$p$ é o do
+Ridge, $0{,}041$, e nenhum modelo passa pela correção. Os dois testes respondem
+a perguntas diferentes. O de Clark--West compara modelos aninhados e desconta,
+sob a hipótese nula, o ruído que a estimação de parâmetros desnecessários
+acrescenta ao modelo maior; ele testa se as variáveis contêm informação sobre
+o prêmio. O de Diebold--Mariano compara os erros observados, sem esse ajuste.
+Por isso o Clark--West pode rejeitar mesmo com $R^2_{\text{fora}}$ negativo,
+como no MQO da janela móvel ($R^2_{\text{fora}} = -0{,}037$, $p = 0{,}004$). A
+conclusão principal apoia-se no Clark--West: as variáveis contêm informação
+sobre o BVRP, mas o ganho sobre a média histórica, medido pelo erro observado,
+não é estatisticamente distinguível com esta amostra. As 987 previsões têm
+alvos de 30 dias sobrepostos e equivalem a cerca de 33 observações
+independentes, o que limita o poder dos dois testes.
 
-Esse resultado tem explicação direta e verificável, e ela reside na granularidade da informação disponível a cada abordagem. O \emph{benchmark} de persistência utiliza o valor contínuo de BVRP$_t$. Os modelos supervisionados acessam o prêmio corrente apenas de forma indireta: por sua variação diária e pela variável de regime, que o discretiza em três faixas. A comparação, portanto, não opõe modelos com informação a modelos sem informação --- ela mede quanto da previsibilidade sobrevive à categorização do preditor mais relevante. A resposta é: menos da metade. Nenhuma das demais variáveis --- retornos defasados, variação da IV, calendário --- recupera o que a discretização descarta.
+Na janela móvel, os $R^2_{\text{fora}}$ são menores (0,095 no Ridge; $-0{,}037$
+no MQO), e o Clark--West mantém a mesma conclusão: rejeita para os mesmos quatro
+modelos com a correção de Bonferroni e não rejeita para o LASSO. Descartar as
+observações mais antigas piora a previsão, o que favorece a janela expansiva.
 
-\input{tables/previsao_bvrp/tab_oos_performance}
+A Figura~\ref{fig:prev-previsoes} mostra o BVRP e as previsões do Ridge, da
+floresta e das duas referências ingênuas. As previsões dos modelos ficam
+próximas da média e não acompanham os picos. Fora da amostra, o BVRP tem média
+de $-5{,}3$ p.p. e é positivo em 290 das 987 datas (29\%); nessas datas, a
+previsão média é negativa em todos os modelos, de $-2{,}3$ p.p. no MQO a
+$-8{,}7$ p.p. no LASSO ($-5{,}1$ p.p. no Ridge). Nenhum modelo antecipa os
+episódios de prêmio positivo, como o de janeiro de 2026, em que o BVRP chega a
+46 p.p. As previsões encolhem para a média porque a previsibilidade é baixa.
 
-A Figura~\ref{fig:prev-previsao-lasso} ilustra a previsão um passo à frente do LASSO
-no período de teste, evidenciando que o modelo acompanha a tendência geral do BVRP
-mas com erros expressivos em episódios de reversão abrupta.
-
+\IfFileExists{figs/previsao_bvrp/fig_previsoes.png}{
 \begin{figure}[H]
-\centering
-\IfFileExists{figs/previsao_bvrp/fig_oos_prediction.png}{%
-    \includegraphics[width=0.85\linewidth]{figs/previsao_bvrp/fig_oos_prediction.png}
-}{%
-    \fbox{\parbox{0.85\linewidth}{\centering Figura não encontrada:\\
-    figs/previsao\_bvrp/fig\_oos\_prediction.png}}%
-}
-\caption{Previsão um passo à frente do BVRP fora da amostra — modelo LASSO.
-Período de teste: dez.~2024\,–\,mar.~2026 ($N = 457$ dias).
-A linha sólida representa o BVRP realizado; a linha tracejada, a previsão do LASSO.}
-\label{fig:prev-previsao-lasso}
+    \centering
+    \includegraphics[width=0.95\linewidth]{figs/previsao_bvrp/fig_previsoes.png}
+    \caption{BVRP e previsões fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026): Ridge, floresta aleatória, $\text{BVRP}^{\text{proxy}}_t$ e prêmio realizado defasado, $\text{BVRP}_{t-30}$. Na legenda, o $R^2$ fora da amostra contra a média histórica.}
+    \label{fig:prev-previsoes}
 \end{figure}
+}{}
 
-\subsection{Importância das variáveis (SHAP)}
-\label{subsec:prev-shap}
-
-A Figura~\ref{fig:prev-shap-barras} reporta a importância média das variáveis no
-modelo de floresta aleatória por meio de valores SHAP (\textit{SHapley Additive
-exPlanations}), métrica preferível à impureza média de redução (MDI) por ser
-não enviesada em relação à cardinalidade das variáveis.\footnote{A importância
-por impureza (MDI) tende a superestimar variáveis contínuas de alta cardinalidade.
-Os valores SHAP eliminam esse viés ao atribuir a cada variável sua contribuição
-marginal média sobre a distribuição de todos os subconjuntos possíveis de preditores.}
-
-\begin{figure}[H]
-\centering
-\IfFileExists{figs/previsao_bvrp/fig_shap_bar.png}{%
-    \includegraphics[width=0.80\linewidth]{figs/previsao_bvrp/fig_shap_bar.png}
-}{%
-    \fbox{\parbox{0.80\linewidth}{\centering Figura não encontrada:\\
-    figs/previsao\_bvrp/fig\_shap\_bar.png}}%
-}
-\caption{Importância média das variáveis pela métrica SHAP — floresta aleatória.
-Barras representam o valor absoluto médio de SHAP de cada variável sobre o
-conjunto de teste. Variáveis ordenadas pela importância decrescente.}
-\label{fig:prev-shap-barras}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\IfFileExists{figs/previsao_bvrp/fig_shap_beeswarm.png}{%
-    \includegraphics[width=0.82\linewidth]{figs/previsao_bvrp/fig_shap_beeswarm.png}
-}{%
-    \fbox{\parbox{0.82\linewidth}{\centering Figura não encontrada:\\
-    figs/previsao\_bvrp/fig\_shap\_beeswarm.png}}%
-}
-\caption{Diagrama de enxame (\textit{beeswarm}) dos valores SHAP — floresta aleatória.
-Cada ponto representa uma observação do conjunto de teste. A cor indica o valor da
-variável (vermelho = alto, azul = baixo); a posição horizontal indica o impacto
-na previsão.}
-\label{fig:prev-shap-enxame}
-\end{figure}
-
-O regime do BVRP emerge como o preditor de maior impacto, muito à frente de
-todas as demais variáveis --- resultado consistente com o dos modelos lineares e
-com a dominância do \emph{benchmark} de persistência: é a variável que discretiza
-o prêmio corrente que concentra a capacidade preditiva, e não os retornos passados.
-A variável de calendário mês ocupa a segunda posição, seguida pelos retornos
-defasados em 20 e 5 dias; as variações de IV e BVRP e as demais variáveis de
-calendário contribuem marginalmente.
-
-Cabe reconciliar uma divergência aparente entre a Tabela~\ref{tab:prev-coeficientes}
-e a Figura~\ref{fig:prev-shap-barras}: nos modelos lineares o coeficiente do mês é
-praticamente nulo ($\approx -0{,}003$), enquanto na floresta aleatória a variável
-figura em segundo lugar. A explicação está na forma funcional. Sob padronização,
-o coeficiente linear do mês mede uma tendência monotônica ao longo do ano --- que
-não existe ---, ao passo que a floresta pode isolar efeitos de meses individuais
-por meio de partições sucessivas. A contribuição efetiva desses efeitos ao
-desempenho fora da amostra é, contudo, modesta: a floresta supera os modelos
-lineares em apenas $0{,}036$ de $R^2$ (0,424 contra 0,388). Com três anos de dados
-de treino, padrões mensais dificilmente se distinguem de variação amostral, e a
-leitura prudente é que esses efeitos têm alcance limitado fora do período estimado.
+Um teste placebo verifica a ausência de vazamento de informação futura: em
+cada origem, o alvo é embaralhado dentro do treino, e o modelo é reestimado
+(200 permutações nos lineares, 10 nas árvores). Se o procedimento não usa
+informação do período de teste, o $R^2_{\text{fora}}$ com o alvo embaralhado
+não deve ser positivo. As medianas ficam entre $-0{,}016$ e $0{,}000$ em todos
+os modelos. O placebo não serve como teste de significância: as permutações
+destroem a autocorrelação dos alvos sobrepostos, e a distribuição resultante
+fica estreita demais; a significância vem dos testes acima.
 
 % =========================================================
-\section{Comparação geral e síntese}
-\label{sec:prev-comparacao}
-% =========================================================
+\section{Regularização em baixa dimensão}
+\label{sec:prev-regularizacao}
 
-Os resultados deste capítulo convergem para uma conclusão robusta: a
-\textbf{persistência temporal} do BVRP constitui o benchmark dominante em
-frequência diária ($R^2 = 0{,}9365$ fora da amostra), e nenhuma família de modelos
-supervisionados o supera. Trata-se de um resultado nulo, no sentido de que os
-preditores auxiliares não agregam poder preditivo sobre o nível do BVRP além do
-que a própria série de ontem já entrega. Longe de ser um impasse, esse achado
-delimita com precisão onde reside a informação econômica do BVRP.
+Com 16 variáveis e de 760 a 1.720 observações de treino, o problema tem baixa
+dimensão, e a motivação usual da regularização --- muitas variáveis em relação
+ao número de observações --- não se aplica. Ainda assim, o Ridge supera o MQO
+($R^2_{\text{fora}}$ de 0,223 contra 0,097; Diebold--Mariano entre os dois,
+$p = 0{,}017$). A explicação está nas variáveis construídas. As volatilidades
+históricas de janelas diferentes compartilham retornos; a proxy, sua variação e
+o prêmio realizado defasado são combinações da volatilidade histórica e da IV.
+Com regressores tão relacionados, os coeficientes do MQO têm variância alta: o
+$R^2$ dentro da amostra do MQO (0,29) é três vezes o de fora (0,10). O Ridge
+encolhe os coeficientes e, com eles, a previsão em direção à média histórica,
+trocando viés por variância \citep{hastie2009elements}. Com sinal fraco, essa
+troca compensa.
 
-Três achados merecem destaque:
-
-\begin{enumerate}
-    \item \textbf{Nenhum modelo supera a persistência.} Os três modelos lineares
-    --- incluindo o MQO não penalizado --- convergem para $R^2 \approx 0{,}39$, e os
-    baseados em árvores para $R^2 \approx 0{,}42\text{--}0{,}44$; todos superam muito
-    a média incondicional, mas ficam muito aquém do benchmark de último valor. Como
-    a matriz contém o prêmio corrente apenas em forma discretizada e em variação, o exercício mede quanto da previsibilidade sobrevive quando o nível contínuo de BVRP$_t$ é substituído por uma representação categórica --- e a resposta é: menos da metade;
-
-    \item \textbf{A não linearidade não resgata o desempenho.} Floresta aleatória e
-    \textit{Gradient Boosting} não se distanciam materialmente dos modelos lineares,
-    indicando que interações e não linearidades entre os preditores disponíveis não
-    contêm sinal explorável relevante sobre o nível do BVRP;
-
-    \item \textbf{O regime do BVRP concentra praticamente toda a capacidade preditiva.} Sob preditores padronizados, o coeficiente do regime domina LASSO e Ridge por ampla margem ($\approx 9{,}2$ contra menos de $0{,}8$ dos demais), com os dois modelos atribuindo pesos quase idênticos a cada variável --- ausência de divergência que indica não haver colinearidade severa entre os preditores retidos. Na floresta aleatória, a importância SHAP aponta a mesma variável como dominante isolada. A convergência entre modelos lineares e não lineares é informativa, mas a leitura correta não é que o estado de mercado carregue informação especial: a variável de regime é uma discretização do próprio BVRP$_t$, e sua dominância confirma, por outro caminho, o que o \emph{benchmark} de persistência já indicava --- a informação sobre o prêmio de amanhã está essencialmente no prêmio de hoje. As demais variáveis contribuem de forma marginal nos modelos lineares; na floresta
-aleatória, a variável de calendário mês destaca-se em segundo lugar, embora com
-impacto muito inferior ao do regime e ganho fora da amostra modesto
-(Seção~\ref{subsec:prev-shap}). A dificuldade de prever o nível do BVRP além de sua própria persistência sugere que o valor prático do prêmio não está na previsão pontual, mas em seu uso como sinal condicionante --- hipótese explorada no Apêndice~\ref{app:estrategias} e no Capítulo~\ref{chap:retornos_nao_linear}.
-\end{enumerate}
+O LASSO vai além: zera todos os coeficientes em 12 das 33 origens e reproduz
+a média histórica. Suas previsões diferem das do MQO em até 25,4 p.p., com
+correlação de apenas 0,34. A regularização ajuda, portanto, não por selecionar
+variáveis, mas por encolher a previsão para a média quando a informação das
+variáveis é pouca.
 
 % =========================================================
-\section{Implicações econômicas}
-\label{sec:prev-implicacoes}
+\section{Não linearidade e regimes de volatilidade}
+\label{sec:prev-nao-linearidade}
+
+A distribuição da volatilidade histórica de 30 dias é bimodal, e o corte de
+$37{,}3\%$ a.a., estimado só na primeira janela, separa um regime de baixa e
+um de alta volatilidade (Seção~\ref{sec:dados-regimes}). Se a relação entre as
+variáveis e o prêmio muda entre os regimes, um modelo linear único é mal
+especificado. Para testar essa hipótese, a dissertação estima o MQO com as 16
+variáveis, a variável indicadora do regime de alta volatilidade, $D_t$, e as 16
+interações $D_t X_t$, na amostra de modelagem inteira, com erro-padrão HAC de
+31 defasagens. A Tabela~\ref{tab:prev-regime} reporta os resultados. As
+interações são conjuntamente muito significantes: $\chi^2(16) = 94{,}9$, com
+$p = 3 \times 10^{-13}$, e o mesmo vale com o corte reestimado em janela
+expansiva ($\chi^2(16) = 85{,}6$). Dentro da amostra, há evidência de não
+linearidade.
+
+\input{tables/previsao_bvrp/tab_regime}
+
+Essa evidência não se converte em previsão melhor. Com as interações, o
+$R^2_{\text{fora}}$ do Ridge passa de 0,223 para 0,229, diferença que o
+Diebold--Mariano não distingue de zero ($p = 0{,}81$); o do MQO, com 33
+regressores, cai de 0,097 para $-0{,}174$. Os resultados são os mesmos com o
+corte expansivo.
+
+As árvores oferecem um teste mais flexível, porque não precisam de um corte
+fixado de antemão: cada divisão escolhe a variável e o ponto de corte que mais
+reduzem o erro, e as volatilidades entram em nível, de modo que uma árvore pode
+encontrar sozinha o corte entre os regimes, ou outro qualquer. Mesmo assim, a
+validação cruzada escolhe quase sempre árvores de um único corte
+(Seção~\ref{sec:prev-modelos}), que não combinam variáveis, e as duas
+famílias de árvores ficam abaixo do Ridge fora da amostra. A não linearidade
+existe dentro da amostra, mas é fraca demais para melhorar a previsão do BVRP.
+O Capítulo~\ref{chap:retornos_nao_linear} volta às árvores para a relação entre
+o BVRP previsto e os retornos.
+
 % =========================================================
+\section{Síntese}
+\label{sec:prev-sintese}
 
-Embora nenhum modelo supervisionado supere o benchmark de persistência na
-previsão do nível do BVRP, a estrutura identificada tem implicações práticas
-relevantes --- e elas residem no uso do prêmio corrente como sinal
-condicionante, não na previsão pontual de seu valor futuro.
+As variáveis disponíveis em $t$ contêm informação sobre o BVRP dos 30 dias
+seguintes: os modelos superam a média histórica, e o Clark--West rejeita a
+igualdade mesmo com a correção para múltiplas comparações. A previsibilidade é
+modesta, e as previsões ficam próximas da média. O Ridge tem o melhor
+desempenho, por encolher a previsão quando o sinal é fraco, e a não linearidade
+encontrada dentro da amostra não melhora a previsão.
 
-O prêmio corrente pode ser utilizado como insumo para alocação dinâmica de risco: valores elevados do BVRP --- isto é, próximos de zero --- sinalizam ambientes em que o prêmio de seguro embutido nas opções encontra-se dissipado, com a volatilidade realizada alcançando a implícita, situação tipicamente associada a períodos de estresse. Em contraste, valores fortemente negativos indicam ambientes de calmaria, nos quais o prêmio pago pelos compradores de proteção é mais elevado.
-
-A dominância da variável que discretiza o prêmio corrente sugere que o valor
-prático do BVRP está em seu uso como filtro de estado --- classificando o
-prêmio observado em faixas --- e não na previsão pontual de seu nível futuro.
-Essa hipótese é avaliada diretamente no Apêndice~\ref{app:estrategias}, que
-condiciona a exposição a quantis extremos do BVRP corrente.
-
-Por fim, cabe ressaltar que os resultados deste capítulo são condicionados à
-amostra disponível (1.523 observações, nov.~2021–mar.~2026) e ao horizonte de
-previsão de 1 dia. Amostras mais longas, frequências intradiárias ou horizontes
-mais curtos podem alterar as conclusões — avenidas que pesquisas futuras poderão
-explorar.
+Os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} usam
+estas previsões, da janela expansiva, como regressor. A escolha foi fixada antes
+de ver os resultados dos retornos: o Ridge é a previsão principal do
+Capítulo~\ref{chap:retornos_linear}, e a floresta aleatória, a do
+Capítulo~\ref{chap:retornos_nao_linear}; em cada capítulo, o outro modelo serve
+de teste de robustez. Como o BVRP previsto é um regressor gerado, a inferência
+desses capítulos incorpora a incerteza da previsão
+(Seção~\ref{sec:met-inferencia}).

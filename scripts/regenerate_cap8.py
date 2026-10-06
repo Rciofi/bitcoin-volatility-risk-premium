@@ -2,10 +2,10 @@
 Gera todas as figuras e tabelas do Capítulo 8.
 
 Outputs:
-  figs/previsao_bvrp/fig_oos_prediction.png   (Fig. 8.1 — melhorada)
-  figs/previsao_bvrp/fig_feature_importance.png (Fig. 8.2 — importância + coeficientes)
-  tables/previsao_bvrp/tab_oos_performance.tex    (Tab. 8.1 — já gerada, regera igual)
-  tables/previsao_bvrp/tab_coeficientes.tex       (Tab. 8.2 — coeficientes Lasso e Ridge)
+  archive/figs/previsao_bvrp/fig_oos_prediction.png   (Fig. 8.1 — melhorada)
+  archive/figs/previsao_bvrp/fig_feature_importance.png (Fig. 8.2 — importância + coeficientes)
+  archive/tables/previsao_bvrp/tab_oos_performance.tex    (Tab. 8.1 — já gerada, regera igual)
+  archive/tables/previsao_bvrp/tab_coeficientes.tex       (Tab. 8.2 — coeficientes Lasso e Ridge)
 """
 
 import math
@@ -35,9 +35,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "ml_dataset.csv"
 # amostra do Cap. 6: 1.524 obs (1.523 apos shift(-1)); menor que a canonica
 # (1.775) devido ao burn-in de 252 obs da variavel de regime
-OUT_FIGS  = ROOT / "figs" / "previsao_bvrp"
-OUT_TABS  = ROOT / "tables" / "previsao_bvrp"
-OUT_SHAP  = ROOT / "tables" / "previsao_bvrp"   # [M1] CSV com shap_values
+# Legado: o Cap. 5 atual usa code/publicar_cap5.py; as saídas deste script ficam em archive/
+OUT_FIGS  = ROOT / "archive" / "figs" / "previsao_bvrp"
+OUT_TABS  = ROOT / "archive" / "tables" / "previsao_bvrp"
+OUT_SHAP  = ROOT / "archive" / "tables" / "previsao_bvrp"   # [M1] CSV com shap_values
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
 OUT_SHAP.mkdir(parents=True, exist_ok=True)

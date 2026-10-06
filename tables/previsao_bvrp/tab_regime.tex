@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Regime de volatilidade e previsão do BVRP.}
+\label{tab:prev-regime}
+\begin{tabular}{llrrr}
+\toprule
+Corte & $H_0$ & $\chi^2$ ($q$) & $p$ & $R^2$ dentro \\
+\midrule
+\multicolumn{5}{l}{\textit{Painel A: interações dentro da amostra (MQO, $N = 1.776$)}} \\
+Corte fixo & 16 interações & 94{,}9 (16) & $3 \times 10^{-13}$ & 0{,}328 \\
+Corte fixo & 16 interações e $D_t$ & 94{,}9 (17) & $8 \times 10^{-13}$ & 0{,}328 \\
+Corte expansivo & 16 interações & 85{,}6 (16) & $2 \times 10^{-11}$ & 0{,}318 \\
+Corte expansivo & 16 interações e $D_t$ & 86{,}9 (17) & $2 \times 10^{-11}$ & 0{,}318 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Painel B: previsão fora da amostra ($R^2_{\text{fora}}$, janela expansiva)}} \\
+Modelo & Sem regime & Corte fixo & Corte expansivo & DM ($p$), fixo \\
+\cmidrule(lr){1-5}
+Ridge & 0{,}223 & 0{,}229 & 0{,}227 & 0{,}81 \\
+MQO & 0{,}097 & $-$0{,}174 & $-$0{,}165 & 0{,}21 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $D_t = 1$ se $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. (corte fixo, estimado na primeira janela); no corte expansivo, reestimado em cada origem. Painel A: MQO com as 16 variáveis, $D_t$ e as 16 interações $D_t X_t$; estatística de Wald $\chi^2(q)$ com erro-padrão HAC de 31 defasagens. Painel B: modelos com as interações, mesmas origens do T5; DM: Diebold--Mariano bilateral contra o mesmo modelo sem regime.}
+\end{table}

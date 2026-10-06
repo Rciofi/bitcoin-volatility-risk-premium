@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Hiperparâmetros: grades e escolhas da validação cruzada embargada.}
+\label{tab:prev-hiperparametros}
+\begin{tabular}{lp{6.2cm}lc}
+\toprule
+Modelo & Grade & Mais frequente & No limite \\
+\midrule
+Ridge & $\alpha$: 17 valores de $10^{-3}$ a $10^{5}$ & $\alpha = 10^{3}$ (24) & 0 \\
+LASSO & $\alpha$: 16 valores de $10^{-3}$ a $10^{2}$ & $\alpha = 4{,}64$ (18) & 0 \\
+\addlinespace
+Floresta aleatória & profundidade máxima: 1, 2, 3, 6, sem limite & 1 (33) & 33 \\
+ & folha mínima: 5, 20, 50, 100, 200 & & \\
+ & fração de variáveis por corte: 0{,}2; 1/3; 1 & & \\
+\addlinespace
+XGBoost & taxa de aprendizagem: 0{,}01; 0{,}03; 0{,}1 & 0{,}01 (33) & 33 \\
+ & profundidade máxima: 1, 2, 4 & 1 (28) & 28 \\
+ & número de árvores: 50, 100, 200, 500 & 50 (22) & 22 \\
+ & peso mínimo por folha: 1, 10 & & \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Janela expansiva, 33 reestimações. Em cada uma, validação cruzada com cinco dobras expansivas e embargo de 30 dias; escolhe-se a combinação de menor erro quadrático médio. Entre parênteses, o número de reestimações com a escolha indicada. Última coluna: reestimações com o hiperparâmetro no extremo de menor capacidade da grade. Floresta com 500 árvores; XGBoost com 80\% das observações e das variáveis em cada árvore. Os modelos lineares usam variáveis padronizadas com a média e o desvio-padrão do treino.}
+\end{table}

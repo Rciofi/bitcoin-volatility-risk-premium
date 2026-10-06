@@ -1,0 +1,38 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Variáveis explicativas, todas conhecidas no fim do dia $t$.}
+\label{tab:prev-dicionario}
+\begin{tabular}{lp{4.2cm}lrl}
+\toprule
+Símbolo & Definição & Código & ADF ($p$) & Tratamento \\
+\midrule
+\multicolumn{5}{l}{\textit{Volatilidade histórica}} \\
+$\text{VH}_{t:t}$ & $\sqrt{365}\,|r_t|$ & \texttt{vh\_1d} & $<$0{,}001 & nível \\
+$\text{VH}_{t-4:t}$ & $\sqrt{(365/5)\sum_{j=0}^{4} r_{t-j}^2}$ & \texttt{vh\_5d} & $<$0{,}001 & nível \\
+$\text{VH}_{t-29:t}$ & $\sqrt{(365/30)\sum_{j=0}^{29} r_{t-j}^2}$ & \texttt{vh\_30d} & $<$0{,}001 & nível \\
+$\text{VH}_{t-59:t}$ & idem, 60 dias & \texttt{vh\_60d} & 0{,}028 & nível \\
+$\text{VH}_{t-89:t}$ & idem, 90 dias & \texttt{vh\_90d} & 0{,}190 & nível \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Volatilidade implícita}} \\
+$\text{IV}_t$ & DVOL no fim de $t$ & \texttt{iv\_30d} & 0{,}084 & nível \\
+$\Delta_1\text{IV}_t$ & $\text{IV}_t - \text{IV}_{t-1}$ & \texttt{d\_iv\_1d} & $<$0{,}001 & diferença \\
+$\Delta_5\text{IV}_t$ & $\text{IV}_t - \text{IV}_{t-5}$ & \texttt{d\_iv\_5d} & $<$0{,}001 & diferença \\
+$\text{IV}_t - \overline{\text{IV}}_{t-4:t}$ & desvio da média móvel de 5 dias & \texttt{iv\_menos\_ma5d} & $<$0{,}001 & desvio da média móvel \\
+$\text{IV}_t - \overline{\text{IV}}_{t-29:t}$ & desvio da média móvel de 30 dias & \texttt{iv\_menos\_ma30d} & $<$0{,}001 & desvio da média móvel \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Preço}} \\
+$r_t$ & $\ln(P_t/P_{t-1})$ & \texttt{ret\_1d} & $<$0{,}001 & log-diferença do preço \\
+$r_{t-4:t}$ & $\sum_{j=0}^{4} r_{t-j}$ & \texttt{ret\_acum\_5d} & $<$0{,}001 & soma de log-diferenças \\
+$r_{t-29:t}$ & $\sum_{j=0}^{29} r_{t-j}$ & \texttt{ret\_acum\_30d} & $<$0{,}001 & soma de log-diferenças \\
+$\ln(P_t/\overline{P}_{t-29:t})$ & preço relativo à média móvel de 30 dias & \texttt{log\_close\_ma30d} & $<$0{,}001 & razão com a média móvel \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Prêmio}} \\
+$\text{BVRP}^{\text{proxy}}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $<$0{,}001 & nível \\
+$\Delta_1\text{BVRP}^{\text{proxy}}_t$ & $\text{BVRP}^{\text{proxy}}_t - \text{BVRP}^{\text{proxy}}_{t-1}$ & \texttt{d\_vrp\_1d} & $<$0{,}001 & diferença \\
+$\text{BVRP}_{t-30}$ & $\text{VH}_{t-29:t} - \text{IV}_{t-30}$ & \texttt{bvrp\_realizado\_defasado} & $<$0{,}001 & nível \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $r_t$ é o log-retorno diário e $P_t$, o preço de fechamento. Volatilidades em \% a.a. Valor-$p$ do teste ADF na amostra de modelagem ($N = 1.776$). As séries com evidência robusta de raiz unitária (o preço e as médias móveis da IV) entram transformadas; as volatilidades entram em nível, inclusive $\text{VH}_{t-89:t}$ e $\text{IV}_t$, cujo ADF fica na fronteira. Os modelos lineares excluem $\text{VH}_{t-29:t}$, porque $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$.}
+\end{table}
