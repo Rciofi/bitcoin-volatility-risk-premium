@@ -2,41 +2,57 @@
 \label{chap:referencial}
 
 Este capítulo apresenta o conjunto de conceitos fundamentais necessários para
-compreender a análise conduzida nesta dissertação. São discutidos: (i) a
+compreender a análise conduzida nesta dissertação. O capítulo discute: (i) a
 formação da volatilidade implícita em mercados de opções; (ii) a mensuração da
-volatilidade realizada; (iii) a definição, interpretações e propriedades do
-\textit{Volatility Risk Premium} (VRP); (iv) peculiaridades do mercado de opções
-de Bitcoin; (v) regimes de volatilidade e sua relação com o BVRP; e
-(vi) abordagens de aprendizado de máquina --- incluindo modelos lineares
-regularizados (LASSO e Ridge) e métodos baseados em árvores (\textit{Random
-Forest} e \textit{Gradient Boosting}) --- aplicadas à previsão do BVRP e de
+volatilidade histórica; (iii) a definição, as interpretações e as propriedades
+do prêmio de risco de volatilidade (VRP) e do prêmio do Bitcoin (BVRP),
+incluindo os regimes de volatilidade; (iv) peculiaridades do mercado de opções
+de Bitcoin; e (v) abordagens de aprendizado de máquina --- incluindo modelos
+lineares regularizados (LASSO e Ridge) e métodos baseados em árvores (floresta
+aleatória e \textit{Gradient Boosting}) --- aplicadas à previsão do BVRP e de
 retornos do Bitcoin.
 
 \section{Volatilidade implícita}
 
 A volatilidade implícita (\textit{Implied Volatility}, IV) representa a
-expectativa de mercado sobre a variabilidade futura do preço do ativo
-subjacente, inferida a partir dos preços das opções pela inversão de modelos de
-precificação, como o modelo de Black--Scholes. Em vez de assumir uma volatilidade futura fixa, o mercado revela,
-por meio dos preços de opções, a volatilidade que equilibra oferta e demanda por
-proteção.
+expectativa de mercado, no mundo neutro ao risco, sobre a variabilidade futura
+do preço do ativo subjacente: $\text{IV}_t = E^*(\text{RV}_{t+1:t+h} \mid I_t)$,\footnote{A
+rigor, o DVOL, como o VIX, é a raiz da variância esperada no mundo neutro ao
+risco, $\text{IV}_t = \sqrt{E^*(\text{RV}^2_{t+1:t+h} \mid I_t)}$; a notação do
+texto ignora a diferença de Jensen entre a raiz da esperança e a esperança da
+raiz.}
+em que o asterisco denota a expectativa no mundo neutro ao risco e $I_t$, a
+informação disponível em $t$ (Seção~\ref{sec:vrp-teorico}). Nesta dissertação,
+a IV não vem da inversão de um modelo de precificação, como o de Black--Scholes:
+o índice DVOL da Deribit, assim como o VIX, é uma estimativa livre de modelo,
+extraída diretamente dos preços de opções fora do dinheiro
+\citep{carr2009variance, cboe2019vix} (Seção~\ref{sec:cap2-dvol}).
 
 Diferentemente da volatilidade histórica, a volatilidade implícita não é uma
 estimativa estatística no sentido clássico. Ela pode ser interpretada como um
-\textit{preço} de risco associado à distribuição neutra ao risco (\textit{risk-neutral})
-dos retornos, refletindo não apenas a expectativa sobre a variância futura, mas
-também prêmios por assimetria, curtose e risco de cauda. Assim, a IV é
-influenciada por fatores como:
+\textit{preço} de risco associado à distribuição neutra ao risco dos retornos.
+Como a estimativa livre de modelo mede a variação quadrática esperada dos
+retornos, e não apenas a volatilidade de um processo de difusão contínuo, ela
+incorpora também os saltos e, por isso, reflete assimetria, curtose e risco de
+cauda \citep{carr2009variance}. Assim, a IV é influenciada por fatores como:
 
 \begin{itemize}
-    \item \textbf{demanda por proteção}: investidores adquirindo opções de venda
-          (\textit{puts}) tendem a elevar a IV, especialmente em \textit{strikes}
-          fora do dinheiro;
-    \item \textbf{estrutura de \textit{skew}/\textit{smile}}: assimetrias de
-          oferta e demanda entre diferentes \textit{strikes} e vencimentos;
+    \item \textbf{demanda por proteção}: a procura por proteção contra quedas,
+          feita com opções de venda ou, pela paridade de compra e venda, com
+          opções de compra \citep{hull2018options}, entra na formação dos
+          preços das opções e, portanto, da IV, sobretudo em preços de
+          exercício fora do dinheiro;
+    \item \textbf{estrutura de \textit{skew}/\textit{smile}}: a IV varia entre
+          preços de exercício e vencimentos. Parte dessa variação vem da
+          própria distribuição do subjacente: quando a IV é calculada por
+          Black--Scholes, que supõe retornos sem saltos, a assimetria e os
+          saltos negativos exigem IV maiores nos preços de exercício baixos,
+          o que gera o sorriso de volatilidade \citep{pan2006jumpRisk,
+          gatheral2011volsurface};
     \item \textbf{eventos esperados}: anúncios regulatórios, atualizações de rede,
           vencimentos relevantes e mudanças de regime percebidas;
-    \item \textbf{condições de liquidez}: \textit{bid--ask spreads}, profundidade
+    \item \textbf{condições de liquidez}: diferença entre os preços de compra e
+          de venda (\textit{bid--ask spread}), profundidade
           do livro de ofertas e variações intradiárias de fluxo.
 \end{itemize}
 
@@ -49,47 +65,64 @@ a negociação contínua e a menor maturidade relativa do mercado, em linha com 
 literatura sobre superfícies de volatilidade \citep{gatheral2011volsurface,
 bakshi2003dynamicsIV}.
 
-\section{Volatilidade realizada}
+\section{Volatilidade histórica}
 
-A volatilidade realizada (\textit{Realized Volatility}, RV) é uma medida
-\textit{ex post} da variabilidade dos retornos observados de um ativo ao longo
-do tempo, construída sob a medida histórica (física). Trata-se de um estimador
-não paramétrico da volatilidade, amplamente utilizado na literatura empírica,
-e constitui um insumo fundamental para a comparação com a volatilidade implícita.
+A volatilidade histórica (VH) é uma medida \textit{ex post} da variabilidade
+dos retornos observados de um ativo ao longo do tempo, construída sob a medida
+física. Trata-se de um estimador não paramétrico da volatilidade, amplamente
+utilizado na literatura empírica, e constitui um insumo fundamental para a
+comparação com a volatilidade implícita.
 
-Neste trabalho, a volatilidade realizada é calculada a partir de retornos
+Neste trabalho, a volatilidade histórica é calculada a partir de retornos
 logarítmicos diários, considerando uma janela móvel de \(h\) dias, conforme:
 
 \[
-RV_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2 },
+\text{VH}_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2 },
 \]
-
-onde \(r_{t-j} = \ln\left(\frac{P_{t-j}}{P_{t-j-1}}\right)\) representa o retorno
+em que \(r_{t-j} = \ln\left(\frac{P_{t-j}}{P_{t-j-1}}\right)\) representa o retorno
 logarítmico diário do ativo, e o fator de anualização por 365 dias reflete a
 negociação contínua do mercado de Bitcoin.
 
-Alternativamente, pode-se definir a variância realizada como:
+O nome segue a distinção usual da literatura. A volatilidade realizada
+(\textit{realized volatility}, RV), no sentido de \citet{andersen2003realized},
+estima a volatilidade de um período somando os retornos quadráticos de
+frequência mais alta observados dentro dele --- por exemplo, retornos
+intradiários para a volatilidade de um dia. A premissa é que a volatilidade
+muda ao longo do tempo, e o estimador mede a volatilidade integrada no
+intervalo. O estimador de volatilidade histórica, por sua vez, trata a
+volatilidade como constante dentro da janela e tira a média dos retornos
+quadráticos. A VH é, assim, o estimador com dados diários da RV que entra na
+definição teórica do prêmio (Seção~\ref{sec:vrp-teorico}); por isso, as duas
+medidas aparecem com símbolos distintos.
+
+A escolha de \(h\) muda as propriedades da medida. Com \(h\) grande, a janela
+troca apenas uma de \(h\) observações de um dia para o outro, e a série fica
+suave e reflete a volatilidade de um período longo; com \(h\) pequeno, a medida
+é mais local e mais ruidosa. Esta dissertação usa \(h = 30\) dias corridos no
+prêmio, o mesmo horizonte da volatilidade implícita com que a VH é comparada;
+janelas de 1, 5, 60 e 90 dias aparecem apenas como variáveis explicativas nos
+capítulos de previsão.
+
+Alternativamente, pode-se definir a variância histórica como:
 
 \[
-\mathrm{VarRV}_t^{(h)} = \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2,
+\left(\text{VH}_t^{(h)}\right)^2 = \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2,
 \]
+sendo a volatilidade histórica a raiz quadrada dessa quantidade.
 
-sendo a volatilidade realizada a raiz quadrada dessa quantidade.
-
-Embora a volatilidade realizada seja usualmente construída a partir de retornos
+Embora a volatilidade histórica seja usualmente construída a partir de retornos
 logarítmicos simples, pode-se alternativamente considerar retornos em excesso
 em relação à taxa livre de risco, definidos como:
 
 \[
 r_t^e = r_t - r_{f,t},
 \]
+em que \(r_{f,t}\) representa a taxa livre de risco no período \(t\).
 
-onde \(r_{f,t}\) representa a taxa livre de risco no período \(t\).
-
-Nesse caso, a volatilidade realizada pode ser definida como:
+Nesse caso, a volatilidade histórica pode ser definida como:
 
 \[
-RV_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} \left( r_{t-j} - r_{f,t-j} \right)^2 }.
+\text{VH}_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} \left( r_{t-j} - r_{f,t-j} \right)^2 }.
 \]
 
 No entanto, para frequências diárias e, em particular, no contexto de criptoativos,
@@ -97,59 +130,87 @@ a diferença empírica entre utilizar retornos simples ou em excesso tende a ser
 negligenciável. Por essa razão, a literatura usualmente adota retornos não ajustados,
 abordagem também seguida neste trabalho.
 
-Embora a RV possa ser estimada com dados intradiários, aumentando a precisão
-(\textit{high-frequency realized volatility}), nesta dissertação utiliza-se a
-versão baseada em dados diários, consistente com a disponibilidade de dados do
-mercado à vista e com as séries derivadas do ecossistema da Deribit, incluindo
-o índice DVOL.
+A volatilidade realizada propriamente dita exigiria dados intradiários, o que
+aumentaria a precisão (\textit{high-frequency realized volatility}); nesta
+dissertação, utiliza-se a volatilidade histórica com dados diários, consistente
+com a disponibilidade de dados do mercado à vista e com as séries derivadas do
+ecossistema da Deribit, incluindo o índice DVOL.
 
 A literatura clássica de volatilidade realizada, especialmente os trabalhos de
 \citet{andersen2003realized} e \citet{corsi2009har}, estabelece a base teórica
 para a construção de estimadores robustos de volatilidade, além de documentar a
 presença de persistência temporal e estrutura de memória longa na dinâmica da
-volatilidade, fenômenos também observados em criptoativos.
-\section{Prêmio de Risco de Volatilidade (BVRP)}
+volatilidade, fatos estilizados também observados em criptoativos.
+\section{Prêmio de risco de volatilidade}
 \label{sec:vrp-teorico}
 
-O \textit{Volatility Risk Premium} (VRP) pode ser interpretado como a
-compensação exigida pelos investidores para assumir risco de volatilidade. Em
-termos empíricos, é comum aproximar o VRP pela diferença entre a volatilidade
-realizada e a volatilidade implícita no mesmo horizonte:
+O prêmio de risco de volatilidade (VRP) pode ser interpretado como a
+compensação exigida pelos investidores para assumir risco de volatilidade.
+Formalmente, um prêmio de risco é a diferença entre a expectativa no mundo
+físico e a expectativa no mundo neutro ao risco. Para um horizonte de $h$ dias,
+
+\begin{equation}
+\text{VRP}_t = E(\text{RV}_{t+1:t+h} \mid I_t) - E^*(\text{RV}_{t+1:t+h} \mid I_t),
+\label{eq:vrp-def}
+\end{equation}
+em que $\text{RV}_{t+1:t+h}$ é a volatilidade realizada entre $t+1$ e $t+h$,
+$I_t$ é a informação disponível em $t$ e o asterisco denota a expectativa no
+mundo neutro ao risco. O segundo termo é a volatilidade implícita,
+$\text{IV}_t = E^*(\text{RV}_{t+1:t+h} \mid I_t)$.
+
+O BVRP é o prêmio de risco de volatilidade do Bitcoin, com $h = 30$ dias. Como
+a expectativa física não é observável, a variável-alvo desta dissertação é a
+realização do prêmio, medida pela volatilidade histórica dos 30 dias seguintes:
 
 \[
-\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t},
+\text{BVRP}_t = \text{VH}_{t+1:t+30} - \text{IV}_t,
 \]
+em que $\text{VH}_{t+1:t+30}$ é a volatilidade histórica calculada com os
+retornos de $t+1$ a $t+30$ e $\text{IV}_t$ é a volatilidade implícita a 30 dias
+observada em $t$, dada pelo índice DVOL da Deribit. A esperança condicional de
+$\text{BVRP}_t$ em $t$ é o VRP da equação~\eqref{eq:vrp-def}, a menos da
+diferença entre a VH e a RV. O BVRP de $t$ só é conhecido em $t+30$; por isso,
+nada que seja usado como informação disponível em $t$ nos capítulos seguintes
+depende dele.
 
-onde:
+Uma alternativa comum na literatura é substituir a expectativa física pela
+volatilidade observada no passado recente: \citet{bollerslev2009expected}, por
+exemplo, medem o prêmio de variância com a variância realizada do mês
+anterior. A hipótese subjacente é a de passeio aleatório sem deriva para a
+volatilidade --- a melhor previsão da VH dos próximos 30 dias é a VH dos
+últimos 30, $E(\text{VH}_{t+1:t+30} \mid I_t) = \text{VH}_{t-29:t}$. Sob essa
+hipótese, o prêmio esperado é aproximado por
 
-\begin{itemize}
-    \item $\text{RV}_{30,t}$ é a volatilidade realizada a 30 dias, calculada em
-          janela retrospectiva (de $t-29$ a $t$);
-    \item $\text{IV}_{30,t}$ é a volatilidade implícita a 30 dias observada em
-          $t$, dada pelo índice DVOL da Deribit.
-\end{itemize}
+\[
+\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t,
+\]
+conhecido em $t$. A hipótese é uma simplificação, e \citet{bekaert2014vix}
+discutem suas limitações, estimando a expectativa física com modelos de
+previsão da variância. Nesta dissertação, a proxy aproxima a expectativa do
+prêmio, e não sua realização: ela entra como variável explicativa disponível
+em $t$, enquanto o Capítulo~\ref{chap:cap5_ml} prevê o próprio BVRP.
 
-A literatura empírica sobre prêmios de risco de volatilidade tem documentado o fenômeno em múltiplos mercados e horizontes. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e histórica. Para mercados de equity, \citet{bollerslev2011VRP} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários --- achado replicado em diversos índices acionários internacionais. \citet{bali2009volatilitypremium} confirma o sinal negativo do VRP em mercado norte-americano e ressaltam sua associação com mudanças de regime de aversão ao risco. No contexto específico de criptoativos, \citet{alexanderImeraj2019} foram pioneiros ao documentar a existência de prêmio de risco de variância em opções de Bitcoin na Deribit, evidenciando que as peculiaridades microestruturais do mercado --- operação contínua, liquidação em cripto, ausência de \textit{circuit breakers} --- produzem dinâmica de prêmio distinta da observada em equity. \citet{almeida2024cryptoVRP} estendem essa análise documentando relação entre o VRP do Bitcoin e fatores de risco sistêmico em criptoativos, e \citet{hoang2023cryptoVRP} caracterizam empiricamente a distribuição do prêmio em múltiplas criptomoedas, encontrando sinal negativo médio mas com instabilidade temporal substancialmente maior que a documentada em mercados tradicionais.
+A literatura empírica sobre prêmios de risco de volatilidade tem documentado esse fato estilizado em múltiplos mercados e horizontes. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para mercados de equity, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários --- achado replicado em diversos índices acionários internacionais \citep{bollerslev2014international}. \citet{bali2009volatilitypremium} confirma o sinal negativo do VRP em mercado norte-americano e ressaltam sua associação com mudanças de regime de aversão ao risco. Os três trabalhos que estudam o prêmio no mercado de Bitcoin \citep{alexanderImeraj2019, almeida2024cryptoVRP, hoang2023cryptoVRP} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
 
-Esta dissertação adota a convenção $\text{RV} - \text{IV}$ seguindo essa literatura. Sob esta convenção, valores negativos do BVRP correspondem ao estado típico em que a volatilidade implícita supera a volatilidade que efetivamente se realiza --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de BVRP positivo ($\text{RV} > \text{IV}$) representam situações em que a volatilidade realizada supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
+Esta dissertação adota a convenção $\text{VH} - \text{IV}$ seguindo essa literatura. Sob esta convenção, valores negativos do BVRP correspondem ao estado típico em que a volatilidade implícita supera a volatilidade que efetivamente se realiza --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de BVRP positivo ($\text{VH} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
 
-A literatura também documenta que o VRP exibe persistência temporal elevada, característica que tem implicações relevantes para a inferência estatística em modelos preditivos. Na amostra desta dissertação, a autocorrelação do BVRP em frequência diária é de $\rho_1 = 0{,}947$, decaindo para $\rho_5 = 0{,}773$ na frequência semanal e $\rho_{20} = 0{,}229$ em janela mensal, tornando-se praticamente nula a partir do lag de 30 dias ($\rho_{30} = 0{,}014$). O teste de Ljung--Box rejeita fortemente a hipótese de ausência de autocorrelação para todos os lags testados ($p < 0{,}001$). Esse padrão contrasta com o das séries que compõem o prêmio: isoladamente, RV e IV exibem persistência substancialmente maior ($\rho_{30} = 0{,}355$ e $\rho_{30} = 0{,}800$, respectivamente) --- consistente com a memória longa documentada para volatilidade realizada \citep{corsi2009har} ---, de modo que a diferença $\text{RV} - \text{IV}$ cancela boa parte do componente persistente comum às duas séries. O BVRP é, portanto, marcadamente menos persistente que qualquer um de seus insumos, ainda que sua autocorrelação de curto prazo seja elevada --- padrão que justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte, intervalos de confiança via reamostragem em blocos para mitigar o viés de Stambaugh, e janelas expansivas para qualquer cálculo de limiares estatísticos.
+A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}, característica que tem implicações relevantes para a inferência estatística em modelos preditivos. Como VH e IV compartilham esse componente persistente, a diferença $\text{VH} - \text{IV}$ tende a cancelar boa parte dele; o Capítulo~\ref{chap:dados} mede esse padrão na amostra. No BVRP há, além disso, uma fonte mecânica de autocorrelação: alvos de datas vizinhas compartilham até 29 dos 30 retornos da janela. Esse padrão justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte, intervalos de confiança via reamostragem em blocos e janelas expansivas para qualquer cálculo de limiares estatísticos. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita, o que permite avaliar a inferência quando há o viés de \citet{stambaugh1999}: quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés.
 
 Do ponto de vista teórico, a distinção entre medida neutra ao risco (associada a
-preços de opções) e medida histórica (associada a retornos observados) implica que
-a diferença $\text{RV} - \text{IV}$ incorpora, além de expectativas de variância,
+preços de opções) e medida física (associada a retornos observados) implica que
+o prêmio incorpora, além de expectativas de variância,
 componentes relacionados a risco de cauda e a preferências por proteção. Em
 mercados tradicionais, como o S\&P 500, a evidência empírica documenta que o VRP
 apresenta sinal sistematicamente negativo, associado à demanda por proteção contra
 quedas abruptas e contra choques de volatilidade
 \citep{bollerslev2011VRP, pan2006jumpRisk, bali2009volatilitypremium}.
 
-No mercado de Bitcoin, entretanto, o BVRP apresenta dinâmica mais instável que a
-documentada em equity. Entre os fatores frequentemente associados a essa
-instabilidade, destacam-se:
+No mercado de Bitcoin, entretanto, \citet{alexanderImeraj2019} documentam,
+sobretudo no início do mercado, que o BVRP apresenta dinâmica mais instável que a documentada em equity. Entre os
+fatores frequentemente associados a essa instabilidade, destacam-se:
 
 \begin{enumerate}
-    \item volatilidade realizada estruturalmente mais elevada, com episódios
+    \item volatilidade histórica estruturalmente mais elevada, com episódios
           intermitentes de grande magnitude;
     \item eventos idiossincráticos e choques de liquidez em criptoativos, com
           impacto rápido sobre a volatilidade implícita;
@@ -159,9 +220,17 @@ instabilidade, destacam-se:
     \item características microestruturais específicas do mercado de derivativos
           de cripto --- operação 24/7, contratos com liquidação inversa e
           mecanismos de auto-deleveraging --- que diferenciam a formação de preços
-          de opções na Deribit dos mercados tradicionais regulados
-          \citep{alexanderImeraj2019}.
+          de opções na Deribit dos mercados tradicionais regulados.
 \end{enumerate}
+
+Esses fatores pesam sobretudo em episódios de volatilidade elevada, o que
+motiva separar a amostra em regimes de volatilidade. A análise usa dois
+regimes, de baixa e de alta volatilidade, definidos pela volatilidade histórica
+de 30 dias, cuja distribuição é bimodal na primeira parte da amostra. O corte
+entre os regimes é estimado apenas com dados da primeira janela de estimação,
+sem informação posterior às datas classificadas
+(Capítulo~\ref{chap:metodologia}); no modelo em árvore do
+Capítulo~\ref{chap:regimes}, os cortes são escolhidos pelo próprio modelo.
 
 A combinação destes fatores produz três características empíricas relevantes para
 a análise conduzida nesta dissertação: (i) o BVRP do Bitcoin é negativo em média
@@ -180,7 +249,7 @@ liquidez superior às demais plataformas. Suas principais características inclu
           acúmulo de eventos fora do pregão, mas aumenta a relevância de efeitos
           intradiários de liquidez;
     \item \textbf{liquidez concentrada}: maior profundidade em opções
-          \textit{at-the-money} e vencimentos curtos (7--30 dias), o que influencia
+          no dinheiro e vencimentos curtos (7--30 dias), o que influencia
           a formação de IV em horizontes próximos;
     \item \textbf{efeito de liquidações automáticas}: posições alavancadas podem
           gerar movimentos bruscos e amplificar a volatilidade;
@@ -192,20 +261,21 @@ A formação da IV no Bitcoin é sensível a fatores microestruturais, tais como
 
 \begin{itemize}
     \item tamanho mínimo de lote e restrições operacionais;
-    \item \textit{bid--ask spreads} mais amplos em horários de menor profundidade;
-    \item heterogeneidade de \textit{market makers} por região e perfil de risco;
+    \item diferenças mais amplas entre os preços de compra e de venda em
+          horários de menor profundidade;
+    \item heterogeneidade de formadores de mercado por região e perfil de risco;
     \item eventos associados ao \textit{funding} de futuros perpétuos, que afetam
-          posicionamento e demanda por \textit{hedge}.
+          posicionamento e demanda por proteção.
 \end{itemize}
 
 Três características microestruturais merecem destaque adicional pelo impacto que exercem sobre a formação de preços de opções na Deribit. Primeiro, os contratos de opções são liquidados em Bitcoin, não em dólares --- propriedade conhecida como \textit{inverse settlement} --- o que introduz convexidade adicional no \textit{payoff} efetivo do detentor de opção quando expresso em moeda fiat. Segundo, a Deribit emprega mecanismo de \textit{auto-deleveraging} (ADL) como instrumento de gestão de risco: em situações de movimentos extremos em que o fundo de garantia da bolsa é insuficiente para cobrir as posições inadimplentes, contratos de contrapartes lucrativas são desfeitos automaticamente. Esse mecanismo difere fundamentalmente dos \textit{circuit breakers} de bolsas tradicionais reguladas e introduz risco de contraparte sistemático que pode ser refletido em prêmios elevados de volatilidade implícita em momentos de estresse. Terceiro, o mercado opera ininterruptamente, sem fechamentos noturnos ou de fim de semana, o que elimina o ``gap'' temporal entre informação e preço típico de mercados tradicionais, mas também concentra liquidez em horários de sobreposição com mercados asiáticos e norte-americanos.
 
-A microestrutura aqui descrita passou por transformação institucional relevante durante o período amostral desta dissertação. Em 10 de janeiro de 2024, a \textit{Securities and Exchange Commission} (SEC) dos Estados Unidos aprovou a listagem de fundos negociados em bolsa (ETFs) que detêm Bitcoin \textit{spot} como ativo subjacente, contemplando onze produtos simultaneamente --- entre os quais o iShares Bitcoin Trust (IBIT, BlackRock), o Fidelity Wise Origin Bitcoin Fund (FBTC) e o ARK 21Shares Bitcoin ETF (ARKB). A aprovação marcou o ingresso pleno de canais institucionais regulados ao mercado de Bitcoin nos Estados Unidos. A implicação para o mercado de opções da Deribit é indireta mas substantiva: o aumento de fluxo institucional ao mercado à vista tende a comprimir a volatilidade realizada estrutural e a alterar a composição da demanda por proteção via opções, com potencial impacto sobre o nível e a persistência do BVRP --- canal cujo efeito é tratado como hipótese de quebra estrutural a ser investigada em extensões futuras (ver Capítulo~\ref{chap:regimes}).
+A microestrutura aqui descrita passou por transformação institucional relevante durante o período amostral desta dissertação. Em 10 de janeiro de 2024, a \textit{Securities and Exchange Commission} (SEC) dos Estados Unidos aprovou a listagem de fundos negociados em bolsa (ETFs) que detêm Bitcoin à vista como ativo subjacente, contemplando onze produtos simultaneamente --- entre os quais o iShares Bitcoin Trust (IBIT, BlackRock), o Fidelity Wise Origin Bitcoin Fund (FBTC) e o ARK 21Shares Bitcoin ETF (ARKB). A aprovação marcou o ingresso pleno de canais institucionais regulados ao mercado de Bitcoin nos Estados Unidos. A implicação para o mercado de opções da Deribit é indireta mas substantiva: o aumento de fluxo institucional ao mercado à vista tende a comprimir a volatilidade histórica estrutural e a alterar a composição da demanda por proteção via opções, com potencial impacto sobre o nível e a persistência do BVRP --- canal cujo efeito é tratado como hipótese de quebra estrutural a ser investigada em extensões futuras (ver Capítulo~\ref{chap:regimes}).
 
 Essas características tornam o BVRP um objeto empírico mais rico, porém mais
 volátil, do que em mercados tradicionais. A sensibilidade da volatilidade
 implícita à microestrutura está alinhada com estudos sobre superfícies de
-volatilidade e dinâmica de \textit{implied vol} \citep{gatheral2011volsurface,
+volatilidade e dinâmica da volatilidade implícita \citep{gatheral2011volsurface,
 bakshi2003dynamicsIV}, que destacam como liquidez, assimetria de fluxos e
 microestrutura afetam a formação da curva de IV, especialmente em mercados menos
 maduros ou mais fragmentados.
@@ -213,38 +283,15 @@ maduros ou mais fragmentados.
 \subsection{O índice DVOL e a comparação com o VIX}
 \label{sec:cap2-dvol}
 
-O índice DVOL da Deribit constitui medida de volatilidade implícita análoga, em sua intenção, ao VIX da CBOE. Conceitualmente, ambos buscam sintetizar a expectativa de mercado sobre a variabilidade futura do ativo subjacente em horizonte de 30 dias, extraída \textit{model-free} dos preços de opções vivas. Formalmente, o DVOL é construído via integração ponderada dos preços de opções fora do dinheiro com vencimentos próximos a 30 dias, de modo análogo à formulação proposta por \citet{carr2009variance} para o conceito de variância neutra ao risco:
+O índice DVOL da Deribit constitui medida de volatilidade implícita análoga, em sua intenção, ao VIX da CBOE. Conceitualmente, ambos buscam sintetizar a expectativa de mercado sobre a variabilidade futura do ativo subjacente em horizonte de 30 dias, extraída dos preços de opções vivas por um método livre de modelo. Formalmente, o DVOL é construído via integração ponderada dos preços de opções fora do dinheiro com vencimentos próximos a 30 dias, de modo análogo à formulação proposta por \citet{carr2009variance} para o conceito de variância neutra ao risco:
 
 \begin{equation}
 \text{DVOL}_t^2 = \frac{2}{\tau} \cdot e^{r\tau} \int_0^{\infty} \frac{Q(K)}{K^2} \, dK,
 \label{eq:dvol-formula}
 \end{equation}
+em que $\tau = 30/365$, $Q(K)$ é o preço de mercado da opção fora do dinheiro com preço de exercício $K$ (opção de venda para $K < F$ e opção de compra para $K > F$, em que $F$ é o preço a termo), e $r$ é a taxa de juros livre de risco. A integral é aproximada na prática por uma soma discreta sobre os preços de exercício negociados, com interpolação para tratar lacunas na superfície de preços.
 
-onde $\tau = 30/365$, $Q(K)$ é o preço de mercado da opção fora do dinheiro com \textit{strike} $K$ (\textit{put} para $K < F$, \textit{call} para $K > F$, com $F$ sendo o preço \textit{forward}), e $r$ é a taxa de juros livre de risco. A integral é aproximada na prática por uma soma discreta sobre os \textit{strikes} negociados, com interpolação para tratar lacunas na superfície de preços.
-
-Quatro diferenças metodológicas e institucionais distinguem o DVOL do VIX. Primeiro, o subjacente do DVOL é o Bitcoin (preço \textit{spot} agregado da Deribit), enquanto o VIX reflete o índice S\&P~500 --- ativos com naturezas estruturalmente distintas em termos de regulação e composição de fluxo. Segundo, o DVOL utiliza opções da própria Deribit, plataforma não regulada por autoridade financeira tradicional, ao passo que o VIX emprega opções listadas na CBOE sob supervisão da SEC. Terceiro, o DVOL é atualizado continuamente em frequência intradiária (24/7), refletindo a operação contínua do mercado de Bitcoin; o VIX, em contraste, opera segundo o horário de pregão da CBOE. Quarto, a profundidade de \textit{strikes} ativos é menor no DVOL do que no VIX, o que pode amplificar ruído de microestrutura em períodos de baixa liquidez. Essas diferenças justificam tratar o DVOL como medida de volatilidade implícita do Bitcoin sem assumir equivalência direta com o VIX em propriedades estatísticas ou comportamento sob estresse de mercado.
-
-\section{Regimes de volatilidade}
-
-Modelos de regimes buscam capturar mudanças estruturais no comportamento da
-volatilidade e do VRP. Em mercados de criptoativos, essas transições tendem a ser
-mais frequentes, refletindo a ocorrência de choques e mudanças rápidas no
-sentimento de mercado. Regimes típicos incluem:
-
-\begin{enumerate}
-    \item \textbf{regime de baixa volatilidade}: períodos de lateralização do
-          preço e menor demanda por proteção;
-    \item \textbf{regime de volatilidade média}: estados intermediários, com
-          elevação gradual da incerteza e aumento progressivo de IV e RV;
-    \item \textbf{regime de alta volatilidade}: movimentos abruptos, liquidações
-          em cascata e aumento expressivo do custo de \textit{hedge}.
-\end{enumerate}
-
-Mesmo sem a implementação explícita de modelos de mudança de regime, como
-\textit{Markov Switching}, a inspeção gráfica e análises por quantis do BVRP
-frequentemente revelam padrões compatíveis com tais regimes, motivando o uso de
-estratégias condicionais e especificações empíricas que permitam relações
-não lineares.
+Quatro diferenças metodológicas e institucionais distinguem o DVOL do VIX. Primeiro, o subjacente do DVOL é o Bitcoin (preço à vista agregado da Deribit), enquanto o VIX reflete o índice S\&P~500 --- ativos com naturezas estruturalmente distintas em termos de regulação e composição de fluxo. Segundo, o DVOL utiliza opções da própria Deribit, plataforma não regulada por autoridade financeira tradicional, ao passo que o VIX emprega opções listadas na CBOE sob supervisão da SEC. Terceiro, o DVOL é atualizado continuamente em frequência intradiária (24/7), refletindo a operação contínua do mercado de Bitcoin; o VIX, em contraste, opera segundo o horário de pregão da CBOE. Quarto, a profundidade de preços de exercício ativos é menor no DVOL do que no VIX, o que pode amplificar ruído de microestrutura em períodos de baixa liquidez. Essas diferenças justificam tratar o DVOL como medida de volatilidade implícita do Bitcoin sem assumir equivalência direta com o VIX em propriedades estatísticas ou comportamento sob estresse de mercado.
 
 \section{Aprendizado de máquina em finanças}
 
@@ -263,7 +310,10 @@ em duas famílias: modelos lineares --- MQO, Ridge e LASSO, em que os dois
 baseados em árvores (\textit{floresta aleatória} e \textit{Gradient Boosting}),
 utilizados pela capacidade de capturar não linearidades, interações entre
 variáveis e de quantificar a importância relativa de preditores como o BVRP em
-um ambiente multivariado.
+um ambiente multivariado. Em todos os modelos com hiperparâmetros, a escolha é
+feita por validação cruzada embargada a cada reestimação: a janela de treino de
+cada dobra termina 30 dias antes da janela de validação, de modo que nenhum
+alvo de treino se sobreponha aos de validação (Capítulo~\ref{chap:cap5_ml}).
 
 \subsection{Modelos lineares: MQO, Ridge e LASSO}
 
@@ -279,7 +329,7 @@ soma dos quadrados dos resíduos sujeita a uma penalidade $\ell_1$:
     \left\{ \sum_{t=1}^{T}(y_t - \mathbf{x}_t'\beta)^2
             + \lambda \sum_{j=1}^{p} |\beta_j| \right\},
 \]
-onde $\lambda \geq 0$ é o parâmetro de regularização. A penalidade $\ell_1$
+em que $\lambda \geq 0$ é o parâmetro de regularização. A penalidade $\ell_1$
 induz esparsidade: coeficientes associados a preditores irrelevantes são levados
 exatamente a zero, realizando seleção automática de variáveis.
 
@@ -292,7 +342,7 @@ O Ridge utiliza penalidade $\ell_2$:
 Diferentemente do LASSO, o Ridge retém todos os preditores, mas encolhe seus
 coeficientes em direção a zero, sendo especialmente útil na presença de
 multicolinearidade. Nesta dissertação, ambos os modelos funcionam como
-\textit{benchmarks} lineares robustos, intermediários entre a regressão por MQO
+modelos de referência lineares robustos, intermediários entre a regressão por MQO
 irrestrita e as abordagens baseadas em árvores.
 
 \subsection{Floresta aleatória}
@@ -325,12 +375,11 @@ independentes, o \textit{Gradient Boosting} realiza otimização sequencial sobr
 uma função de perda, resultando em maior sensibilidade a padrões sutis e
 relações não lineares.
 
-Nesta dissertação, utiliza-se a implementação de \textit{Gradient Boosting} da
-biblioteca \texttt{scikit-learn}, em sua configuração padrão. Os
-hiperparâmetros são mantidos nos valores padrão da biblioteca --- opção que
-privilegia a reprodutibilidade e uma avaliação em configuração convencional,
-em vez da otimização de desempenho, cujas implicações são discutidas no
-Capítulo~\ref{chap:cap5_ml}.
+Nesta dissertação, utiliza-se a implementação XGBoost
+\citep{chen2016xgboost}. Os hiperparâmetros --- número de árvores, taxa de
+aprendizado, profundidade e peso mínimo por folha --- são escolhidos por
+validação cruzada embargada a cada reestimação, como nos demais modelos
+(Capítulo~\ref{chap:cap5_ml}).
 
 Entre suas características, destacam-se:
 
@@ -346,4 +395,6 @@ Os cinco modelos --- MQO, LASSO, Ridge, \textit{floresta aleatória} e
 \textit{Gradient Boosting} --- são empregados nesta dissertação para avaliar se o
 BVRP é previsível fora da amostra a partir de variáveis de volatilidade, retorno
 e estado de mercado, comparando modelos lineares e não lineares contra
-\textit{benchmarks} de referência.
+modelos de referência. A floresta aleatória é também o modelo único em árvore
+do Capítulo~\ref{chap:regimes}, que gera o BVRP previsto usado para testar a
+relação não linear entre o prêmio e os retornos futuros.

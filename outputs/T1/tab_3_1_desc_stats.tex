@@ -4,21 +4,21 @@
 \caption{Estatísticas descritivas das variáveis principais.
 Período: mar.\ 2021 -- mar.\ 2026 ($N=1{.}806$ observações diárias).
 BVRP e volatilidades em pontos percentuais anualizados;
-retorno diário em fração decimal.
+log-retorno diário em fração decimal.
 Curtose reportada como excesso (Fisher): distribuição normal $= 0$.}
 \label{tab:cap3_desc_stats}
 \resizebox{\textwidth}{!}{\begin{tabular}{lrrrrrrrrrr}
 \toprule
 Variável & Média & D.P. & Mín. & p5 & p25 & p75 & p95 & Máx. & Assim. & Curtose \\
 \midrule
-BVRP prospectivo (p.p.) & -8,76 & 17,26 & -75,83 & -35,67 & -19,12 & 1,71 & 20,28 & 46,10 & 0,241 & 0,734 \\
-BVRP retrospectivo, proxy (p.p.) & -8,63 & 11,92 & -43,28 & -28,22 & -16,25 & -2,20 & 11,71 & 31,66 & 0,383 & 0,674 \\
-RV 30d prospectiva (p.p.) & 53,17 & 19,07 & 16,61 & 26,64 & 39,39 & 65,15 & 85,24 & 121,98 & 0,808 & 0,639 \\
-RV 30d retrospectiva (p.p.) & 53,30 & 19,08 & 16,61 & 26,64 & 39,39 & 65,29 & 85,24 & 121,98 & 0,785 & 0,606 \\
+BVRP (p.p.) & -8,76 & 17,26 & -75,83 & -35,67 & -19,12 & 1,71 & 20,28 & 46,10 & 0,241 & 0,734 \\
+BVRP$^{\text{proxy}}$ (p.p.) & -8,63 & 11,92 & -43,28 & -28,22 & -16,25 & -2,20 & 11,71 & 31,66 & 0,383 & 0,674 \\
+VH 30d prospectiva (p.p.) & 53,17 & 19,07 & 16,61 & 26,64 & 39,39 & 65,15 & 85,24 & 121,98 & 0,808 & 0,639 \\
+VH 30d retrospectiva (p.p.) & 53,30 & 19,08 & 16,61 & 26,64 & 39,39 & 65,29 & 85,24 & 121,98 & 0,785 & 0,606 \\
 IV 30d (p.p.) & 61,93 & 18,70 & 32,38 & 37,65 & 48,12 & 75,02 & 94,98 & 156,20 & 0,820 & 0,407 \\
-Retorno diário & 0,0001 & 0,0296 & -0,1670 & -0,0472 & -0,0132 & 0,0140 & 0,0461 & 0,1353 & -0,253 & 3,862 \\
+Log-retorno diário & 0,0001 & 0,0296 & -0,1670 & -0,0472 & -0,0132 & 0,0140 & 0,0461 & 0,1353 & -0,253 & 3,862 \\
 \bottomrule
 \end{tabular}}
 \par\smallskip
-\footnotesize\textit{Nota}: RV 30d calculada como raiz da média dos retornos logarítmicos diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os retornos de $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$. IV 30d: índice DVOL da Deribit, observado em $t$. BVRP prospectivo: $\text{BVRP}_{t+1:t+30\,|\,t} = \text{RV}_{t+1:t+30} - \text{IV}_t$; BVRP retrospectivo (proxy): $\text{RV}_{t-29:t} - \text{IV}_t$.
+\footnotesize\textit{Nota}: VH 30d (volatilidade histórica) calculada como raiz da média dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os retornos de $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$. IV 30d: índice DVOL da Deribit, observado em $t$. BVRP: $\text{VH}_{t+1:t+30} - \text{IV}_t$; $\text{BVRP}^{\text{proxy}}$: $\text{VH}_{t-29:t} - \text{IV}_t$.
 \end{table}

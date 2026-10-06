@@ -22,13 +22,16 @@ abril/2023); depois do T0, o BVRP é unimodal. A bimodalidade da RV (Fig. 8.2)
 sobrevive.
 
 Saídas: data/regimes_T9.csv (sem alterar ml_dataset_T4.csv) e, em
-outputs/T9/, cortes por origem e figuras.
+outputs/T9/, cortes por origem e figuras. Com --publicar-cap3, o histograma
+da 1ª janela é copiado para figs/cap3/vh_bimodalidade.png (Cap. 3, C3.1).
 
-Uso:  python code/regimes_T9.py
+Uso:  python code/regimes_T9.py [--publicar-cap3]
 """
 
+import argparse
 import io
 import os
+import shutil
 import subprocess
 import sys
 
@@ -175,7 +178,7 @@ def figuras(df, pj, corte, cortes):
             label="corte reestimado em cada origem (janela expansiva)")
     ax.axhline(corte, color=AZUL, linestyle="--", linewidth=1.4,
                label=f"corte fixo da 1ª janela = {br(corte, 1)}% a.a.")
-    ax.set_ylabel("corte da RV de 30 dias (% a.a.)")
+    ax.set_ylabel("corte da VH de 30 dias (% a.a.)")
     ax.set_xlabel("origem de previsão")
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
@@ -213,6 +216,10 @@ def _figura_bvrp(df, old):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--publicar-cap3", action="store_true",
+                    help="copia o histograma da 1ª janela para figs/cap3/vh_bimodalidade.png")
+    args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     df = carregar()
     div = gerar_divisoes(len(df), h=H)
@@ -240,6 +247,10 @@ def main():
           f"{cortes.corte.iloc[-1]:.1f} ({str(cortes.origem.iloc[-1])[:10]}); mín. {cortes.corte.min():.1f}, "
           f"máx. {cortes.corte.max():.1f}")
     figuras(df, pj, corte, cortes)
+    if args.publicar_cap3:
+        shutil.copyfile(os.path.join(OUT, "fig_T9_histograma_rv.png"),
+                        os.path.join(ROOT, "figs", "cap3", "vh_bimodalidade.png"))
+        print("Histograma copiado para figs/cap3/vh_bimodalidade.png")
     print(f"Saídas: data/regimes_T9.csv e {OUT}")
 
 

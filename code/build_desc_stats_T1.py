@@ -2,13 +2,15 @@
 build_desc_stats_T1.py
 ======================
 Gera as Tabs. 3.1 (estatisticas descritivas) e 3.2 (ADF/KPSS) e a tabela
-comparativa das definicoes do BVRP, SEM sobrescrever tables/ (sincronizado
-com o Overleaf). Todas as saidas vao para --out-dir.
+comparativa das definicoes do BVRP. Todas as saidas vao para --out-dir; com
+--publicar-cap3, as Tabs. 3.1 e 3.2 (.tex e .csv) sao copiadas tambem para
+tables/cap3/ (desc_stats_cap3.*, adf_kpss_table.*), os nomes usados no Cap. 3.
+Rotulos na notacao da secao 14 de docs/pendencias_T1.md (VH, BVRP, BVRP^proxy).
 
 Criado no T0/T1 do plano de revisao (set/2026): as Tabs. 3.1 e 3.2 nao
 tinham gerador versionado. A partir do T1, as duas definicoes do BVRP saem
-lado a lado: prospectiva (bvrp_30d_fut, RV de t+1 a t+30 - IV_t) e
-retrospectiva (vrp_30d, proxy; RV de t-29 a t - IV_t). So entram as colunas
+lado a lado: prospectiva (bvrp_30d_fut, VH de t+1 a t+30 - IV_t) e
+retrospectiva (vrp_30d, proxy; VH de t-29 a t - IV_t). So entram as colunas
 presentes no dataset, entao o script continua rodando sobre dados pre-T1.
 
 Convencoes (conferidas contra a Tab. 3.1 publicada, reproduzida exatamente):
@@ -26,11 +28,12 @@ Entradas:
   data/ml_dataset.csv        -> apenas para a contagem de N por etapa
 
 Uso:
-  python code/build_desc_stats_T1.py --out-dir outputs/T1
+  python code/build_desc_stats_T1.py --out-dir outputs/T1 [--publicar-cap3]
 """
 
 import argparse
 import os
+import shutil
 import sys
 import warnings
 
@@ -50,17 +53,17 @@ DATA = os.path.join(ROOT, "data")
 # Definicoes do BVRP comparadas lado a lado. So entram as colunas presentes
 # no dataset.
 BVRP_DEFS = {
-    "bvrp_30d_fut": "BVRP prospectivo (p.p.)",
-    "vrp_30d":      "BVRP retrospectivo, proxy (p.p.)",
+    "bvrp_30d_fut": "BVRP (p.p.)",
+    "vrp_30d":      r"BVRP$^{\text{proxy}}$ (p.p.)",
 }
 
 # Demais linhas da Tab. 3.1: (coluna, rotulo, casas decimais). So entram as
 # colunas presentes no dataset.
 VOL_ROWS = [
-    ("rv_30d_fut", "RV 30d prospectiva (p.p.)", 2),
-    ("rv_30d",     "RV 30d retrospectiva (p.p.)", 2),
+    ("rv_30d_fut", "VH 30d prospectiva (p.p.)", 2),
+    ("rv_30d",     "VH 30d retrospectiva (p.p.)", 2),
     ("iv_30d",     "IV 30d (p.p.)", 2),
-    ("ret",        "Retorno diário", 4),
+    ("ret",        "Log-retorno diário", 4),
 ]
 
 ADF_LABELS = {
@@ -168,7 +171,7 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\caption{Estatísticas descritivas das variáveis principais.",
         f"Período: {periodo} ($N={fmt_n(n)}$ observações diárias).",
         r"BVRP e volatilidades em pontos percentuais anualizados;",
-        r"retorno diário em fração decimal.",
+        r"log-retorno diário em fração decimal.",
         r"Curtose reportada como excesso (Fisher): distribuição normal $= 0$.}",
         r"\label{tab:cap3_desc_stats}",
         r"\resizebox{\textwidth}{!}{\begin{tabular}{lrrrrrrrrrr}",
@@ -184,12 +187,12 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\bottomrule",
         r"\end{tabular}}",
         r"\par\smallskip",
-        r"\footnotesize\textit{Nota}: RV 30d calculada como raiz da média dos retornos logarítmicos"
-        r" diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os retornos de"
-        r" $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$."
+        r"\footnotesize\textit{Nota}: VH 30d (volatilidade histórica) calculada como raiz da média"
+        r" dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os"
+        r" retornos de $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$."
         r" IV 30d: índice DVOL da Deribit, observado em $t$."
-        + (r" BVRP prospectivo: $\text{BVRP}_{t+1:t+30\,|\,t} = \text{RV}_{t+1:t+30} - \text{IV}_t$;"
-           r" BVRP retrospectivo (proxy): $\text{RV}_{t-29:t} - \text{IV}_t$."
+        + (r" BVRP: $\text{VH}_{t+1:t+30} - \text{IV}_t$;"
+           r" $\text{BVRP}^{\text{proxy}}$: $\text{VH}_{t-29:t} - \text{IV}_t$."
            if "bvrp_30d_fut" in bvrp_cols else ""),
         r"\end{table}",
     ]
@@ -201,7 +204,7 @@ def tab_3_2(df, out_dir, bvrp_cols):
     series = []
     if "close" in df.columns:
         series.append(("close", r"Preço (\textit{close})", df["close"]))
-    series.append(("ret", "Retorno diário", df["ret"]))
+    series.append(("ret", "Log-retorno diário", df["ret"]))
     for col, label, _ in VOL_ROWS:
         if col in df.columns and col != "ret":
             series.append((col, label.replace(" (p.p.)", ""), df[col]))
@@ -297,6 +300,8 @@ def n_por_etapa(out_dir):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default=os.path.join("outputs", "T1"))
+    ap.add_argument("--publicar-cap3", action="store_true",
+                    help="copia as Tabs. 3.1 e 3.2 para tables/cap3/ com os nomes usados no Cap. 3")
     args = ap.parse_args()
     out_dir = args.out_dir if os.path.isabs(args.out_dir) else os.path.join(ROOT, args.out_dir)
     os.makedirs(out_dir, exist_ok=True)
@@ -314,6 +319,14 @@ def main():
     tab_3_2(df_ref, out_dir, bvrp_cols)
     comp = comparativo(df_ref, df_full, out_dir, bvrp_cols)
     etapas = n_por_etapa(out_dir)
+
+    if args.publicar_cap3:
+        cap3 = {"tab_3_1_desc_stats": "desc_stats_cap3", "tab_3_2_adf_kpss": "adf_kpss_table"}
+        for origem, destino in cap3.items():
+            for ext in (".tex", ".csv"):
+                shutil.copyfile(os.path.join(out_dir, origem + ext),
+                                os.path.join(ROOT, "tables", "cap3", destino + ext))
+        print("Tabs. 3.1 e 3.2 copiadas para tables/cap3/")
 
     pd.set_option("display.width", 200)
     print(f"Saidas em: {out_dir}\n")

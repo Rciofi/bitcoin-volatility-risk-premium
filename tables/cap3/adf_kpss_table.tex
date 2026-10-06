@@ -1,7 +1,7 @@
 \begin{table}[H]
 \centering
 \small
-\caption{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação. Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade. Período: mar.\ 2021 -- mar.\ 2026 ($N = 1{.}775$ observações diárias).}
+\caption{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação. Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade. Período: mar.\ 2021 -- mar.\ 2026 ($N = 1{.}806$ observações diárias).}
 \label{tab:adf_kpss}
 \begin{tabular}{lrrrrl}
 \toprule
@@ -9,16 +9,15 @@ Variável & \multicolumn{2}{c}{ADF} & \multicolumn{2}{c}{KPSS} & Conclusão \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
  & Estat. & $p$-valor & Estat. & $p$-valor & \\
 \midrule
-Preço (\textit{close}) & $-1{,}06$ & $0{,}731$ & $4{,}47$ & ${\leq}0{,}01$ & I(1) \\
-Retorno diário & $-7{,}59$ & $< 0{,}001$ & $0{,}25$ & ${\geq}0{,}10$ & I(0) \\
-RV 30d & $-5{,}09$ & $< 0{,}001$ & $2{,}34$ & ${\leq}0{,}01$ & Longa memória$^{a}$ \\
-IV 30d & $-2{,}77$ & $0{,}063$ & $4{,}22$ & ${\leq}0{,}01$ & Longa memória$^{b}$ \\
-BVRP & $-6{,}57$ & $< 0{,}001$ & $0{,}91$ & ${\leq}0{,}01$ & Longa memória$^{c}$ \\
+Preço (\textit{close}) & $-1{,}06$ & $0{,}730$ & $4{,}30$ & ${\leq}0{,}01$ & I(1) \\
+Log-retorno diário & $-7{,}83$ & $< 0{,}001$ & $0{,}22$ & ${\geq}0{,}10$ & I(0) \\
+VH 30d prospectiva & $-4{,}50$ & $< 0{,}001$ & $2{,}35$ & ${\leq}0{,}01$ & Longa memória \\
+VH 30d retrospectiva & $-4{,}08$ & $0{,}001$ & $2{,}46$ & ${\leq}0{,}01$ & Longa memória \\
+IV 30d & $-2{,}72$ & $0{,}071$ & $4{,}41$ & ${\leq}0{,}01$ & Longa memória \\
+BVRP & $-7{,}34$ & $< 0{,}001$ & $0{,}68$ & $0{,}015$ & Longa memória \\
+BVRP$^{\text{proxy}}$ & $-6{,}65$ & $< 0{,}001$ & $1{,}19$ & ${\leq}0{,}01$ & Longa memória \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\footnotesize
-$^{a}$~RV 30d: ADF rejeita I(1), mas KPSS rejeita I(0); compatível com longa memória; mantida em nível.\\
-$^{b}$~IV 30d: ADF borderline ($p = 0{,}063$); KPSS rejeita I(0); mantida em nível.\\
-$^{c}$~BVRP herda persistência de IV e RV; variável central da dissertação; mantida em nível.
+\footnotesize\textit{Nota}: ADF com seleção de defasagens por AIC; KPSS com constante e defasagens automáticas. \textit{Longa memória}: ADF rejeita (ou está na fronteira) e KPSS rejeita a estacionariedade.
 \end{table}

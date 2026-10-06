@@ -814,3 +814,43 @@ Busca em `code/`, `scripts/` (`*.py`) e nos notebooks versionados por composiç�
 | `code/build_ml_dataset.py` (legado) | `ret` (log) | `ret_lag_5/20` = soma | correto |
 | `code/analyze_bvrp_by_return_sign.py` | `ret` (log) | não; só o sinal | correto (o sinal não muda) |
 | `code/build_desc_stats_T1.py:204` | `ret` (log) | não; estatísticas descritivas | correto, mas **a Tab. 3.1 descreve o log-retorno**: o texto deve dizer "log-retorno diário" (C3) |
+
+## 14. Convenção de notação: VH e RV (Fase 2, C2.4/C2.5, 06/10/2026)
+
+Decisão do usuário na reescrita do Cap. 2. **Vale para todos os capítulos, tabelas, figuras,
+legendas e notas** (inclusive os rótulos gravados dentro dos PNGs).
+
+| Símbolo | Significado | Onde aparece |
+|---|---|---|
+| **VH** (volatilidade histórica) | medida empírica: raiz de (365/h) × soma dos log-retornos diários ao quadrado numa janela de h dias, sem subtrair a média | todo uso empírico, nas duas janelas: retrospectiva, `VH_{t−29:t}` (`vh_30d` em t), e prospectiva, `VH_{t+1:t+30}` (`vh_30d` em t+30) |
+| **RV** (volatilidade realizada) | só a grandeza teórica da definição do prêmio, VRP_t = E(RV_{t+1:t+h} \| I_t) − E*(RV_{t+1:t+h} \| I_t) | Cap. 2, Seção "Prêmio de risco de volatilidade", e onde a definição for retomada (C4.5) |
+| **IV** | volatilidade implícita, IV_t = E*(RV_{t+1:t+h} \| I_t), medida pelo DVOL | todo o texto |
+| **BVRP** | alvo prospectivo, `VH_{t+1:t+30} − IV_t` (coluna `bvrp_30d_fut`) | todo o texto |
+| **BVRP^proxy** | proxy retrospectiva, `VH_{t−29:t} − IV_t` (coluna `vrp_30d`), sob passeio aleatório sem deriva; aproxima a expectativa, não a realização | todo o texto |
+
+- O texto diz, uma vez (Cap. 2, Seção "Volatilidade histórica"), que a VH é o estimador da RV com
+  dados diários.
+- "Volatilidade realizada" fica reservada à RV teórica e à literatura de alta frequência
+  (Andersen et al., 2003). Na varredura F7, toda "volatilidade realizada" que descreve a medida
+  empírica vira "volatilidade histórica", e todo `RV`/`RV_{30,t}` empírico vira `VH`.
+- Os nomes de colunas no código (`vh_30d`, `rv_30d_fut`, `vrp_30d`) não mudam; `rv_30d_fut`
+  é a VH prospectiva (ver seção 12).
+
+## 15. Referências pendentes para os próximos capítulos (Fase 2, 06/10/2026)
+
+Registradas na reescrita do Cap. 2. Os metadados das entradas novas foram conferidos pelo usuário.
+
+| Item | Ação | Tarefa |
+|---|---|---|
+| `bollerslev2014international` (Bollerslev, Marrone, Xu e Zhou, 2014, *JFQA* 49(3)) | Entrou no .bib e no Cap. 2 (réplica internacional da previsibilidade). **Citar também no Cap. 6** (atual Cap. 5): trata de vieses de amostra finita em regressões com retornos sobrepostos | **C6** |
+| `bollerslev2011VRP` | Entrada corrigida para Bollerslev, Gibson e Zhou (2011), *J. Econometrics* 160(1), 235–245 (chave mantida). No Cap. 2, a previsibilidade no S&P 500 passou a citar `bollerslev2009expected` | feito (Cap. 2) |
+| `cap8_regimes.tex:246`, efeito alavancagem | A frase cita `bollerslev2011VRP` e `bali2009volatilitypremium`, que não tratam do efeito. **Precisa de outra referência** (Black, 1976; Christie, 1982), **fora do .bib**: perguntar antes de acrescentar | **C7** |
+
+## 16. Cap. 3 (Fase 2, 06/10/2026)
+
+| Item | Registro | Tarefa |
+|---|---|---|
+| **C3.4 pode ser duplicata do C3.2** | O plano cita "p. 45, R 56:46" para o C3.4 ("gráfico que compara grandezas diferentes, *misleading*"), mas nesse trecho a reunião trata da tabela do H1 (*"essa tabela aí não serve para nada"*). O único *misleading* da reunião (~45:40–45:43) é o boxplot de 2026, ano incompleto, que já é o C3.2. **Aplicado como C3.4**, por decisão do usuário: a legenda do painel (a) da série temporal diz que só a VH prospectiva cobre a mesma janela da IV de t e que a retrospectiva é a da proxy. Confirmar com o Prof. Marcelo | **C3.4** → reunião |
+| Data de 2026 nas legendas | O plano diz "dados até julho/agosto"; a amostra termina em **03/03/2026**. Legendas e eixo usam a data real (1º/01 a 03/03/2026, N = 62). O primeiro ano também é incompleto (24/03 a 31/12/2021, N = 283) e ganhou a mesma marcação | **C3.2** |
+| Geradores do Cap. 3 | `build_desc_stats_T1.py`, `plot_cap3_T1.py`, `plot_vrp_vs_return_T12.py` e `regimes_T9.py` ganharam `--publicar-cap3` (cópia para `tables/cap3/` e `figs/cap3/` com os nomes do .tex) e rótulos na notação da seção 14. Os cálculos não mudaram | **C3** |
+| Citações do H1 | `newey1987simple` (convenção de pesos de Bartlett, h+1 defasagens) e `newey1994automatic` (regra automática do statsmodels, L = 7), conforme a anotação da p. 45 (*"fazer uma referência mais precisa à regra"*). Usar as mesmas chaves no C4.4 | **C3.3**, C4.4 |
