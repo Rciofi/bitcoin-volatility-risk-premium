@@ -1,3 +1,5 @@
+> Registro histórico. Os N e definições aqui foram superados na Fase 1 da revisão (out/2026): ver docs/pendencias_T1.md e a memória do projeto (project_bvrp_prospectivo.md).
+
 # Estado da revisão — retomada
 
 _Última atualização: 01/07/2026, sessão de revisão Cap. 3/4/5/6 — os quatro capítulos revisados, corrigidos e sincronizados._
