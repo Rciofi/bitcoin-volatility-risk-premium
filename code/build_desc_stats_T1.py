@@ -4,7 +4,7 @@ build_desc_stats_T1.py
 Gera as Tabs. 3.1 (estatisticas descritivas) e 3.2 (ADF/KPSS) e a tabela
 comparativa das definicoes do BVRP. Todas as saidas vao para --out-dir; com
 --publicar-cap3, as Tabs. 3.1 e 3.2 (.tex e .csv) sao copiadas tambem para
-tables/cap3/ (desc_stats_cap3.*, adf_kpss_table.*), os nomes usados no Cap. 3.
+tables/dados/ (desc_stats.*, adf_kpss_table.*), os nomes usados no Cap. 3.
 Rotulos na notacao da secao 14 de docs/pendencias_T1.md (VH, BVRP, BVRP^proxy).
 
 Criado no T0/T1 do plano de revisao (set/2026): as Tabs. 3.1 e 3.2 nao
@@ -173,7 +173,7 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"BVRP e volatilidades em pontos percentuais anualizados;",
         r"log-retorno diário em fração decimal.",
         r"Curtose reportada como excesso (Fisher): distribuição normal $= 0$.}",
-        r"\label{tab:cap3_desc_stats}",
+        r"\label{tab:dados-descritivas}",
         r"\resizebox{\textwidth}{!}{\begin{tabular}{lrrrrrrrrrr}",
         r"\toprule",
         r"Variável & Média & D.P. & Mín. & p5 & p25 & p75 & p95 & Máx. & Assim. & Curtose \\",
@@ -237,7 +237,7 @@ def tab_3_2(df, out_dir, bvrp_cols):
         r"\caption{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação."
         r" Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade."
         f" Período: {periodo} ($N = {fmt_n(n)}$ observações diárias).}}",
-        r"\label{tab:adf_kpss}",
+        r"\label{tab:dados-adf-kpss}",
         r"\begin{tabular}{lrrrrl}",
         r"\toprule",
         r"Variável & \multicolumn{2}{c}{ADF} & \multicolumn{2}{c}{KPSS} & Conclusão \\",
@@ -301,7 +301,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default=os.path.join("outputs", "T1"))
     ap.add_argument("--publicar-cap3", action="store_true",
-                    help="copia as Tabs. 3.1 e 3.2 para tables/cap3/ com os nomes usados no Cap. 3")
+                    help="copia as Tabs. 3.1 e 3.2 para tables/dados/ com os nomes usados no Cap. 3")
     args = ap.parse_args()
     out_dir = args.out_dir if os.path.isabs(args.out_dir) else os.path.join(ROOT, args.out_dir)
     os.makedirs(out_dir, exist_ok=True)
@@ -321,12 +321,12 @@ def main():
     etapas = n_por_etapa(out_dir)
 
     if args.publicar_cap3:
-        cap3 = {"tab_3_1_desc_stats": "desc_stats_cap3", "tab_3_2_adf_kpss": "adf_kpss_table"}
+        cap3 = {"tab_3_1_desc_stats": "desc_stats", "tab_3_2_adf_kpss": "adf_kpss_table"}
         for origem, destino in cap3.items():
             for ext in (".tex", ".csv"):
                 shutil.copyfile(os.path.join(out_dir, origem + ext),
-                                os.path.join(ROOT, "tables", "cap3", destino + ext))
-        print("Tabs. 3.1 e 3.2 copiadas para tables/cap3/")
+                                os.path.join(ROOT, "tables", "dados", destino + ext))
+        print("Tabs. 3.1 e 3.2 copiadas para tables/dados/")
 
     pd.set_option("display.width", 200)
     print(f"Saidas em: {out_dir}\n")

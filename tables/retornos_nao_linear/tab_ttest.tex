@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Diferença de retornos futuros entre regimes de alta e baixa volatilidade, sob quatro critérios de inferência.}
+\label{tab:retnl-teste-t}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrcccc}
+\toprule
+Horizonte & Média Alta Vol & Média Baixa Vol & Diferença & $t$-stat & $p$-valor & $p$ (FDR) & $p$ (NW) & $p$ (não sobrep.) \\
+\midrule
+1d & 0,0272 & 0,0717 & -0,0445 & -0,2258 & 0,8215 & 0,8215 & 0,8167 & 0,8215 \\
+5d & -0,0048 & 0,4608 & -0,4656 & -1,0780 & 0,2813 & 0,3376 & 0,5698 & 0,6243 \\
+10d & 0,1743 & 1,0926 & -0,9183 & -1,4069 & 0,1598 & 0,2397 & 0,5831 & 0,6582 \\
+20d & 0,3133 & 2,8820 & -2,5686 & -2,5911 & 0,0097*** & 0,0194 & 0,4517 & 0,5346 \\
+30d & 0,0602 & 4,8610 & -4,8008 & -3,9888 & 0,0001*** & 0,0004 & 0,3556 & 0,5077 \\
+60d & 3,1805 & 8,3032 & -5,1228 & -3,0482 & 0,0024*** & 0,0071 & 0,5697 & 0,6184 \\
+\bottomrule
+\end{tabular}
+}
+\par\smallskip
+\footnotesize\textit{Nota}: Retornos expressos em \%. *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$ (estrelas ancoradas no $p$-valor bruto). $p$ (FDR): correção de Benjamini--Hochberg sobre os 6 horizontes testados. $p$ (NW): regressão do retorno futuro contra dummy de regime, sobre as observações dos regimes de alta e baixa volatilidade ($N=888$), erro-padrão HAC (Newey--West) com $\text{maxlags}=h$. $p$ (não sobrep.): mediana do $p$-valor de Welch sobre subamostras não sobrepostas (fases $j=0,\ldots,h-1$, espaçadas em $h$ dias).
+\end{table}

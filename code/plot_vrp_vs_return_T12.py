@@ -2,14 +2,14 @@
 plot_vrp_vs_return_T12.py — dispersão BVRP x retorno futuro de 30 dias (T12)
 
 Substitui, para o Cap. 3, a figura de code/plot_vrp_vs_return.py com h = 20
-(figs/cap3/vrp_vs_return_20d.png) por h = 30, alinhando o horizonte ao do BVRP
+(figs/dados/vrp_vs_return_20d.png) por h = 30, alinhando o horizonte ao do BVRP
 (plano, T12). Figura descritiva: usa a proxy vrp_30d (conhecida em t) e a
 amostra descritiva (data/vrp_with_targets.csv, N = 1.806). A reta é de MQO, e
 a legenda traz b com erro-padrão de Newey–West com h+1 = 31 defasagens
 (hac_utils), no lugar da correlação simples da versão antiga.
 
 Grava em outputs/T12/; com --publicar-cap3, copia a figura para
-figs/cap3/vrp_vs_return_30d.png, o nome usado no Cap. 3. Rótulo do eixo na
+figs/dados/vrp_vs_return_30d.png, o nome usado no Cap. 3. Rótulo do eixo na
 notação da seção 14 de docs/pendencias_T1.md (BVRP^proxy).
 
 Uso:  python code/plot_vrp_vs_return_T12.py [--publicar-cap3]
@@ -44,7 +44,7 @@ def br(v, d):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--publicar-cap3", action="store_true",
-                    help="copia a figura para figs/cap3/vrp_vs_return_30d.png")
+                    help="copia a figura para figs/dados/vrp_vs_return_30d.png")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     df = pd.read_csv(os.path.join(ROOT, "data", "vrp_with_targets.csv"), parse_dates=["date"]).sort_values("date")
@@ -73,8 +73,8 @@ def main():
     plt.close(fig)
     if args.publicar_cap3:
         shutil.copyfile(os.path.join(OUT, "fig_T12_vrp_vs_ret30d.png"),
-                        os.path.join(ROOT, "figs", "cap3", "vrp_vs_return_30d.png"))
-        print("Figura copiada para figs/cap3/vrp_vs_return_30d.png")
+                        os.path.join(ROOT, "figs", "dados", "vrp_vs_return_30d.png"))
+        print("Figura copiada para figs/dados/vrp_vs_return_30d.png")
     print(f"T12: N = {int(res.nobs)}, β = {b:.4f}, EP HAC (31) = {res.bse['vrp_30d']:.4f}, "
           f"p = {res.pvalues['vrp_30d']:.3f}, R² = {res.rsquared:.4f}. Saídas em {OUT}")
 

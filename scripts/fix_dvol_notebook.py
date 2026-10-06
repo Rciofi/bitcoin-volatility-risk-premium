@@ -35,10 +35,10 @@ nb["cells"][6]["source"] = [
     "ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=8)\n",
     "ax1.grid(True, alpha=0.3)\n",
     "\n",
-    "os.makedirs('../figs/cap3', exist_ok=True)\n",
+    "os.makedirs('../figs/dados', exist_ok=True)\n",
     "fig.tight_layout()\n",
-    "fig.savefig('../figs/cap3/vrp_timeseries.png', dpi=300, bbox_inches='tight')\n",
-    "print('Salvo em: ../figs/cap3/vrp_timeseries.png')\n",
+    "fig.savefig('../figs/dados/vrp_timeseries.png', dpi=300, bbox_inches='tight')\n",
+    "print('Salvo em: ../figs/dados/vrp_timeseries.png')\n",
     "plt.show()\n",
 ]
 nb["cells"][6]["outputs"] = []
@@ -62,10 +62,10 @@ nb["cells"][7]["source"] = [
     "ax.legend()\n",
     "ax.grid(True, alpha=0.3)\n",
     "\n",
-    "os.makedirs('../figs/cap3', exist_ok=True)\n",
+    "os.makedirs('../figs/dados', exist_ok=True)\n",
     "fig.tight_layout()\n",
-    "fig.savefig('../figs/cap3/vrp_histogram_kde.png', dpi=300, bbox_inches='tight')\n",
-    "print('Salvo em: ../figs/cap3/vrp_histogram_kde.png')\n",
+    "fig.savefig('../figs/dados/vrp_histogram_kde.png', dpi=300, bbox_inches='tight')\n",
+    "print('Salvo em: ../figs/dados/vrp_histogram_kde.png')\n",
     "plt.show()\n",
 ]
 nb["cells"][7]["outputs"] = []
@@ -84,10 +84,10 @@ nb["cells"][8]["source"] = [
     "ax.set_xlabel('VRP 30D (p.p. de vol.)')\n",
     "ax.grid(True, axis='x', alpha=0.4)\n",
     "\n",
-    "os.makedirs('../figs/cap3', exist_ok=True)\n",
+    "os.makedirs('../figs/dados', exist_ok=True)\n",
     "fig.tight_layout()\n",
-    "fig.savefig('../figs/cap3/vrp_boxplot.png', dpi=300, bbox_inches='tight')\n",
-    "print('Salvo em: ../figs/cap3/vrp_boxplot.png')\n",
+    "fig.savefig('../figs/dados/vrp_boxplot.png', dpi=300, bbox_inches='tight')\n",
+    "print('Salvo em: ../figs/dados/vrp_boxplot.png')\n",
     "plt.show()\n",
 ]
 nb["cells"][8]["outputs"] = []

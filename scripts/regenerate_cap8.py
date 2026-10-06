@@ -2,10 +2,10 @@
 Gera todas as figuras e tabelas do Capítulo 8.
 
 Outputs:
-  figs/cap8/fig_cap8_oos_prediction.png   (Fig. 8.1 — melhorada)
-  figs/cap8/fig_cap8_feature_importance.png (Fig. 8.2 — importância + coeficientes)
-  tables/tab8/tab8_oos_performance.tex    (Tab. 8.1 — já gerada, regera igual)
-  tables/tab8/tab8_coeficientes.tex       (Tab. 8.2 — coeficientes Lasso e Ridge)
+  figs/previsao_bvrp/fig_oos_prediction.png   (Fig. 8.1 — melhorada)
+  figs/previsao_bvrp/fig_feature_importance.png (Fig. 8.2 — importância + coeficientes)
+  tables/previsao_bvrp/tab_oos_performance.tex    (Tab. 8.1 — já gerada, regera igual)
+  tables/previsao_bvrp/tab_coeficientes.tex       (Tab. 8.2 — coeficientes Lasso e Ridge)
 """
 
 import math
@@ -35,9 +35,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "ml_dataset.csv"
 # amostra do Cap. 6: 1.524 obs (1.523 apos shift(-1)); menor que a canonica
 # (1.775) devido ao burn-in de 252 obs da variavel de regime
-OUT_FIGS  = ROOT / "figs" / "cap8"
-OUT_TABS  = ROOT / "tables" / "tab8"
-OUT_SHAP  = ROOT / "tables" / "cap8"   # [M1] CSV com shap_values
+OUT_FIGS  = ROOT / "figs" / "previsao_bvrp"
+OUT_TABS  = ROOT / "tables" / "previsao_bvrp"
+OUT_SHAP  = ROOT / "tables" / "previsao_bvrp"   # [M1] CSV com shap_values
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
 OUT_SHAP.mkdir(parents=True, exist_ok=True)
@@ -263,9 +263,9 @@ ax.set_xlabel("Data", fontsize=10)
 ax.legend(fontsize=9)
 ax.set_title("Previsão fora da amostra: BVRP realizado vs. LASSO", fontsize=11)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap8_oos_prediction.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_oos_prediction.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap8_oos_prediction.png salva")
+print("OK fig_oos_prediction.png salva")
 
 
 # -- 4. SHAP -- Importancia das variaveis com TreeExplainer [M1] ----------------
@@ -287,8 +287,8 @@ print(f"\n[M1] SHAP calculado: {shap_values.shape[0]} obs x {shap_values.shape[1
 
 # [M1] Salvar shap_values como CSV para reprodutibilidade
 shap_df = pd.DataFrame(shap_values, columns=feat_names, index=Xte_shap.index)
-shap_df.to_csv(OUT_SHAP / "shap_values_rf_cap8.csv")
-print(f"[M1] shap_values_rf_cap8.csv salvo: {shap_df.shape}")
+shap_df.to_csv(OUT_SHAP / "shap_values_rf.csv")
+print(f"[M1] shap_values_rf.csv salvo: {shap_df.shape}")
 
 # [M1] Fig. 8.2 -- Beeswarm plot (substituicao da importancia MDI como figura principal)
 shap.summary_plot(
@@ -307,9 +307,9 @@ try:
 except Exception as _e:
     print(f"  [aviso] nao foi possivel traduzir a colorbar do beeswarm: {_e}")
 plt.tight_layout()
-plt.savefig(str(OUT_FIGS / "fig_cap8_shap_beeswarm.png"), dpi=300, bbox_inches="tight")
+plt.savefig(str(OUT_FIGS / "fig_shap_beeswarm.png"), dpi=300, bbox_inches="tight")
 plt.close()
-print("OK fig_cap8_shap_beeswarm.png salva")
+print("OK fig_shap_beeswarm.png salva")
 
 # [M1] Fig. 8.3 -- Bar plot (importancia media |SHAP|)
 shap.summary_plot(
@@ -320,9 +320,9 @@ shap.summary_plot(
 # O rotulo original em ingles e longo demais e sai cortado; troca por um curto
 plt.gca().set_xlabel("Impacto médio no modelo — média de |valor SHAP|", fontsize=10)
 plt.tight_layout()
-plt.savefig(str(OUT_FIGS / "fig_cap8_shap_bar.png"), dpi=300, bbox_inches="tight")
+plt.savefig(str(OUT_FIGS / "fig_shap_bar.png"), dpi=300, bbox_inches="tight")
 plt.close()
-print("OK fig_cap8_shap_bar.png salva")
+print("OK fig_shap_bar.png salva")
 
 # Ranking SHAP (importancia media |SHAP|) para log
 import numpy as _np
@@ -379,12 +379,12 @@ ax.set_title(f"LASSO — Coeficientes ($\\alpha={ALPHA_LASSO_FMT}$)", fontsize=1
 ax.tick_params(axis="y", labelsize=8)
 
 fig.tight_layout(pad=2.0)
-fig.savefig(OUT_FIGS / "fig_cap8_mdi_appendix.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_mdi_appendix.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap8_mdi_appendix.png salva (apendice -- MDI mantido para referencia)")
+print("OK fig_mdi_appendix.png salva (apendice -- MDI mantido para referencia)")
 
 # ── 5. Tab. 8.1 — Desempenho OOS (regera, formato já correto) ────────────────
-tab1_path = OUT_TABS / "tab8_oos_performance.tex"
+tab1_path = OUT_TABS / "tab_oos_performance.tex"
 
 _MESES_ABREV = {1: "jan.", 2: "fev.", 3: "mar.", 4: "abr.", 5: "mai.", 6: "jun.",
                 7: "jul.", 8: "ago.", 9: "set.", 10: "out.", 11: "nov.", 12: "dez."}
@@ -405,7 +405,7 @@ lines = [
     r"\caption{Desempenho preditivo fora da amostra --- Prêmio de Risco de Volatilidade do Bitcoin.",
     f"Período OOS\\@: {_oos_ini} -- {_oos_fim} ($N={_n_oos}$ observações diárias).",
     r"O MSE e o RMSE são reportados em unidades percentuais ao quadrado e percentuais, respectivamente.}",
-    r"\label{tab:cap8_oos_performance}",
+    r"\label{tab:prev-desempenho}",
     r"\begin{tabular}{lccc}",
     r"\toprule",
     r"Modelo & MSE & RMSE & $R^2_{\text{OOS}}$ \\",
@@ -433,7 +433,7 @@ lines += [
 ]
 
 tab1_path.write_text("\n".join(lines), encoding="utf-8")
-print("OK tab8_oos_performance.tex salva")
+print("OK tab_oos_performance.tex salva")
 
 # ── 6. Tab. 8.2 — Coeficientes Lasso e Ridge ─────────────────────────────────
 ridge_model  = models["Ridge"]
@@ -454,7 +454,7 @@ tab2_lines = [
     r"\caption{Coeficientes estimados dos modelos lineares regularizados --- LASSO e Ridge.",
     r"Os coeficientes são ordenados pela magnitude absoluta do LASSO.",
     r"Variáveis com coeficiente LASSO exatamente zero foram eliminadas pela penalidade $L_1$.}",
-    r"\label{tab:cap8_coeficientes}",
+    r"\label{tab:prev-coeficientes}",
     r"\begin{tabular}{lrr}",
     r"\toprule",
     r"Variável & LASSO & Ridge \\",
@@ -479,15 +479,15 @@ tab2_lines += [
     r"\end{table}",
 ]
 
-tab2_path = OUT_TABS / "tab8_coeficientes.tex"
+tab2_path = OUT_TABS / "tab_coeficientes.tex"
 tab2_path.write_text("\n".join(tab2_lines), encoding="utf-8")
-print("OK tab8_coeficientes.tex salva")
+print("OK tab_coeficientes.tex salva")
 
 print("\nResumo de outputs:")
-print(f"  {OUT_FIGS / 'fig_cap8_oos_prediction.png'}")
-print(f"  {OUT_FIGS / 'fig_cap8_shap_beeswarm.png'}   [M1 -- novo, figura principal]")
-print(f"  {OUT_FIGS / 'fig_cap8_shap_bar.png'}         [M1 -- novo, bar plot]")
-print(f"  {OUT_FIGS / 'fig_cap8_mdi_appendix.png'}     [M1 -- MDI movido para apendice]")
-print(f"  {OUT_SHAP / 'shap_values_rf_cap8.csv'}       [M1 -- shap_values CSV]")
-print(f"  {OUT_TABS / 'tab8_oos_performance.tex'}")
-print(f"  {OUT_TABS / 'tab8_coeficientes.tex'}")
+print(f"  {OUT_FIGS / 'fig_oos_prediction.png'}")
+print(f"  {OUT_FIGS / 'fig_shap_beeswarm.png'}   [M1 -- novo, figura principal]")
+print(f"  {OUT_FIGS / 'fig_shap_bar.png'}         [M1 -- novo, bar plot]")
+print(f"  {OUT_FIGS / 'fig_mdi_appendix.png'}     [M1 -- MDI movido para apendice]")
+print(f"  {OUT_SHAP / 'shap_values_rf.csv'}       [M1 -- shap_values CSV]")
+print(f"  {OUT_TABS / 'tab_oos_performance.tex'}")
+print(f"  {OUT_TABS / 'tab_coeficientes.tex'}")

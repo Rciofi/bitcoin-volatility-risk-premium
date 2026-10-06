@@ -5,7 +5,7 @@ Versões T1 das três figuras de code/plot_vrp_timeseries.py, com a definição
 prospectiva (bvrp_30d_fut, VH de t+1 a t+30 - IV_t) e a retrospectiva
 (vrp_30d, proxy; VH de t-29 a t - IV_t) lado a lado. Notação da seção 14 de
 docs/pendencias_T1.md (VH, BVRP, BVRP^proxy). Grava em --out-dir; com
---publicar-cap3, copia também as figuras usadas pelo Cap. 3 para figs/cap3/
+--publicar-cap3, copia também as figuras usadas pelo Cap. 3 para figs/dados/
 (vrp_timeseries.png, vrp_histogram_kde.png, vrp_boxplot.png).
 
 Amostra: data/vrp_with_targets.csv (amostra de referência, sem data fixa).
@@ -149,7 +149,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default=os.path.join("outputs", "T1", "figs"))
     ap.add_argument("--publicar-cap3", action="store_true",
-                    help="copia as figuras para figs/cap3/ com os nomes usados no Cap. 3")
+                    help="copia as figuras para figs/dados/ com os nomes usados no Cap. 3")
     args = ap.parse_args()
     out_dir = args.out_dir if os.path.isabs(args.out_dir) else os.path.join(ROOT, args.out_dir)
     os.makedirs(out_dir, exist_ok=True)
@@ -175,7 +175,7 @@ def main():
         f(df, caminho)
         print(f"Figura salva em: {caminho}")
         if args.publicar_cap3:
-            destino = os.path.join(ROOT, "figs", "cap3", cap3[nome])
+            destino = os.path.join(ROOT, "figs", "dados", cap3[nome])
             shutil.copyfile(caminho, destino)
             print(f"  copiada para: {destino}")
 

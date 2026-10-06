@@ -1,7 +1,7 @@
 """
 Regenera todas as figuras e tabelas do Cap. 5 usando os dados originais da dissertacao.
 Reproducao fiel do notebook cap5_ols_vrp.ipynb.
-Saida: figs/cap5/ e tables/cap5/
+Saida: figs/retornos_linear/ e tables/retornos_linear/
 
 Uso: py code/regenerate_cap5.py
 """
@@ -15,8 +15,8 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).parent.parent
 DATA  = ROOT / "data" / "vrp_with_targets.csv"          # IC1: fonte canonica (1.775 obs)
-FIGS  = ROOT / "figs"  / "cap5"
-TABS  = ROOT / "tables" / "cap5"
+FIGS  = ROOT / "figs"  / "retornos_linear"
+TABS  = ROOT / "tables" / "retornos_linear"
 FIGS.mkdir(parents=True, exist_ok=True)
 TABS.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +33,7 @@ HORIZONS = [1, 5, 10, 20, 30, 60]
 # de ativos cripto (processos de longa memoria). As series sao mantidas em nivel
 # seguindo a convencao da literatura; a inferencia e tratada via erros padrao HAC
 # (Newey-West) com maxlags=h em cada horizonte, mitigando distorcoes por
-# autocorrelacao serial. Ver tabela ADF/KPSS em tables/cap3/adf_kpss_table.csv.
+# autocorrelacao serial. Ver tabela ADF/KPSS em tables/dados/adf_kpss_table.csv.
 
 # ---------------------------------------------------------------------------
 # 1. Carregar dados (retornos futuros ja estao no arquivo)
@@ -186,7 +186,7 @@ t1 = time.time()
 print("  Tempo MBB: %.1f s" % (t1 - t0))
 
 df_boot  = pd.DataFrame(rows_boot)
-out_boot = TABS / "bootstrap_ci_cap5.csv"
+out_boot = TABS / "bootstrap_ci.csv"
 df_boot.to_csv(out_boot, index=False)
 print("Bootstrap CI salvo: %s" % out_boot)
 
@@ -196,7 +196,7 @@ tab_boot.write_text(r"""\begin{table}[H]
 \caption{Coeficientes $\hat{\beta}_h$ do modelo básico com intervalos de
 confiança de 95\% obtidos por \textit{Moving Block Bootstrap}
 (tamanho de bloco de 30 dias, 1.000 replicações).}
-\label{tab:cap5-bootstrap}
+\label{tab:retlin-bootstrap}
 \begin{tabular}{rrrrrr}
 \toprule
 $h$ & $\hat{\beta}_h$ & IC 2{,}5\% & IC 97{,}5\% & $p$-HAC & $p$-bootstrap \\
@@ -276,7 +276,7 @@ tab_basic = TABS / "tab_ols_basico_multihoriz.tex"
 tab_basic.write_text(r"""\begin{table}[H]
 \centering
 \caption{Resultados MQO (HAC) do BVRP para múltiplos horizontes de previsão.}
-\label{tab:ols_basico_multihoriz}
+\label{tab:retlin-basico}
 \footnotesize
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{cccccr}
@@ -325,7 +325,7 @@ _hdr = (
     "(|\\hat{\\beta}_1| + |\\hat{\\beta}_2|) \\times 100$: "
     "valores pr\\'{o}ximos de 0 indicam $\\hat{\\beta}_1 \\approx -\\hat{\\beta}_2$, "
     "consistente com o BVRP como combina\\c{c}\\~ao linear relevante.}\n"
-    "\\label{tab:ols_rv_iv_multihoriz}\n"
+    "\\label{tab:retlin-componentes}\n"
     "\\footnotesize\n"
     "\\begin{adjustbox}{max width=\\textwidth}\n"
     "\\begin{tabular}{crrrrrrrrrr}\n"

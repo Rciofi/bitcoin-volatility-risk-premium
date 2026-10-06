@@ -2,7 +2,7 @@
 
 Reproduz exatamente a figura produzida pelo bloco 8 de code/regenerate_cap5.py
 -- mesmo estilo, mesmas cores -- mas lendo os coeficientes ja publicados em
-tables/cap5/tab_ols_rv_iv_multihoriz.tex, sem reestimar nada. Serve para
+tables/retornos_linear/tab_ols_rv_iv_multihoriz.tex, sem reestimar nada. Serve para
 corrigir o rotulo do titulo ("OLS E1" -> "MQO E1", alem do travessao, que no
 matplotlib aparecia como tres hifens literais) sem rodar o pipeline inteiro,
 que reescreveria tabelas e o CSV do bootstrap.
@@ -19,8 +19,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parents[1]
-TAB = ROOT / "tables" / "cap5" / "tab_ols_rv_iv_multihoriz.tex"
-OUT = ROOT / "figs" / "cap5" / "beta_comparacao_rv_iv.png"
+TAB = ROOT / "tables" / "retornos_linear" / "tab_ols_rv_iv_multihoriz.tex"
+OUT = ROOT / "figs" / "retornos_linear" / "beta_comparacao_rv_iv.png"
 
 # Linha da tabela: h & beta_RV & t & p & beta_IV & ...
 LINHA = re.compile(

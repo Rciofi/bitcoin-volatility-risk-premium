@@ -3,16 +3,16 @@
 Gera todas as figuras e tabelas do Capítulo 9 — Regimes de Volatilidade e BVRP.
 
 Outputs:
-  figs/cap9/fig_cap9_01_rv30d_regimes.png        — série temporal RV com limiares
-  figs/cap9/fig_cap9_02_hist_rv30d.png            — histograma RV 30d com limiares
-  figs/cap9/fig_cap9_03_boxplot_bvrp_regimes.png  — BVRP por regime
-  figs/cap9/fig_cap9_04_boxplot_ret_regimes.png   — retornos futuros por regime (3 horizontes)
-  figs/cap9/fig_cap9_05_scatter_bvrp_ret.png      — BVRP vs retornos futuros (3 horizontes)
-  tables/cap9/tab_cap9_01_frequencia_regimes.tex
-  tables/cap9/tab_cap9_02_estatisticas_regimes.tex
-  tables/cap9/tab_cap9_03_retornos_regimes.tex
-  tables/cap9/tab_cap9_04_ttest.tex
-  tables/cap9/tab_cap9_05_regressoes.tex
+  figs/retornos_nao_linear/fig_rv30d_regimes.png        — série temporal RV com limiares
+  figs/retornos_nao_linear/fig_hist_rv30d.png            — histograma RV 30d com limiares
+  figs/retornos_nao_linear/fig_boxplot_bvrp_regimes.png  — BVRP por regime
+  figs/retornos_nao_linear/fig_boxplot_ret_regimes.png   — retornos futuros por regime (3 horizontes)
+  figs/retornos_nao_linear/fig_scatter_bvrp_ret.png      — BVRP vs retornos futuros (3 horizontes)
+  tables/retornos_nao_linear/tab_frequencia_regimes.tex
+  tables/retornos_nao_linear/tab_estatisticas_regimes.tex
+  tables/retornos_nao_linear/tab_retornos_regimes.tex
+  tables/retornos_nao_linear/tab_ttest.tex
+  tables/retornos_nao_linear/tab_regressoes.tex
 """
 
 from pathlib import Path
@@ -36,8 +36,8 @@ matplotlib.rcParams.update({
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "vrp_with_regimes.csv"   # IC1: fonte canonica com ret_fut_* (1.775 obs)
-OUT_FIGS = ROOT / "figs" / "cap9"
-OUT_TABS = ROOT / "tables" / "cap9"
+OUT_FIGS = ROOT / "figs" / "retornos_nao_linear"
+OUT_TABS = ROOT / "tables" / "retornos_nao_linear"
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
 
@@ -126,7 +126,7 @@ lines = [
     r"\centering",
     r"\small",
     r"\caption{Distribuição dos regimes de volatilidade com base nos quantis da RV 30 dias.}",
-    r"\label{tab:cap9_frequencia_regimes}",
+    r"\label{tab:retnl-frequencia}",
     r"\begin{tabular}{lrr}",
     r"\toprule",
     r"Regime & Observações & Participação (\%) \\",
@@ -149,8 +149,8 @@ lines += [
     + f"{df['date'].max().strftime('%d/%m/%Y')}.",
     r"\end{table}",
 ]
-(OUT_TABS / "tab_cap9_01_frequencia_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
-print("OK tab_cap9_01_frequencia_regimes.tex")
+(OUT_TABS / "tab_frequencia_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
+print("OK tab_frequencia_regimes.tex")
 
 # ── 4. Tab 9.2 — Estatísticas de RV, IV e BVRP por regime ───────────────────
 vars_tab = {"rv_30d": "RV 30d", "iv_30d": "IV 30d", "vrp_30d": "BVRP"}
@@ -160,7 +160,7 @@ lines = [
     r"\centering",
     r"\small",
     r"\caption{Estatísticas descritivas de RV, IV e BVRP por regime de volatilidade.}",
-    r"\label{tab:cap9_estatisticas_regimes}",
+    r"\label{tab:retnl-estatisticas}",
     r"\begin{tabular}{llrrrr}",
     r"\toprule",
     r"Variável & Regime & Média & Mediana & Desvio-padrão & N \\",
@@ -177,8 +177,8 @@ for col, label in vars_tab.items():
     lines.append(r"\midrule")
 lines[-1] = r"\bottomrule"
 lines += [r"\end{tabular}", r"\end{table}"]
-(OUT_TABS / "tab_cap9_02_estatisticas_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
-print("OK tab_cap9_02_estatisticas_regimes.tex")
+(OUT_TABS / "tab_estatisticas_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
+print("OK tab_estatisticas_regimes.tex")
 
 # ── 5. Tab 9.3 — Retornos futuros médios por regime ──────────────────────────
 lines = [
@@ -186,7 +186,7 @@ lines = [
     r"\centering",
     r"\small",
     r"\caption{Retorno futuro médio (\%) por regime de volatilidade e horizonte.}",
-    r"\label{tab:cap9_retornos_regimes}",
+    r"\label{tab:retnl-retornos}",
     r"\begin{tabular}{l" + "r" * len(HORIZONS) + "}",
     r"\toprule",
     r"Regime & " + " & ".join([f"{h}d" for h in HORIZONS]) + r" \\",
@@ -197,8 +197,8 @@ for regime in REGIMES:
     vals = " & ".join([fmt_br(sub[f"ret_fut_{h}d"].mean() * 100) for h in HORIZONS])
     lines.append(f"{regime} & {vals} \\\\")
 lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
-(OUT_TABS / "tab_cap9_03_retornos_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
-print("OK tab_cap9_03_retornos_regimes.tex")
+(OUT_TABS / "tab_retornos_regimes.tex").write_text("\n".join(lines), encoding="utf-8")
+print("OK tab_retornos_regimes.tex")
 
 # ── 6. Tab 9.4 — Teste t: Alta vol vs Baixa vol ──────────────────────────────
 test_rows = []
@@ -230,7 +230,7 @@ lines = [
     r"\centering",
     r"\small",
     r"\caption{Diferença de retornos futuros entre regimes de alta e baixa volatilidade, sob quatro critérios de inferência.}",
-    r"\label{tab:cap9_ttest}",
+    r"\label{tab:retnl-teste-t}",
     r"\resizebox{\textwidth}{!}{%",
     r"\begin{tabular}{lrrrrcccc}",
     r"\toprule",
@@ -258,8 +258,8 @@ lines += [
       r"não sobrepostas (fases $j=0,\ldots,h-1$, espaçadas em $h$ dias).",
     r"\end{table}",
 ]
-(OUT_TABS / "tab_cap9_04_ttest.tex").write_text("\n".join(lines), encoding="utf-8")
-print("OK tab_cap9_04_ttest.tex")
+(OUT_TABS / "tab_ttest.tex").write_text("\n".join(lines), encoding="utf-8")
+print("OK tab_ttest.tex")
 
 # ── 7. Tab 9.5 — Regressões condicionais ─────────────────────────────────────
 # ret_h = α + β₁·BVRP + β₂·Alta_Vol + β₃·(BVRP × Alta_Vol) + ε  (HAC NW)
@@ -293,7 +293,7 @@ lines = [
     r"\small",
     r"\caption{Regressões condicionais do retorno futuro em função do BVRP e do regime de volatilidade.",
     r"Erros-padrão de Newey--West com $h$ defasagens. Coeficientes com $t$-estatísticas entre parênteses.}",
-    r"\label{tab:cap9_regressoes}",
+    r"\label{tab:retnl-regressoes}",
     r"\begin{tabular}{l" + "r" * len(HORIZONS) + "}",
     r"\toprule",
     r"Variável & " + header_h + r" \\",
@@ -327,8 +327,8 @@ lines += [
     r"\footnotesize\textit{Nota}: *** $p<0{,}01$; ** $p<0{,}05$; * $p<0{,}10$.",
     r"\end{table}",
 ]
-(OUT_TABS / "tab_cap9_05_regressoes.tex").write_text("\n".join(lines), encoding="utf-8")
-print("OK tab_cap9_05_regressoes.tex")
+(OUT_TABS / "tab_regressoes.tex").write_text("\n".join(lines), encoding="utf-8")
+print("OK tab_regressoes.tex")
 
 # ── 8. Fig 9.1 — Série temporal RV com limiares de regime ────────────────────
 fig, ax = plt.subplots(figsize=(12, 4))
@@ -344,9 +344,9 @@ ax.set_xlabel("Data", fontsize=10)
 ax.legend(fontsize=9)
 ax.set_title("Regimes de Volatilidade — RV 30 dias", fontsize=11)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap9_01_rv30d_regimes.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_rv30d_regimes.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap9_01_rv30d_regimes.png")
+print("OK fig_rv30d_regimes.png")
 
 # ── 9. Fig 9.2 — Histograma RV 30d ───────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -358,9 +358,9 @@ ax.set_ylabel("Densidade", fontsize=10)
 ax.legend(fontsize=9)
 ax.set_title("Distribuição da Volatilidade Realizada 30 dias", fontsize=11)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap9_02_hist_rv30d.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_hist_rv30d.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap9_02_hist_rv30d.png")
+print("OK fig_hist_rv30d.png")
 
 # ── 10. Fig 9.3 — Boxplot BVRP por regime ────────────────────────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -376,9 +376,9 @@ ax.axhline(0, linestyle="--", linewidth=0.8, color="grey")
 ax.set_ylabel("BVRP (%)", fontsize=10)
 ax.set_title("Distribuição do BVRP por Regime de Volatilidade", fontsize=11)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap9_03_boxplot_bvrp_regimes.png", dpi=300)
+fig.savefig(OUT_FIGS / "fig_boxplot_bvrp_regimes.png", dpi=300)
 plt.close(fig)
-print("OK fig_cap9_03_boxplot_bvrp_regimes.png")
+print("OK fig_boxplot_bvrp_regimes.png")
 
 # ── 11. Fig 9.4 — Boxplot retornos futuros por regime (3 horizontes) ─────────
 horizons_fig = [5, 10, 20]
@@ -398,9 +398,9 @@ for ax, h in zip(axes, horizons_fig):
     ax.set_title(f"Horizonte {h}d", fontsize=10)
 fig.suptitle("Retorno Futuro por Regime de Volatilidade", fontsize=11, y=1.01)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap9_04_boxplot_ret_regimes.png", dpi=300, bbox_inches="tight")
+fig.savefig(OUT_FIGS / "fig_boxplot_ret_regimes.png", dpi=300, bbox_inches="tight")
 plt.close(fig)
-print("OK fig_cap9_04_boxplot_ret_regimes.png")
+print("OK fig_boxplot_ret_regimes.png")
 
 # ── 12. Fig 9.5 — Scatter BVRP vs retorno futuro (3 horizontes) ──────────────
 fig, axes = plt.subplots(1, 3, figsize=(13, 4))
@@ -421,9 +421,9 @@ for ax, h in zip(axes, horizons_fig):
         ax.legend(fontsize=7, markerscale=1.5)
 fig.suptitle("BVRP versus Retorno Futuro por Regime", fontsize=11, y=1.01)
 fig.tight_layout()
-fig.savefig(OUT_FIGS / "fig_cap9_05_scatter_bvrp_ret.png", dpi=300, bbox_inches="tight")
+fig.savefig(OUT_FIGS / "fig_scatter_bvrp_ret.png", dpi=300, bbox_inches="tight")
 plt.close(fig)
-print("OK fig_cap9_05_scatter_bvrp_ret.png")
+print("OK fig_scatter_bvrp_ret.png")
 
 print("\nTodos os outputs do Cap. 9 gerados com sucesso.")
 print(f"  Figuras : {OUT_FIGS}")

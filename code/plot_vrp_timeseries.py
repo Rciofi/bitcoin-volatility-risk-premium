@@ -24,7 +24,7 @@ def main():
     df = df[df["date"] <= AMOSTRA_FIM].reset_index(drop=True)
     print(f"Truncado para amostra canonica: N={len(df)}  {df['date'].min().date()} a {df['date'].max().date()}")
 
-    figs_dir = os.path.join(base_dir, "figs", "cap3")
+    figs_dir = os.path.join(base_dir, "figs", "dados")
     os.makedirs(figs_dir, exist_ok=True)
 
     # ================================================

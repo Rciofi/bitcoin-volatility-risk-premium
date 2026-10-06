@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 DATA = ROOT / "data" / "dataset_bvrp_with_skew.csv"
-OUT  = ROOT / "figs" / "cap5"
+OUT  = ROOT / "archive" / "figs" / "cap5"
 OUT.mkdir(parents=True, exist_ok=True)
 
 BVRP_COL = "vrp_30d"

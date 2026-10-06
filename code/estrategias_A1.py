@@ -295,13 +295,13 @@ def replica_cap7(vr, btc, simples=False):
 
 
 def ler_publicado():
-    """Linhas numéricas das tabelas publicadas em tables/tab7/ (rótulo -> valores)."""
-    arquivos = {"7.1": "tab7_1_perf_buy_hold.tex", "7.2": "tab7_2_perf_vrp_quantile.tex",
-                "7.2b": "tab7_2b_custos.tex", "7.3": "tab7_3_perf_bvrp_multi_quantile.tex",
-                "7.4": "tab7_4_perf_bvrp_regimes.tex"}
+    """Linhas numéricas das tabelas publicadas em tables/estrategias/ (rótulo -> valores)."""
+    arquivos = {"7.1": "tab_perf_buy_hold.tex", "7.2": "tab_perf_vrp_quantile.tex",
+                "7.2b": "tab_custos.tex", "7.3": "tab_perf_bvrp_multi_quantile.tex",
+                "7.4": "tab_perf_bvrp_regimes.tex"}
     out = {}
     for tab, arq in arquivos.items():
-        with open(os.path.join(ROOT, "tables", "tab7", arq), encoding="utf-8") as fh:
+        with open(os.path.join(ROOT, "tables", "estrategias", arq), encoding="utf-8") as fh:
             corpo = fh.read().split(r"\midrule", 1)[1]
         linhas = {}
         for ln in corpo.splitlines():

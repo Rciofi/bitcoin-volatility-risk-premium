@@ -1,9 +1,9 @@
 """Regenera a Figura 5.1 -- coeficiente do BVRP por horizonte com IC bootstrap.
 
-O PNG original (figs/cap5/beta_por_horizonte_basico_bootstrap.png) nao tinha
+O PNG original (figs/retornos_linear/beta_por_horizonte_basico_bootstrap.png) nao tinha
 gerador versionado: era um arquivo solto, com o titulo dizendo "OLS" e com os
 rotulos de p-valor posicionados fora da area do grafico. Este script recria a
-figura a partir de tables/cap5/bootstrap_ci_cap5.csv, que ja contem beta_hat,
+figura a partir de tables/retornos_linear/bootstrap_ci.csv, que ja contem beta_hat,
 os limites do IC 95% bootstrap e o p-HAC de cada horizonte.
 
 Uso:
@@ -19,8 +19,8 @@ from matplotlib.ticker import FormatStrFormatter
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-CSV = ROOT / "tables" / "cap5" / "bootstrap_ci_cap5.csv"
-OUT = ROOT / "figs" / "cap5" / "beta_por_horizonte_basico_bootstrap.png"
+CSV = ROOT / "tables" / "retornos_linear" / "bootstrap_ci.csv"
+OUT = ROOT / "figs" / "retornos_linear" / "beta_por_horizonte_basico_bootstrap.png"
 
 # Parametros do bootstrap, para a legenda (ver regenerate_cap5.py).
 N_BOOTSTRAP = 1000

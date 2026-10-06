@@ -14,9 +14,9 @@ Correções em relação ao script original (não versionado):
      consistente com regenerate_cap8.py.
 
 Outputs gerados:
-  - chapters/cap6_ml/tables/linear_models_cap6.csv          [SOBRESCREVE]
-  - chapters/cap6_ml/tables/linear_model_coefficients_cap6.csv [SOBRESCREVE]
-  - chapters/cap6_ml/tables/linear_cv_results_cap6.csv      [NOVO]
+  - archive/chapters/cap6_ml/tables/linear_models_cap6.csv          [SOBRESCREVE]
+  - archive/chapters/cap6_ml/tables/linear_model_coefficients_cap6.csv [SOBRESCREVE]
+  - archive/chapters/cap6_ml/tables/linear_cv_results_cap6.csv      [NOVO]
 """
 
 import os
@@ -32,7 +32,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # =====================================================================
 ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(ROOT, "data", "ml_dataset.csv")
-OUT_DIR   = os.path.join(ROOT, "chapters", "cap6_ml", "tables")
+OUT_DIR   = os.path.join(ROOT, "archive", "chapters", "cap6_ml", "tables")
 
 TARGET = "ret_fut_1d"
 

@@ -61,7 +61,7 @@ def main():
     df = df.sort_values("date").reset_index(drop=True)
 
     # Diretório de figuras
-    figs_dir = os.path.join(base_dir, "figs", "cap3")
+    figs_dir = os.path.join(base_dir, "figs", "dados")
     os.makedirs(figs_dir, exist_ok=True)
 
     # ====== VRP(t) vs Retorno Futuro ======

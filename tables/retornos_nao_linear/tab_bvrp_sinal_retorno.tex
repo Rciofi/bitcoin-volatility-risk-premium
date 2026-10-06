@@ -1,0 +1,24 @@
+﻿% Tabela gerada automaticamente por analyze_bvrp_by_return_sign.py
+\begin{table}[htbp]
+  \centering
+  \caption{BVRP e retornos futuros do Bitcoin condicionais ao sinal do retorno
+    corrente. Estatísticas reportadas em pontos percentuais.
+    Diferença = média do grupo \textit{ret}>0 menos média do grupo \textit{ret}<0.
+    Teste de Welch (variâncias desiguais): $^{*}p<0{,}10$; $^{**}p<0{,}05$; $^{***}p<0{,}01$.}
+  \label{tab:retnl-sinal-retorno}
+  \begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
+    \toprule
+    \textbf{Variável} & \textbf{BVRP $|$ \textit{ret}>0} & \textbf{BVRP $|$ \textit{ret}<0} & \textbf{Diferença} & \textbf{\textit{p}-valor Welch} \\
+    \midrule
+    BVRP médio (\texttt{vrp\_30d}) & $-8,031$ & $-8,469$ & $+0,438$ & $0,470$ \\
+    \midrule
+    Retorno futuro médio ($h=5$) & $0,002$ & $0,004$ & $-0,002$ & $0,577$ \\
+    Retorno futuro médio ($h=20$) & $0,010$ & $0,013$ & $-0,003$ & $0,646$ \\
+    Retorno futuro médio ($h=30$) & $0,018$ & $0,016$ & $+0,002$ & $0,806$ \\
+    \midrule
+    $N$ & $876$ & $899$ & & \\
+    \bottomrule
+  \end{tabular}
+\end{adjustbox}
+\end{table}

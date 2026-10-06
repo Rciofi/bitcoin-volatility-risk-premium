@@ -862,4 +862,31 @@ Registradas na reescrita do Cap. 2. Os metadados das entradas novas foram confer
 | **Numeração das hipóteses** | O Cap. 4 passou a organizar a análise por questão e capítulo (existência, Cap. 3; previsão do BVRP, Cap. 5; previsibilidade linear, Cap. 6; não linear, Cap. 7; estratégias no apêndice) e só mantém "H1". **O Cap. 1 ainda numera H1 a H4 na estrutura antiga** (H3 = estratégias, H4 = aprendizado de máquina) e precisa ser alinhado | **F3** |
 | Regra para o texto | Os capítulos descrevem o método atual; a comparação com versões anteriores da dissertação vai para o relatório ao orientador. Trechos marcados nas seções 7.1, 9.1, 11.1, 11.2 e 11.4 | Fase 2 |
 | Citações novas | `campbell2008predicting`, `clark2007approximately`, `diebold1995comparing` e `pagan1984` (metadados conferidos pelo usuário) | C4, C5, C6 |
-| **Ordem dos capítulos e referências cruzadas** | O `frontmatter/main.tex` ainda inclui os capítulos na ordem antiga (cap5_resultados_ols, cap6_ml_unificado, cap7_estrategias, cap8_regimes). Na reescrita dos Caps. 5 a 7, ajustar o `main.tex` à estrutura-alvo do plano (Cap. 5 = previsão do BVRP, atual Cap. 6; Cap. 6 = modelo linear, atual Cap. 5; Cap. 7 = não linear, atual Cap. 8; estratégias no apêndice) e conferir que nenhum capítulo menciona número de capítulo escrito à mão (sempre `\ref`) | **C5–C7**, F8 |
+| **Ordem dos capítulos e referências cruzadas** | O `frontmatter/main.tex` ainda inclui os capítulos na ordem antiga (cap5_resultados_ols, cap6_ml_unificado, cap7_estrategias, cap8_regimes). Na reescrita dos Caps. 5 a 7, ajustar o `main.tex` à estrutura-alvo do plano (Cap. 5 = previsão do BVRP, atual Cap. 6; Cap. 6 = modelo linear, atual Cap. 5; Cap. 7 = não linear, atual Cap. 8; estratégias no apêndice) e conferir que nenhum capítulo menciona número de capítulo escrito à mão (sempre `\ref`) | **feito na seção 18** (estrutura); F8 |
+
+## 18. Estrutura por tema (Fase 2, etapa 5a, 06/10/2026)
+
+Renomeação aprovada pelo usuário, sem mudança de conteúdo. **Os caminhos, nomes de arquivo e
+rótulos citados nas seções 1 a 17 (e no `HANDOFF.md`) são os antigos**; a correspondência
+completa (capítulos, 23 figuras, 29 tabelas, 31 itens de legado e 115 rótulos) está em
+`docs/mapa_renomeacao.csv`.
+
+| Novo | Arquivo | Antes | Rótulo do capítulo |
+|---|---|---|---|
+| Cap. 1–4 | `introducao`, `referencial`, `dados`, `metodologia` | `cap1_`…`cap4_` | sem mudança |
+| Cap. 5 | `previsao_bvrp` | `cap6_ml_unificado` | `chap:previsao_bvrp` (era `chap:cap5_ml`) |
+| Cap. 6 | `retornos_linear` | `cap5_resultados_ols` | `chap:retornos_linear` (era `chap:resultados_ols`) |
+| Cap. 7 | `retornos_nao_linear` | `cap8_regimes` | `chap:retornos_nao_linear` (era `chap:regimes`) |
+| Cap. 8 | `consideracoes_finais` | `cap9_conclusao` | `chap:consideracoes_finais` (era `chap:conclusao`) |
+| — | `nota_metodologica` | `Nota_metodologica` | sem mudança |
+| Apêndice A | `apendice_estrategias` | `cap7_estrategias` | `app:estrategias` (era `chap:estrategias`) |
+| Apêndices B–D | `apendice_variaveis`, `apendice_scripts`, `apendice_pastas` | `apendiceA/B/C_*` | `app:variaveis`, `app:scripts`, `app:pastas` |
+
+| Item | Registro |
+|---|---|
+| Convenção | `figs/<tema>/` e `tables/<tema>/` com os temas `dados`, `previsao_bvrp`, `retornos_linear`, `retornos_nao_linear` e `estrategias`; nomes de arquivo sem número de capítulo; rótulos `tipo:prefixo-nome`, com prefixos `intro`, `refer`, `dados`, `met`, `prev`, `retlin`, `retnl`, `concl` e `estr`. `outputs/Tn/` continua por tarefa |
+| Apêndices | letras atribuídas pelo `\appendix` (tiradas dos títulos); 11 ocorrências de "Capítulo~\ref" para as estratégias viraram "Apêndice~\ref" (havia 3 além das 8 listadas na proposta: `introducao.tex:19` e as duas de `previsao_bvrp.tex`, esta reescrita na etapa 5b) |
+| Legado | Figuras e tabelas fora do documento, `chapters/cap6_ml/`, `chapters/cap8_ml/` e os notebooks `Cap6_ML.ipynb` e `Cap7_Estratégia.ipynb` foram para `archive/<caminho antigo>` |
+| Scripts | Diretórios, nomes de arquivo e `\label` gravados foram atualizados nos geradores (`regenerate_cap5/7/8/9`, `analyze_bvrp_by_return_sign`, `build_desc_stats_T1`, `plot_cap3_T1`, `regimes_T9`, `plot_vrp_vs_return_T12` etc.) e na leitura das tabelas publicadas do `estrategias_A1.py`. Os nomes dos scripts e a opção `--publicar-cap3` não mudaram. Scripts de legado (`regenerate_cap6_scatter`, `train_linear_cap6`, `test_log_transform_cap5`) gravam em `archive/` |
+| Conferência | `scripts/verificar_latex.py`: arquivos de `\include`/`\input`/`\includegraphics`, `\ref` sem `\label`, rótulos duplicados, citações fora do .bib, ambientes desbalanceados, "Capítulo~\ref" apontando para apêndice e caracteres de controle. Não substitui a compilação no Overleaf (F8) |
+| Pendente | O pacote `build/dissertacao_overleaf_*.zip` tem a estrutura antiga e precisa ser refeito. Os `.aux`/`.bak` locais (ignorados pelo git) continuam em `chapters/` com os nomes antigos. Os Apêndices B–D e os comentários com números antigos dentro deles ficam para o F8 |

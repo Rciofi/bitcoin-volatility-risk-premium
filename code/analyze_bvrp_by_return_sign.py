@@ -8,9 +8,9 @@ do retorno corrente do BTC (analogia ao leverage effect documentado em
 equity para a volatilidade implícita).
 
 Saídas:
-  - tables/cap9/bvrp_by_return_sign.csv      (estatísticas brutas)
-  - tables/cap9/tab_bvrp_sinal_retorno.tex   (tabela LaTeX)
-  - figs/cap9/fig_cap9_bvrp_sinal.png        (boxplot por grupo)
+  - tables/retornos_nao_linear/bvrp_by_return_sign.csv      (estatísticas brutas)
+  - tables/retornos_nao_linear/tab_bvrp_sinal_retorno.tex   (tabela LaTeX)
+  - figs/retornos_nao_linear/fig_bvrp_sinal.png        (boxplot por grupo)
 
 Autor: Rodrigo Ciofi
 Dissertação: Prêmio de Risco de Volatilidade do Bitcoin (BVRP) — FGV EESP
@@ -29,8 +29,8 @@ import matplotlib.patches as mpatches
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 DATA_PATH   = os.path.join(PROJECT_DIR, "data", "vrp_with_targets.csv")
-TABLE_DIR   = os.path.join(PROJECT_DIR, "tables", "cap9")
-FIG_DIR     = os.path.join(PROJECT_DIR, "figs",   "cap9")
+TABLE_DIR   = os.path.join(PROJECT_DIR, "tables", "retornos_nao_linear")
+FIG_DIR     = os.path.join(PROJECT_DIR, "figs",   "retornos_nao_linear")
 
 os.makedirs(TABLE_DIR, exist_ok=True)
 os.makedirs(FIG_DIR,   exist_ok=True)
@@ -203,7 +203,7 @@ tex_lines.append(r"  \caption{BVRP e retornos futuros do Bitcoin condicionais ao
 tex_lines.append(r"    corrente. Estatísticas reportadas em pontos percentuais.")
 tex_lines.append(r"    Diferença = média do grupo \textit{ret}>0 menos média do grupo \textit{ret}<0.")
 tex_lines.append(r"    Teste de Welch (variâncias desiguais): $^{*}p<0{,}10$; $^{**}p<0{,}05$; $^{***}p<0{,}01$.}")
-tex_lines.append(r"  \label{tab:cap9_sinal_retorno}")
+tex_lines.append(r"  \label{tab:retnl-sinal-retorno}")
 tex_lines.append(r"  \begin{tabular}{lrrrr}")
 tex_lines.append(r"    \toprule")
 tex_lines.append(r"    \textbf{Variável} & \textbf{BVRP $|$ \textit{ret}>0} & \textbf{BVRP $|$ \textit{ret}<0} & \textbf{Diferença} & \textbf{\textit{p}-valor Welch} \\")
@@ -306,7 +306,7 @@ patch_neg = mpatches.Patch(color="#E8694C", alpha=0.75, label="ret < 0 (negativo
 ax.legend(handles=[patch_pos, patch_neg], fontsize=8.5, loc="upper right")
 
 plt.tight_layout()
-fig_path = os.path.join(FIG_DIR, "fig_cap9_bvrp_sinal.png")
+fig_path = os.path.join(FIG_DIR, "fig_bvrp_sinal.png")
 plt.savefig(fig_path, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"✓ Figura salva: {fig_path}")

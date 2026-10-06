@@ -15,7 +15,7 @@ import xgboost as xgb
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "bvrp_ml_target_fut_1d.csv"
-FIGS = ROOT / "figs" / "cap6"
+FIGS = ROOT / "archive" / "figs" / "cap6"
 FIGS.mkdir(parents=True, exist_ok=True)
 
 SEED = 42

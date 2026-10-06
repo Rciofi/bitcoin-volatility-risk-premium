@@ -170,11 +170,11 @@ def ensure_folder_path(cookie, csrf, tree, path_parts):
 def push_figs(figs=None):
     """
     Envia figuras PNG de figs/ (incluindo subpastas) para o Overleaf.
-    Preserva a estrutura de subpastas (ex: figs/cap9/fig_cap9_01.png
-    vai para a pasta cap9/ dentro de figs/ no Overleaf).
+    Preserva a estrutura de subpastas (ex: figs/retornos_nao_linear/fig_rv30d_regimes.png
+    vai para a pasta retornos_nao_linear/ dentro de figs/ no Overleaf).
 
     Se figs for uma lista de caminhos relativos a partir de figs/, envia só essas.
-    Ex: push_figs(['cap9/fig_cap9_01_rv30d_regimes.png'])
+    Ex: push_figs(['retornos_nao_linear/fig_rv30d_regimes.png'])
     """
     cookie, _ = load_auth()
     csrf, tree = get_project_info(cookie)

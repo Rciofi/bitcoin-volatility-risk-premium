@@ -1,0 +1,250 @@
+\chapter{Construção das Variáveis de Volatilidade}
+\label{app:variaveis}
+
+Este apêndice apresenta a formulação das variáveis utilizadas ao longo da
+dissertação: retornos logarítmicos, volatilidade realizada (RV), volatilidade
+implícita (IV), prêmio de risco de volatilidade do Bitcoin (BVRP), retornos
+futuros e as classificações de regime. As expressões seguem práticas
+padrão em finanças quantitativas, com adaptações relevantes ao mercado de
+criptoativos (negociação contínua 24/7).
+
+\section{Retornos logarítmicos}
+
+Dado o preço diário do Bitcoin $P_t$, define-se o retorno logarítmico como:
+\[
+r_t = \ln\left(\frac{P_t}{P_{t-1}}\right).
+\]
+O uso de retornos logarítmicos é conveniente por (i) permitir aditividade no
+tempo e (ii) apresentar boa compatibilidade com modelos contínuos de preços.
+
+Esses retornos são utilizados tanto na construção da volatilidade realizada
+quanto na definição de retornos futuros em diferentes horizontes.
+
+\section{Volatilidade Realizada (RV)}
+
+A volatilidade realizada anualizada, construída a partir de retornos diários em
+um horizonte de $h$ dias, é definida por:
+\[
+RV_{h,t} = \sqrt{\frac{365}{h}\sum_{i=1}^{h} r_{t-i+1}^{2}},
+\]
+em que o fator 365 anualiza a medida, considerando que o mercado de criptoativos
+opera continuamente (24/7).
+
+Ao longo da dissertação, utiliza-se majoritariamente $h=30$, de modo que:
+\[
+RV_{30,t} = \sqrt{\frac{365}{30}\sum_{i=1}^{30} r_{t-i+1}^{2}}.
+\]
+
+Cabe distinguir duas noções de volatilidade frequentemente confundidas na literatura. A \textit{volatilidade de processo} refere-se ao parâmetro latente $\sigma_t$ do processo gerador dos retornos --- grandeza não observável diretamente. A \textit{volatilidade amostral} (ou realizada), $RV_{h,t}$, é um estimador não paramétrico construído a partir dos retornos observados em janela de $h$ períodos. Essa distinção é relevante para o BVRP: a diferença $RV_{30,t} - IV_{30,t}$ compara uma medida histórica (amostral) com uma medida de expectativa neutra ao risco, e não o parâmetro latente com a expectativa teórica.
+
+\subsection{Observação sobre alinhamento temporal}
+
+A definição acima corresponde ao estimador \textit{backward-looking}, isto é,
+calculado com retornos observados no passado (janela móvel encerrando em $t$).
+Essa construção é adequada para análises empíricas e preditivas quando se deseja
+utilizar apenas informação disponível até $t$. Em contextos de precificação, é
+comum comparar IV em $t$ com uma RV \textit{ex-post} (realizada ao longo do
+período futuro). Quando pertinente, a dissertação deixa explícito o alinhamento
+adotado em cada exercício empírico.
+
+\subsection{Estimadores alternativos de RV}
+
+A literatura apresenta estimadores mais robustos para RV, sobretudo quando há
+informação intradiária e/ou preocupação com ruído de microestrutura. Exemplos incluem:
+\begin{itemize}
+    \item \textbf{Parkinson} (baseado em máximos e mínimos intradiários);
+    \item \textbf{Garman--Klass} (usa abertura, máximo, mínimo e fechamento);
+    \item \textbf{Rogers--Satchell} (robusto a \textit{drift});
+    \item \textbf{MedRV} (baseado em estatísticas medianas, resistente a ruído).
+\end{itemize}
+
+Apesar dessas alternativas, adota-se a versão clássica baseada em retornos diários
+por sua simplicidade, transparência e consistência com a disponibilidade de dados
+e com o horizonte de 30 dias utilizado na volatilidade implícita.
+
+\section{Volatilidade Implícita (IV)}
+
+A volatilidade implícita a 30 dias ($IV_{30,t}$) é obtida de duas formas:
+
+\begin{enumerate}
+    \item diretamente do índice DVOL da Deribit, utilizado como proxy da volatilidade
+    implícita de curto prazo;
+    \item quando necessário, via interpolação linear no tempo entre vencimentos adjacentes.
+\end{enumerate}
+
+Seja $T_1$ e $T_2$ (em dias) dois vencimentos observáveis tais que $T_1 < 30 < T_2$.
+Define-se então:
+\[
+IV_{30,t} = w \cdot IV_{T_1,t} + (1-w)\cdot IV_{T_2,t},
+\]
+com peso:
+\[
+w = \frac{T_2 - 30}{T_2 - T_1}.
+\]
+
+Esse procedimento é análogo à interpolação de maturidade utilizada em índices de
+volatilidade de mercado, como no caso do VIX.
+
+\section{Prêmio de Risco de Volatilidade (BVRP)}
+
+O Prêmio de Risco de Volatilidade do Bitcoin (BVRP), variável central da dissertação,
+é definido como:
+\[
+BVRP_t = RV_{30,t} - IV_{30,t}.
+\]
+
+Em termos econômicos, $BVRP_t$ mede o diferencial entre a volatilidade
+efetivamente observada no mercado à vista (via RV, construída em janela
+retrospectiva de 30 dias) e a incerteza precificada no mercado de opções
+(via IV). Valores negativos --- o estado típico --- indicam que a volatilidade
+implícita está acima da volatilidade realizada, consistente com um prêmio pago
+pelos compradores de opções como proteção contra choques de variância. Valores
+positivos ocorrem em episódios de surpresa, em que a volatilidade realizada
+supera a implícita.
+
+\begin{itemize}
+    \item \textbf{BVRP negativo:} IV $>$ RV, estado típico --- prêmio de seguro
+    embutido nos preços de opções; quanto mais negativo, maior a demanda por
+    proteção e/ou aversão ao risco;
+    \item \textbf{BVRP positivo:} RV $>$ IV, típico de episódios de surpresa
+    (choques exógenos, liquidações em cascata, \textit{jumps});
+    \item \textbf{Alta magnitude (em módulo):} indica períodos de forte assimetria
+    entre volatilidade precificada e observada, frequentemente associados a
+    mudanças de regime.
+\end{itemize}
+
+\section{Retornos futuros}
+
+Os retornos futuros utilizados para avaliação preditiva são definidos como retornos
+simples acumulados no horizonte $h$:
+\[
+R_{t+h} = \frac{P_{t+h}}{P_t} - 1.
+\]
+
+Em particular, são utilizados os seguintes horizontes
+$h \in \{1, 5, 10, 20, 30, 60\}$:
+
+\begin{align*}
+R_{t+1}  &= \frac{P_{t+1}}{P_t}  - 1, \\
+R_{t+5}  &= \frac{P_{t+5}}{P_t}  - 1, \\
+R_{t+10} &= \frac{P_{t+10}}{P_t} - 1, \\
+R_{t+20} &= \frac{P_{t+20}}{P_t} - 1, \\
+R_{t+30} &= \frac{P_{t+30}}{P_t} - 1, \\
+R_{t+60} &= \frac{P_{t+60}}{P_t} - 1.
+\end{align*}
+
+Os horizontes escolhidos capturam diferentes janelas de
+previsão e correspondem aos utilizados na literatura
+empírica de prêmios de risco de volatilidade:
+\begin{itemize}
+    \item \textbf{1 dia}: horizonte de curtíssimo prazo, dominado
+    por ruído de microestrutura;
+    \item \textbf{5 dias}: dinâmica semanal frequentemente analisada
+    em criptoativos;
+    \item \textbf{10 dias}: horizonte intermediário curto;
+    \item \textbf{20 dias}: horizonte aproximadamente mensal, com
+    maior suavização do ruído de curto prazo;
+    \item \textbf{30 dias}: horizonte de médio prazo, alinhado à
+    janela de cálculo do BVRP;
+    \item \textbf{60 dias}: horizonte de médio-longo prazo,
+    utilizado como referência para análise da estabilidade
+    dos resultados.
+\end{itemize}
+
+A inclusão de múltiplos horizontes permite avaliar como
+a relação entre o BVRP e os retornos futuros varia com
+o horizonte de previsão, conforme discutido nos
+Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear}.
+
+\section{Classificação de regimes}
+
+A dissertação emprega duas classificações de regime, com propósitos
+distintos.
+
+\subsection{Regime do BVRP (preditor dos modelos de aprendizado de máquina)}
+
+A variável \texttt{vrp\_regime\_num}, empregada como preditor no
+Capítulo~\ref{chap:previsao_bvrp}, discretiza o \emph{próprio} $\text{BVRP}_t$
+em tercis:
+\[
+\text{Regime}_t =
+\begin{cases}
+\text{Baixo}, & \text{BVRP}_t \leq q_{1/3,t}, \\
+\text{Médio}, & q_{1/3,t} < \text{BVRP}_t \leq q_{2/3,t}, \\
+\text{Alto},  & \text{BVRP}_t > q_{2/3,t},
+\end{cases}
+\]
+em que $q_{1/3,t}$ e $q_{2/3,t}$ são os quantis $1/3$ e $2/3$ da
+distribuição do BVRP \emph{disponível até $t$}, recalculados a cada
+instante por janela expansiva com período mínimo de 252 observações. As
+observações do período de aquecimento, para as quais os quantis ainda não
+estão definidos, permanecem sem classificação --- o que explica a amostra
+reduzida do Capítulo~\ref{chap:previsao_bvrp} (1.523 observações, contra 1.775
+da amostra completa).
+
+Essa construção é central para a interpretação dos resultados: por ser uma
+discretização do prêmio corrente, sua dominância como preditor não indica
+que variáveis de estado de mercado carreguem informação especial, mas que a
+informação sobre o BVRP futuro reside em seu valor presente.
+
+\subsection{Regime de volatilidade realizada (análise condicional)}
+
+O Capítulo~\ref{chap:retornos_nao_linear} classifica cada observação em um de três
+regimes mutuamente exclusivos com base nos quantis da $RV_{30,t}$
+calculados sobre a amostra completa:
+
+\begin{itemize}
+    \item \textbf{Baixa volatilidade}: $RV_{30,t} \leq q_{25}(RV_{30})$;
+    \item \textbf{Média volatilidade}: $q_{25}(RV_{30}) < RV_{30,t} < q_{75}(RV_{30})$;
+    \item \textbf{Alta volatilidade}: $RV_{30,t} \geq q_{75}(RV_{30})$.
+\end{itemize}
+
+Na amostra de março de 2021 a março de 2026 ($N = 1.775$), os limiares
+estimados são $q_{25} = 39{,}3\%$ e $q_{75} = 65{,}6\%$ (em base
+anualizada), resultando em 444 observações em cada regime extremo e 887
+no regime intermediário.
+
+A variável indicadora de alta volatilidade $D_t^{\text{alto}}$ é definida como:
+\[
+D_t^{\text{alto}} = \mathbf{1}\!\left\{RV_{30,t} \geq q_{75}(RV_{30})\right\},
+\]
+sendo utilizada nos termos de interação das regressões condicionais do
+Capítulo~\ref{chap:retornos_nao_linear}:
+\[
+R_{t+h} = \alpha + \beta_1\,\text{BVRP}_t + \beta_2\,D_t^{\text{alto}}
+          + \beta_3\,(\text{BVRP}_t \times D_t^{\text{alto}}) + \varepsilon_{t+h}.
+\]
+
+O Apêndice~\ref{app:estrategias} adota ainda uma terceira partição, por
+tercis da $RV_{30,t}$ (limiares de $43{,}5\%$ e $60{,}7\%$), restrita à
+decomposição das estratégias condicionais por regime.
+
+\section{Defasagem das variáveis e prevenção de \textit{look-ahead bias}}
+
+Para assegurar validade empírica e evitar \textit{look-ahead bias}, a modelagem
+preditiva utiliza apenas informação disponível até o instante de decisão. Em
+particular, variáveis explicativas observadas no instante $t$ são, quando necessário,
+defasadas de modo que:
+\[
+X_t = X^{\text{observado}}_{t-1},
+\]
+o que garante que:
+\begin{itemize}
+    \item preditores não utilizem informações do mesmo dia do alvo quando isso implicar
+    vazamento temporal;
+    \item previsões sejam realizadas apenas com informações disponíveis à época;
+    \item a avaliação fora da amostra seja genuína e reprodutível.
+\end{itemize}
+
+\section{Resumo}
+
+Este apêndice consolidou a formulação matemática das variáveis centrais da
+dissertação --- retornos logarítmicos, $RV_{30,t}$, $IV_{30,t}$, $BVRP_t$,
+retornos futuros em seis horizontes ($h \in \{1,5,10,20,30,60\}$ dias) e
+as duas classificações de regime (a discretização do próprio BVRP em
+tercis por janela expansiva e a partição da $RV_{30,t}$ em quartis)
+--- assegurando precisão e alinhamento com práticas usuais na literatura de
+volatilidade e prêmio de risco. Essas definições fundamentam a construção dos
+\textit{datasets}, as análises econométricas e os exercícios preditivos e de
+estratégias discutidos nos capítulos principais.
