@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import seaborn as sns
 
-os.makedirs('figs/estrategias', exist_ok=True)
+os.makedirs('archive/figs/estrategias', exist_ok=True)
 
 # ---- Estetica global ----
 FIGSIZE_WIDE  = (10, 4.5)
@@ -75,7 +75,7 @@ df['rv_regime'] = pd.qcut(df['rv_30d'], q=3, labels=['Baixo', 'Medio', 'Alto'])
 # gera as Tabelas 7.2-7.4) -- substitui o quantil fixo com look-ahead bias
 # (q80_th = df['vrp_30d'].quantile(0.80)) usado anteriormente nas figuras de
 # retorno acumulado. Ver regenerate_cap7.py para a definicao do sinal.
-df_sig = pd.read_csv('tables/estrategias/daily_returns.csv', parse_dates=['date'])
+df_sig = pd.read_csv('archive/tables/estrategias/daily_returns.csv', parse_dates=['date'])
 df = df.merge(df_sig.drop(columns=['ret']), on='date', how='left')
 
 # Periodo real plotado (eixo X das figuras de retorno acumulado do BVRP) --
@@ -116,7 +116,7 @@ _fim = _mes_ano_pt(df_btc['date'].max())
 ax.set_title(f'Retorno acumulado — Buy-and-Hold (Bitcoin, {_ini} – {_fim})')
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.1f}x'))
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_cum_returns_buy_hold.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_cum_returns_buy_hold.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_cum_returns_buy_hold.png")
 
@@ -136,7 +136,7 @@ ax.set_ylabel('Retorno acumulado (base 1)')
 ax.set_title('Retorno acumulado — Estratégia condicional BVRP (quantil 80%)')
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_cum_returns_bvrp_quantile.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_cum_returns_bvrp_quantile.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_cum_returns_bvrp_quantile.png")
 
@@ -161,7 +161,7 @@ ax.set_title(f'Buy-and-Hold vs Estratégia BVRP q80 ({periodo_bvrp})')
 ax.legend(framealpha=0.9)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_cum_returns_bh_vs_bvrp_quantile.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_cum_returns_bh_vs_bvrp_quantile.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_cum_returns_bh_vs_bvrp_quantile.png")
 
@@ -184,7 +184,7 @@ ax.set_title(f'Retorno acumulado por quantil do BVRP ({periodo_bvrp})')
 ax.legend(framealpha=0.9, ncol=3)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_cum_returns_bvrp_multi_quantile.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_cum_returns_bvrp_multi_quantile.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_cum_returns_bvrp_multi_quantile.png")
 
@@ -197,7 +197,7 @@ print("  OK: fig_cum_returns_bvrp_multi_quantile.png")
 # com a tabela (evita divergencia por look-ahead bias no limiar, corrigido em
 # c02e22a mas nunca propagado para este script de figuras).
 print("Gerando fig_7_03 (heatmap quantis)...")
-df_q3 = pd.read_csv('tables/estrategias/perf_multi_quantile.csv', index_col='quantil')
+df_q3 = pd.read_csv('archive/tables/estrategias/perf_multi_quantile.csv', index_col='quantil')
 metrics_data = {}
 for idx in df_q3.index:
     metrics_data[idx.replace('\\%', '%')] = {
@@ -223,7 +223,7 @@ ax.set_title('Métricas de desempenho por quantil do BVRP (z-score, valores orig
 ax.set_xlabel('')
 ax.set_ylabel('Quantil')
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_heatmap_bvrp_quantile_metrics.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_heatmap_bvrp_quantile_metrics.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_heatmap_bvrp_quantile_metrics.png")
 
@@ -245,7 +245,7 @@ ax.set_title('Retorno acumulado — BVRP q80 por regime de volatilidade realizad
 ax.legend(framealpha=0.9)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:.2f}x'))
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_cum_returns_bvrp_by_regime.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_cum_returns_bvrp_by_regime.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_cum_returns_bvrp_by_regime.png")
 
@@ -256,7 +256,7 @@ print("  OK: fig_cum_returns_bvrp_by_regime.png")
 # Le as metricas do CSV gerado por regenerate_cap7.py (mesma fonte da Tab 7.4) --
 # ver nota acima sobre o heatmap de quantis.
 print("Gerando fig_7_05 (heatmap regimes)...")
-df_r4 = pd.read_csv('tables/estrategias/perf_regimes.csv', index_col='regime')
+df_r4 = pd.read_csv('archive/tables/estrategias/perf_regimes.csv', index_col='regime')
 label_map_csv = {'Baixa RV': 'Baixa RV', 'Media RV': 'Média RV', 'Alta RV': 'Alta RV'}
 regime_metrics = {}
 for idx in df_r4.index:
@@ -281,7 +281,7 @@ ax.set_title('Métricas de desempenho por regime de RV (z-score, valores origina
 ax.set_xlabel('')
 ax.set_ylabel('Regime de Volatilidade')
 fig.tight_layout()
-fig.savefig('figs/estrategias/fig_heatmap_bvrp_regimes.png', dpi=DPI, bbox_inches='tight')
+fig.savefig('archive/figs/estrategias/fig_heatmap_bvrp_regimes.png', dpi=DPI, bbox_inches='tight')
 plt.close(fig)
 print("  OK: fig_heatmap_bvrp_regimes.png")
 

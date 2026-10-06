@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import os
 
-os.makedirs('tables/estrategias', exist_ok=True)
+os.makedirs('archive/tables/estrategias', exist_ok=True)
 
 ANN = 365        # Bitcoin: mercado 24/7
 MIN_PERIODS = 252  # janela minima para limiar expansivo (elimina lookahead)
@@ -120,7 +120,7 @@ tab1_rows = [
     r"\bottomrule",
     r"\end{tabular}",
 ]
-with open('tables/estrategias/tab_perf_buy_hold.tex', 'w', encoding='utf-8') as fh:
+with open('archive/tables/estrategias/tab_perf_buy_hold.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(tab1_rows))
 print("Tabela 1 salva: tables/estrategias/tab_perf_buy_hold.tex")
 
@@ -205,7 +205,7 @@ lines2 = [
     r"\bottomrule",
     r"\end{tabular}",
 ]
-with open('tables/estrategias/tab_perf_vrp_quantile.tex', 'w', encoding='utf-8') as fh:
+with open('archive/tables/estrategias/tab_perf_vrp_quantile.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(lines2))
 print("Tabela 2 salva: tables/estrategias/tab_perf_vrp_quantile.tex")
 
@@ -234,11 +234,11 @@ for cost_bp in [0, 5, 10]:
         'n_operacoes': ops80,
     })
 lines2b += [r"\bottomrule", r"\end{tabular}"]
-with open('tables/estrategias/tab_custos.tex', 'w', encoding='utf-8') as fh:
+with open('archive/tables/estrategias/tab_custos.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(lines2b))
 print("Tabela 2b (custos) salva: tables/estrategias/tab_custos.tex")
 
-pd.DataFrame(cost_rows_csv).to_csv('tables/estrategias/strategy_costs.csv', index=False)
+pd.DataFrame(cost_rows_csv).to_csv('archive/tables/estrategias/strategy_costs.csv', index=False)
 print("CSV de custos salvo: tables/estrategias/strategy_costs.csv")
 
 
@@ -284,7 +284,7 @@ lines3.append(r"\midrule")
 lines3.append("Buy \\& Hold & {:.4f} & {:.4f} & {:.4f} & -- & -- & {:.4f} & {} & -- & 1.0000 {}".format(
     r_bh2, v_bh2, s_bh2, m_bh2, _fmt(sortino_bh2), _NL))
 lines3 += [r"\bottomrule", r"\end{tabular}"]
-with open('tables/estrategias/tab_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-8') as fh:
+with open('archive/tables/estrategias/tab_perf_bvrp_multi_quantile.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(lines3))
 print("Tabela 3 salva: tables/estrategias/tab_perf_bvrp_multi_quantile.tex")
 
@@ -294,7 +294,7 @@ print("Tabela 3 salva: tables/estrategias/tab_perf_bvrp_multi_quantile.tex")
 pd.DataFrame(rows3, columns=[
     "quantil", "ret_anual", "vol_anual", "sharpe_bruto", "sharpe_5bps",
     "sharpe_10bps", "max_drawdown", "sortino", "turnover", "pct_tempo",
-]).to_csv('tables/estrategias/perf_multi_quantile.csv', index=False)
+]).to_csv('archive/tables/estrategias/perf_multi_quantile.csv', index=False)
 print("CSV salvo: tables/estrategias/perf_multi_quantile.csv")
 
 
@@ -331,7 +331,7 @@ for row in rows4:
     lines4.append("{} & {:.4f} & {:.4f} & {:.4f} & {:.4f} & {} & {:.4f} & {:.4f} {}".format(
         row[0], row[1], row[2], row[3], row[4], _fmt(row[5]), row[6], row[7], _NL))
 lines4 += [r"\bottomrule", r"\end{tabular}"]
-with open('tables/estrategias/tab_perf_bvrp_regimes.tex', 'w', encoding='utf-8') as fh:
+with open('archive/tables/estrategias/tab_perf_bvrp_regimes.tex', 'w', encoding='utf-8') as fh:
     fh.write("\n".join(lines4))
 print("Tabela 4 salva: tables/estrategias/tab_perf_bvrp_regimes.tex")
 
@@ -339,12 +339,12 @@ print("Tabela 4 salva: tables/estrategias/tab_perf_bvrp_regimes.tex")
 pd.DataFrame(rows4, columns=[
     "regime", "ret_anual", "vol_anual", "sharpe", "max_drawdown",
     "sortino", "turnover", "pct_tempo",
-]).to_csv('tables/estrategias/perf_regimes.csv', index=False)
+]).to_csv('archive/tables/estrategias/perf_regimes.csv', index=False)
 print("CSV salvo: tables/estrategias/perf_regimes.csv")
 
 # Serie diaria completa (date, ret, sr_q80, sr_q60/70/80/90, sr_regime_*) --
 # fonte unica para as figuras de retorno acumulado (Fig 7.2, 7.3, 7.4, 7.6).
-daily_series.to_csv('tables/estrategias/daily_returns.csv', index=False)
+daily_series.to_csv('archive/tables/estrategias/daily_returns.csv', index=False)
 print("CSV salvo: tables/estrategias/daily_returns.csv")
 
 print("\nTodas as tabelas do cap7 regeneradas com sucesso.")

@@ -1,0 +1,26 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Estratégias com o BVRP previsto pelo Ridge, por quantil (27/02/2024 a 02/03/2026).}
+\label{tab:estr-quantis}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrr}
+\toprule
+Regra & Quantil & Sharpe (0) & Sharpe (10) & Sharpe (30) & Sortino & DD máx. (\%) & Giro (op./ano) & Tempo posic. (\%) \\
+\midrule
+Comprado/neutro & q60 & $-$0{,}14 & $-$0{,}22 & $-$0{,}40 & $-$0{,}20 & $-$46{,}6 & 27{,}8 & 59{,}3 \\
+ & q70 & $-$0{,}34 & $-$0{,}42 & $-$0{,}59 & $-$0{,}48 & $-$40{,}6 & 24{,}8 & 50{,}7 \\
+ & q80 & $-$0{,}25 & $-$0{,}35 & $-$0{,}55 & $-$0{,}36 & $-$28{,}2 & 24{,}8 & 41{,}0 \\
+ & q90 & $-$0{,}39 & $-$0{,}50 & $-$0{,}72 & $-$0{,}53 & $-$23{,}9 & 19{,}9 & 26{,}5 \\
+\midrule
+Vendido/neutro & q60 & 0{,}14 & 0{,}05 & $-$0{,}12 & 0{,}19 & $-$58{,}0 & 27{,}8 & 59{,}3 \\
+ & q70 & 0{,}34 & 0{,}25 & 0{,}09 & 0{,}48 & $-$49{,}0 & 24{,}8 & 50{,}7 \\
+ & q80 & 0{,}25 & 0{,}16 & $-$0{,}04 & 0{,}36 & $-$39{,}9 & 24{,}8 & 41{,}0 \\
+ & q90 & 0{,}39 & 0{,}28 & 0{,}05 & 0{,}57 & $-$19{,}8 & 19{,}9 & 26{,}5 \\
+\midrule
+Compra e manutenção & -- & 0{,}43 & -- & -- & 0{,}64 & $-$49{,}5 & -- & 100{,}0 \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Posição definida com informação até o fim de $t$ e aplicada ao retorno simples de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe: média $\times$ 365 / (desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino: média $\times$ 365 / ($\sqrt{\text{média}(\min(r_t, 0)^2)} \times \sqrt{365}$), com todos os dias. DD máx.: drawdown máximo a partir do valor inicial 1. Compra e manutenção nas mesmas datas, sem custo. Sem custos, o retorno diário da regra vendida/neutra é o da comprada/neutra com o sinal trocado. Entre parênteses, o custo em bps; Sortino, drawdown, giro e tempo sem custos.}
+\end{table}

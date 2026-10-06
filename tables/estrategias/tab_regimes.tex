@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Estratégias por regime de volatilidade (quantil 80\%): Ridge de 27/02/2024 a 02/03/2026 e proxy de 21/06/2023 a 02/03/2026.}
+\label{tab:estr-regimes}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrrrr}
+\toprule
+Sinal & Regime & Regra & Dias posic. & Ret. anual (\%) & Sharpe (0) & Sharpe (30) & DD máx. (\%) \\
+\midrule
+$\widehat{\text{BVRP}}_t$ (Ridge) & Baixa volatilidade & Comprado/neutro & 221 & $-$11{,}0 & $-$0{,}45 & $-$0{,}60 & $-$21{,}4 \\
+ &  & Vendido/neutro & 221 & 7{,}6 & 0{,}45 & 0{,}31 & $-$22{,}3 \\
+ &  & Compra e manutenção & 227 & $-$11{,}1 & $-$0{,}45 & -- & $-$22{,}5 \\
+ & Alta volatilidade & Comprado/neutro & 80 & 1{,}9 & 0{,}20 & $-$0{,}36 & $-$12{,}6 \\
+ &  & Vendido/neutro & 80 & $-$4{,}0 & $-$0{,}20 & $-$0{,}76 & $-$28{,}4 \\
+ &  & Compra e manutenção & 508 & 23{,}0 & 0{,}69 & -- & $-$39{,}4 \\
+\midrule
+$\text{BVRP}^{\text{proxy}}_t$ & Baixa volatilidade & Comprado/neutro & 0 & 0{,}0 & -- & -- & 0{,}0 \\
+ &  & Vendido/neutro & 0 & 0{,}0 & -- & -- & 0{,}0 \\
+ &  & Compra e manutenção & 310 & 0{,}2 & 0{,}12 & -- & $-$22{,}5 \\
+ & Alta volatilidade & Comprado/neutro & 238 & 2{,}7 & 0{,}23 & $-$0{,}08 & $-$27{,}3 \\
+ &  & Vendido/neutro & 238 & $-$7{,}0 & $-$0{,}23 & $-$0{,}55 & $-$33{,}3 \\
+ &  & Compra e manutenção & 676 & 35{,}4 & 0{,}93 & -- & $-$39{,}4 \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Posição definida com informação até o fim de $t$ e aplicada ao retorno simples de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe: média $\times$ 365 / (desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino: média $\times$ 365 / ($\sqrt{\text{média}(\min(r_t, 0)^2)} \times \sqrt{365}$), com todos os dias. DD máx.: drawdown máximo a partir do valor inicial 1. Compra e manutenção nas mesmas datas, sem custo. Sem custos, o retorno diário da regra vendida/neutra é o da comprada/neutra com o sinal trocado. Regime de alta volatilidade: $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. (Seção~\ref{sec:met-regimes}). Em cada regime, a regra e o compra e manutenção ficam neutros nos dias do outro regime; no compra e manutenção, os dias posicionados são os dias do regime. Com o Ridge, o período é o da negociação (depois do burn-in de 252 previsões); a proxy é avaliada desde a primeira data das previsões do Ridge. Sem dias posicionados, Sharpe indefinido (--).}
+\end{table}
