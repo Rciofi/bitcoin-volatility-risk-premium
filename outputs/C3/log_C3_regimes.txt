@@ -1,0 +1,6 @@
+Corte fixo (T9): 37.302399% a.a.; N = 1806; regime de alta: 1412 datas (78.2%)
+BVRP: baixa 2.00 (N=394), alta -11.77 (N=1412); dif -13.77, EP 3.55, z -3.87, p 0.0001
+BVRP_proxy: baixa -13.56 (N=394), alta -7.26 (N=1412); dif 6.30, EP 2.10, z 3.01, p 0.0026
+VH_retrospectiva: baixa 30.65, alta 59.62
+VH_prospectiva: baixa 46.22, alta 55.11
+IV: baixa 44.21, alta 66.88

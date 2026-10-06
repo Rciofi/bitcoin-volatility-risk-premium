@@ -187,6 +187,27 @@ oscilar.
 \end{figure}
 }{}
 
+O prêmio difere entre os regimes, e a direção da diferença depende da versão.
+Como $\text{BVRP} = \text{VH} - \text{IV}$, prêmio maior corresponde a BVRP mais
+negativo; \citet{almeida2024cryptoVRP}, que medem o prêmio pela variância
+neutra ao risco menos a física, usam o sinal oposto. Na proxy, o prêmio é maior
+no regime de baixa volatilidade: a média é de $-13{,}56$ p.p. nas 394 datas
+desse regime e de $-7{,}26$ p.p. nas 1.412 do regime de alta. A diferença, de
+$6{,}30$ p.p., é estimada por MQO da proxy numa variável indicadora do regime
+de alta, com erro-padrão de Newey--West de 31 defasagens ($2{,}10$;
+$p = 0{,}003$). É o padrão que \citet{almeida2024cryptoVRP} encontram com dois
+regimes obtidos de outra forma e com a variância realizada dos 27 dias
+anteriores, também retrospectiva. No BVRP, a diferença se inverte: a média é de
+$+2{,}00$ p.p. no regime de baixa e de $-11{,}77$ p.p. no de alta (diferença de
+$-13{,}77$ p.p., com erro-padrão de $3{,}55$; $p < 0{,}001$). A inversão vem da
+volatilidade histórica. No regime de baixa, a VH dos 30 dias anteriores tem
+média de $30{,}7\%$ a.a., a IV, de $44{,}2\%$, e a VH dos 30 dias seguintes, de
+$46{,}2\%$: a IV supera a volatilidade recente, mas não a que se realiza em
+seguida. A proxy, que compara a IV com a VH passada, registra um prêmio grande;
+o BVRP, que a compara com a VH futura, não. Parte da diferença na proxy é, além
+disso, mecânica: o regime é definido pela mesma $\text{VH}_{t-29:t}$ que entra
+na proxy, e, no regime de baixa, a proxy é negativa em todas as datas.
+
 Para avaliar a heterogeneidade temporal do prêmio, a
 Figura~\ref{fig:dados-boxplot-anual} agrupa a amostra por ano e apresenta a
 distribuição do BVRP e da proxy em cada subperíodo.

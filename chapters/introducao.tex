@@ -1,37 +1,163 @@
-﻿\chapter{Introdução}
+\chapter{Introdução}
 \label{chap:introducao}
 
-O surgimento do Bitcoin como ativo financeiro com mercado de derivativos maduro --- particularmente a partir do desenvolvimento de mercados de opções líquidos na Deribit, hoje responsável pela maior parte do volume global negociado em opções de criptoativos --- abriu espaço para o estudo de fenômenos econômicos tradicionalmente associados a mercados de \textit{equity} em um ambiente estruturalmente novo: alta volatilidade idiossincrática, operação contínua, ausência de \textit{circuit breakers} e participação relativamente menor de investidores institucionais. Entre esses fenômenos, o \textit{volatility risk premium} (VRP) --- diferencial entre a volatilidade realizada e a volatilidade implícita extraída dos preços de opções --- ocupa posição central na literatura de finanças, sendo interpretado como compensação paga pelos compradores de opções pela proteção contra choques de variância \citep{bollerslev2011VRP, bali2009volatilitypremium, pan2006jumpRisk}. Sua extensão para criptoativos, contudo, permanece pouco explorada empiricamente \citep{hoang2023cryptoVRP, alexanderImeraj2019, almeida2024cryptoVRP}, motivando a investigação central desta dissertação.
+Os mercados de derivativos permitem negociar a volatilidade como um ativo:
+opções, \textit{swaps} de variância e índices de volatilidade implícita, como o
+VIX, transformam a incerteza sobre o preço futuro em algo que se compra e se
+vende \citep{carr2009variance, alexanderImeraj2019}. Nos criptoativos, essa
+incerteza é muito maior que nos mercados tradicionais. Entre 2017 e 2022, a
+volatilidade implícita média das opções de Bitcoin foi de 82\% a.a., muito
+acima da do S\&P~500 \citep{almeida2024cryptoVRP}; na amostra desta
+dissertação, de março de 2021 a março de 2026, foi de $61{,}9\%$ a.a. As
+opções de Bitcoin se concentram na Deribit, a maior bolsa de derivativos de
+criptoativos e a principal fonte de dados dos estudos sobre essas opções
+\citep{almeida2024cryptoVRP}; em 2019 e 2020, quase toda a negociação de opções
+de Bitcoin ocorria nela \citep{alexanderImeraj2019}. Desde 24 de março de 2021,
+a Deribit publica o DVOL, índice de volatilidade implícita de 30 dias
+construído a partir dos preços dessas opções \citep{han2026price}
+(Seção~\ref{sec:refer-dvol}).
 
-Esta dissertação investiga o Prêmio de Risco de Volatilidade do Bitcoin (BVRP), definido como a diferença entre a volatilidade realizada em janela retrospectiva de 30 dias e a volatilidade implícita extraída do índice DVOL da Deribit ($\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}$), em uma amostra diária de 1.775 observações entre março de 2021 e março de 2026. O objetivo central é caracterizar o BVRP em três dimensões complementares: (i) sua existência e magnitude como prêmio de seguro; (ii) seu potencial preditivo, linear e não linear, sobre retornos futuros do Bitcoin em múltiplos horizontes; e (iii) sua utilidade econômica em estratégias condicionais de negociação. A análise é conduzida sob protocolos econométricos contemporâneos que privilegiam inferência robusta: regressões de Mínimos Quadrados Ordinários com erros-padrão de Newey--West calibrados ao horizonte de previsão, intervalos de confiança via \textit{Moving Block Bootstrap}, separação estrita entre conjuntos de treino e teste em modelos de aprendizado de máquina, e janelas expansivas para qualquer cálculo de limiares estatísticos --- evitando o viés de antecipação que contaminaria estratégias de negociação avaliadas \textit{ex-post}.
+O preço da volatilidade nas opções não é uma previsão neutra. Em ações, a
+volatilidade implícita supera, em média, a que se realiza depois: os
+compradores de opções pagam um prêmio para se proteger do risco de
+volatilidade, e esse prêmio prevê os retornos futuros do índice
+\citep{bollerslev2009expected}. Esta dissertação estuda o prêmio de risco de
+volatilidade do Bitcoin (BVRP), a diferença entre a volatilidade histórica (VH)
+dos 30 dias seguintes e a volatilidade implícita (IV) de 30 dias dada pelo
+DVOL, $\text{BVRP}_t = \text{VH}_{t+1:t+30} - \text{IV}_t$. Com essa convenção,
+um prêmio maior corresponde a um BVRP mais negativo. A dissertação responde a
+quatro perguntas: o prêmio existe? Ele pode ser previsto com a informação
+disponível em $t$? O prêmio previsto prevê linearmente os retornos do Bitcoin?
+Um modelo não linear encontra a relação que o linear não encontra?
 
-\section*{Hipóteses e principais resultados}
-\label{sec:intro-hipoteses}
+\section*{Roteiro e resultados}
+\label{sec:intro-roteiro}
 
-Quatro hipóteses estruturam a investigação. A primeira (H1) postula a existência do BVRP como prêmio de seguro genuíno --- e é \textbf{confirmada}: o BVRP médio da amostra é de aproximadamente $-8{,}25$ pontos percentuais, consistente com a interpretação clássica de prêmio pago pelos compradores de opções e em linha com a evidência documentada em mercados tradicionais \citep{carr2009variance, bollerslev2011VRP}. A segunda hipótese (H2), que afirma capacidade preditiva linear do BVRP sobre retornos futuros, \textbf{não é confirmada}: regressões em seis horizontes (1 a 60 dias) produzem coeficientes uniformemente não significativos, com o menor valor-$p$ atingindo apenas $0{,}241$, resultado robusto à reamostragem em blocos e à correção para múltiplos testes. A terceira hipótese (H3), sobre utilidade econômica, é \textbf{parcialmente confirmada}: estratégias baseadas em quantis extremos do BVRP reduzem o \textit{drawdown} máximo de aproximadamente $78\%$ (compra e manutenção) para $38\%$, ainda que sem ganho em \textit{Sharpe ratio}, sugerindo papel defensivo mais do que de geração de alfa. A quarta hipótese (H4), sobre heterogeneidade condicional e não linearidade, é \textbf{parcialmente confirmada}, e a forma da confirmação é reveladora. Por um lado, a não linearidade não resgata a previsibilidade: modelos não paramétricos --- floresta aleatória e \textit{gradient boosting} --- alcançam $R^2$ fora da amostra de apenas $0{,}42$ a $0{,}44$ na previsão do próprio BVRP, praticamente indistinguíveis dos modelos lineares e muito aquém do \textit{benchmark} de persistência ($R^2 = 0{,}94$), que nenhum modelo supervisionado supera. A variável que concentra quase toda a capacidade preditiva é justamente a que discretiza o prêmio corrente em faixas (importância média $|\text{SHAP}|$ cerca de quatro vezes superior à do segundo preditor), confirmando que a informação sobre o BVRP de amanhã está essencialmente em seu valor de hoje. Por outro lado, a dimensão condicional é inequívoca: o prêmio médio varia de $-13{,}20$ p.p. em regimes de baixa volatilidade realizada a $+0{,}66$ p.p. em regimes de alta, praticamente desaparecendo sob estresse. O conjunto indica que o conteúdo informacional do BVRP não reside na previsão pontual de seu nível --- inatingível além da própria persistência da série ---, mas na identificação do estado de volatilidade do mercado, motivando a análise condicional por regimes.
+\textbf{Existência do prêmio.} A dissertação mede o prêmio com a VH dos 30 dias
+seguintes, e não com a dos 30 anteriores, porque a IV de $t$ precifica a
+volatilidade de $t+1$ a $t+30$: só a janela prospectiva cobre o mesmo período.
+A versão com a VH passada,
+$\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$, é conhecida
+em $t$ e serve de variável explicativa, mas supõe que a volatilidade siga um
+passeio aleatório. A única hipótese formal da dissertação (H1) é que o prêmio é
+negativo em média. O teste regride o BVRP numa constante, com erro-padrão de
+Newey--West de 31 defasagens, que cobre a sobreposição entre alvos vizinhos.
+Nas 1.806 datas da amostra, a média é de $-8{,}76$ p.p. ($t = -5{,}15$), e a IV
+supera a VH dos 30 dias seguintes em 72\% das datas: o prêmio existe. A
+distribuição da VH de 30 dias é bimodal, o que indica dois regimes de
+volatilidade; o corte entre eles, de $37{,}3\%$ a.a., é estimado só com os dois
+primeiros anos da amostra, para que nenhuma data seja classificada com
+informação posterior a ela. No regime de baixa volatilidade, a IV supera a VH
+dos 30 dias anteriores, mas não a dos 30 seguintes: a proxy registra um prêmio
+maior nesse regime, e o BVRP, nenhum.
 
-\section*{Contribuições}
+\textbf{Previsão do prêmio.} O BVRP de $t$ só é conhecido em $t+30$ e não pode
+ser usado como variável explicativa, e a proxy aproxima mal a sua realização: a
+correlação entre as duas na mesma data é de $-0{,}02$. Por isso, antes de
+relacionar o prêmio aos retornos, a dissertação prevê o BVRP fora da amostra,
+com 17 variáveis conhecidas em $t$ --- volatilidades históricas de 1 a 90 dias,
+a IV e suas variações, retornos passados e a proxy --- e cinco modelos: MQO,
+Ridge, LASSO, floresta aleatória e XGBoost. Os modelos são reestimados a cada
+30 dias em janela expansiva, e o treino de cada origem exclui os alvos que
+ainda não se realizaram. Na janela expansiva, todos superam a média histórica: o Ridge reduz o erro
+quadrático em 22\%, e o teste de \citet{clark2007approximately} rejeita a
+igualdade com a média para quatro dos cinco modelos, mesmo com a correção para
+múltiplas comparações. A previsibilidade, porém, é modesta: as previsões ficam
+próximas da média e não antecipam os episódios de prêmio positivo. A relação
+entre as variáveis e o prêmio muda entre os regimes dentro da amostra, mas essa
+mudança não melhora a previsão fora dela.
 
-A contribuição desta dissertação é tripla. Empiricamente, constrói e documenta uma série temporal extensa do BVRP do Bitcoin em horizonte de 30 dias, incorporando procedimentos de tratamento de dados específicos para criptoativos --- janelas retrospectivas estritas, eliminação de variáveis não estacionárias da matriz de regressores via testes ADF/KPSS, e tratamento explícito de microestrutura do mercado de derivativos da Deribit \citep{alexanderImeraj2019}. Metodologicamente, aplica um conjunto coerente de procedimentos econométricos para inferência em séries persistentes com retornos sobrepostos (Newey--West com $\text{maxlags} = h$, \textit{Moving Block Bootstrap}, correção FDR de Benjamini--Hochberg), além de protocolo rigoroso de avaliação fora da amostra em modelos de aprendizado de máquina (validação cruzada temporal com \textit{embargo}, janelas expansivas para limiares de regime, substituição de medidas de importância baseadas em impureza por valores SHAP). Aplicadamente, discute as implicações para gestão de risco e desenho de estratégias quantitativas em mercados de opções de Bitcoin, explicitando limitações --- particularmente a baixa precisão estatística das estimativas em uma amostra ainda relativamente curta --- e desafios operacionais de implementação.
+\textbf{Previsibilidade linear dos retornos.} Com o BVRP previsto, a
+dissertação estima a regressão de \citet{bollerslev2009expected}: o retorno do
+Bitcoin nos $h$ dias seguintes, com $h$ de 1 a 60 dias, sobre o prêmio em $t$.
+O BVRP previsto é um regressor gerado, e o erro-padrão usual ignora a incerteza
+da sua estimação \citep{pagan1984}; por isso, a inferência principal usa um
+bootstrap em blocos em dois níveis, que reestima o modelo de previsão em cada
+reamostragem. O coeficiente é negativo nos seis horizontes, na direção de
+\citet{bollerslev2009expected}: um prêmio maior antecede retornos maiores.
+Nenhum horizonte, porém, é significante depois das correções para o regressor
+gerado e para as comparações múltiplas, e o teste conjunto nos seis horizontes
+não rejeita ($p = 0{,}37$); ele só rejeita quando a estimação do BVRP previsto
+é ignorada. A inclinação é mais negativa no regime de baixa volatilidade, mas a
+diferença entre os regimes depende da posição do corte.
 
-\section*{Estrutura da dissertação}
+\textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende
+de um corte fixado de antemão, a dissertação repete o teste com uma floresta
+aleatória, que escolhe sozinha os cortes nas volatilidades e gera o BVRP
+previsto. O coeficiente fica perto de zero em todos os horizontes, e o teste
+conjunto não rejeita ($p = 0{,}96$). As árvores cortam a VH de 30 dias entre
+45\% e 58\% a.a., e não em $37{,}3\%$, e a floresta aplicada direto ao retorno
+também não supera a média histórica de forma significante. O
+Apêndice~\ref{app:estrategias} traduz o prêmio previsto em regras de negociação: nenhuma supera o compra e manutenção
+em índice de Sharpe, e a perda máxima menor vem de ficar fora do mercado na
+maior parte dos dias.
 
-O restante da dissertação está organizado em oito capítulos. O Capítulo~\ref{chap:referencial} apresenta o referencial teórico, com ênfase na formação do BVRP, microestrutura do mercado de derivativos de cripto, regimes de volatilidade e fundamentos de aprendizado de máquina em finanças. O Capítulo~\ref{chap:dados} descreve a construção da amostra, estatísticas descritivas e testes de estacionariedade. O Capítulo~\ref{chap:metodologia} formaliza a estratégia empírica. O Capítulo~\ref{chap:retornos_linear} reporta os resultados das regressões econométricas (teste de H2). O Capítulo~\ref{chap:previsao_bvrp} apresenta os modelos de aprendizado de máquina aplicados à previsão do próprio BVRP, com análise de importância via SHAP (teste de H4). O Apêndice~\ref{app:estrategias} avalia estratégias condicionais baseadas em quantis do BVRP (teste de H3). O Capítulo~\ref{chap:retornos_nao_linear} examina a heterogeneidade condicional do prêmio por regime de volatilidade realizada. O Capítulo~\ref{chap:consideracoes_finais} sintetiza as evidências e aponta extensões para pesquisas futuras.
+Em resumo, o prêmio existe e é grande, e as variáveis disponíveis em $t$
+contêm alguma informação sobre ele, mas o prêmio previsto não prevê os retornos
+do Bitcoin nesta amostra, nem com o modelo linear nem com o não linear. As 987
+previsões, com alvos de 30 dias sobrepostos, equivalem a cerca de 33
+observações independentes; os testes têm pouco poder, e a ausência de
+significância não é evidência de ausência de relação.
 
-% --- [Fase 3, F4] Texto retirado do Cap. 2 (C2.7/D3, 06/10/2026) -------------
-% A comparação com os três artigos de referência vem para esta introdução.
-% Reescrever dizendo o que cada artigo fez e o que esta dissertação acrescenta.
-% Texto original do Cap. 2, Seção "Prêmio de risco de volatilidade":
-%
-% No contexto específico de criptoativos, \citet{alexanderImeraj2019} foram
-% pioneiros ao documentar a existência de prêmio de risco de variância em opções
-% de Bitcoin na Deribit, evidenciando que as peculiaridades microestruturais do
-% mercado --- operação contínua, liquidação em cripto, ausência de
-% \textit{circuit breakers} --- produzem dinâmica de prêmio distinta da observada
-% em equity. \citet{almeida2024cryptoVRP} estendem essa análise documentando
-% relação entre o VRP do Bitcoin e fatores de risco sistêmico em criptoativos, e
-% \citet{hoang2023cryptoVRP} caracterizam empiricamente a distribuição do prêmio
-% em múltiplas criptomoedas, encontrando sinal negativo médio mas com
-% instabilidade temporal substancialmente maior que a documentada em mercados
-% tradicionais.
-% ------------------------------------------------------------------------------
+\section*{Contribuição}
+\label{sec:intro-contribuicao}
+
+Dois trabalhos estudam o prêmio de volatilidade do Bitcoin com dados da
+Deribit. \citet{alexanderImeraj2019} são os primeiros: constroem um índice de
+volatilidade do Bitcoin pelo método do VIX, com mais de 7 milhões de preços de
+opções coletados a cada 15 minutos entre março de 2019 e março de 2020, e medem
+o prêmio pelo resultado de um \textit{swap} de variância, com a variância
+realizada ao longo da vida do contrato --- uma definição prospectiva, com o
+mesmo sinal da adotada aqui. Eles descrevem o prêmio em vencimentos de 7 a 90
+dias, quase sempre negativo a partir de julho de 2019, e sua correlação com o
+prêmio de outros ativos, próxima de zero antes da pandemia e mais alta depois,
+com ações e ouro. \citet{almeida2024cryptoVRP} usam opções da Deribit de julho
+de 2017 a dezembro de 2022 e medem o prêmio pela variância neutra ao risco
+menos a física, com a variância realizada dos 27 dias anteriores --- uma medida
+retrospectiva, com o sinal oposto ao desta dissertação. O prêmio médio, de 0,14
+em variância anualizada, é muito maior que o do S\&P~500. Com dois regimes
+obtidos pelo agrupamento das densidades neutras ao risco na amostra inteira,
+eles encontram prêmio maior no regime de baixa volatilidade. Nenhum dos dois
+prevê o prêmio nem regride o retorno do Bitcoin nele. Em trabalho relacionado,
+\citet{han2026price} usa o DVOL diário desde o início da série, agregado por
+semana: as inovações do índice, resíduos de um AR(1), formam um fator de risco
+de volatilidade do mercado de criptoativos, e a sensibilidade de cada
+criptoativo a esse fator é precificada no corte transversal dos retornos da
+semana seguinte, de dezembro de 2021 a julho de 2024. Ele não mede o prêmio
+de volatilidade.
+
+Esta dissertação acrescenta quatro elementos. Primeiro, a amostra: cinco anos
+de dados diários, de março de 2021 a março de 2026, mais longa que a de
+\citet{alexanderImeraj2019} e mais recente que a de
+\citet{almeida2024cryptoVRP}, porque cobre 2023 a 2026 e a aprovação dos ETFs
+de Bitcoin à vista, em janeiro de 2024. A volatilidade implícita é o mesmo
+índice usado por \citet{han2026price}, o DVOL, e não um índice próprio.
+Segundo, a definição: o prêmio é prospectivo, como em
+\citet{alexanderImeraj2019}, mas em volatilidade, e a proxy retrospectiva entra
+como variável explicativa, e não como o prêmio. Terceiro, a previsão: a
+dissertação prevê o prêmio fora da amostra e usa a previsão na regressão de
+\citet{bollerslev2009expected}, com a inferência corrigida para o regressor
+gerado. Quarto, os regimes: como \citet{almeida2024cryptoVRP}, a dissertação
+usa dois regimes de volatilidade, mas definidos por um corte na VH estimado sem
+informação posterior às datas classificadas. Com a proxy, retrospectiva como a
+medida deles, o prêmio é maior no regime de baixa volatilidade --- média de
+$-13{,}56$ p.p., contra $-7{,}26$ p.p. no de alta, lembrando que prêmio maior é
+BVRP mais negativo ---, o mesmo padrão que eles encontram; com o BVRP
+prospectivo, a diferença se inverte (Seção~\ref{sec:dados-regimes}).
+
+\section*{Organização}
+\label{sec:intro-organizacao}
+
+O Capítulo~\ref{chap:referencial} apresenta o referencial teórico: a
+volatilidade implícita e a histórica, a definição do prêmio, o mercado de
+opções de Bitcoin e os modelos de aprendizado de máquina. O
+Capítulo~\ref{chap:dados} descreve os dados, testa H1 e define os regimes. O
+Capítulo~\ref{chap:metodologia} formaliza as questões, as amostras, os modelos
+e a inferência. O Capítulo~\ref{chap:previsao_bvrp} prevê o BVRP, e os
+Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} testam se
+o BVRP previsto prevê os retornos, com o modelo linear e com o modelo em
+árvore. O Capítulo~\ref{chap:consideracoes_finais} conclui, e a Nota
+Metodológica trata da reprodutibilidade. O Apêndice~\ref{app:estrategias}
+avalia as regras de negociação, e os Apêndices~\ref{app:variaveis},
+\ref{app:scripts} e~\ref{app:pastas} documentam as variáveis, os scripts e a
+estrutura de pastas.
