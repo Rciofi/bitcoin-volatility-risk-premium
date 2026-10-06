@@ -1,7 +1,14 @@
 \chapter*{Resumo}
 \addcontentsline{toc}{chapter}{Resumo}
 
-Esta dissertação investiga o Prêmio de Risco de Volatilidade do Bitcoin (BVRP), definido como a diferença entre a volatilidade realizada em janela retrospectiva de 30 dias e a volatilidade implícita extraída do índice DVOL da Deribit ($\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}$), em uma amostra diária de 1.775 observações entre março de 2021 e março de 2026. A análise documenta que o BVRP é, em média, negativo (aproximadamente $-8{,}25$ pontos percentuais), refletindo um prêmio de seguro pago pelos compradores de opções, em linha com a literatura de criptoativos. Por meio de regressões de Mínimos Quadrados Ordinários com erros-padrão de Newey--West calibrados ao horizonte ($\text{maxlags} = h$), e robustez por \textit{Moving Block Bootstrap}, demonstra-se que o BVRP não apresenta capacidade preditiva linear estatisticamente significativa sobre retornos futuros do Bitcoin em nenhum dos seis horizontes testados (1 a 60 dias). A ausência de previsibilidade linear, contudo, não exclui dimensões condicionais e não lineares: estratégias baseadas em quantis extremos do BVRP reduzem o \textit{drawdown} máximo de aproximadamente 78\% (compra e manutenção) para 38\%, ainda que sem ganho em \textit{Sharpe}; e modelos não paramétricos --- floresta aleatória e \textit{gradient boosting} --- não superam o \textit{benchmark} de persistência na previsão do próprio BVRP ($R^2$ de 0,42--0,44 contra 0,94 da persistência), embora a variável que discretiza o prêmio corrente em faixas emerja como preditor dominante via análise de valores SHAP, indicando que a informação sobre o BVRP futuro está essencialmente em seu valor presente, e não nas demais variáveis explicativas. Os resultados sugerem que o BVRP do Bitcoin constitui prêmio de seguro economicamente relevante e estruturalmente condicional ao regime de mercado, embora desprovido de conteúdo informacional linear sobre a direção dos retornos futuros do ativo subjacente.
+Esta dissertação estuda o prêmio de risco de volatilidade do Bitcoin (BVRP),
+diferença entre a volatilidade histórica dos 30 dias seguintes e a implícita do
+índice DVOL, da Deribit, com dados diários de março de 2021 a março de 2026. O
+BVRP é negativo em média ($-8{,}76$ p.p.): a volatilidade implícita supera a
+que se realiza depois. Modelos lineares e de aprendizado de máquina preveem o
+BVRP fora da amostra melhor que a média histórica, mas com ganho modesto. O
+BVRP previsto não prevê os retornos do Bitcoin nesta amostra, nem com modelo
+linear nem com floresta aleatória.
 
 \vspace{0.5cm}
-\noindent\textbf{Palavras-chave:} Bitcoin; volatilidade implícita; volatilidade realizada; prêmio de risco de volatilidade; DVOL; Deribit; aprendizado de máquina; floresta aleatória; \textit{gradient boosting}; regimes de volatilidade; Newey--West; \textit{Moving Block Bootstrap}; estratégias de negociação.
+\noindent\textbf{Palavras-chave:} Bitcoin; prêmio de risco de volatilidade; volatilidade implícita; DVOL; previsibilidade de retornos; aprendizado de máquina.

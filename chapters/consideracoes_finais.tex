@@ -1,46 +1,76 @@
 \chapter{Considerações Finais}
 \label{chap:consideracoes_finais}
 
-Esta dissertação investigou o Prêmio de Risco de Volatilidade do Bitcoin (BVRP), definido como a diferença entre a volatilidade realizada em janela retrospectiva de 30 dias e a volatilidade implícita extraída do índice DVOL da Deribit, sobre uma amostra diária de 1.775 observações entre março de 2021 e março de 2026. O objetivo foi caracterizar o prêmio em três dimensões complementares: sua existência e magnitude, seu conteúdo preditivo sobre retornos futuros e sua utilidade econômica em estratégias condicionais. As seções seguintes retomam as quatro hipóteses formuladas no Capítulo~\ref{chap:introducao}, explicitam as limitações da análise e apontam extensões.
+Esta dissertação estudou o prêmio de risco de volatilidade do Bitcoin, medido
+pela diferença entre a volatilidade histórica dos 30 dias seguintes e a
+volatilidade implícita dada pelo DVOL, com dados diários de março de 2021 a
+março de 2026. O prêmio existe e é grande: a média do BVRP é de $-8{,}76$ p.p.
+($t = -5{,}15$), e a IV supera a VH dos 30 dias seguintes em 72\% das datas.
+As variáveis conhecidas em $t$ contêm alguma informação sobre o prêmio: na
+janela expansiva, todos os modelos de previsão superam a média histórica fora
+da amostra, e o Ridge reduz o erro quadrático em 22\%. A previsibilidade,
+porém, é modesta, e as previsões não antecipam os episódios de prêmio
+positivo. A medida também muda a leitura dos regimes: com a proxy
+retrospectiva, o prêmio é maior no regime de baixa volatilidade, como em
+\citet{almeida2024cryptoVRP}; com o BVRP prospectivo, a diferença se inverte.
 
-\section{Síntese das evidências}
-\label{sec:concl-sintese}
-
-\textbf{O prêmio existe e é economicamente relevante (H1).} O BVRP médio da amostra é de aproximadamente $-8{,}25$ pontos percentuais, com a volatilidade implícita situando-se sistematicamente acima da realizada. A magnitude e o sinal são consistentes com a interpretação clássica de prêmio de seguro pago pelos compradores de opções, replicando em criptoativos um padrão amplamente documentado em mercados de \emph{equity}. Este é o achado mais robusto da dissertação: não depende de especificação econométrica, mantém-se em todos os subperíodos anuais analisados e é insensível ao sinal do retorno corrente.
-
-\textbf{O prêmio não prediz linearmente os retornos futuros (H2).} Regressões em seis horizontes (1 a 60 dias) produzem coeficientes uniformemente não significativos, com o menor valor-$p$ atingindo 0,241 --- resultado robusto à reamostragem em blocos e à correção para múltiplos testes. A ausência de previsibilidade linear é, portanto, uma conclusão negativa firme, e não um artefato de baixa potência em uma única especificação. O Capítulo~\ref{chap:retornos_nao_linear} reforça esse achado ao mostrar que nem mesmo a interação entre o prêmio e o regime de volatilidade recupera significância estatística convencional.
+O BVRP previsto não prevê os retornos do Bitcoin nesta amostra. No modelo
+linear, o coeficiente é negativo nos seis horizontes, na direção de
+\citet{bollerslev2009expected}, mas nenhum horizonte é significante depois das
+correções para o regressor gerado e para as comparações múltiplas, e o teste
+conjunto não rejeita ($p = 0{,}37$). A floresta aleatória, que escolhe sozinha
+os cortes nas volatilidades, também não encontra a relação: o coeficiente fica
+perto de zero em todos os horizontes, e o teste conjunto não rejeita
+($p = 0{,}96$). Com cerca de 33 observações independentes fora da amostra, os
+testes têm pouco poder, e a ausência de significância não é evidência de
+ausência de relação.
 
 O Apêndice~\ref{app:estrategias} estende a análise a regras simples de negociação com o BVRP previsto, em caráter exploratório: nenhuma delas supera o compra e manutenção em índice de Sharpe no mesmo período, e a menor perda máxima que apresentam decorre da menor exposição ao ativo, não de informação sobre a direção dos retornos.
-
-\textbf{A não linearidade não resgata a previsibilidade, mas a dimensão condicional é inequívoca (H4).} Modelos não paramétricos alcançam $R^2$ fora da amostra de 0,42 a 0,44 na previsão do próprio BVRP --- praticamente indistinguíveis dos modelos lineares e muito aquém do \emph{benchmark} de persistência ($R^2 = 0{,}94$), que nenhum modelo supervisionado supera. Cabe registrar que essa comparação é estruturalmente assimétrica: o \emph{benchmark} utiliza o valor contínuo do prêmio corrente, enquanto os modelos o acessam apenas de forma discretizada, em três faixas. A assimetria, contudo, é reveladora --- é justamente essa variável discretizada que concentra quase toda a capacidade preditiva dos modelos, enquanto retornos defasados, variações de volatilidade e calendário contribuem de forma marginal. Em outras palavras, a informação sobre o prêmio de amanhã está essencialmente no prêmio de hoje, e a categorização em faixas destrói a maior parte dela. A dimensão condicional, por sua vez, é confirmada pela análise do Capítulo~\ref{chap:retornos_nao_linear}: o prêmio médio varia de $-13{,}20$ p.p. em regimes de baixa volatilidade a $+0{,}66$ p.p. em regimes de alta, praticamente desaparecendo sob estresse.
-
-\textbf{Leitura conjunta.} O conteúdo informacional do BVRP não reside na previsão pontual de seu nível --- inatingível além da própria persistência da série --- nem na antecipação da direção dos retornos. O prêmio é grande, persistente e sistematicamente negativo; é essa regularidade estrutural, e não sua variação de curto prazo, que carrega significado econômico. A dissipação do prêmio em regimes de estresse, documentada no Capítulo~\ref{chap:retornos_nao_linear}, é a manifestação mais nítida desse mecanismo: o seguro é caro justamente quando o sinistro não ocorre.
 
 \section{Limitações}
 \label{sec:concl-limitacoes}
 
-\textbf{Extensão amostral.} A amostra cobre cinco anos, período curto para inferência sobre prêmios de risco em um ativo de volatilidade estrutural elevada. A baixa precisão estatística das estimativas --- visível nos intervalos de confiança amplos do Capítulo~\ref{chap:retornos_linear} --- é consequência direta dessa limitação, e não deve ser confundida com evidência de ausência de efeito.
+\textbf{A proxy de passeio aleatório.} A expectativa física da volatilidade
+não é observável. O BVRP mede a realização do prêmio, e a proxy, que aproxima
+sua expectativa, supõe que a volatilidade histórica siga um passeio aleatório
+sem deriva. A proxy aproxima mal a realização do prêmio --- a correlação entre
+as duas na mesma data é de $-0{,}02$ ---, e os resultados que a usam, como a
+diferença do prêmio entre os regimes, dependem dessa hipótese. O BVRP
+previsto, que estima a expectativa com mais variáveis, também a aproxima só de
+forma modesta.
 
-\textbf{Quebra estrutural associada aos ETFs \emph{spot}.} A aprovação dos ETFs \emph{spot} de Bitcoin pela SEC em janeiro de 2024 ocorreu dentro do período amostral e introduziu canal institucional regulado de exposição ao ativo, com potencial efeito sobre a demanda por proteção via opções. A análise trata a amostra como bloco único, hipótese que se justifica pela transição gradual do mercado, mas que não foi testada formalmente.
+\textbf{Dados diários.} A volatilidade histórica é calculada com retornos
+diários. Sem dados intradiários, não é possível estimar a volatilidade
+realizada com a precisão da literatura de alta frequência
+\citep{andersen2003realized} nem separar os movimentos contínuos dos saltos
+nos episódios de estresse, justamente aqueles em que o BVRP fica positivo.
 
-\textbf{Pulverização amostral na análise por regimes.} A decomposição das estratégias condicionais por regime de volatilidade realizada reduz drasticamente o número de observações com sinal ativo em cada célula --- em particular no regime de baixa volatilidade, com apenas 23 observações. Os resultados dessa decomposição são reportados como descritivos e não sustentam inferência confiável.
+\textbf{Período fora da amostra curto.} As 987 previsões cobrem de junho de
+2023 a março de 2026 e, com alvos de 30 dias sobrepostos, equivalem a cerca de
+33 observações independentes. Os testes de previsibilidade dos retornos têm,
+por isso, pouco poder, e uma relação fraca entre o prêmio e os retornos
+poderia passar sem ser detectada.
 
-\textbf{Escolhas de calibração.} O quantil de entrada das estratégias é selecionado a partir do conjunto de limiares testados sobre a amostra completa; embora o limiar seja recalculado em janela expansiva a cada instante, a escolha do percentil de referência utiliza informação de todo o período. Analogamente, os hiperparâmetros dos modelos baseados em árvores adotam valores convencionais, sem otimização sistemática --- pendência reconhecida no Capítulo~\ref{chap:previsao_bvrp}.
+\textbf{Mudança estrutural com os ETFs.} A amostra inclui a aprovação dos ETFs
+de Bitcoin à vista pela SEC, em janeiro de 2024, que abriu um canal regulado
+de exposição ao ativo e pode ter mudado a demanda por proteção com opções. A
+análise trata o período como um bloco único, e a estabilidade dos parâmetros
+antes e depois da aprovação não foi testada. A bimodalidade da VH de 30 dias,
+que define os regimes, também perde nitidez a partir de 2025.
 
-\textbf{Fricções não modeladas.} Os resultados incorporam custos de transação unilaterais de até 10 \emph{bps} por operação, mas não capturam \emph{slippage} em períodos de baixa profundidade, restrições de posicionamento ou fricções de liquidez intradiária, que podem reduzir os ganhos documentados em implementações reais.
+\textbf{Concentração na Deribit.} O DVOL é calculado só com opções da
+Deribit. Como a negociação de opções de Bitcoin se concentra nela, o índice é
+a medida natural da volatilidade implícita do ativo, mas o prêmio medido é o
+dessa bolsa, e a dissertação não o compara com o de opções negociadas em
+outras plataformas.
 
-\section{Extensões para pesquisas futuras}
-\label{sec:concl-extensoes}
+\section{Pesquisa futura}
+\label{sec:concl-pesquisa-futura}
 
-\textbf{Componentes de memória longa.} Os testes de estacionariedade do Capítulo~\ref{chap:dados} indicam que RV, IV e BVRP exibem padrão compatível com processos altamente persistentes --- ADF rejeita a raiz unitária, mas KPSS também rejeita a estacionariedade. A incorporação de componentes no espírito do modelo HAR (médias mensais e trimestrais) como preditores adicionais é a extensão mais natural, e permitiria avaliar se a persistência de longo prazo carrega informação além das defasagens curtas empregadas nesta dissertação.
-
-\textbf{Seleção de variáveis em dois estágios.} A combinação de um estágio de seleção via LASSO com um modelo não paramétrico no segundo estágio permitiria separar o efeito da seleção de preditores do efeito da flexibilidade funcional, hoje confundidos na comparação entre modelos lineares regularizados e modelos baseados em árvores.
-
-\textbf{Teste formal da quebra estrutural.} A hipótese de estabilidade dos parâmetros ao longo do período amostral pode ser testada por procedimentos como Chow, CUSUM ou janelas móveis de regressão centradas na data de aprovação dos ETFs. A estimação separada para os subperíodos pré e pós-ETF permitiria avaliar se o sinal e a magnitude do prêmio de seguro se modificaram após o ingresso institucional pleno.
-
-\textbf{Estrutura a termo do prêmio.} Esta dissertação restringe-se ao horizonte de 30 dias, alinhado ao índice DVOL. A extensão para múltiplos vencimentos permitiria caracterizar a estrutura a termo do prêmio e verificar se a dissipação em regimes de estresse é uniforme ao longo da curva ou concentrada em vencimentos curtos.
-
-\section{Observação final}
-\label{sec:concl-final}
-
-O resultado central desta dissertação é, em larga medida, negativo: o BVRP do Bitcoin não prevê retornos. Essa conclusão tem valor próprio. A literatura de criptoativos convive com um viés de publicação favorável a achados positivos, frequentemente obtidos sob protocolos que não controlam viés de antecipação, sobreposição de janelas ou múltiplos testes. Documentar com rigor que um sinal economicamente plausível \emph{não} carrega previsibilidade direcional --- e simultaneamente identificar onde seu conteúdo informacional de fato reside --- é contribuição tão legítima quanto a demonstração de um efeito. O prêmio de risco de volatilidade do Bitcoin é real, é grande e é informativo sobre o estado do mercado; não é, contudo, um preditor de retornos.
+Duas extensões decorrem dessas limitações. Com dados intradiários, a
+volatilidade realizada poderia ser estimada com mais precisão e separada em
+componentes contínuo e de saltos, e a expectativa física poderia vir de modelos
+de previsão da variância, como em \citet{bekaert2014vix}, no lugar do passeio
+aleatório. À medida que o período posterior aos ETFs se alonga, a estabilidade
+do prêmio e da sua relação com os retornos antes e depois da aprovação poderá
+ser testada com mais observações independentes.

@@ -1,7 +1,15 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-This dissertation investigates the Bitcoin Volatility Risk Premium (BVRP), defined as the difference between the 30-day backward-looking realized volatility and the implied volatility extracted from Deribit's DVOL index ($\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}$), over a daily sample of 1,775 observations from March 2021 to March 2026. The premium is, on average, negative (approximately $-8.25$ percentage points), consistent with an insurance premium paid by option buyers, as documented in the cryptoasset literature. Using ordinary least squares regressions with Newey--West standard errors calibrated to the horizon ($\text{maxlags} = h$) and robustness via \textit{Moving Block Bootstrap}, we show that the BVRP exhibits no statistically significant linear predictive power over future Bitcoin returns at any of the six horizons tested (1 to 60 days). The absence of linear predictability, however, does not preclude conditional and nonlinear dimensions: strategies based on extreme quantiles of the BVRP reduce maximum drawdown from approximately 78\% (buy-and-hold) to 38\%, albeit with no Sharpe-ratio gain; and nonparametric models --- random forest and gradient boosting --- do not outperform the persistence \textit{benchmark} in predicting the BVRP itself (out-of-sample $R^2$ of 0.42--0.44 versus 0.94 for persistence), although the variable that discretizes the current premium into bands emerges as the dominant predictor via SHAP value analysis, indicating that information about the future BVRP lies essentially in its present value rather than in the remaining explanatory variables. The results suggest that the Bitcoin VRP constitutes an economically meaningful insurance premium that is structurally conditional on the market regime, while being devoid of linear informational content about the direction of future returns of the underlying asset.
+This dissertation studies the Bitcoin volatility risk premium (BVRP), the
+difference between the historical volatility over the following 30 days and
+the implied volatility of Deribit's DVOL index, using daily data from March
+2021 to March 2026. The BVRP is negative on average ($-8.76$ percentage
+points): implied volatility exceeds the volatility subsequently realized.
+Linear and machine learning models forecast the BVRP out of sample better than
+the historical mean, but the gain is modest. The forecast BVRP does not predict
+Bitcoin returns in this sample, either with a linear model or with a random
+forest.
 
 \vspace{0.5cm}
-\noindent\textbf{Keywords:} Bitcoin; implied volatility; realized volatility; volatility risk premium; DVOL; Deribit; machine learning; random forest; gradient boosting; volatility regimes; Newey--West; Moving Block Bootstrap; trading strategies.
+\noindent\textbf{Keywords:} Bitcoin; volatility risk premium; implied volatility; DVOL; return predictability; machine learning.
