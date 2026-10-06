@@ -200,7 +200,7 @@ da amostra; (ii) primeira janela de 730 obs., janela móvel de 730 e reestimaç�
 | `code/regenerate_cap5.py`, `scripts/regenerate_cap9.py` | `vrp_with_targets.csv` / `vrp_with_regimes.csv` | retornos futuros | **amostra inteira** (regressões dentro da amostra) | — | — | — | sim |
 | `scripts/regenerate_cap7.py`, `code/analyze_vrp_regimes.py` | `vrp_with_regimes.csv` / `vrp_with_targets.csv` | — | limiar em janela expansiva com mínimo de 252 obs. (não é treino/teste) | — | — | — | sim |
 
-**Para o texto (C4.2) — dizer explicitamente:** nenhuma divisão antiga tinha embargo entre treino
+**[Para o relatório ao orientador, não para o texto.]** ~~Para o texto (C4.2) — dizer explicitamente:~~ nenhuma divisão antiga tinha embargo entre treino
 e teste nem reestimação; todas eram uma única divisão fixa por proporção (70/30, 70/15/15 ou 80/20).
 **O Cap. 8 publicado usava uma única divisão 70/30, sem intervalo entre treino e teste.** O protocolo
 novo (T8) substitui isso por origens com reestimação a cada 30 dias, janela expansiva e embargo
@@ -299,7 +299,7 @@ Realizado fora da amostra: média −5,3; positivo em 290 de 987 dias (29%).
 | Achado | Tarefa |
 |---|---|
 | **Comparação múltipla (5 modelos contra a média; Bonferroni, limite 0,05/5 = 0,01).** Clark–West: sobrevivem Ridge, floresta aleatória, XGBoost e MQO (não o LASSO, p = 0,016), nas duas janelas. Diebold–Mariano: **nenhum sobrevive** (o menor é o do Ridge, p = 0,042). **O texto do Cap. 5 deve apoiar a conclusão principal no Clark–West, mencionando a correção.** Ressalva: o CW ajusta pelo ruído de estimação a favor do modelo maior e pode ser significante mesmo com R² fora da amostra negativo (MQO na móvel: R² = −0,037, CW p = 0,004); e 987 previsões com alvos sobrepostos equivalem a ~33 observações independentes. | **C5**, T5 |
-| **XGBoost: o sobreajuste da 1ª rodada (R² dentro da amostra 0,67, fora −0,08) vinha da grade truncada.** Com a grade estendida, a validação cruzada escolhe árvores de profundidade 1 com taxa de 0,01, e a distância some (0,16 dentro, 0,10 fora). Registrar no texto que a grade inicial não permitia regularização suficiente. | **C5**, T7 |
+| **XGBoost: o sobreajuste da 1ª rodada (R² dentro da amostra 0,67, fora −0,08) vinha da grade truncada.** Com a grade estendida, a validação cruzada escolhe árvores de profundidade 1 com taxa de 0,01, e a distância some (0,16 dentro, 0,10 fora). Registrar ~~no texto~~ que a grade inicial não permitia regularização suficiente **[Para o relatório ao orientador, não para o texto.]** | **C5**, T7 |
 | **LASSO × MQO: regularização efetiva** (diferença máxima de 25,4 p.p. e correlação de 0,34 entre as previsões, janela expansiva), ao contrário do T6. No limite, o LASSO **zera todos os coeficientes e prevê exatamente a média histórica** em 12 das 33 origens (26 de 33 na móvel) — daí 100% de previsões negativas e R² idêntico nas duas rodadas. | **C5.2** |
 | **Nenhum modelo antecipa os episódios positivos** (ex.: fev/2026, +45). Nos 290 dias com prêmio positivo, todas as previsões médias são negativas (−2,3 a −8,7). As previsões **encolhem para a média por baixa previsibilidade, não por erro de especificação** (diferente do T6). | **C5**, F2 |
 | **Limites da grade depois da extensão:** Ridge e LASSO escolhem valores interiores (0 origens nos limites). As árvores continuam no limite de **menor capacidade**: floresta com profundidade 1 em 33/33 origens (25/33 na móvel); XGBoost com taxa 0,01 em 33/33, 50 árvores em 22/33 e profundidade 1 em 28/33. Esse limite é estrutural: árvores de profundidade 1 com encolhimento máximo já se aproximam da média histórica (desvio-padrão das previsões de 2,0–2,3 contra 4,5 do Ridge); estender mais só aproximaria da média. É evidência de **sinal não linear fraco**. | **T7**, **T11**, C5 |
@@ -416,7 +416,7 @@ janela expansiva). Horizontes h = 1, 5, 10, 20, 30, 60; EP de Newey–West com h
 
 ### 11.1 Regressor gerado: bootstrap em blocos em dois níveis
 
-- **Desenho abandonado (registrar no Cap. 6, nota metodológica).** O primeiro desenho reamostrava
+- **[Para o relatório ao orientador, não para o texto.]** **Desenho abandonado** ~~(registrar no Cap. 6, nota metodológica)~~. O primeiro desenho reamostrava
   a série inteira em blocos e aplicava as origens de previsão por posição. Com isso, as "datas
   fora da amostra" de cada reamostragem misturavam épocas, e o bootstrap estimava outro
   parâmetro: a média dos β* ficou perto de zero, e o IC não continha β̂ em nenhuma das 24
@@ -459,7 +459,7 @@ janela expansiva). Horizontes h = 1, 5, 10, 20, 30, 60; EP de Newey–West com h
   fora da amostra; "não significante" nesses horizontes **não** é evidência de ausência de
   relação.
 - **Comparações múltiplas:** 6 horizontes; reportar quais sobrevivem a Bonferroni (0,0083).
-- **Tabelas publicadas do Cap. 5:** usavam maxlags = h; `publicado_h_vs_h1_T10.csv` mostra o
+- **[Para o relatório ao orientador, não para o texto.]** **Tabelas publicadas do Cap. 5:** usavam maxlags = h; `publicado_h_vs_h1_T10.csv` mostra o
   efeito de passar a h+1 (T3) nos mesmos dados (N = 1.806, proxy `vrp_30d`).
 
 ### 11.3 T12 — dispersão BVRP × retorno de 30 dias
@@ -520,7 +520,7 @@ previsto (β × 100 dos CSVs).
   interação): p < 0,05 só em h = 60 (0,035). **Com o corte expansivo, não se sustenta:** interação
   com p ≥ 0,06 e Wald com p ≥ 0,16. **Para o texto:** a diferença entre regimes é frágil (some
   com o corte expansivo) e deve ser apresentada como **sugestiva**, não como resultado.
-- **Publicado (proxy `vrp_30d`, N = 1.806):** β ≈ 0 em todos os h (p de 0,17 a 0,93). Passar de
+- **[Para o relatório ao orientador, não para o texto.]** **Publicado (proxy `vrp_30d`, N = 1.806):** β ≈ 0 em todos os h (p de 0,17 a 0,93). Passar de
   maxlags = h para h+1 muda o EP em −3% a +1%: irrelevante aqui. A proxy na amostra inteira não
   mostra a relação que o BVRP previsto mostra fora da amostra; a comparação mistura amostra
   (1.806 × 987 datas) e regressor (proxy × previsão).
@@ -854,3 +854,12 @@ Registradas na reescrita do Cap. 2. Os metadados das entradas novas foram confer
 | Data de 2026 nas legendas | O plano diz "dados até julho/agosto"; a amostra termina em **03/03/2026**. Legendas e eixo usam a data real (1º/01 a 03/03/2026, N = 62). O primeiro ano também é incompleto (24/03 a 31/12/2021, N = 283) e ganhou a mesma marcação | **C3.2** |
 | Geradores do Cap. 3 | `build_desc_stats_T1.py`, `plot_cap3_T1.py`, `plot_vrp_vs_return_T12.py` e `regimes_T9.py` ganharam `--publicar-cap3` (cópia para `tables/cap3/` e `figs/cap3/` com os nomes do .tex) e rótulos na notação da seção 14. Os cálculos não mudaram | **C3** |
 | Citações do H1 | `newey1987simple` (convenção de pesos de Bartlett, h+1 defasagens) e `newey1994automatic` (regra automática do statsmodels, L = 7), conforme a anotação da p. 45 (*"fazer uma referência mais precisa à regra"*). Usar as mesmas chaves no C4.4 | **C3.3**, C4.4 |
+
+## 17. Cap. 4 (Fase 2, 06/10/2026)
+
+| Item | Registro | Tarefa |
+|---|---|---|
+| **Numeração das hipóteses** | O Cap. 4 passou a organizar a análise por questão e capítulo (existência, Cap. 3; previsão do BVRP, Cap. 5; previsibilidade linear, Cap. 6; não linear, Cap. 7; estratégias no apêndice) e só mantém "H1". **O Cap. 1 ainda numera H1 a H4 na estrutura antiga** (H3 = estratégias, H4 = aprendizado de máquina) e precisa ser alinhado | **F3** |
+| Regra para o texto | Os capítulos descrevem o método atual; a comparação com versões anteriores da dissertação vai para o relatório ao orientador. Trechos marcados nas seções 7.1, 9.1, 11.1, 11.2 e 11.4 | Fase 2 |
+| Citações novas | `campbell2008predicting`, `clark2007approximately`, `diebold1995comparing` e `pagan1984` (metadados conferidos pelo usuário) | C4, C5, C6 |
+| **Ordem dos capítulos e referências cruzadas** | O `frontmatter/main.tex` ainda inclui os capítulos na ordem antiga (cap5_resultados_ols, cap6_ml_unificado, cap7_estrategias, cap8_regimes). Na reescrita dos Caps. 5 a 7, ajustar o `main.tex` à estrutura-alvo do plano (Cap. 5 = previsão do BVRP, atual Cap. 6; Cap. 6 = modelo linear, atual Cap. 5; Cap. 7 = não linear, atual Cap. 8; estratégias no apêndice) e conferir que nenhum capítulo menciona número de capítulo escrito à mão (sempre `\ref`) | **C5–C7**, F8 |

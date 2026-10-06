@@ -1,206 +1,268 @@
-﻿\chapter{Metodologia}
+\chapter{Metodologia}
 \label{chap:metodologia}
 
 Este capítulo apresenta a metodologia empírica adotada para investigar a
 existência e as propriedades do prêmio de risco de volatilidade no mercado de
 Bitcoin, bem como seu conteúdo informacional para a previsão de retornos futuros
 do ativo. Com base nas evidências descritivas apresentadas no
-Capítulo~\ref{chap:dados}, são formuladas as hipóteses de pesquisa e
-especificados os modelos econométricos e preditivos utilizados ao longo da
-dissertação.
+Capítulo~\ref{chap:dados}, o capítulo define as questões de pesquisa, as
+variáveis, as amostras e os modelos utilizados ao longo da dissertação.
 
-A estratégia empírica combina modelos econométricos lineares de referência com
-abordagens mais flexíveis, incluindo técnicas de aprendizado de máquina, com
-o objetivo de capturar possíveis não linearidades, variação temporal de
-parâmetros e interações complexas características do mercado de criptoativos.
-Este capítulo concentra-se na definição formal das hipóteses, das variáveis e
-das especificações empíricas, enquanto os resultados são apresentados nos
+A estratégia empírica tem duas etapas. Na primeira, a dissertação prevê o BVRP
+fora da amostra, apenas com informação disponível em $t$. Na segunda, testa se
+o BVRP previsto prevê os retornos futuros do Bitcoin, primeiro com um modelo
+linear e depois com um modelo não linear em árvore, capaz de capturar
+não linearidades, efeitos de regime e interações características do mercado de
+criptoativos. Este capítulo concentra-se na definição formal das variáveis, das
+amostras e das especificações empíricas; os resultados são apresentados nos
 capítulos subsequentes.
 
 % =========================================================
-\section{Questões de pesquisa e hipóteses}
+\section{Questões de pesquisa}
 \label{sec:hipoteses}
 
-A análise empírica desenvolvida nesta dissertação é guiada por duas questões
-centrais. A primeira refere-se à existência de um prêmio de risco de
-volatilidade estatisticamente e economicamente relevante no mercado de opções
-de Bitcoin. A segunda diz respeito ao potencial conteúdo informacional desse
-prêmio para a previsão de retornos futuros do Bitcoin no mercado à vista.
+Quatro questões guiam a análise empírica, cada uma tratada em um capítulo:
 
-As hipóteses de trabalho que orientam a análise empírica desta dissertação
-estão formalmente enunciadas no Capítulo~\ref{chap:introducao}
-(Seção~\ref{sec:cap1-hipoteses}). Para fins de operacionalização, cada uma
-é testada por procedimentos específicos detalhados nas seções seguintes:
-H1~(existência do prêmio) é avaliada por teste~$t$ sobre a média amostral
-do BVRP, com erro-padrão HAC (Newey--West, 30 defasagens) para acomodar a
-persistência da série (Seção~\ref{sec:cap5-h1}); H2~(previsibilidade linear) é avaliada por regressões MQO com
-erros-padrão HAC (Newey--West, $\text{maxlags} = h$) em múltiplos horizontes;
-H3~(utilidade econômica) é avaliada por estratégias condicionais baseadas em
-quantis do BVRP; e H4~(heterogeneidade condicional e não linearidade) é
-avaliada por modelos de aprendizado de máquina com variáveis de estado de
-mercado. Cada procedimento segue protocolos metodológicos próprios detalhados
-nas seções correspondentes.
+\begin{enumerate}
+    \item \textbf{Existência do prêmio (H1)}: o BVRP é negativo em média? O
+          Capítulo~\ref{chap:dados} (Seção~\ref{sec:h1}) responde com um teste
+          $t$ sobre a média, com erro-padrão de Newey--West de $h+1$
+          defasagens (Seção~\ref{sec:inferencia}).
+    \item \textbf{Previsão do prêmio}: a informação disponível em $t$ prevê o
+          BVRP fora da amostra melhor que a média histórica? O
+          Capítulo~\ref{chap:cap5_ml} compara modelos lineares e em árvore.
+    \item \textbf{Previsibilidade linear dos retornos}: o BVRP previsto prevê
+          linearmente os retornos futuros do Bitcoin? O
+          Capítulo~\ref{chap:resultados_ols} estima regressões lineares em seis
+          horizontes.
+    \item \textbf{Previsibilidade não linear}: um modelo em árvore, que escolhe
+          sozinho os cortes nas volatilidades, encontra a relação que o modelo
+          linear não encontra? O Capítulo~\ref{chap:regimes} responde.
+\end{enumerate}
 
+As estratégias de negociação baseadas no prêmio ficam em apêndice
+(Capítulo~\ref{chap:estrategias}), como análise exploratória.
 
 % =========================================================
 \section{Definição das variáveis e horizontes de previsão}
 \label{sec:variaveis_horizontes}
 
-Nesta seção são definidas formalmente as variáveis utilizadas nos modelos
-empíricos, bem como os horizontes temporais considerados na análise. Todas as
-variáveis são construídas a partir das séries descritas no
-Capítulo~\ref{chap:dados}, respeitando estritamente a informação disponível no
-tempo $t$, de modo a evitar viés de \textit{look-ahead}.
+Esta seção define formalmente as variáveis utilizadas nos modelos empíricos,
+bem como os horizontes temporais considerados na análise. Todas as variáveis
+são construídas a partir das séries descritas no Capítulo~\ref{chap:dados}.
 
-A variável dependente principal é o retorno futuro do Bitcoin no mercado
-\textit{spot}, definido como o retorno simples acumulado ao longo de um
-horizonte de $h$ dias:
+A variável dependente dos Capítulos~\ref{chap:resultados_ols}
+e~\ref{chap:regimes} é o retorno futuro do Bitcoin no mercado à vista, definido
+como o retorno simples acumulado ao longo de um horizonte de $h$ dias:
 \[
 R_{t+h} = \frac{P_{t+h}}{P_t} - 1,
 \]
-em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e $R_{t+h}$
-o retorno simples acumulado no horizonte de $h$ dias. Adota-se o retorno simples
-para a variável dependente por corresponder ao retorno efetivo de uma posição no
-ativo; a volatilidade realizada, por sua vez, é construída a partir de retornos
-logarítmicos diários, convenção padrão para agregação temporal de variância.
-$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão.
+em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e
+$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão. O retorno
+simples corresponde ao retorno efetivo de uma posição no ativo; a volatilidade
+histórica, por sua vez, é construída a partir de log-retornos diários,
+convenção padrão para agregação temporal de variância.
 
-A principal variável explicativa é o prêmio de risco de volatilidade observado
-no tempo $t$, definido como a diferença entre a volatilidade realizada no mercado
-à vista e a volatilidade implícita extraída do mercado de opções, ambas
-construídas em janelas móveis de 30 dias:
+A variável-alvo do Capítulo~\ref{chap:cap5_ml} é o BVRP,
+$\text{BVRP}_t = \text{VH}_{t+1:t+30} - \text{IV}_t$, definido na
+Seção~\ref{sec:vrp-teorico}. Ele só é conhecido em $t+30$ e, por isso, nunca
+entra como variável explicativa. A versão conhecida em $t$ é a proxy,
 \[
-\text{BVRP}_t = \text{RV}_{30,t} - \text{IV}_{30,t}.
+\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t,
 \]
-Essa variável sintetiza a percepção de risco e incerteza futura implícita nos
-preços das opções de Bitcoin. Em especificações alternativas, são também
-consideradas a volatilidade implícita ($\text{IV}_{30,t}$) e a volatilidade
-realizada ($\text{RV}_{30,t}$) isoladamente como controles adicionais.
+que supõe um passeio aleatório sem deriva para a volatilidade histórica: a
+melhor previsão da VH dos próximos 30 dias seria a VH dos últimos 30. A
+Seção~\ref{sec:vrp-teorico} discute essa hipótese, sabidamente uma
+simplificação. Na amostra completa, a correlação entre a proxy e o BVRP na
+mesma data é de $-0{,}02$: a proxy aproxima mal a realização do prêmio, o que
+motiva prevê-lo com um conjunto mais amplo de variáveis.
 
-Todas as variáveis explicativas são medidas no tempo $t$, garantindo que
-estariam disponíveis aos agentes econômicos no momento da formação das
-expectativas. A consideração de múltiplos horizontes de previsão permite
-investigar se o conteúdo informacional do BVRP se manifesta de forma distinta
-ao longo do tempo.
+As variáveis explicativas, todas conhecidas em $t$, são 17, em quatro grupos:
+(i) a volatilidade histórica de 1, 5, 30, 60 e 90 dias, em que as três
+primeiras seguem a estrutura diária, semanal e mensal do modelo HAR de
+\citet{corsi2009har}; (ii) a volatilidade implícita de 30 dias, suas variações
+em 1 e 5 dias e seus desvios em relação às médias móveis de 5 e 30 dias;
+(iii) o log-retorno diário, os log-retornos acumulados de 5 e 30 dias e o log
+do preço relativo à sua média móvel de 30 dias; e (iv) a proxy, sua variação
+diária e o prêmio realizado defasado,
+$\text{VH}_{t-29:t} - \text{IV}_{t-30}$, isto é, o BVRP de $t-30$, que se
+realiza em $t$. As séries com evidência robusta de raiz unitária --- o preço e
+as médias móveis da IV --- entram transformadas; as volatilidades, persistentes,
+entram em nível. Como $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} -
+\text{IV}_t$ por construção, os modelos lineares excluem a VH de 30 dias para
+evitar colinearidade perfeita. O Capítulo~\ref{chap:cap5_ml} traz o dicionário
+completo das variáveis.
 
 % =========================================================
-\section{Modelos econométricos de referência}
+\section{Amostras e janela de estimação}
+\label{sec:amostras}
+
+A dissertação usa duas amostras. A amostra completa, com 1.806 observações
+diárias de 24/03/2021 a 03/03/2026, serve à análise descritiva e ao teste de H1
+(Capítulo~\ref{chap:dados}). A amostra de modelagem, com 1.776 observações de
+23/04/2021 a 03/03/2026, serve aos Capítulos~\ref{chap:cap5_ml},
+\ref{chap:resultados_ols} e~\ref{chap:regimes}. Ela começa 30 dias depois porque
+o prêmio realizado defasado exige a IV de $t-30$, e o índice DVOL só existe a
+partir de 24/03/2021. As duas amostras terminam em 03/03/2026, o último dia
+com retorno de 60 dias à frente. O alvo do Capítulo~\ref{chap:cap5_ml} só
+precisa de 30 dias à frente, mas uma única amostra de modelagem torna os
+resultados dos três capítulos comparáveis.
+
+Os modelos de previsão são estimados numa subamostra e avaliados fora dela, em
+origens de previsão sucessivas. A primeira janela de estimação tem 730 dias,
+de 23/04/2021 a 22/04/2023. Em cada origem $t$, o modelo é estimado apenas com
+as datas $s \le t - h$ --- o embargo: o alvo de $s$ olha $h$ dias à frente e só
+é conhecido em $s + h$ --- e prevê as datas de $t$ até a véspera da origem
+seguinte, sempre com as variáveis explicativas da própria data. No
+Capítulo~\ref{chap:cap5_ml}, $h = 30$, o horizonte do BVRP. O modelo é
+reestimado a cada 30 dias. A primeira origem é 21/06/2023, e o período fora da
+amostra tem 987 datas (de 21/06/2023 a 03/03/2026), em 33 origens. Esse período
+é o mesmo nos Capítulos~\ref{chap:cap5_ml} a~\ref{chap:regimes}, porque o
+regressor dos Capítulos~\ref{chap:resultados_ols} e~\ref{chap:regimes} é o BVRP
+previsto no Capítulo~\ref{chap:cap5_ml}.
+
+Na janela principal, expansiva, o treino acumula todas as datas desde o início
+da amostra de modelagem; como robustez, a janela móvel mantém os últimos 730
+dias. Os hiperparâmetros dos modelos regularizados e em árvore são escolhidos
+por validação cruzada embargada em cada reestimação: cinco dobras expansivas
+dentro do treino da origem, com o mesmo embargo --- numa dobra cuja validação
+começa em $v$, o treino da dobra usa $s \le v - h$.
+
+% =========================================================
+\section{Modelos econométricos}
 \label{sec:modelos_referencia}
 
-Esta seção apresenta os modelos econométricos de referência utilizados para
-avaliar a relação entre o prêmio de risco de volatilidade do Bitcoin e os
-retornos futuros do ativo. O objetivo desses modelos é estabelecer uma linha de
-base empírica simples, transparente e comparável à literatura existente, antes
-da introdução de abordagens mais flexíveis e não lineares.
+Um modelo é uma especificação com suas premissas; o método de mínimos
+quadrados ordinários (MQO) é um estimador. Nas especificações lineares desta
+seção, o MQO é o estimador padrão, adequado sob a condição de ortogonalidade
+$E(\varepsilon \mid X) = 0$, em que $\varepsilon$ é o erro e $X$, o vetor de
+regressores.
 
-Os modelos são especificações lineares estimadas por mínimos quadrados
-ordinários (MQO) sobre a amostra completa disponível, nas quais os retornos
-futuros do Bitcoin são explicados pelo prêmio de risco de volatilidade observado
-no período anterior.
+\subsection{Previsão do prêmio}
 
-\subsection{Especificação básica}
-
-A especificação econométrica básica é dada por:
+O Capítulo~\ref{chap:cap5_ml} modela o BVRP como função das variáveis
+explicativas,
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_h \, \text{BVRP}_t + \varepsilon_{t+h},
+\text{BVRP}_t = f(X_t) + u_t,
+\label{eq:previsao_bvrp}
+\end{equation}
+em que $X_t$ reúne as 17 variáveis da Seção~\ref{sec:variaveis_horizontes}. No
+modelo linear, $f(X_t) = X_t'\gamma$, estimado por MQO, Ridge ou LASSO; nos
+modelos em árvore, $f$ é estimada por floresta aleatória ou por XGBoost
+(Capítulo~\ref{chap:referencial}). As referências são a média histórica, a
+proxy e o prêmio realizado defasado (Seção~\ref{sec:avaliacao_oos}).
+
+\subsection{Retornos e BVRP previsto: modelo linear}
+
+O Capítulo~\ref{chap:resultados_ols} estima, para cada horizonte $h$, o modelo
+linear
+\begin{equation}
+R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
 \label{eq:ols_basico}
 \end{equation}
-em que $R_{t+h}$ representa o retorno acumulado do Bitcoin no horizonte $h$,
-$\text{BVRP}_t$ denota o prêmio de risco de volatilidade observado no tempo $t$,
-$\alpha_h$ é um intercepto específico ao horizonte de previsão,
-$\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$ representa o termo
-de erro.
+em que $\widehat{\text{BVRP}}_t$ é o BVRP previsto para a data $t$ pelo modelo
+estimado na origem vigente, $\alpha_h$ é um intercepto específico ao horizonte
+de previsão, $\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$
+representa o termo de erro. O estimador é o MQO, aplicado às 987 datas fora da
+amostra. A previsão principal vem do Ridge, e a da floresta aleatória serve de
+robustez --- escolha fixada antes de ver os resultados. A análise não impõe
+restrições \textit{a priori} sobre o sinal de $\beta_h$.
 
-O coeficiente $\beta_h$ captura a relação marginal entre o prêmio de risco de
-volatilidade e os retornos futuros do Bitcoin. A análise empírica não impõe
-restrições \textit{a priori} sobre o sinal desse coeficiente, permitindo que os
-dados determinem a direção da relação. As regressões são estimadas separadamente
-para cada horizonte de previsão, permitindo avaliar como o efeito do BVRP varia
-ao longo do tempo.
-
-\subsection{Extensão com variáveis de controle}
-
-Para avaliar a robustez dos resultados, a especificação básica é estendida com
-a inclusão da volatilidade realizada e da volatilidade implícita como regressores
-individuais, sem o BVRP:
+Duas extensões complementam o modelo~\eqref{eq:ols_basico}. A primeira
+substitui o prêmio por seus componentes:
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_{1,h} \, \text{RV}_t + \beta_{2,h} \,
+R_{t+h} = \alpha_h + \beta_{1,h} \, \text{VH}_{t-29:t} + \beta_{2,h} \,
 \text{IV}_t + \varepsilon_{t+h}.
 \label{eq:ols_controles}
 \end{equation}
+Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença $\text{VH} - \text{IV}$
+sintetiza o conteúdo informacional conjunto das duas medidas. A segunda
+acrescenta o regime de volatilidade:
+\begin{equation}
+R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \delta_h \, D_t
++ \gamma_h \, D_t \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
+\label{eq:ols_regime}
+\end{equation}
+em que $D_t = 1$ no regime de alta volatilidade
+(Seção~\ref{sec:regimes_metodo}).
 
-Essa formulação evita a colinearidade perfeita que surgiria ao incluir
-$\text{BVRP}_t$, $\text{RV}_t$ e $\text{IV}_t$ simultaneamente, uma vez que
-$\text{BVRP}_t \equiv \text{RV}_t - \text{IV}_t$ por construção. O teste de
-robustez consiste em verificar se os coeficientes estimados satisfazem
-$\hat{\beta}_{1,h} \approx -\hat{\beta}_{2,h}$: caso positivo, o BVRP
-sintetiza de forma suficiente o conteúdo informacional conjunto das duas
-medidas de volatilidade. Os resultados e a interpretação econômica são
-apresentados no Capítulo 5.
+\subsection{Retornos e BVRP previsto: modelo em árvore}
 
-\subsection{Inferência estatística}
-
-A inferência estatística é conduzida com erros padrão robustos à
-heterocedasticidade e à autocorrelação serial, reconhecendo que retornos
-financeiros frequentemente exibem tais características. Em particular, são
-utilizados erros padrão do tipo HAC (Newey--West), com número de defasagens
-compatível com o horizonte de previsão considerado, de modo a acomodar a
-sobreposição temporal inerente à construção dos retornos acumulados.
-
-A significância estatística dos coeficientes é avaliada por meio de testes $t$,
-enquanto a relevância econômica é analisada a partir da magnitude, sinal e
-estabilidade dos coeficientes estimados ao longo dos diferentes horizontes e
-especificações.
+O Capítulo~\ref{chap:regimes} reestima o modelo~\eqref{eq:ols_basico} com
+$\widehat{\text{BVRP}}_t = \hat{f}(X_t) - \text{IV}_t$, em que $\hat{f}$ é uma
+floresta aleatória que prevê $\text{VH}_{t+1:t+30}$ com as mesmas variáveis,
+origens e embargo. A floresta escolhe sozinha os cortes nas volatilidades, o
+que substitui os regimes construídos à mão por um único modelo em árvore. Como
+robustez, a floresta prevê o BVRP diretamente, e o Ridge é estimado nas duas
+formas.
 
 % =========================================================
-\section{Estratégia empírica e procedimento de estimação}
-\label{sec:estrategia_empirica}
+\section{Inferência estatística}
+\label{sec:inferencia}
 
-A análise econométrica é conduzida em frequência diária, respeitando a ordenação
-temporal das informações. Em todas as especificações, as variáveis explicativas
-são observadas no tempo $t$, enquanto as variáveis dependentes correspondem a
-retornos acumulados em horizontes futuros $t+h$, assegurando que apenas
-informação disponível \textit{ex ante} seja utilizada na previsão.
+Os retornos de $h$ dias de datas vizinhas compartilham $h-1$ retornos diários,
+e os alvos de 30 dias compartilham até 29. A sobreposição permanece nos dados e
+induz autocorrelação nos erros, que não reflete necessariamente dependência
+econômica. O erro-padrão HAC de Newey--West não elimina esse problema: ele o
+contorna, sob certas condições --- estacionariedade e dependência que decai com
+a defasagem ---, tornando a inferência assintoticamente válida. A dissertação
+usa o núcleo de Bartlett com $h+1$ defasagens, sendo $h$ o horizonte de
+previsão, com pesos $1 - j/(h+2)$, $j = 0, \ldots, h+1$
+\citep{newey1987simple}: $h$ defasagens cobrem a sobreposição, e a defasagem
+adicional capta a autocorrelação remanescente. Não se aplica correção de
+amostra pequena, e o valor-$p$ vem da distribuição normal. A correção atua no
+erro-padrão do estimador de MQO, não no estimador. Mesmo com ela, 987 datas com
+alvos de 30 dias sobrepostos equivalem a cerca de 33 observações
+independentes, e os testes têm pouco poder.
 
-\subsection{Estimação sobre a amostra completa}
-
-Os modelos de MQO são estimados sobre a amostra completa disponível, sem divisão
-em janelas móveis ou subperíodos. Essa abordagem é padrão na literatura de
-previsão de retornos com variáveis de risco e permite a obtenção de estimativas
-estáveis dos parâmetros, aproveitando ao máximo a informação disponível.
-
-\subsection{Sobreposição temporal}
-
-Como os retornos futuros considerados correspondem a horizontes superiores a um
-dia, as observações apresentam sobreposição temporal (\textit{overlapping
-observations}). Esse fenômeno introduz autocorrelação no termo de erro que não
-reflete necessariamente dependência econômica, mas decorre da própria construção
-da variável dependente. Para lidar com esse problema, a inferência estatística é
-conduzida com erros padrão HAC (Newey--West), com número de defasagens igual ao
-horizonte de previsão ($\text{maxlags} = h$), conforme implementado nos scripts
-de estimação e consistente com a Seção~\ref{sec:modelos_referencia}.
-
-\subsection{Separação treino e teste para modelos preditivos}
-
-Para as análises preditivas baseadas em aprendizado de máquina, desenvolvidas
-no Capítulo~\ref{chap:cap5_ml}, a amostra é dividida em períodos de treino e teste,
-respeitando estritamente a ordem temporal das observações. A amostra de treino é
-utilizada para a estimação dos parâmetros, enquanto a amostra de teste é
-reservada para a avaliação de desempenho fora da amostra (\textit{out-of-sample}).
-Essa separação não se aplica às regressões por MQO, cujo objetivo é avaliar relações
-em amostra.
+Nos Capítulos~\ref{chap:resultados_ols} e~\ref{chap:regimes}, o regressor é
+gerado: o BVRP previsto vem de um primeiro estágio estimado, e o erro-padrão de
+MQO do segundo estágio ignora a incerteza dessa estimação \citep{pagan1984}.
+Por isso, a inferência principal usa um bootstrap em blocos em dois níveis
+\citep{kunsch1989}. No primeiro nível, o modelo de previsão é reestimado, em
+cada origem, numa amostra reamostrada em blocos dentro da própria janela de
+treino, o que preserva o embargo. No segundo, os pares (previsão, retorno) das
+987 datas são reamostrados em blocos, e $\beta_h$ é reestimado. O bootstrap em
+blocos tem validade assintótica sob condições sobre o tamanho do bloco, que
+cresce com a amostra, e pode trazer refinamentos em amostras finitas em alguns
+casos; ele não dispensa hipóteses assintóticas. O
+Capítulo~\ref{chap:resultados_ols} detalha o procedimento. Como cada
+especificação é testada em seis horizontes, a dissertação reporta também quais
+coeficientes sobrevivem à correção de Bonferroni ($0{,}05/6 \approx 0{,}0083$).
+Como os seis horizontes são fortemente correlacionados entre si, a dissertação
+também testa conjuntamente a hipótese de que $\beta_h = 0$ em todos os
+horizontes, com a matriz de covariância dos coeficientes obtida no bootstrap;
+os Capítulos~\ref{chap:resultados_ols} e~\ref{chap:regimes} detalham o teste.
 
 % =========================================================
-\section{Considerações sobre robustez e extensões}
-\label{sec:robustez}
+\section{Avaliação fora da amostra}
+\label{sec:avaliacao_oos}
 
-Além das especificações econométricas básicas, esta dissertação considera
-análises de robustez destinadas a avaliar a estabilidade dos resultados em
-diferentes horizontes de previsão, períodos amostrais e conjuntos de variáveis
-explicativas.
+O desempenho das previsões do Capítulo~\ref{chap:cap5_ml} é medido pelo $R^2$
+fora da amostra contra a média histórica \citep{campbell2008predicting},
+\[
+R^2_{\text{fora}} = 1 - \frac{\sum_t (y_t - \hat{y}_t)^2}{\sum_t (y_t - \bar{y}_t)^2},
+\]
+em que $\hat{y}_t$ é a previsão do modelo e $\bar{y}_t$ é a média dos alvos já
+conhecidos na origem vigente ($s \le t - h$). Um $R^2_{\text{fora}}$ positivo
+indica que o modelo erra menos que a média histórica. Dois testes complementam
+a métrica. O teste de \citet{clark2007approximately} compara cada modelo com a
+média histórica, que é um modelo aninhado, contra a alternativa unilateral de
+que o modelo é melhor. O teste de \citet{diebold1995comparing} compara pares de
+modelos, com perda quadrática e alternativa bilateral. Nos dois, a série de
+diferenças de perda é regredida numa constante, com erro-padrão HAC de $h+1$
+defasagens (Seção~\ref{sec:inferencia}). A proxy e o prêmio realizado defasado
+servem de modelos de referência secundários.
 
-Adicionalmente, são exploradas extensões que incorporam não linearidades,
-interações entre variáveis e possíveis efeitos de regime, reconhecendo que a
-relação entre o BVRP e os retornos futuros do Bitcoin pode variar ao longo do
-tempo. Essas extensões motivam a adoção de modelos de aprendizado de máquina,
-desenvolvidos em detalhe no Capítulo~\ref{chap:cap5_ml}.
+% =========================================================
+\section{Regimes de volatilidade}
+\label{sec:regimes_metodo}
+
+O regime de alta volatilidade é definido por $D_t = 1$ se
+$\text{VH}_{t-29:t} > 37{,}3\%$ a.a. O corte vem da mistura de duas normais
+estimada apenas na primeira janela de estimação (Seção~\ref{sec:regimes}), de
+modo que nenhuma data é classificada com informação posterior a ela. Como
+robustez, a dissertação reestima o corte em cada origem, só com os dados
+disponíveis até ela (janela expansiva). No modelo em árvore do
+Capítulo~\ref{chap:regimes}, os cortes são escolhidos pela própria floresta e
+comparados com o de $37{,}3\%$ a.a.
