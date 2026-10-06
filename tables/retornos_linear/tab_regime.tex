@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Retorno futuro, BVRP previsto e regime de volatilidade.}
+\label{tab:retlin-regime}
+\begin{tabular}{rrrrrrr}
+\toprule
+$h$ & Baixa: $\hat\beta_h$ & $p$ & Alta & $\hat\gamma_h$ & $p$ & $p$ (Wald) \\
+\midrule
+\multicolumn{7}{l}{\textit{Corte fixo} (31{,}4\% das datas no regime de baixa)} \\
+1 & $-$0{,}071 & 0{,}155 & $-$0{,}061 & 0{,}011 & 0{,}857 & 0{,}554 \\
+5 & $-$0{,}528 & 0{,}034 & $-$0{,}131 & 0{,}396 & 0{,}140 & 0{,}250 \\
+10 & $-$1{,}091 & 0{,}015 & $-$0{,}159 & 0{,}932 & 0{,}046 & 0{,}128 \\
+20 & $-$2{,}147 & 0{,}006 & $-$0{,}313 & 1{,}834 & 0{,}034 & 0{,}081 \\
+30 & $-$2{,}922 & 0{,}005 & $-$0{,}339 & 2{,}583 & 0{,}031 & 0{,}071 \\
+60 & $-$5{,}172 & $<$0{,}001 & $-$1{,}034 & 4{,}138 & 0{,}026 & 0{,}035 \\
+\addlinespace
+\multicolumn{7}{l}{\textit{Corte expansivo} (25{,}1\% das datas no regime de baixa)} \\
+1 & $-$0{,}072 & 0{,}227 & $-$0{,}058 & 0{,}014 & 0{,}833 & 0{,}491 \\
+5 & $-$0{,}295 & 0{,}176 & $-$0{,}139 & 0{,}156 & 0{,}510 & 0{,}751 \\
+10 & $-$0{,}546 & 0{,}145 & $-$0{,}196 & 0{,}350 & 0{,}392 & 0{,}694 \\
+20 & $-$1{,}313 & 0{,}055 & $-$0{,}342 & 0{,}971 & 0{,}184 & 0{,}414 \\
+30 & $-$2{,}030 & 0{,}037 & $-$0{,}319 & 1{,}711 & 0{,}100 & 0{,}250 \\
+60 & $-$4{,}397 & 0{,}005 & $-$1{,}077 & 3{,}319 & 0{,}064 & 0{,}159 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R_{t+h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \delta_h D_t + \gamma_h D_t\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com $D_t = 1$ no regime de alta volatilidade. Inclinação no regime de baixa: $\hat\beta_h$; no de alta: $\hat\beta_h + \hat\gamma_h$; em p.p. por p.p. Valores-$p$ HAC com $h+1$ defasagens; Wald: $\delta_h = \gamma_h = 0$. Corte fixo: $37{,}3\%$ a.a., da primeira janela; expansivo: reestimado em cada origem.}
+\end{table}

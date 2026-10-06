@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Teste conjunto nos seis horizontes.}
+\label{tab:retlin-conjunto}
+\begin{tabular}{lrrr}
+\toprule
+Inferência & $W$ & $p$ (Wald) & $p$ (max-$|t|$) \\
+\midrule
+Dois níveis, blocos de 60 dias (principal) & 6{,}46 & 0{,}373 & 0{,}115 \\
+Dois níveis, blocos de 30 dias & 8{,}45 & 0{,}207 & 0{,}135 \\
+Dois níveis, blocos de 90 dias & 7{,}59 & 0{,}269 & 0{,}149 \\
+Dois níveis, $\alpha$ reescolhido & 4{,}08 & 0{,}666 & 0{,}173 \\
+Só o 2º nível (ignora o 1º estágio) & 13{,}76 & 0{,}032 & 0{,}022 \\
+HAC empilhado, 61 defasagens (ignora o 1º estágio) & 15{,}11 & 0{,}019 & -- \\
+\midrule
+\multicolumn{4}{l}{\textit{max-$|t|$ por horizonte (principal), valor-$p$ ajustado}} \\
+\multicolumn{4}{l}{$h = 1$: 0{,}115; $h = 5$: 0{,}193; $h = 10$: 0{,}345; $h = 20$: 0{,}485; $h = 30$: 0{,}578; $h = 60$: 0{,}290} \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $H_0$: $\beta_h = 0$ nos seis horizontes. Wald: $W = \bar\beta^{*\prime}\,\Sigma^{*-1}\,\bar\beta^*$, com a média e a covariância dos $\beta^*$ do bootstrap, $\chi^2(6)$; equivale ao teste na escala corrigida da atenuação. max-$|t|$: o maior $|z_h|$ entre os horizontes, com valor crítico tirado da distribuição do máximo nas reamostragens (passo único). HAC empilhado: as seis regressões estimadas em conjunto, com Newey--West. Os $\beta^*$ de horizontes vizinhos têm correlação de 0,8 a 0,97, e o número de condição da matriz de correlação é 475.}
+\end{table}

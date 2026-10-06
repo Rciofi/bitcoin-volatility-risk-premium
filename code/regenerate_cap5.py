@@ -1,7 +1,7 @@
 """
 Regenera todas as figuras e tabelas do Cap. 5 usando os dados originais da dissertacao.
 Reproducao fiel do notebook cap5_ols_vrp.ipynb.
-Saida: figs/retornos_linear/ e tables/retornos_linear/
+Saida: archive/figs/retornos_linear/ e archive/tables/retornos_linear/ (legado; o Cap. 6 atual usa code/publicar_cap6.py)
 
 Uso: py code/regenerate_cap5.py
 """
@@ -15,8 +15,8 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).parent.parent
 DATA  = ROOT / "data" / "vrp_with_targets.csv"          # IC1: fonte canonica (1.775 obs)
-FIGS  = ROOT / "figs"  / "retornos_linear"
-TABS  = ROOT / "tables" / "retornos_linear"
+FIGS  = ROOT / "archive" / "figs"  / "retornos_linear"
+TABS  = ROOT / "archive" / "tables" / "retornos_linear"
 FIGS.mkdir(parents=True, exist_ok=True)
 TABS.mkdir(parents=True, exist_ok=True)
 

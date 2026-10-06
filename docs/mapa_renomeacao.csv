@@ -216,3 +216,11 @@ legado,figs/previsao_bvrp/fig_shap_beeswarm.png,archive/figs/previsao_bvrp/fig_s
 legado,tables/previsao_bvrp/tab_coeficientes.tex,archive/tables/previsao_bvrp/tab_coeficientes.tex
 legado,tables/previsao_bvrp/tab_oos_performance.tex,archive/tables/previsao_bvrp/tab_oos_performance.tex
 legado,tables/previsao_bvrp/shap_values_rf.csv,archive/tables/previsao_bvrp/shap_values_rf.csv
+legado,tables/retornos_linear/bootstrap_ci.csv,archive/tables/retornos_linear/bootstrap_ci.csv
+legado,tables/retornos_linear/nota_fdr.tex,archive/tables/retornos_linear/nota_fdr.tex
+legado,tables/retornos_linear/tab_bootstrap_ci.tex,archive/tables/retornos_linear/tab_bootstrap_ci.tex
+legado,tables/retornos_linear/tab_h1_teste_media.tex,archive/tables/retornos_linear/tab_h1_teste_media.tex
+legado,tables/retornos_linear/tab_ols_basico_multihoriz.tex,archive/tables/retornos_linear/tab_ols_basico_multihoriz.tex
+legado,tables/retornos_linear/tab_ols_rv_iv_multihoriz.tex,archive/tables/retornos_linear/tab_ols_rv_iv_multihoriz.tex
+legado,figs/retornos_linear/beta_comparacao_rv_iv.png,archive/figs/retornos_linear/beta_comparacao_rv_iv.png
+legado,figs/retornos_linear/beta_por_horizonte_basico_bootstrap.png,archive/figs/retornos_linear/beta_por_horizonte_basico_bootstrap.png

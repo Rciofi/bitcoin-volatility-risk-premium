@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Retorno futuro sobre a volatilidade histórica e a implícita.}
+\label{tab:retlin-componentes}
+\begin{tabular}{rrrrrrr}
+\toprule
+$h$ & $\hat\beta_{1,h}$ (VH) & $p$ & $\hat\beta_{2,h}$ (IV) & $p$ & $\hat\beta_{1,h} + \hat\beta_{2,h}$ & $p$ \\
+\midrule
+1 & $-$0{,}009 & 0{,}233 & 0{,}026 & 0{,}023 & 0{,}017 & 0{,}039 \\
+5 & $-$0{,}019 & 0{,}493 & 0{,}061 & 0{,}155 & 0{,}042 & 0{,}183 \\
+10 & $-$0{,}031 & 0{,}599 & 0{,}090 & 0{,}329 & 0{,}059 & 0{,}329 \\
+20 & $-$0{,}025 & 0{,}832 & 0{,}103 & 0{,}564 & 0{,}078 & 0{,}524 \\
+30 & 0{,}005 & 0{,}979 & 0{,}074 & 0{,}776 & 0{,}079 & 0{,}667 \\
+60 & 0{,}178 & 0{,}514 & 0{,}046 & 0{,}927 & 0{,}224 & 0{,}551 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R_{t+h} = \alpha_h + \beta_{1,h}\,\text{VH}_{t-29:t} + \beta_{2,h}\,\text{IV}_t + \varepsilon_{t+h}$, nas mesmas 987 datas; coeficientes em p.p. de retorno por p.p. de volatilidade. Valores-$p$ HAC com $h+1$ defasagens; a última coluna testa $\beta_{1,h} + \beta_{2,h} = 0$.}
+\end{table}
