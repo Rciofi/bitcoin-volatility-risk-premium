@@ -1,0 +1,26 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Testes de robustez: retorno futuro sobre o BVRP previsto por outros modelos.}
+\label{tab:retnl-robustez}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & $h = 1$ & $h = 5$ & $h = 10$ & $h = 20$ & $h = 30$ & $h = 60$ \\
+\midrule
+\multicolumn{7}{l}{\textit{Floresta, direta}} \\
+\quad $\hat\beta_h$ & $-$0{,}057 & $-$0{,}113 & $-$0{,}142 & $-$0{,}294 & $-$0{,}357 & $-$1{,}235 \\
+\quad $p$ HAC & 0{,}148 & 0{,}342 & 0{,}487 & 0{,}493 & 0{,}606 & 0{,}333 \\
+\quad $p$ bootstrap & 0{,}438 & 0{,}597 & 0{,}770 & 0{,}794 & 0{,}834 & 0{,}720 \\
+\multicolumn{7}{l}{\textit{Ridge, $\hat f(X_t) - \text{IV}_t$}} \\
+\quad $\hat\beta_h$ & $-$0{,}013 & $-$0{,}027 & $-$0{,}034 & $-$0{,}019 & 0{,}024 & 0{,}047 \\
+\quad $p$ HAC & 0{,}122 & 0{,}395 & 0{,}580 & 0{,}883 & 0{,}904 & 0{,}904 \\
+\quad $p$ bootstrap & 0{,}183 & 0{,}602 & 0{,}905 & -- & 0{,}707 & 0{,}787 \\
+\multicolumn{7}{l}{\textit{Ridge, direta}} \\
+\quad $\hat\beta_h$ & $-$0{,}045 & $-$0{,}144 & $-$0{,}250 & $-$0{,}459 & $-$0{,}586 & $-$1{,}433 \\
+\quad $p$ HAC & 0{,}011 & 0{,}025 & 0{,}029 & 0{,}046 & 0{,}091 & 0{,}028 \\
+\quad $p$ bootstrap & 0{,}043 & 0{,}080 & 0{,}170 & 0{,}242 & 0{,}303 & 0{,}143 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Mesma especificação da Tabela~\ref{tab:retnl-principal}, com o BVRP previsto por outros modelos. Forma direta: previsões do Capítulo~\ref{chap:previsao_bvrp}. Bootstrap em dois níveis, 999 reamostragens em blocos de 60 dias, as mesmas em todos os regressores; -- quando $\lambda \le 0$.}
+\end{table}

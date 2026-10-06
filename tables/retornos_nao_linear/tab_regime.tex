@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Teste de significância conjunta por horizonte, com o regime de volatilidade.}
+\label{tab:retnl-regime}
+\begin{tabular}{rrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{Corte fixo} & \multicolumn{3}{c}{Corte expansivo} \\ \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+$h$ & $\chi^2(3)$ & $p$ & $p$ (regime) & $\chi^2(3)$ & $p$ & $p$ (regime) \\
+\midrule
+1 & 1{,}36 & 0{,}716 & 0{,}694 & 1{,}30 & 0{,}729 & 0{,}689 \\
+5 & 3{,}23 & 0{,}357 & 0{,}203 & 2{,}81 & 0{,}422 & 0{,}249 \\
+10 & 3{,}19 & 0{,}363 & 0{,}226 & 2{,}34 & 0{,}505 & 0{,}350 \\
+20 & 2{,}70 & 0{,}441 & 0{,}336 & 1{,}86 & 0{,}602 & 0{,}497 \\
+30 & 1{,}90 & 0{,}593 & 0{,}522 & 1{,}64 & 0{,}651 & 0{,}549 \\
+60 & 0{,}65 & 0{,}886 & 0{,}728 & 1{,}51 & 0{,}680 & 0{,}478 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R_{t+h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \delta_h D_t + \gamma_h D_t\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com o BVRP previsto da Tabela~\ref{tab:retnl-principal}. $\chi^2(3)$ e $p$: Wald de $\beta_h = \delta_h = \gamma_h = 0$; $p$ (regime): Wald de $\delta_h = \gamma_h = 0$. HAC com $h+1$ defasagens, que ignora a estimação do BVRP previsto. Corte fixo: $37{,}3\%$ a.a.; expansivo: reestimado em cada origem.}
+\end{table}

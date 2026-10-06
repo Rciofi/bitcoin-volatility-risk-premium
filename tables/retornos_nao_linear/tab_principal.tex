@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Retorno futuro sobre o BVRP previsto pela floresta: estimativas e inferência por horizonte.}
+\label{tab:retnl-principal}
+\begin{tabular}{rrrrrrr}
+\toprule
+ & & \multicolumn{3}{c}{HAC} & \multicolumn{2}{c}{Bootstrap em dois níveis} \\ \cmidrule(lr){3-5}\cmidrule(lr){6-7}
+$h$ & $\hat\beta_h$ & EP & $p$ & $R^2$ & $\lambda$ & $p$ \\
+\midrule
+1 & $-$0{,}006 & 0{,}010 & 0{,}553 & 0{,}0003 & 1{,}16 & 0{,}454 \\
+5 & $-$0{,}006 & 0{,}038 & 0{,}869 & 0{,}0001 & 1{,}96 & 0{,}757 \\
+10 & 0{,}005 & 0{,}066 & 0{,}937 & 0{,}0000 & $-$0{,}35 & -- \\
+20 & 0{,}030 & 0{,}136 & 0{,}827 & 0{,}0004 & 0{,}64 & 0{,}904 \\
+30 & 0{,}070 & 0{,}209 & 0{,}738 & 0{,}0014 & 0{,}83 & 0{,}801 \\
+60 & $-$0{,}076 & 0{,}371 & 0{,}837 & 0{,}0007 & $-$0{,}12 & -- \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R_{t+h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com $\widehat{\text{BVRP}}_t = \hat f(X_t) - \text{IV}_t$ e $\hat f$ a floresta aleatória para $\text{VH}_{t+1:t+30}$ (janela expansiva); 987 datas. $\hat\beta_h$ e EP em pontos percentuais de retorno por ponto percentual de BVRP previsto. HAC: Newey--West com $h+1$ defasagens. Bootstrap: 999 reamostragens em blocos de 60 dias; $\lambda$ é a razão entre a média dos $\beta^*$ e $\hat\beta_h$, e o valor-$p$ usa o EP do bootstrap dividido por $\lambda$; com $\lambda \le 0$, a correção não é definida (--).}
+\end{table}

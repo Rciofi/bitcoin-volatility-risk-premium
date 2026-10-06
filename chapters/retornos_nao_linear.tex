@@ -1,354 +1,279 @@
-﻿\chapter{Regimes de Volatilidade e o Prêmio de Risco de Volatilidade do Bitcoin}
+\chapter{BVRP previsto e retornos futuros: modelo não linear}
 \label{chap:retornos_nao_linear}
 
-\section{Motivação e Objetivo do Capítulo}
-\label{sec:retnl-motivacao}
+Este capítulo repete o teste do Capítulo~\ref{chap:retornos_linear} com um
+único modelo em árvore no lugar dos regimes construídos à mão: uma floresta
+aleatória, que escolhe sozinha os cortes nas volatilidades, gera o BVRP
+previsto, e o retorno futuro é regredido nele. O coeficiente é praticamente
+nulo em todos os horizontes, e o teste conjunto nos seis horizontes não
+rejeita ($p = 0{,}96$). O resultado se repete com as outras formas e modelos
+de previsão e com a floresta aplicada direto ao retorno.
 
-Os capítulos anteriores estabeleceram que o Prêmio de Risco de
-Volatilidade do Bitcoin (BVRP) é negativo em média (aproximadamente
-$-8{,}25$ p.p.) --- consistente com um prêmio de seguro pago pelos
-compradores de opções --- e que sua capacidade preditiva linear sobre
-retornos futuros é estatisticamente nula nos horizontes testados. A
-magnitude do prêmio, contudo, não é homogênea ao longo do tempo: os
-resultados descritivos sugerem que ela depende do ambiente de
-volatilidade vigente, questão que este capítulo investiga
-sistematicamente.
+% =========================================================
+\section{Especificação}
+\label{sec:retnl-especificacao}
 
-O Capítulo~\ref{chap:previsao_bvrp} estabeleceu que a dinâmica do próprio
-BVRP não é previsível além de sua persistência: a variável que
-discretiza o prêmio corrente concentra praticamente toda a capacidade
-preditiva dos modelos supervisionados, enquanto retornos defasados e
-calendário contribuem de forma marginal. Resta investigar uma questão
-distinta: se o nível do prêmio se relaciona com os retornos futuros do
-Bitcoin de forma condicional ao ambiente de volatilidade --- questão
-que este capítulo trata diretamente.
-
-O objetivo deste capítulo é analisar o comportamento do BVRP em diferentes ambientes
-de volatilidade. Especificamente, busca-se: (i) caracterizar estatisticamente os
-regimes de volatilidade realizada; (ii) testar se a distribuição do BVRP difere
-significativamente entre regimes; (iii) avaliar se retornos futuros são estatisticamente
-diferentes entre regimes de alta e baixa volatilidade; e (iv) investigar se a
-interação entre BVRP e regime de volatilidade tem poder preditivo incremental sobre
-os retornos futuros.
-
-\section{Definição dos Regimes de Volatilidade}
-\label{sec:retnl-regimes}
-
-Os regimes de volatilidade são definidos com base nos quantis da volatilidade realizada
-de 30 dias ($\text{RV}_{30d}$), calculada como desvio-padrão anualizado dos retornos
-logarítmicos diários do Bitcoin em janelas móveis de 30 dias. A amostra cobre o período
-de 24 de março de 2021 a 3 de março de 2026, totalizando 1.775 observações após
-o tratamento de dados ausentes.
-
-A classificação é feita por três categorias mutuamente exclusivas:
-
-\begin{itemize}
-    \item \textbf{Baixa volatilidade}: $\text{RV}_{30d} \leq q_{25} = 39{,}3\%$;
-    \item \textbf{Média volatilidade}: $39{,}3\% < \text{RV}_{30d} < 65{,}6\%$;
-    \item \textbf{Alta volatilidade}: $\text{RV}_{30d} \geq q_{75} = 65{,}6\%$.
-\end{itemize}
-
-A Tabela~\ref{tab:retnl-frequencia} apresenta a distribuição das observações
-entre os regimes.
-
-\input{tables/retornos_nao_linear/tab_frequencia_regimes}
-
-Por construção, os regimes extremos concentram 25\% das observações cada, e o regime
-intermediário reúne os 50\% centrais da distribuição da RV. A Figura~\ref{fig:retnl-vh-regimes}
-exibe a série temporal da RV 30 dias com os limiares de regime sobrepostos. Observa-se
-que os episódios de alta volatilidade tendem a ocorrer em clusters, refletindo a
-persistência temporal da volatilidade (\textit{volatility clustering}) característica
-de mercados financeiros e especialmente pronunciada no mercado de criptoativos.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figs/retornos_nao_linear/fig_rv30d_regimes.png}
-\caption{Volatilidade realizada de 30 dias com limiares de regime.
-A região azul sombreada indica períodos de baixa volatilidade ($\text{RV}_{30d} \leq 39{,}3\%$);
-a região vermelha indica períodos de alta volatilidade ($\text{RV}_{30d} \geq 65{,}6\%$).
-Período: 24 mar.\ 2021 -- 3 mar.\ 2026.}
-\label{fig:retnl-vh-regimes}
-\end{figure}
-
-A Figura~\ref{fig:retnl-histograma-vh} apresenta o histograma da distribuição da RV 30 dias,
-mostrando que a distribuição é aproximadamente unimodal com assimetria positiva,
-consistente com a literatura de volatilidade em ativos financeiros.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.75\textwidth]{figs/retornos_nao_linear/fig_hist_rv30d.png}
-\caption{Distribuição da volatilidade realizada de 30 dias com limiares de regime.
-As linhas tracejadas marcam o primeiro quartil (39,3\%) e o terceiro quartil (65,6\%)
-utilizados para definir os regimes.}
-\label{fig:retnl-histograma-vh}
-\end{figure}
-
-\section{Caracterização do BVRP por Regime}
-\label{sec:retnl-bvrp-regimes}
-
-\input{tables/retornos_nao_linear/tab_estatisticas_regimes}
-
-A Tabela~\ref{tab:retnl-estatisticas} reporta as estatísticas descritivas do BVRP em cada regime de volatilidade. Três padrões merecem destaque:
-
-\paragraph{Regimes de baixa e média volatilidade.} O BVRP é fortemente negativo, com médias de $-13{,}20$ p.p. em regimes de baixa volatilidade e $-10{,}24$ p.p. em regimes intermediários --- magnitudes que excedem substancialmente a média incondicional da amostra ($-8{,}25$ p.p.). Esses resultados são consistentes com a interpretação clássica de prêmio de seguro: em períodos de calmaria, a volatilidade implícita permanece elevada vis-à-vis a realizada, refletindo a demanda persistente por proteção contra eventos de cauda mesmo quando esses eventos não se materializam.
-
-\paragraph{Regime de alta volatilidade.} O padrão se inverte completamente. A média do BVRP no regime de alta volatilidade é de $+0{,}66$ p.p. --- valor estatisticamente próximo de zero, com desvio padrão substancialmente maior ($16{,}64$ p.p. contra $7{,}37$ e $10{,}27$ p.p. nos demais regimes). Esse resultado tem interpretação econômica direta: em períodos de estresse de mercado, a volatilidade realizada \emph{alcança ou supera} a volatilidade implícita, dissipando o prêmio de seguro embutido nos preços de opções. Em outras palavras, choques de variância suficientemente grandes para caracterizar regimes de alta volatilidade tendem a exceder o que o mercado de opções havia precificado, eliminando temporariamente o diferencial sistemático.
-
-\paragraph{Implicação para a inferência condicional.} A dispersão dramaticamente maior do BVRP no regime de alta volatilidade ($\sigma = 16{,}64$ p.p.) indica que o comportamento do prêmio sob estresse é estruturalmente mais errático --- propriedade que tem implicações relevantes para a inferência estatística condicional explorada nas seções seguintes.
-
-\paragraph{Nota sobre a natureza da dispersão em alta volatilidade.} A dispersão elevada do BVRP no regime de alta volatilidade não reflete necessariamente a presença de \textit{outliers} em sentido estatístico clássico. A distribuição de cauda pesada observada é consistente com choques de variância genüinos --- episódios em que a volatilidade realizada excede substancialmente a implícita em momentos de estresse agudo. Essa interpretação é reforçada pela persistência temporal documentada no Capítulo~\ref{chap:dados}: os episódios de alta volatilidade ocorrem em \textit{clusters}, sugerindo que constituem fases estruturais do mercado e não observações aberrantes.
-
-A Figura~\ref{fig:retnl-boxplot-bvrp} ilustra estas diferenças por meio de
-diagramas de caixa.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.72\textwidth]{figs/retornos_nao_linear/fig_boxplot_bvrp_regimes.png}
-\caption{Distribuição do BVRP por regime de volatilidade. No
-regime de alta volatilidade, a mediana do BVRP é próxima de zero
-($-0{,}83$ p.p.) com distribuição altamente dispersa, enquanto nos regimes de baixa e
-média volatilidade o prêmio de seguro é consistentemente elevado em magnitude (medianas de $-11{,}53$ e
-$-9{,}41$ p.p., respectivamente).}
-\label{fig:retnl-boxplot-bvrp}
-\end{figure}
-
-\section{Retornos Futuros por Regime de Volatilidade}
-\label{sec:retnl-retornos}
-
-A Tabela~\ref{tab:retnl-retornos} apresenta o retorno futuro médio do Bitcoin
-para cada combinação de regime e horizonte de previsão.
-
-\input{tables/retornos_nao_linear/tab_retornos_regimes}
-
-O padrão é monotônico e economicamente relevante: em todos os horizontes avaliados
-(1, 5, 10, 20, 30 e 60 dias), o retorno futuro médio é maior no regime de baixa
-volatilidade do que no regime de alta. Para horizontes curtos (1 dia), as diferenças
-são pequenas e potencialmente ruídosas. A partir de 20 dias, a diferença torna-se economicamente substancial: em
-$h=30$, o retorno médio acumulado é de $4{,}86\%$ no regime de baixa
-volatilidade contra $0{,}06\%$ no de alta; em $h=60$, de $8{,}30\%$ contra
-$3{,}18\%$. A significância estatística dessas diferenças é examinada na
-seção seguinte.
-
-\subsection{Testes de Significância Estatística}
-\label{sec:retnl-teste-t}
-
-A Tabela~\ref{tab:retnl-teste-t} reporta os testes de diferença de médias
-entre os regimes de baixa e alta volatilidade sob quatro critérios de
-inferência. O teste $t$ de Welch, aplicado à amostra sobreposta,
-indicaria diferenças significativas a partir de $h = 20$ dias
-($p = 0{,}0097$ em $h=20$; $p = 0{,}0001$ em $h=30$; $p = 0{,}0024$ em
-$h=60$), significância que sobrevive à correção de Benjamini--Hochberg
-para os seis horizontes testados. Esse critério, contudo, é inadequado:
-a correção de Welch acomoda variâncias desiguais entre grupos, mas não
-a autocorrelação induzida pela sobreposição das janelas de retorno --- em
-$h=30$, duas observações consecutivas compartilham 29 dos 30 dias que
-compõem o retorno acumulado.
-
-Duas correções apropriadas conduzem à mesma conclusão. A regressão do
-retorno futuro contra uma \textit{dummy} de regime com erros-padrão HAC
-(Newey--West, $\text{maxlags}=h$) utiliza todas as observações dos dois
-regimes contrastados ($N = 888$; o regime intermediário é excluído,
-como no teste de Welch) e reproduz exatamente as mesmas diferenças
-pontuais, mas
-não identifica significância em nenhum horizonte (menor valor-$p$ de
-$0{,}356$, em $h=30$). A reamostragem em janelas não sobrepostas ---
-procedimento análogo ao adotado no apêndice deste capítulo --- corrobora
-o resultado (valores-$p$ medianos entre $0{,}508$ e $0{,}822$).
-
-\textbf{A diferença de retornos futuros entre regimes não é
-estatisticamente distinguível de zero sob inferência válida.} O ponto
-estimado é economicamente expressivo --- $4{,}80$ pontos percentuais em
-$h=30$, favoráveis ao regime de baixa volatilidade --- mas a amostra
-contém apenas cerca de 59 janelas independentes de 30 dias em cinco
-anos, precisão insuficiente para estabelecer o efeito. Trata-se de
-limitação de potência amostral, não de evidência de ausência de efeito.
-
-\input{tables/retornos_nao_linear/tab_ttest}
-
-A direção do padrão, ainda que não estabelecida estatisticamente,
-merece registro por contrariar a intuição clássica. Conforme reportado
-na Tabela~\ref{tab:retnl-retornos}, os retornos médios em
-horizontes longos são \emph{maiores} no regime de baixa volatilidade
-($4{,}86\%$ em $h = 30$) do que no regime de alta volatilidade
-($0{,}06\%$ em $h = 30$). Esse padrão sugere que os retornos do Bitcoin
-tendem a se concentrar em períodos de baixa volatilidade, momento em que
-o prêmio de seguro precificado nas opções é mais elevado. A leitura
-econômica seria coerente com a lógica de aversão ao risco: investidores
-exigiriam prêmio maior de proteção justamente nos períodos em que o
-mercado, no agregado, oferece retornos superiores. A precisão amostral
-disponível, contudo, não permite distinguir essa hipótese de variação
-aleatória.
-
-A Figura~\ref{fig:retnl-boxplot-retornos} ilustra as distribuições condicionais
-dos retornos futuros para os horizontes de 5, 10 e 20 dias.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figs/retornos_nao_linear/fig_boxplot_ret_regimes.png}
-\caption{Distribuição dos retornos futuros por regime de volatilidade para horizontes
-de 5, 10 e 20 dias. A dispersão aumenta com o horizonte, mas a separação entre as
-medianas dos regimes de alta e baixa volatilidade torna-se progressivamente mais
-pronunciada.}
-\label{fig:retnl-boxplot-retornos}
-\end{figure}
-
-\section{Análise de Regressão Condicional}
-\label{sec:retnl-regressao}
-
-Para avaliar se a interação entre o BVRP e o regime de volatilidade tem poder preditivo
-incremental sobre os retornos futuros, estimam-se regressões condicionais da forma:
-
+A forma principal do BVRP previsto é
 \begin{equation}
-R_{t+h} = \alpha + \beta_1 \cdot \text{BVRP}_t
-          + \beta_2 \cdot D_t^{\text{alto}}
-          + \beta_3 \cdot \left(\text{BVRP}_t \times D_t^{\text{alto}}\right) + \varepsilon_{t+h},
-\label{eq:retnl-condicional}
+\widehat{\text{BVRP}}_t = \hat f(X_t) - \text{IV}_t,
+\label{eq:retnl-forma}
 \end{equation}
+em que $\hat f$ é uma floresta aleatória que prevê a volatilidade histórica dos
+30 dias seguintes, $\text{VH}_{t+1:t+30}$, com as 17 variáveis $X_t$, as
+origens, o embargo e a janela expansiva do Capítulo~\ref{chap:previsao_bvrp}.
+Como $\text{BVRP}_t = \text{VH}_{t+1:t+30} - \text{IV}_t$, subtrair a IV de
+$t$ da previsão da VH dá uma previsão do prêmio. A floresta entra com todas as
+volatilidades em nível e escolhe, em cada divisão, a variável e o ponto de
+corte que mais reduzem o erro; os cortes que separam regimes de volatilidade
+saem do próprio modelo, sem corte nem variável indicadora fixados de antemão.
+A forma~\eqref{eq:retnl-forma} e a floresta foram fixadas antes de ver os
+resultados deste capítulo. Como testes de robustez, a floresta prevê o BVRP
+diretamente, como no Capítulo~\ref{chap:previsao_bvrp}, e o Ridge é estimado
+nas duas formas.
 
-\noindent onde $R_{t+h}$ é o retorno simples acumulado do Bitcoin de $t$ a $t+h$,
-$D_t^{\text{alto}}$ é uma variável indicadora igual a 1 quando o Bitcoin se encontra
-em regime de alta volatilidade ($\text{RV}_{30d} \geq q_{75}$), e
-$\text{BVRP}_t \times D_t^{\text{alto}}$ é o termo de interação entre o prêmio e
-o regime. Os erros-padrão são calculados pelo método de Newey--West com $h$
-defasagens, para corrigir autocorrelação e heteroscedasticidade induzidas pela
-sobreposição das janelas de retorno.
+Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, o retorno simples de
+$t$ a $t+h$ é regredido no BVRP previsto, como na
+equação~\eqref{eq:met-retorno-linear}, nas mesmas 987 datas fora da amostra e
+com a inferência do Capítulo~\ref{chap:retornos_linear}: erro-padrão HAC com
+$h+1$ defasagens e bootstrap em blocos em dois níveis, que incorpora a
+estimação do BVRP previsto. As reamostragens são as mesmas em todos os
+horizontes e nos quatro regressores.
 
-\input{tables/retornos_nao_linear/tab_regressoes}
+% =========================================================
+\section{Previsão do BVRP nas duas formas}
+\label{sec:retnl-previsao}
 
-Os resultados da Tabela~\ref{tab:retnl-regressoes} revelam que nenhum dos coeficientes associados aos preditores (BVRP, regime e termo de interação) é estatisticamente significativo a 5\% em qualquer horizonte. O único coeficiente significativo a esse nível é a constante no horizonte de 20 dias ($p<0{,}05$), que é também marginalmente significativa (10\%) nos horizontes de 10 e 30 dias. O $R^2$ das regressões é baixo em todos os horizontes, variando de 0,17\% (1 dia) a 2,22\% (30 dias), refletindo a dificuldade estrutural de prever retornos diários de ativos especulativos.
+A Tabela~\ref{tab:retnl-previsao} compara as previsões do BVRP. Na forma
+$\hat f(X_t) - \text{IV}_t$, a floresta tem $R^2_{\text{fora}}$ de 0,009,
+contra 0,143 na forma direta e 0,223 do Ridge direto. A diferença vem da IV. A
+forma~\eqref{eq:retnl-forma} impõe coeficiente $-1$ à IV de $t$, e a IV com
+coeficiente unitário prevê mal a volatilidade futura: a referência que só usa
+a IV, a média histórica da VH menos $\text{IV}_t$, tem $R^2_{\text{fora}}$ de
+$-0{,}59$. Na forma direta, o modelo aprende um efeito da IV menor que um. Com
+987 datas, porém, o Diebold--Mariano não distingue as duas formas da floresta
+($p = 0{,}28$), e no Ridge a diferença fica na fronteira ($p = 0{,}063$). A
+variável indicadora do regime de alta volatilidade, acrescentada às
+variáveis da floresta, piora a previsão (Diebold--Mariano contra a floresta
+sem ela, $p = 0{,}005$).
 
-Individualmente, o coeficiente $\hat{\beta}_1$ (BVRP) apresenta sinal positivo em todos os horizontes a partir de 5 dias --- e é essencialmente nulo em 1 dia ---, mas não é estatisticamente significativo em nenhum deles ($|t|\leq 1{,}43$). Controlando pelo regime, portanto, o nível do BVRP não prediz de forma confiável os retornos futuros do Bitcoin, resultado coerente com a fraca previsibilidade direcional estabelecida no Capítulo~\ref{chap:retornos_linear}. O sinal positivo, ainda que sem significância, aponta no máximo para uma associação tênue --- insuficiente para sustentar qualquer interpretação preditiva robusta.
+\input{tables/retornos_nao_linear/tab_previsao_formas}
 
-O coeficiente $\hat{\beta}_2$ (\emph{dummy} de alta volatilidade) é
-negativo em todos os horizontes, na mesma direção da diferença de médias
-reportada na Seção~\ref{sec:retnl-teste-t}, mas igualmente sem significância
-estatística. O coeficiente $\hat{\beta}_3$ (interação BVRP\,$\times$\,alta vol) é negativo em todos os horizontes e atinge significância marginal (10\%) apenas em 20 dias ($\hat{\beta}_3 = -0{,}0029$; $t = -1{,}93$). O sinal negativo indica que, dentro do regime de alta volatilidade, a inclinação total do BVRP sobre os retornos ($\hat{\beta}_1 + \hat{\beta}_3$) torna-se negativa, invertendo a associação positiva observada fora desse regime; a evidência, contudo, é fraca --- restrita a um único horizonte e ao nível de 10\% --- e não sustenta conclusões firmes.
+A forma principal prevê o BVRP pior, mas a conclusão sobre os retornos não
+depende dela: as Seções~\ref{sec:retnl-resultados}
+e~\ref{sec:retnl-robustez} mostram que nenhuma das quatro combinações de forma
+e modelo prevê o retorno.
 
-A Figura~\ref{fig:retnl-dispersao} apresenta diagramas de dispersão do BVRP
-versus retorno futuro, desagregados por regime, para os horizontes de 5, 10 e 20 dias.
+% =========================================================
+\section{Resultados}
+\label{sec:retnl-resultados}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figs/retornos_nao_linear/fig_scatter_bvrp_ret.png}
-\caption{Dispersão do BVRP versus retorno futuro por regime de volatilidade.
-A linha tracejada representa a linha de tendência linear incondicional para toda
-a amostra. A separação vertical entre os pontos dos regimes de alta (vermelho) e
-baixa (azul) volatilidade torna-se progressivamente mais pronunciada com o horizonte,
-ainda que a diferença não seja estatisticamente significativa
-sob inferência robusta à sobreposição.}
-\label{fig:retnl-dispersao}
-\end{figure}
+A Tabela~\ref{tab:retnl-principal} e a Figura~\ref{fig:retnl-betas}
+apresentam os resultados da forma principal. O coeficiente fica entre
+$-0{,}076$ e $0{,}070$ p.p. de retorno por p.p. de BVRP previsto, troca de
+sinal entre os horizontes, e os valores-$p$ HAC ficam entre 0,55 e 0,94. O
+$R^2$ não passa de 0,0014.
 
+\input{tables/retornos_nao_linear/tab_principal}
 
-\section{Análise condicional ao sinal do retorno corrente}
-\label{sec:retnl-sinal-retorno}
-
-A literatura clássica de volatilidade em mercados de equity documenta o chamado \textit{leverage effect}: a volatilidade implícita tende a aumentar de forma mais pronunciada após retornos negativos do que após retornos positivos de magnitude comparável \citep{bollerslev2011VRP, bali2009volatilitypremium}. Esse padrão assimétrico, originalmente atribuído à alavancagem financeira das empresas e posteriormente reinterpretado como reflexo de aversão ao risco condicional, tem implicações diretas para a precificação de opções e, portanto, para a dinâmica do prêmio de risco de variância. Esta seção investiga se o BVRP exibe assimetria análoga em relação ao sinal do retorno corrente do Bitcoin.
-
-A amostra de 1.775 observações é dividida em dois grupos mutuamente exclusivos: $876$ dias com retorno positivo ($r_t > 0$) e $899$ dias com retorno negativo ($r_t < 0$), sem observações com retorno exatamente nulo. A Tabela~\ref{tab:retnl-sinal-retorno} reporta a média do BVRP e dos retornos futuros do Bitcoin em horizontes de 5, 20 e 30 dias, condicionais ao sinal do retorno corrente, juntamente com testes $t$ de Welch para diferença de médias entre os dois grupos.
-
-\input{tables/retornos_nao_linear/tab_bvrp_sinal_retorno}
-
-Os resultados estabelecem que \textbf{o BVRP do Bitcoin não exibe assimetria estatisticamente significativa em relação ao sinal do retorno corrente}. A média do BVRP em dias com retorno positivo ($-8{,}03$ p.p.) é praticamente idêntica à observada em dias com retorno negativo ($-8{,}47$ p.p.), com diferença de apenas $0{,}44$ pontos percentuais ($p = 0{,}470$ pelo teste de Welch). Os retornos futuros do Bitcoin em horizontes de 5, 20 e 30 dias também não diferem entre os dois grupos ($p > 0{,}57$ em todos os casos).
-
-A Figura~\ref{fig:retnl-sinal-retorno} ilustra graficamente a sobreposição quase completa das distribuições do BVRP nos dois grupos.
-
+\IfFileExists{figs/retornos_nao_linear/fig_betas.png}{
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{figs/retornos_nao_linear/fig_bvrp_sinal.png}
-    \caption{Distribuição do BVRP condicional ao sinal do retorno corrente do Bitcoin. As duas distribuições são estatisticamente indistinguíveis (teste de Welch, $p = 0{,}470$).}
-    \label{fig:retnl-sinal-retorno}
+    \includegraphics[width=0.9\linewidth]{figs/retornos_nao_linear/fig_betas.png}
+    \caption{Coeficiente do retorno futuro sobre o BVRP previsto, por horizonte e regressor, com intervalos de confiança de 95\% pelo erro-padrão HAC com $h+1$ defasagens.}
+    \label{fig:retnl-betas}
 \end{figure}
+}{}
 
-A ausência de assimetria por sinal do retorno é achado substantivo. Três interpretações econômicas, não mutuamente exclusivas, podem ser propostas. Primeiro, o mercado de opções de Bitcoin pode estar em estágio de maturação institucional no qual os formadores de mercado precificam o risco de variância de forma simétrica, sem internalizar plenamente o padrão de aversão ao risco assimétrico observado em equity. Segundo, a base de investidores do Bitcoin --- historicamente mais concentrada em participantes que adotam posições direcionais (\textit{long-only} ou \textit{long-short} oportunísticas) do que em institucionais com \textit{mandates} de proteção de capital --- pode produzir demanda por proteção menos sensível ao sinal recente do retorno. Terceiro, a estrutura microestrutural do mercado da Deribit (\textit{inverse settlement}, \textit{auto-deleveraging}, operação contínua), descrita na Seção~\ref{sec:refer-dvol}, pode neutralizar mecanismos de \textit{feedback} entre quedas de preço e elevação da IV que operam em mercados tradicionais regulados.
+Com $\hat\beta_h$ perto de zero, a correção de escala do bootstrap deixa de
+funcionar. A razão $\lambda_h$ entre a média dos $\beta^*$ e $\hat\beta_h$,
+que no Capítulo~\ref{chap:retornos_linear} mede a atenuação, divide por um
+número próximo de zero: fica entre $-2{,}75$ e $3{,}45$ e é negativa em 5 das
+18 combinações de horizonte e tamanho de bloco, casos em que o erro-padrão
+corrigido não é definido. Nesses casos, a inferência se apoia no erro-padrão
+HAC e no teste conjunto, que não usa $\lambda_h$.
 
-Cabe notar que a ausência de assimetria por sinal não exclui formas mais sutis de dependência não linear --- por exemplo, assimetria por magnitude do retorno (independentemente do sinal) ou condicional a regimes de volatilidade. A segunda possibilidade é tratada nas seções anteriores deste capítulo via classificação por quartis da volatilidade realizada. Quanto à primeira, um teste complementar --- se o BVRP prevê a \emph{magnitude}, e não a direção, do retorno futuro --- sugere relação economicamente coerente mas estatisticamente marginal; ver Seção~\ref{sec:retnl-magnitude} para os detalhes e as ressalvas metodológicas.
+O teste conjunto é um teste de significância conjunta de Wald, cuja
+estatística dividida pelo número de restrições é a estatística $F$. Ele testa
+$\beta_h = 0$ nos seis horizontes com a covariância dos $\beta^*$ do bootstrap
+(Tabela~\ref{tab:retnl-conjunto}). Para a forma principal, $\chi^2(6) = 1{,}45$
+e $p = 0{,}96$, e o resultado se repete com blocos de 30 e de 90 dias
+($p = 0{,}95$ e $0{,}96$), com o max-$|t|$ ($p = 0{,}79$) e com o HAC das seis
+regressões empilhadas ($p = 0{,}93$). Ao contrário do Ridge direto, para o qual
+os testes que ignoram a estimação do BVRP previsto rejeitam
+(Capítulo~\ref{chap:retornos_linear}), nenhum teste rejeita com a floresta,
+nas duas formas.
 
-\section{Síntese das evidências sobre regimes}
+\input{tables/retornos_nao_linear/tab_conjunto}
+
+% =========================================================
+\section{Testes de robustez}
+\label{sec:retnl-robustez}
+
+A Tabela~\ref{tab:retnl-robustez} repete a regressão com o BVRP previsto pelos
+outros três regressores. Com a floresta na forma direta, o coeficiente é
+negativo em todos os horizontes, como no Capítulo~\ref{chap:retornos_linear},
+mas nenhum é significante (valores-$p$ HAC entre 0,15 e 0,61). Com o Ridge na
+forma $\hat f(X_t) - \text{IV}_t$, os valores-$p$ HAC ficam entre 0,12 e 0,90.
+O Ridge direto reproduz o Capítulo~\ref{chap:retornos_linear}. O teste conjunto
+não rejeita com nenhum dos três quando a estimação do BVRP previsto é
+considerada ($p$ entre 0,37 e 0,98).
+
+\input{tables/retornos_nao_linear/tab_robustez}
+
+% =========================================================
+\section{Como a árvore escolhe as quebras}
+\label{sec:retnl-quebras}
+
+A Figura~\ref{fig:retnl-importancia} mostra a importância das variáveis nas
+duas formas da floresta, pela redução de impureza dentro da amostra, média
+das 33 origens, e pelo aumento do erro quadrático médio fora da amostra
+quando a variável é permutada. Na forma direta, a volatilidade histórica dos
+30 dias anteriores é a variável mais importante pelos dois critérios, seguida
+da de 90 dias. Na forma $\hat f(X_t) - \text{IV}_t$, a previsão do BVRP é
+dominada pela IV, que entra com coeficiente $-1$ por construção, e pela
+$\text{BVRP}^{\text{proxy}}_t$, as duas variáveis cuja permutação mais aumenta
+o erro. Dentro do modelo da VH, a volatilidade histórica de 90 dias tem a
+maior redução de impureza (0,39), mas importância negativa por permutação fora
+da amostra: permutá-la reduz o erro. A variável que a floresta mais usa
+dentro da amostra não ajuda fora dela, o que é coerente com o
+$R^2_{\text{fora}}$ baixo dessa forma.
+
+\IfFileExists{figs/retornos_nao_linear/fig_importancia.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_importancia.png}
+    \caption{Importância das variáveis nas duas formas da floresta: redução de impureza dentro da amostra (média das 33 origens) e aumento do erro quadrático médio do BVRP previsto fora da amostra quando a variável é permutada (barras laranja: permutar reduz o erro).}
+    \label{fig:retnl-importancia}
+\end{figure}
+}{}
+
+A Figura~\ref{fig:retnl-cortes} mostra onde as árvores cortam as
+volatilidades. Na forma direta, a floresta corta a VH de 30 dias entre 55\% e
+58\% a.a. (mediana ponderada de 56,1\%), e nenhuma redução de impureza vem de
+cortes entre 35\% e 40\%. Na forma $\hat f(X_t) - \text{IV}_t$, a VH de 30
+dias aparece em 23 das 33 origens, com cortes entre 45\% e 49\% (mediana
+ponderada de 48,5\%), e a redução de impureza se concentra na VH de 90 dias,
+com cortes entre 60\% e 63\%, e na de 60 dias, perto de 63\%. As árvores
+cortam a VH de 30 dias entre 45\% e 58\% a.a., não em $37{,}3\%$: na ponta de
+cima ou acima da faixa do corte reestimado em cada origem (de 27,0\% a
+51,5\%), e preferem as volatilidades de 60 e de 90 dias à de 30. Os dois regimes da
+Seção~\ref{sec:dados-regimes} separam os dias calmos dos demais; os cortes da
+floresta separam a volatilidade alta da muito alta.
+
+\IfFileExists{figs/retornos_nao_linear/fig_cortes.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_cortes.png}
+    \caption{Limiares escolhidos pelas árvores nas volatilidades históricas de 30, 60 e 90 dias, nas duas formas da floresta: redução de impureza por faixa de 1 p.p., somada nas 33 origens. Na VH de 30 dias, a linha pontilhada marca o corte fixo de $37{,}3\%$ a.a., e a faixa sombreada, o intervalo do corte reestimado em cada origem.}
+    \label{fig:retnl-cortes}
+\end{figure}
+}{}
+
+A dependência parcial do BVRP previsto na VH de 30 dias
+(Figura~\ref{fig:retnl-dependencia}) é plana na maior parte do intervalo e, na
+forma direta, cai de 1 a 3 p.p. acima de cerca de 55\%: com a volatilidade
+histórica alta, a floresta prevê um prêmio mais negativo, isto é, uma
+volatilidade futura mais abaixo da IV. Na forma
+$\hat f(X_t) - \text{IV}_t$, o maior salto varia entre as origens.
+
+\IfFileExists{figs/retornos_nao_linear/fig_dependencia_parcial.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_dependencia_parcial.png}
+    \caption{Dependência parcial do BVRP previsto na volatilidade histórica de 30 dias, nas duas formas da floresta, com a $\text{BVRP}^{\text{proxy}}_t$ recalculada a cada valor da VH. Linhas cinza: as 33 origens; linha azul: a última origem.}
+    \label{fig:retnl-dependencia}
+\end{figure}
+}{}
+
+% =========================================================
+\section{Regime de volatilidade e retornos}
+\label{sec:retnl-regime}
+
+O teste de significância conjunta também é aplicado por horizonte, com a
+variável indicadora do regime de alta volatilidade e sua interação com o BVRP
+previsto, como na equação~\eqref{eq:met-retorno-regime}
+(Tabela~\ref{tab:retnl-regime}). Para a forma principal, o teste dos três
+coeficientes tem valores-$p$ entre 0,36 e 0,89 com o corte fixo e entre 0,42
+e 0,73 com o corte expansivo. Nos quatro regressores, só 3 das 48
+combinações de regressor, corte e horizonte ficam abaixo do limite de
+Bonferroni, sem padrão: o Ridge direto em $h = 60$, com os dois cortes, e a
+floresta direta em $h = 20$, só com o corte expansivo. A diferença entre os
+regimes continua sugestiva e frágil, como no
+Capítulo~\ref{chap:retornos_linear}, e esses valores-$p$ são do HAC, que
+ignora a estimação do BVRP previsto.
+
+\input{tables/retornos_nao_linear/tab_regime}
+
+A Tabela~\ref{tab:retnl-retorno-regime} descreve o retorno futuro médio por
+regime, sem o BVRP previsto. Com o corte fixo, o retorno médio é menor no
+regime de alta volatilidade em todos os horizontes, de $-0{,}03$ p.p. em
+$h = 1$ a $-3{,}23$ p.p. em $h = 30$, e continua menor em $h = 60$
+($-2{,}45$ p.p.). Só com a volatilidade extrema, definida pelo quartil
+superior da VH com os dados disponíveis até $t$, os retornos ficam perto de
+zero ou negativos de $h = 10$ a $h = 30$ e superam os das demais datas em
+$h = 60$ ($11{,}46\%$ contra $7{,}64\%$), um padrão de reversão à média.
+Nenhuma diferença é significante (valores-$p$ entre 0,20 e 0,82 nas duas
+definições), e as 64 datas de volatilidade extrema formam só quatro episódios
+(março e abril de 2024, agosto de 2024, março de 2025 e fevereiro e março de
+2026).
+
+\input{tables/retornos_nao_linear/tab_retorno_regime}
+
+% =========================================================
+\section{Floresta direto no retorno}
+\label{sec:retnl-arvore-retorno}
+
+Uma alternativa às duas etapas é a floresta aplicada direto ao retorno,
+$R_{t+h} = g_h(X_t) + \varepsilon_{t+h}$, com uma floresta por horizonte e as
+mesmas variáveis e origens, que escolhe as quebras sem passar pelo BVRP
+(Tabela~\ref{tab:retnl-arvore-retorno}). O $R^2_{\text{fora}}$ contra a média
+histórica do retorno fica entre $-0{,}358$ e $0{,}021$, e nenhum horizonte é
+significante no Clark--West (valores-$p$ entre 0,11 e 0,94). Em $h = 60$, a
+floresta erra mais que a média histórica (Diebold--Mariano, $p = 0{,}014$). O
+$R^2$ dentro da amostra cresce com o horizonte, de 0,02 a 0,39, enquanto o de
+fora fica negativo: com alvos de $h$ dias sobrepostos, a floresta se ajusta ao
+ruído dos horizontes longos.
+
+\input{tables/retornos_nao_linear/tab_arvore_retorno}
+
+% =========================================================
+\section{Sinal do retorno}
+\label{sec:retnl-sinal}
+
+Em ações, a volatilidade aumenta mais depois de quedas de preço que depois de
+altas, o efeito alavancagem \citep{black1976studies, christie1982stochastic}.
+No câmbio, o sinal do retorno depende da moeda de cotação --- a queda de uma
+moeda é a alta da outra ---, e não há uma direção que corresponda à queda do
+ativo. \citet{hansen2005forecast} mostram que, no câmbio marco--dólar, modelos
+com efeito alavancagem não superam o GARCH(1,1), ao contrário do que ocorre
+com as ações da IBM.
+
+A Tabela~\ref{tab:retnl-sinal} divide a amostra de modelagem pelo sinal do
+log-retorno do dia. O BVRP médio é praticamente o mesmo nos dias de alta e de
+queda ($-9{,}00$ e $-8{,}63$ p.p.; $p = 0{,}56$). A IV, porém, responde ao
+sinal como nas ações: sobe, em média, 0,41 p.p. nos dias de queda e cai 0,46
+p.p. nos de alta. A regressão da variação diária da IV nas partes positiva e
+negativa do retorno mostra a assimetria: cada ponto percentual de queda eleva a
+IV em 0,77 p.p. ($p < 0{,}001$), e as altas não a movem ($p = 0{,}96$). O sinal
+do retorno muda a IV, mas não o prêmio.
+
+\input{tables/retornos_nao_linear/tab_sinal}
+
+% =========================================================
+\section{Síntese}
 \label{sec:retnl-sintese}
 
-Os resultados deste capítulo estabelecem quatro conclusões empíricas sobre a heterogeneidade do BVRP por regime de volatilidade realizada:
+O modelo único em árvore não encontra a previsibilidade que o modelo linear
+não encontrou. Com a floresta escolhendo os cortes nas volatilidades, o BVRP
+previsto tem coeficiente praticamente nulo em todos os horizontes, e o teste
+conjunto não rejeita em nenhuma das formas e modelos; a floresta aplicada
+direto ao retorno também não supera a média histórica. As árvores cortam a
+VH de 30 dias entre 45\% e 58\% a.a., acima do corte de $37{,}3\%$ entre os
+regimes, e preferem as volatilidades de 60 e de 90 dias. A diferença de
+retornos entre regimes não é significante em nenhuma definição.
+O sinal do retorno do dia move a IV, como nas ações, mas não o prêmio.
 
-\paragraph{Achado 1 --- Dissipação do prêmio em regimes de estresse.} O BVRP médio varia de forma sistemática entre regimes: $-13{,}20$ p.p. em baixa volatilidade, $-10{,}24$ p.p. em média volatilidade, e $+0{,}66$ p.p. em alta volatilidade. A magnitude do prêmio de seguro, portanto, não é constante --- ela se concentra em períodos de calmaria e praticamente desaparece em períodos de estresse, quando a volatilidade realizada alcança ou supera a implícita.
-
-\paragraph{Achado 2 --- Ausência de diferença estatisticamente
-significativa nos retornos futuros entre regimes.} Os retornos futuros
-médios são sistematicamente maiores no regime de baixa volatilidade, com
-diferença que cresce com o horizonte e atinge $4{,}80$ pontos
-percentuais em $h=30$. Sob inferência robusta à sobreposição das janelas
-(Newey--West sobre a amostra completa; reamostragem não sobreposta),
-contudo, nenhum horizonte alcança significância convencional. O efeito
-de regime sobre retornos futuros, se existe, não é identificável com a
-precisão que esta amostra permite.
-
-\paragraph{Achado 3 --- Heterogeneidade do prêmio, não dos retornos.} A
-variação sistemática do BVRP entre regimes (Achado 1), combinada à
-dispersão dramaticamente maior sob estresse, caracteriza o prêmio como
-estruturalmente condicional ao ambiente de volatilidade. Essa
-heterogeneidade é uma propriedade do prêmio em si --- mensurada
-contemporaneamente, sem sobreposição de janelas --- e não se estende à
-sua relação com retornos futuros, que permanece estatisticamente
-indistinguível de zero (Achado 2). A hipótese H4, formulada no
-Capítulo~\ref{chap:introducao}, é confirmada nessa dimensão: o prêmio
-varia com o estado do mercado. A investigação de modelos não
-paramétricos (Capítulo~\ref{chap:previsao_bvrp}) responde a uma questão
-distinta --- se a dinâmica do próprio BVRP é previsível fora da amostra
---- e conclui que não, além de sua própria persistência.
-
-
-\paragraph{Achado 4 --- Ausência de leverage effect.} A análise condicional ao sinal do retorno corrente (Seção~\ref{sec:retnl-sinal-retorno}) estabelece que o BVRP do Bitcoin não exibe assimetria estatisticamente significativa em função da direção do movimento recente de preço, em contraste com o \textit{leverage effect} documentado em mercados de equity. Esse resultado adiciona dimensão complementar à evidência de heterogeneidade condicional: o prêmio de risco de variância é estruturalmente sensível ao \textit{nível} de volatilidade realizada (Achados 1 e 3), mas não ao \textit{sinal} do retorno corrente.
-
-\paragraph{Limitação --- quebra estrutural associada aos ETFs \textit{spot}.} A aprovação dos ETFs \textit{spot} de Bitcoin pela SEC em janeiro de 2024 ocorreu dentro do período amostral desta dissertação e introduziu canal institucional regulado de exposição ao Bitcoin que pode ter alterado a dinâmica de demanda por proteção via opções, e consequentemente o comportamento do BVRP. A análise principal trata a amostra como bloco único, hipótese que se justifica pela transição gradual do mercado, mas que pode ser testada formalmente em extensões futuras por meio de procedimentos como os testes de Chow, CUSUM ou janelas móveis de regressão centradas em torno da data da aprovação. Adicionalmente, a estimação separada dos parâmetros para os subperíodos pré-ETF (mar/2021 a jan/2024) e pós-ETF (jan/2024 a mar/2026) permitiria avaliar se o sinal e a magnitude do prêmio de seguro se modificaram de forma sistemática após o ingresso institucional pleno.
-
-\section{Apêndice do capítulo: robustez do teste de magnitude}
-\label{sec:retnl-magnitude}
-
-Como evidência complementar à caracterização de regimes por volatilidade,
-testou-se se o BVRP prevê a \emph{magnitude} do retorno futuro de 30 dias
-($|R_{t+30}|$), em contraste com sua ausência de poder preditivo
-\emph{direcional} (Capítulo~\ref{chap:retornos_linear}). A decomposição em
-componentes isolados descarta atribuição a RV ou IV separadamente: nenhum
-dos dois é estatisticamente significativo isoladamente ($p=0{,}63$ e
-$p=0{,}32$, respectivamente, $R^2 < 1\%$), enquanto a combinação BVRP
-atinge $R^2=3{,}70\%$ --- evidência de que o sinal reside na diferença
-RV$-$IV, não em nível de volatilidade isolado.
-
-A inferência estatística, contudo, é sensível ao método de correção para
-retornos sobrepostos. A Tabela~\ref{tab:retnl-magnitude} reporta
-quatro abordagens: Newey--West e Hansen--Hodrick (ambos aplicados à
-amostra sobreposta completa, $N=1.775$), \textit{Moving Block Bootstrap}
-(idem), e reamostragem não sobreposta (30 fases de início possíveis,
-$N\approx59$ cada). Reporta-se a mediana entre as 30 fases para evitar a
-escolha \textit{ad hoc} de um único ponto de partida, e não porque a
-mediana seja o estimador ideal para esse procedimento. As três primeiras
-abordagens compartilham a mesma amostra sobreposta e, por isso, estão
-sujeitas ao mesmo viés de tamanho amostral finito documentado por
-\citet{fersonSarkissianSimin2003} para regressores persistentes com
-retornos sobrepostos; a quarta, estruturalmente imune a esse viés por
-eliminar a sobreposição, não confirma significância ao nível de 5\%.
-
-\begin{table}[H]
-\centering
-\caption{Robustez da significância estatística do teste de magnitude
-($|R_{t+30}| \sim \text{BVRP}_t$) sob quatro métodos de correção para
-retornos sobrepostos.}
-\label{tab:retnl-magnitude}
-\begin{tabular}{lrl}
-\toprule
-Método & $p$-valor & Amostra \\
-\midrule
-Newey--West (HAC)          & 0{,}0027 & Sobreposta ($N=1.775$) \\
-Hansen--Hodrick             & 0{,}0054 & Sobreposta ($N=1.775$) \\
-Moving Block Bootstrap      & 0{,}0120 & Sobreposta ($N=1.775$) \\
-Não sobreposta (mediana)    & 0{,}1048 & 30 fases, $N\approx59$ cada \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-O sinal é direcionalmente robusto e economicamente coerente com a
-interpretação de prêmio de seguro (BVRP mais negativo antecede maior
-magnitude de movimento futuro), mas sua significância estatística é
-marginal sob a correção mais conservadora. É reportado, portanto, como
-evidência sugestiva de que o BVRP se relaciona com a volatilidade futura
---- não como achado confirmatório --- e não é incorporado às conclusões
-direcionais do Capítulo~\ref{chap:retornos_linear}.
+A amostra inclui a aprovação dos ETFs de Bitcoin à vista pela SEC, em janeiro
+de 2024 (Capítulo~\ref{chap:referencial}). A análise trata o período como um
+bloco único; a estabilidade dos parâmetros antes e depois da aprovação não é
+testada nesta dissertação.

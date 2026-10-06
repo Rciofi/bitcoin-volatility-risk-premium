@@ -7,10 +7,15 @@ Investiga se o BVRP exibe comportamento assimétrico em função do sinal
 do retorno corrente do BTC (analogia ao leverage effect documentado em
 equity para a volatilidade implícita).
 
+LEGADO (Fase 2): usa a proxy vrp_30d e o teste de Welch, que não considera a
+persistência do BVRP. A análise do Cap. 7 é feita por code/descritivas_C7.py
+(BVRP prospectivo e variação da IV, diferenças com HAC); este script grava
+só em archive/.
+
 Saídas:
-  - tables/retornos_nao_linear/bvrp_by_return_sign.csv      (estatísticas brutas)
-  - tables/retornos_nao_linear/tab_bvrp_sinal_retorno.tex   (tabela LaTeX)
-  - figs/retornos_nao_linear/fig_bvrp_sinal.png        (boxplot por grupo)
+  - archive/tables/retornos_nao_linear/bvrp_by_return_sign.csv      (estatísticas brutas)
+  - archive/tables/retornos_nao_linear/tab_bvrp_sinal_retorno.tex   (tabela LaTeX)
+  - archive/figs/retornos_nao_linear/fig_bvrp_sinal.png        (boxplot por grupo)
 
 Autor: Rodrigo Ciofi
 Dissertação: Prêmio de Risco de Volatilidade do Bitcoin (BVRP) — FGV EESP
@@ -29,8 +34,9 @@ import matplotlib.patches as mpatches
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 DATA_PATH   = os.path.join(PROJECT_DIR, "data", "vrp_with_targets.csv")
-TABLE_DIR   = os.path.join(PROJECT_DIR, "tables", "retornos_nao_linear")
-FIG_DIR     = os.path.join(PROJECT_DIR, "figs",   "retornos_nao_linear")
+# legado: substituído por code/descritivas_C7.py (Fase 2, C7.3)
+TABLE_DIR   = os.path.join(PROJECT_DIR, "archive", "tables", "retornos_nao_linear")
+FIG_DIR     = os.path.join(PROJECT_DIR, "archive", "figs",   "retornos_nao_linear")
 
 os.makedirs(TABLE_DIR, exist_ok=True)
 os.makedirs(FIG_DIR,   exist_ok=True)

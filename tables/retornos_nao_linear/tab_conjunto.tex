@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Teste conjunto nos seis horizontes.}
+\label{tab:retnl-conjunto}
+\begin{tabular}{lrrrrr}
+\toprule
+Regressor & $W$ & $p$ (Wald) & $p$ (max-$|t|$) & $p$ (HAC empilhado) & $p$ (só 2º nível) \\
+\midrule
+Floresta, $\hat f(X_t) - \text{IV}_t$ (principal) & 1{,}45 & 0{,}963 & 0{,}791 & 0{,}925 & 0{,}952 \\
+\quad blocos de 30 dias & 1{,}63 & 0{,}950 & 0{,}670 & & \\
+\quad blocos de 90 dias & 1{,}48 & 0{,}961 & 0{,}905 & & \\
+Floresta, direta & 1{,}12 & 0{,}980 & 0{,}708 & 0{,}234 & 0{,}507 \\
+Ridge, $\hat f(X_t) - \text{IV}_t$ & 4{,}39 & 0{,}624 & 0{,}382 & 0{,}233 & 0{,}389 \\
+Ridge, direta & 6{,}46 & 0{,}373 & 0{,}115 & 0{,}019 & 0{,}032 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $H_0$: $\beta_h = 0$ nos seis horizontes. Wald: $W = \bar\beta^{*\prime}\,\Sigma^{*-1}\,\bar\beta^*$, com a média e a covariância dos $\beta^*$ do bootstrap em dois níveis (blocos de 60 dias, salvo indicação), $\chi^2(6)$; continua definido quando $\lambda_h \le 0$. max-$|t|$: valor-$p$ global do maior $|z_h|$. HAC empilhado: as seis regressões em conjunto, Newey--West com 61 defasagens. As duas últimas colunas ignoram a estimação do BVRP previsto.}
+\end{table}

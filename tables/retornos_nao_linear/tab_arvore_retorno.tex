@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Floresta aleatória direto no retorno futuro.}
+\label{tab:retnl-arvore-retorno}
+\begin{tabular}{rrrrr}
+\toprule
+$h$ & $R^2_{\text{fora}}$ & $p$ (CW) & $p$ (DM) & $R^2$ dentro \\
+\midrule
+1 & 0{,}001 & 0{,}133 & 0{,}850 & 0{,}02 \\
+5 & $-$0{,}001 & 0{,}186 & 0{,}964 & 0{,}03 \\
+10 & 0{,}000 & 0{,}196 & 0{,}997 & 0{,}04 \\
+20 & 0{,}021 & 0{,}108 & 0{,}758 & 0{,}07 \\
+30 & $-$0{,}075 & 0{,}197 & 0{,}549 & 0{,}15 \\
+60 & $-$0{,}358 & 0{,}935 & 0{,}014 & 0{,}39 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R_{t+h} = g_h(X_t) + \varepsilon_{t+h}$, com $g_h$ uma floresta aleatória por horizonte, as mesmas variáveis, origens e janela expansiva, e embargo de $h$ dias; 987 previsões. $R^2_{\text{fora}}$ contra a média histórica do retorno; Clark--West unilateral e Diebold--Mariano bilateral contra a média histórica, com HAC de $h+1$ defasagens. $R^2$ dentro: média nas 33 origens.}
+\end{table}

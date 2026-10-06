@@ -36,8 +36,8 @@ matplotlib.rcParams.update({
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "vrp_with_regimes.csv"   # IC1: fonte canonica com ret_fut_* (1.775 obs)
-OUT_FIGS = ROOT / "figs" / "retornos_nao_linear"
-OUT_TABS = ROOT / "tables" / "retornos_nao_linear"
+OUT_FIGS = ROOT / "archive" / "figs" / "retornos_nao_linear"   # legado: fora do Cap. 7 (Fase 2)
+OUT_TABS = ROOT / "archive" / "tables" / "retornos_nao_linear"
 OUT_FIGS.mkdir(parents=True, exist_ok=True)
 OUT_TABS.mkdir(parents=True, exist_ok=True)
 

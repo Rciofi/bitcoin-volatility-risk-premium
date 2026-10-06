@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Previsão do BVRP: forma direta e forma $\hat f(X_t) - \text{IV}_t$.}
+\label{tab:retnl-previsao}
+\begin{tabular}{lrrrrr}
+\toprule
+Modelo & $R^2_{\text{fora}}$ & $R^2_{\text{fora}}$ (móvel) & $p$ (CW) & Negativas & BVRP $> 0$ \\
+\midrule
+Ridge, direta & 0{,}223 & 0{,}095 & $<$0{,}001 & 93\% & $-$5{,}1 \\
+Floresta, direta & 0{,}143 & 0{,}073 & $<$0{,}001 & 100\% & $-$6{,}8 \\
+Floresta, $\hat f(X_t) - \text{IV}_t$ (principal) & 0{,}009 & $-$0{,}069 & $<$0{,}001 & 67\% & $-$0{,}8 \\
+Floresta, $\hat f(X_t) - \text{IV}_t$, com $D_t$ & $-$0{,}041 & -- & $<$0{,}001 & 68\% & $-$1{,}2 \\
+Ridge, $\hat f(X_t) - \text{IV}_t$ & $-$0{,}073 & $-$0{,}047 & $<$0{,}001 & 63\% & 0{,}7 \\
+Média histórica da VH $-\ \text{IV}_t$ & $-$0{,}588 & $-$0{,}268 & $<$0{,}001 & 25\% & 9{,}8 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Alvo: $\text{BVRP}_t = \text{VH}_{t+1:t+30} - \text{IV}_t$; 987 previsões, de 21/06/2023 a 03/03/2026. Direta: o modelo prevê o BVRP. $\hat f(X_t) - \text{IV}_t$: o modelo prevê $\text{VH}_{t+1:t+30}$, e a IV de $t$ é subtraída. $D_t$: indicadora do regime de alta volatilidade (corte fixo) como variável a mais. Média histórica da VH $-\ \text{IV}_t$: média de $\text{VH}_{t+1:t+30}$ nos alvos conhecidos na origem, menos a IV de $t$. $R^2_{\text{fora}}$ contra a média histórica do BVRP, nas janelas expansiva e móvel (730 dias); Clark--West unilateral (expansiva), com HAC de 31 defasagens. Última coluna: média do BVRP previsto nas datas em que o BVRP realizado foi positivo, em p.p.}
+\end{table}

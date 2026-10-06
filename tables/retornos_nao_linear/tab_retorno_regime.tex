@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Retorno futuro médio por regime de volatilidade.}
+\label{tab:retnl-retorno-regime}
+\begin{tabular}{rrrrr}
+\toprule
+$h$ & Baixa / demais & Alta / extrema & Diferença & $p$ \\
+\midrule
+\multicolumn{5}{l}{\textit{Corte fixo ($37{,}3\%$ a.a.)}: Baixa, $N = 394$; Alta, $N = 1382$} \\
+1 & 0{,}09 & 0{,}06 & $-$0{,}03 & 0{,}821 \\
+5 & 0{,}51 & 0{,}23 & $-$0{,}28 & 0{,}674 \\
+10 & 1{,}03 & 0{,}43 & $-$0{,}60 & 0{,}663 \\
+20 & 2{,}54 & 0{,}77 & $-$1{,}77 & 0{,}524 \\
+30 & 4{,}40 & 1{,}17 & $-$3{,}23 & 0{,}435 \\
+60 & 6{,}44 & 3{,}99 & $-$2{,}45 & 0{,}693 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Quartil superior em janela expansiva}: Demais, $N = 983$; Extrema, $N = 64$} \\
+1 & 0{,}11 & 0{,}38 & 0{,}27 & 0{,}451 \\
+5 & 0{,}59 & 0{,}29 & $-$0{,}30 & 0{,}729 \\
+10 & 1{,}21 & $-$0{,}02 & $-$1{,}23 & 0{,}287 \\
+20 & 2{,}53 & $-$0{,}29 & $-$2{,}82 & 0{,}197 \\
+30 & 3{,}82 & 0{,}50 & $-$3{,}32 & 0{,}281 \\
+60 & 7{,}64 & 11{,}46 & 3{,}82 & 0{,}521 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Retorno simples médio de $t$ a $t+h$, em \%. Diferença: regime de alta (ou volatilidade extrema) menos o outro grupo, estimada pela regressão do retorno numa indicadora do regime, com HAC de $h+1$ defasagens. Corte fixo: amostra de modelagem, 23/04/2021 a 03/03/2026. Quartil superior: $\text{VH}_{t-29:t}$ acima do terceiro quartil da própria série com dados até $t$, a partir de 730 observações (22/04/2023 a 03/03/2026).}
+\end{table}
