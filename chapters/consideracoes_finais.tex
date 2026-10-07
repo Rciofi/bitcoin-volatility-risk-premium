@@ -7,10 +7,11 @@ volatilidade implícita dada pelo DVOL, com dados diários de março de 2021 a
 março de 2026. O prêmio existe e é grande: a média do BVRP é de $-8{,}76$ p.p.
 ($t = -5{,}15$), e a IV supera a VH dos 30 dias seguintes em 72\% das datas.
 As variáveis conhecidas em $t$ contêm alguma informação sobre o prêmio: na
-janela expansiva, todos os modelos de previsão superam a média histórica fora
-da amostra, e o Ridge reduz o erro quadrático em 22\%. A previsibilidade,
-porém, é modesta, e as previsões não antecipam os episódios de prêmio
-positivo. A medida também muda a leitura dos regimes: com a proxy
+janela expansiva, todos os modelos de previsão têm erro fora da amostra menor
+que o da média histórica, o Ridge reduz o da média em 22\%, e o teste de
+Clark--West rejeita a 5\% para os cinco. A previsibilidade, porém, é modesta: o
+\textit{model confidence set} não separa os modelos da média histórica, e as
+previsões não antecipam os episódios de prêmio positivo. A medida também muda a leitura dos regimes: com a proxy
 retrospectiva, o prêmio é maior no regime de baixa volatilidade, como em
 \citet{almeida2024cryptoVRP}; com o BVRP prospectivo, a diferença se inverte.
 

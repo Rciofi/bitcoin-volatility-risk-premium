@@ -59,11 +59,13 @@ com 17 variáveis conhecidas em $t$ --- volatilidades históricas de 1 a 90 dias
 a IV e suas variações, retornos passados e a proxy --- e cinco modelos: MQO,
 Ridge, LASSO, floresta aleatória e XGBoost. A dissertação reestima os modelos a
 cada 30 dias em janela expansiva, e o treino de cada origem exclui os alvos que
-ainda não se realizaram. Na janela expansiva, todos superam a média histórica: o Ridge reduz o erro
-quadrático em 22\%, e o teste de \citet{clark2007approximately} rejeita a
-igualdade com a média para quatro dos cinco modelos, mesmo com a correção para
-múltiplas comparações. A previsibilidade, porém, é modesta: as previsões ficam
-próximas da média e não antecipam os episódios de prêmio positivo. A relação
+ainda não se realizaram. Na janela expansiva, todos têm erro quadrático fora
+da amostra menor que o da média histórica (o Ridge reduz o da média em 22\%), e
+o teste de \citet{clark2007approximately} rejeita a 5\%, para os cinco, a
+hipótese de que as variáveis não acrescentam informação à média. A
+previsibilidade, porém, é modesta: o \textit{model confidence set} de
+\citet{hansen2011model} não separa os modelos da média histórica, e as
+previsões ficam próximas dela e não antecipam os episódios de prêmio positivo. A relação
 entre as variáveis e o prêmio muda entre os regimes dentro da amostra, mas essa
 mudança não melhora a previsão fora dela.
 
