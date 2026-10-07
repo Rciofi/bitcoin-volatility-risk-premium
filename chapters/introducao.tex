@@ -45,9 +45,9 @@ Newey--West de 31 defasagens, que cobre a sobreposição entre alvos vizinhos.
 Nas 1.806 datas da amostra, a média é de $-8{,}76$ p.p. ($t = -5{,}15$), e a IV
 supera a VH dos 30 dias seguintes em 72\% das datas: o prêmio existe. A
 distribuição da VH de 30 dias é bimodal, o que indica dois regimes de
-volatilidade; o corte entre eles, de $37{,}3\%$ a.a., é estimado só com os dois
-primeiros anos da amostra, para que nenhuma data seja classificada com
-informação posterior a ela. No regime de baixa volatilidade, a IV supera a VH
+volatilidade; a dissertação estima o corte entre eles, de $37{,}3\%$ a.a., só
+com os dois primeiros anos da amostra, para que nenhuma data seja classificada
+com informação posterior a ela. No regime de baixa volatilidade, a IV supera a VH
 dos 30 dias anteriores, mas não a dos 30 seguintes: a proxy registra um prêmio
 maior nesse regime, e o BVRP, nenhum.
 
@@ -57,8 +57,8 @@ correlação entre as duas na mesma data é de $-0{,}02$. Por isso, antes de
 relacionar o prêmio aos retornos, a dissertação prevê o BVRP fora da amostra,
 com 17 variáveis conhecidas em $t$ --- volatilidades históricas de 1 a 90 dias,
 a IV e suas variações, retornos passados e a proxy --- e cinco modelos: MQO,
-Ridge, LASSO, floresta aleatória e XGBoost. Os modelos são reestimados a cada
-30 dias em janela expansiva, e o treino de cada origem exclui os alvos que
+Ridge, LASSO, floresta aleatória e XGBoost. A dissertação reestima os modelos a
+cada 30 dias em janela expansiva, e o treino de cada origem exclui os alvos que
 ainda não se realizaram. Na janela expansiva, todos superam a média histórica: o Ridge reduz o erro
 quadrático em 22\%, e o teste de \citet{clark2007approximately} rejeita a
 igualdade com a média para quatro dos cinco modelos, mesmo com a correção para
@@ -77,8 +77,8 @@ reamostragem. O coeficiente é negativo nos seis horizontes, na direção de
 \citet{bollerslev2009expected}: um prêmio maior antecede retornos maiores.
 Nenhum horizonte, porém, é significante depois das correções para o regressor
 gerado e para as comparações múltiplas, e o teste conjunto nos seis horizontes
-não rejeita ($p = 0{,}37$); ele só rejeita quando a estimação do BVRP previsto
-é ignorada. A inclinação é mais negativa no regime de baixa volatilidade, mas a
+não rejeita ($p = 0{,}37$); ele só rejeita quando ignora a estimação do BVRP
+previsto. A inclinação é mais negativa no regime de baixa volatilidade, mas a
 diferença entre os regimes depende da posição do corte.
 
 \textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende

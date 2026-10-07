@@ -1,117 +1,60 @@
-﻿\chapter*{Nota Metodológica: Reprodutibilidade e Limitações Práticas}
-\addcontentsline{toc}{chapter}{Nota Metodológica: Reprodutibilidade e Limitações Práticas}
+\chapter*{Nota Metodológica: Reprodutibilidade}
+\addcontentsline{toc}{chapter}{Nota Metodológica: Reprodutibilidade}
 \label{chap:nota_metodologica}
 
-Esta dissertação adota como princípio central a transparência metodológica e a
-consistência empírica. Todas as definições de variáveis, especificações
-econométricas e desenhos preditivos são descritos de forma explícita, permitindo
-replicação conceitual integral dos resultados apresentados. Esta nota consolida
-os principais aspectos práticos de reprodutibilidade, as escolhas de
-implementação e as limitações inerentes ao exercício empírico.
+Esta nota reúne as escolhas de implementação que permitem reproduzir os
+resultados. As definições das variáveis estão no
+Apêndice~\ref{app:variaveis}; os scripts, no Apêndice~\ref{app:scripts}; e a
+ordem de execução, no Apêndice~\ref{app:pastas}. As limitações da análise
+estão na Seção~\ref{sec:concl-limitacoes}.
 
-\section*{Fontes de dados e período amostral}
+\section*{Dados e amostras}
 
-Os dois insumos primários da dissertação são: (i) os preços diários de
-fechamento do Bitcoin (\textit{ticker} BTC/USDT), obtidos via API pública da
-Binance; e (ii) o índice DVOL (\textit{Deribit Volatility Index}), obtido via
-API pública da Deribit. Ambas as séries cobrem o período de abril de 2021 a
-abril de 2026, totalizando 1.775 observações diárias após o alinhamento e a
-remoção de valores faltantes.
+Os preços de fechamento diários do Bitcoin (par BTCUSDT) vêm da API pública da
+Binance, e o índice DVOL, da API pública da Deribit. A série de preços não
+tinha os dias de 1º a 31 de março de 2023, que a dissertação completa com as
+velas diárias da mesma fonte; o pipeline interrompe a execução se faltar
+qualquer data. A amostra completa tem 1.806 observações, de 24/03/2021 a
+03/03/2026, e serve à análise descritiva e ao teste de H1; a amostra de
+modelagem tem 1.776, de 23/04/2021 a 03/03/2026, e serve aos
+Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
+(Seção~\ref{sec:met-amostras}).
 
-O ponto de partida em abril de 2021 é determinado pela disponibilidade
-histórica do DVOL na Deribit. Extensões da amostra para períodos anteriores
-requeriam volatilidade implícita de outra fonte, o que implicaria quebra
-metodológica. Optou-se por preservar a homogeneidade da fonte ao custo de uma
-janela amostral mais curta.
+\section*{Informação disponível em \texorpdfstring{$t$}{t}}
 
-\section*{Construção das variáveis centrais}
+As variáveis explicativas de cada data são conhecidas no fim do próprio dia.
+O BVRP de $t$ só é conhecido em $t+30$ e nunca entra como variável
+explicativa. A dissertação reestima os modelos a cada 30 dias, em 33 origens,
+e o treino de cada origem $t$ usa apenas as datas $s \le t - h$; a validação
+cruzada, com cinco dobras expansivas, aplica o mesmo embargo dentro do treino.
+O corte principal entre os regimes usa só a primeira janela de estimação. Um
+teste placebo, com o alvo embaralhado dentro do treino, confere que o
+procedimento não usa informação do período de teste
+(Capítulo~\ref{chap:previsao_bvrp}).
 
-A volatilidade realizada $RV_{30,t}$ é calculada como a raiz quadrada da soma
-dos quadrados dos retornos logarítmicos diários em janela móvel de 30 dias,
-anualizada pelo fator 365, refletindo a operação contínua (24/7) do mercado de
-criptoativos. A volatilidade implícita $IV_{30,t}$ é diretamente extraída do
-índice DVOL, que representa a expectativa do mercado de opções da Deribit para
-a volatilidade do Bitcoin ao longo dos próximos 30 dias. O BVRP é então definido
-como $BVRP_t = RV_{30,t} - IV_{30,t}$.
+\section*{Modelos e inferência}
 
-Ambas as séries estão expressas em base anualizada e em pontos percentuais, o
-que torna a interpretação do diferencial direta: um $BVRP_t < 0$ --- o estado típico --- indica que o
-mercado de opções precifica mais volatilidade do que a efetivamente observada
-no mercado à vista.
-
-\section*{Prevenção de \textit{look-ahead bias}}
-
-Toda a modelagem preditiva utiliza estritamente informações disponíveis no
-instante de decisão $t$. Os retornos futuros
-$R_{t+h} = P_{t+h}/P_t - 1$ são construídos com deslocamento negativo
-(\texttt{shift(-h)}), de modo que constituem a variável-alvo, nunca um preditor.
-Os preditores defasados são construídos com \texttt{shift(+1)} quando necessário.
-A divisão temporal treino/teste (70\,\%/30\,\%) preserva a ordenação
-cronológica das observações, sem embaralhamento.
-
-\section*{Modelos econométricos}
-
-As regressões do Capítulo~\ref{chap:retornos_linear} e do
-Capítulo~\ref{chap:retornos_nao_linear} são estimadas por MQO com erros-padrão HAC de
-Newey--West, com número de defasagens igual ao horizonte $h$ de cada regressão.
-Essa escolha corrige a autocorrelação induzida pela sobreposição das janelas de
-retorno ($h > 1$) sem impor estrutura paramétrica adicional.
-
-\section*{Modelos de aprendizado de máquina}
-
-Os cinco modelos supervisionados (MQO, LASSO, Ridge, \textit{floresta aleatória} e \textit{Gradient Boosting}) são implementados com a biblioteca \texttt{scikit-learn}. A estratégia de seleção de hiperparâmetros difere entre os capítulos de aprendizado de máquina, em função dos objetivos preditivos distintos. Para os modelos lineares regularizados (LASSO e Ridge), os hiperparâmetros são selecionados por validação cruzada temporal --- especificamente, cinco divisões em janela expansiva com \textit{embargo} de 30 dias entre cada janela de treino e a janela de validação correspondente (implementação customizada, uma vez que o particionador padrão de séries temporais não acomoda o \textit{embargo}), configuração consistente com a literatura de retornos sobrepostos; o MQO, por não possuir hiperparâmetro de regularização, corresponde ao caso-limite $\alpha = 0$ e não passa por essa seleção. Para os modelos baseados em árvores (\textit{floresta aleatória} e \textit{Gradient Boosting}), os hiperparâmetros são fixados em valores convencionalmente adotados na literatura --- limitação metodológica explicitamente reconhecida e discutida na seção de modelos do mesmo capítulo. A robustez dos resultados do Capítulo~\ref{chap:previsao_bvrp} é avaliada de forma independente por meio de valores SHAP calculados no conjunto de teste, procedimento que não depende da escolha dos hiperparâmetros para o ordenamento de importância das variáveis. Os modelos baseados em árvores (\textit{floresta aleatória} e \textit{Gradient Boosting}) utilizam \texttt{random\_state=42} em ambos os capítulos, garantindo determinismo. Os modelos lineares (MQO, Ridge e LASSO) operam sobre variáveis padronizadas (\texttt{StandardScaler} ajustado exclusivamente no conjunto de treino, sem reestimação no teste).
-
-O Capítulo~\ref{chap:previsao_bvrp} avalia a previsão do nível do BVRP em frequência diária (um passo à frente). Os retornos futuros do Bitcoin, cuja previsibilidade linear é tratada no Capítulo~\ref{chap:retornos_linear}, não são alvo do exercício preditivo do Capítulo~\ref{chap:previsao_bvrp}.
-
-\section*{Classificação de regimes}
-
-Os limiares de regime ($q_{25} = 39{,}3\%$ e $q_{75} = 65{,}6\%$ da $RV_{30}$)
-são calculados sobre a amostra completa. Essa escolha implica que a
-classificação de cada observação histórica utiliza informação do período futuro
---- o que é adequado para análise descritiva e estratégias aplicadas
-\textit{ex-post}, mas deve ser considerado ao interpretar os resultados em
-termos de implementação em tempo real.
-
-\section*{Limitações práticas}
-
-As principais limitações do estudo são:
-
-\begin{itemize}
-    \item \textbf{Janela amostral}: a série cobre apenas cinco anos (2021--2026),
-    incluindo um único ciclo completo de mercado de criptoativos. Resultados
-    podem não generalizar para janelas distintas ou outros ativos digitais.
-
-    \item \textbf{Granularidade dos dados}: a análise utiliza dados diários. O
-    uso de dados intradiários permitiria estimar a $RV$ de forma mais precisa
-    (estimadores de Parkinson, Garman--Klass ou MedRV), potencialmente
-    alterando a magnitude e a significância do BVRP.
-
-    \item \textbf{Fonte única de IV}: a dependência exclusiva do DVOL da Deribit
-    significa que a série de volatilidade implícita reflete o fluxo de ordens e
-    a liquidez de uma única plataforma, o que pode introduzir vieses de
-    precificação em períodos de baixa liquidez.
-
-    \item \textbf{Fricções de mercado}: as estratégias do
-    Apêndice~\ref{app:estrategias} incorporam custos de transação
-    unilaterais de até 10~bps por operação, mas não capturam
-    \textit{slippage} em períodos de baixa profundidade, restrições de
-    alavancagem ou fricções de liquidez intradiária. Nessa dimensão, os
-    resultados devem ser interpretados como limites superiores do
-    desempenho líquido.
-
-    \item \textbf{Regimes definidos ex-post}: os quantis de classificação de
-    regime são calculados sobre a amostra completa, de modo que a análise de
-    regimes do Capítulo~\ref{chap:retornos_nao_linear} é descritiva e não constitui uma
-    estratégia implementável em tempo real sem reestimação recursiva dos
-    limiares.
-\end{itemize}
+O MQO, o Ridge, o LASSO e a floresta aleatória usam a biblioteca
+\texttt{scikit-learn}, e o XGBoost, a biblioteca \texttt{xgboost}; os modelos
+lineares usam as variáveis padronizadas com a média e o desvio-padrão do
+treino de cada origem. As regressões usam o MQO do \texttt{statsmodels} com
+erro-padrão de Newey--West: núcleo de Bartlett com $h+1$ defasagens, sem
+correção de amostra pequena e com valor-$p$ pela distribuição normal. O
+bootstrap em blocos em dois níveis usa 999 reamostragens e blocos de 60 dias,
+com blocos de 30 e de 90 dias como robustez (Seção~\ref{sec:met-inferencia}).
 
 \section*{Reprodutibilidade}
 
-Todos os scripts Python utilizados na dissertação estão organizados no
-repositório do projeto (ver Apêndice~\ref{app:pastas}) e produzem resultados
-idênticos quando executados na ordem documentada. As figuras e tabelas
-incluídas no texto são geradas diretamente pelos scripts de regeneração
-(\path{scripts/regenerate_cap*.py}), sem edições manuais posteriores.
-As definições matemáticas das variáveis e os trechos de código comentados
-encontram-se nos Apêndices~\ref{app:variaveis} e~\ref{app:scripts}, respectivamente.
+As sementes são fixas: 42 nos modelos em árvore e nas permutações do placebo,
+e 20261001 nas reamostragens do bootstrap. As tabelas e as figuras do texto
+são gravadas pelos scripts, sem edição manual; os geradores recalculam as
+estatísticas reportadas a partir das saídas gravadas e interrompem a execução
+se a diferença passar de $10^{-9}$. O ambiente usado tem Python 3.14.4,
+\texttt{pandas} 3.0.2, \texttt{NumPy} 2.4.4, \texttt{statsmodels} 0.14.6,
+\texttt{scikit-learn} 1.8.0 e \texttt{xgboost} 3.2.0; o arquivo
+\texttt{requirements.txt} do repositório fixa essas versões e as das demais
+bibliotecas.
+
+\section*{Disponibilidade}
+
+O código e os dados estão disponíveis mediante solicitação ao autor.

@@ -24,13 +24,13 @@ por MQO, nas 987 datas fora da amostra do Capítulo~\ref{chap:previsao_bvrp}
 $\widehat{\text{BVRP}}_t$, a previsão do Ridge na janela expansiva. A previsão
 da floresta aleatória serve de teste de robustez; as duas escolhas foram
 fixadas antes de ver os resultados deste capítulo
-(Seção~\ref{sec:prev-sintese}). Os coeficientes são reportados em pontos
+(Seção~\ref{sec:prev-sintese}). As tabelas reportam os coeficientes em pontos
 percentuais de retorno por ponto percentual de BVRP previsto.
 
 A especificação é preditiva: $\beta_h$ mede se o BVRP previsto em $t$
 antecipa o retorno dos $h$ dias seguintes, e não o efeito causal do prêmio
 sobre o preço. Os retornos de datas vizinhas se sobrepõem em $h-1$ dias, o que
-induz autocorrelação nos erros. A correção para essa sobreposição é feita no
+induz autocorrelação nos erros. A correção para essa sobreposição atua no
 erro-padrão, e não no estimador: o $\hat\beta_h$ é o mesmo do MQO, e o
 erro-padrão de Newey--West com $h+1$ defasagens contorna a autocorrelação sob
 as condições da Seção~\ref{sec:met-inferencia}. Mesmo com essa correção,
@@ -47,10 +47,10 @@ O erro-padrão HAC trata $\widehat{\text{BVRP}}_t$ como se fosse observado,
 quando ele é estimado no primeiro estágio \citep{pagan1984}. Por isso, a
 inferência principal usa o bootstrap em blocos em dois níveis da
 Seção~\ref{sec:met-inferencia} \citep{kunsch1989}, um procedimento não
-paramétrico: em cada reamostragem, o modelo de previsão é reestimado em cada
-origem, com um treino reamostrado em blocos dentro da própria janela de
-treino, e $\beta_h$ é reestimado com os pares (previsão, retorno) das 987
-datas, também reamostrados em blocos.\footnote{No principal, o $\alpha$ do
+paramétrico: em cada reamostragem, o bootstrap reestima o modelo de previsão em
+cada origem, com um treino reamostrado em blocos dentro da própria janela de
+treino, e reestima $\beta_h$ com os pares (previsão, retorno) das 987 datas,
+também reamostrados em blocos.\footnote{No principal, o $\alpha$ do
 Ridge fica fixo, em cada origem, no valor escolhido no
 Capítulo~\ref{chap:previsao_bvrp}. Reescolhê-lo por validação cruzada em
 cada treino reamostrado distorce o procedimento: blocos repetidos podem cair
@@ -111,8 +111,8 @@ toma o maior $|z_h|$ entre os horizontes e tira o valor crítico da
 distribuição do máximo nas reamostragens \citep{westfall1993resampling}, em
 aplicação com bootstrap em dados dependentes como a de
 \citet{romano2005stepwise}, também não rejeita: o menor valor-$p$ ajustado é
-0,115, em $h = 1$. A hipótese conjunta só é rejeitada quando a estimação do
-BVRP previsto é ignorada: com o HAC das seis regressões empilhadas
+0,115, em $h = 1$. Os testes só rejeitam a hipótese conjunta quando ignoram a
+estimação do BVRP previsto: com o HAC das seis regressões empilhadas
 ($p = 0{,}019$) e com o bootstrap só do segundo nível, que mantém as previsões
 fixas ($p = 0{,}032$). A diferença entre os dois grupos de testes é o efeito
 do regressor gerado.
@@ -151,7 +151,7 @@ e a IV. Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença
 $\text{VH}_{t-29:t} - \text{IV}_t$, que é a $\text{BVRP}^{\text{proxy}}_t$,
 resume o conteúdo das duas medidas. A Tabela~\ref{tab:retlin-componentes}
 mostra que os coeficientes têm sinais opostos de $h = 1$ a $h = 20$, a IV com
-sinal positivo, e que a restrição só é rejeitada em $h = 1$ ($p = 0{,}039$;
+sinal positivo, e que o teste só rejeita a restrição em $h = 1$ ($p = 0{,}039$;
 nos demais horizontes, $p \ge 0{,}18$). Nenhum coeficiente individual é
 significante depois da correção de Bonferroni. O teste usa a volatilidade
 histórica retrospectiva, a da proxy, e não o BVRP previsto: ele diz se a

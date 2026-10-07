@@ -54,7 +54,7 @@ $17{,}3$ contra $11{,}9$ p.p.), com mínimo de $-75{,}8$ p.p., em novembro de
 \IfFileExists{tables/dados/desc_stats.tex}{
   \input{tables/dados/desc_stats.tex}
 }{}
-Os testes formais de estacionariedade confirmam que o preço do Bitcoin (\textit{close}) é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (VH 30d e IV 30d) e as duas versões do prêmio apresentam resultados inconclusivos --- o ADF rejeita a raiz unitária, mas o KPSS também rejeita a estacionariedade (no BVRP, com valor-$p$ de $0{,}015$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. Essas séries são mantidas em nível (Tabela~\ref{tab:dados-adf-kpss}).
+Os testes formais de estacionariedade confirmam que o preço de fechamento do Bitcoin é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (VH 30d e IV 30d) e as duas versões do prêmio apresentam resultados inconclusivos --- o ADF rejeita a raiz unitária, mas o KPSS também rejeita a estacionariedade (no BVRP, com valor-$p$ de $0{,}015$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. A dissertação mantém essas séries em nível (Tabela~\ref{tab:dados-adf-kpss}).
 
 \IfFileExists{tables/dados/adf_kpss_table.tex}{
   \input{tables/dados/adf_kpss_table.tex}
@@ -117,8 +117,8 @@ inferior), com anotações dos principais eventos de mercado do período.
 A inspeção visual da série evidencia períodos recorrentes de elevação do prêmio
 de risco de volatilidade, frequentemente associados a episódios de estresse no
 mercado, como choques macroeconômicos globais, eventos regulatórios relevantes e
-fases de forte desalavancagem. Observa-se também a presença de persistência
-temporal, sugerindo que o BVRP não se comporta como um processo puramente
+fases de forte desalavancagem. A série também mostra persistência temporal, o
+que sugere que o BVRP não se comporta como um processo puramente
 aleatório, mas apresenta dinâmica própria ao longo do tempo.
 
 % =========================================================

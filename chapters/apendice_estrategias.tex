@@ -6,8 +6,8 @@ previsto e os retornos futuros estudada nos
 Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. A
 análise é exploratória. Nenhum dos dois capítulos encontra previsibilidade dos
 retornos que resista às correções para o regressor gerado e para as
-comparações múltiplas, e as regras a seguir não são apresentadas como fonte de
-retorno excedente. Elas mostram como o coeficiente negativo do
+comparações múltiplas, e o apêndice não apresenta as regras a seguir como fonte
+de retorno excedente. Elas mostram como o coeficiente negativo do
 Capítulo~\ref{chap:retornos_linear} se traduz no desempenho de uma posição no
 mercado à vista, antes e depois dos custos de transação.
 
@@ -25,21 +25,21 @@ conhecida em $t$.
 
 \paragraph{Regra.} Em cada data, o limiar $q(t)$ é o quantil $q$ do sinal nas
 observações até $t$, em janela expansiva, e o sinal é alto quando
-$\widehat{\text{BVRP}}_t \ge q(t)$. A posição é definida no fim de $t$ e
-aplicada ao retorno simples de $t$ a $t+1$; nenhuma informação posterior a $t$
-entra na decisão. O limiar só é calculado a partir da 252ª previsão. Como as
+$\widehat{\text{BVRP}}_t \ge q(t)$. A regra define a posição no fim de $t$ e a
+aplica ao retorno simples de $t$ a $t+1$; nenhuma informação posterior a $t$
+entra na decisão. O cálculo do limiar começa na 252ª previsão. Como as
 previsões começam em 21/06/2023, a negociação com o Ridge vai de 27/02/2024 a
 02/03/2026, 735 dias; a última data da amostra, 03/03/2026, fica de fora porque
 o retorno seguinte cairia depois dela. Com um \textit{burn-in} de 126
 previsões, como sensibilidade, a negociação começa em 24/10/2023 (861 dias). O
-quantil de referência é o de 80\%; os de 60\%, 70\% e 90\% são reportados ao
-lado.
+quantil de referência é o de 80\%; as tabelas reportam ao lado os de 60\%,
+70\% e 90\%.
 
 \paragraph{Direções.} Com o sinal alto, a regra comprada/neutra fica comprada
 em uma unidade de Bitcoin, e a vendida/neutra, vendida em uma unidade; nos
-outros dias, as duas ficam fora do mercado. As duas direções foram fixadas
-antes de ver os resultados e são reportadas juntas, para que a direção não
-seja escolhida depois deles. Sem custos, o retorno diário da vendida é o da
+outros dias, as duas ficam fora do mercado. A dissertação fixou as duas
+direções antes de ver os resultados e as reporta juntas, para que a direção
+não seja escolhida depois deles. Sem custos, o retorno diário da vendida é o da
 comprada com o sinal trocado, e o índice de Sharpe também.
 
 \paragraph{Custos.} Os custos são unilaterais, de 0, 10 e 30 pontos-base
@@ -153,8 +153,8 @@ Sharpe de 0,34 do compra e manutenção e desaparece com custos; o que se manté
 é o \textit{drawdown} menor ($-36{,}4\%$ contra $-72{,}4\%$), com a regra
 posicionada em 26\% dos dias (Figura~\ref{fig:estr-proxy}).
 
-Para separar o efeito do sinal do efeito do período, a proxy é avaliada também
-nas mesmas 735 datas do Ridge, com o limiar calculado sobre todo o histórico
+Para separar o efeito do sinal do efeito do período, o apêndice avalia a proxy
+também nas mesmas 735 datas do Ridge, com o limiar calculado sobre todo o histórico
 dela desde 2021. Nessas datas, a comprada com a proxy tem Sharpe de 0,02,
 contra $-0{,}25$ com o Ridge, e o compra e manutenção é o mesmo (0,43). A
 diferença entre as duas regras vem do sinal, e não do período.

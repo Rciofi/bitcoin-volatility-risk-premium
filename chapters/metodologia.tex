@@ -14,8 +14,8 @@ o BVRP previsto prevê os retornos futuros do Bitcoin, primeiro com um modelo
 linear e depois com um modelo não linear em árvore, capaz de capturar
 não linearidades, efeitos de regime e interações características do mercado de
 criptoativos. Este capítulo concentra-se na definição formal das variáveis, das
-amostras e das especificações empíricas; os resultados são apresentados nos
-capítulos subsequentes.
+amostras e das especificações empíricas; os capítulos seguintes apresentam os
+resultados.
 
 % =========================================================
 \section{Questões de pesquisa}
@@ -86,8 +86,9 @@ em 1 e 5 dias e seus desvios em relação às médias móveis de 5 e 30 dias;
 do preço relativo à sua média móvel de 30 dias; e (iv) a proxy, sua variação
 diária e o prêmio realizado defasado,
 $\text{VH}_{t-29:t} - \text{IV}_{t-30}$, isto é, o BVRP de $t-30$, que se
-realiza em $t$. As séries com evidência robusta de raiz unitária --- o preço e
-as médias móveis da IV --- entram transformadas; as volatilidades, persistentes,
+realiza em $t$. As séries classificadas como I(1) --- o preço e as médias
+móveis da IV, em que o ADF não rejeita a raiz unitária e o KPSS rejeita a
+estacionariedade --- entram transformadas; as volatilidades, persistentes,
 entram em nível. Como $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} -
 \text{IV}_t$ por construção, os modelos lineares excluem a VH de 30 dias para
 evitar colinearidade perfeita. O Capítulo~\ref{chap:previsao_bvrp} traz o dicionário
@@ -108,9 +109,9 @@ com retorno de 60 dias à frente. O alvo do Capítulo~\ref{chap:previsao_bvrp} s
 precisa de 30 dias à frente, mas uma única amostra de modelagem torna os
 resultados dos três capítulos comparáveis.
 
-Os modelos de previsão são estimados numa subamostra e avaliados fora dela, em
-origens de previsão sucessivas. A primeira janela de estimação tem 730 dias,
-de 23/04/2021 a 22/04/2023. Em cada origem $t$, o modelo é estimado apenas com
+A dissertação estima os modelos de previsão numa subamostra e os avalia fora
+dela, em origens de previsão sucessivas. A primeira janela de estimação tem 730 dias,
+de 23/04/2021 a 22/04/2023. Em cada origem $t$, o modelo usa apenas
 as datas $s \le t - h$ --- o embargo: o alvo de $s$ olha $h$ dias à frente e só
 é conhecido em $s + h$ --- e prevê as datas de $t$ até a véspera da origem
 seguinte, sempre com as variáveis explicativas da própria data. No
@@ -123,8 +124,8 @@ previsto no Capítulo~\ref{chap:previsao_bvrp}.
 
 Na janela principal, expansiva, o treino acumula todas as datas desde o início
 da amostra de modelagem; como robustez, a janela móvel mantém os últimos 730
-dias. Os hiperparâmetros dos modelos regularizados e em árvore são escolhidos
-por validação cruzada embargada em cada reestimação: cinco dobras expansivas
+dias. Em cada reestimação, a validação cruzada embargada escolhe os
+hiperparâmetros dos modelos regularizados e em árvore: cinco dobras expansivas
 dentro do treino da origem, com o mesmo embargo --- numa dobra cuja validação
 começa em $v$, o treino da dobra usa $s \le v - h$.
 
@@ -193,7 +194,7 @@ $\widehat{\text{BVRP}}_t = \hat{f}(X_t) - \text{IV}_t$, em que $\hat{f}$ é uma
 floresta aleatória que prevê $\text{VH}_{t+1:t+30}$ com as mesmas variáveis,
 origens e embargo. A floresta escolhe sozinha os cortes nas volatilidades, o
 que substitui os regimes construídos à mão por um único modelo em árvore. Como
-robustez, a floresta prevê o BVRP diretamente, e o Ridge é estimado nas duas
+robustez, a floresta prevê o BVRP diretamente, e o Ridge entra nas duas
 formas.
 
 % =========================================================
@@ -219,15 +220,15 @@ Nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}, o re
 gerado: o BVRP previsto vem de um primeiro estágio estimado, e o erro-padrão de
 MQO do segundo estágio ignora a incerteza dessa estimação \citep{pagan1984}.
 Por isso, a inferência principal usa um bootstrap em blocos em dois níveis
-\citep{kunsch1989}. No primeiro nível, o modelo de previsão é reestimado, em
-cada origem, numa amostra reamostrada em blocos dentro da própria janela de
-treino, o que preserva o embargo. No segundo, os pares (previsão, retorno) das
-987 datas são reamostrados em blocos, e $\beta_h$ é reestimado. O bootstrap em
+\citep{kunsch1989}. No primeiro nível, o bootstrap reestima o modelo de
+previsão, em cada origem, numa amostra reamostrada em blocos dentro da própria
+janela de treino, o que preserva o embargo. No segundo, reamostra em blocos os
+pares (previsão, retorno) das 987 datas e reestima $\beta_h$. O bootstrap em
 blocos tem validade assintótica sob condições sobre o tamanho do bloco, que
 cresce com a amostra, e pode trazer refinamentos em amostras finitas em alguns
 casos; ele não dispensa hipóteses assintóticas. O
-Capítulo~\ref{chap:retornos_linear} detalha o procedimento. Como cada
-especificação é testada em seis horizontes, a dissertação reporta também quais
+Capítulo~\ref{chap:retornos_linear} detalha o procedimento. Como a dissertação
+testa cada especificação em seis horizontes, ela reporta também quais
 coeficientes sobrevivem à correção de Bonferroni ($0{,}05/6 \approx 0{,}0083$).
 Como os seis horizontes são fortemente correlacionados entre si, a dissertação
 também testa conjuntamente a hipótese de que $\beta_h = 0$ em todos os
@@ -238,7 +239,7 @@ os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} detalh
 \section{Avaliação fora da amostra}
 \label{sec:met-avaliacao}
 
-O desempenho das previsões do Capítulo~\ref{chap:previsao_bvrp} é medido pelo $R^2$
+O Capítulo~\ref{chap:previsao_bvrp} mede o desempenho das previsões pelo $R^2$
 fora da amostra contra a média histórica \citep{campbell2008predicting},
 \[
 R^2_{\text{fora}} = 1 - \frac{\sum_t (y_t - \hat{y}_t)^2}{\sum_t (y_t - \bar{y}_t)^2},
@@ -249,8 +250,8 @@ indica que o modelo erra menos que a média histórica. Dois testes complementam
 a métrica. O teste de \citet{clark2007approximately} compara cada modelo com a
 média histórica, que é um modelo aninhado, contra a alternativa unilateral de
 que o modelo é melhor. O teste de \citet{diebold1995comparing} compara pares de
-modelos, com perda quadrática e alternativa bilateral. Nos dois, a série de
-diferenças de perda é regredida numa constante, com erro-padrão HAC de $h+1$
+modelos, com perda quadrática e alternativa bilateral. Os dois regridem a série
+de diferenças de perda numa constante, com erro-padrão HAC de $h+1$
 defasagens (Seção~\ref{sec:met-inferencia}). A proxy e o prêmio realizado defasado
 servem de modelos de referência secundários.
 
@@ -264,5 +265,5 @@ estimada apenas na primeira janela de estimação (Seção~\ref{sec:dados-regime
 modo que nenhuma data é classificada com informação posterior a ela. Como
 robustez, a dissertação reestima o corte em cada origem, só com os dados
 disponíveis até ela (janela expansiva). No modelo em árvore do
-Capítulo~\ref{chap:retornos_nao_linear}, os cortes são escolhidos pela própria floresta e
-comparados com o de $37{,}3\%$ a.a.
+Capítulo~\ref{chap:retornos_nao_linear}, a própria floresta escolhe os cortes, que o capítulo
+compara com o de $37{,}3\%$ a.a.

@@ -4,7 +4,7 @@
 Este capítulo repete o teste do Capítulo~\ref{chap:retornos_linear} com um
 único modelo em árvore no lugar dos regimes construídos à mão: uma floresta
 aleatória, que escolhe sozinha os cortes nas volatilidades, gera o BVRP
-previsto, e o retorno futuro é regredido nele. O coeficiente é praticamente
+previsto, e o capítulo regride o retorno futuro nele. O coeficiente é praticamente
 nulo em todos os horizontes, e o teste conjunto nos seis horizontes não
 rejeita ($p = 0{,}96$). O resultado se repete com as outras formas e modelos
 de previsão e com a floresta aplicada direto ao retorno.
@@ -26,13 +26,13 @@ $t$ da previsão da VH dá uma previsão do prêmio. A floresta entra com todas 
 volatilidades em nível e escolhe, em cada divisão, a variável e o ponto de
 corte que mais reduzem o erro; os cortes que separam regimes de volatilidade
 saem do próprio modelo, sem corte nem variável indicadora fixados de antemão.
-A forma~\eqref{eq:retnl-forma} e a floresta foram fixadas antes de ver os
-resultados deste capítulo. Como testes de robustez, a floresta prevê o BVRP
-diretamente, como no Capítulo~\ref{chap:previsao_bvrp}, e o Ridge é estimado
+A dissertação fixou a forma~\eqref{eq:retnl-forma} e a floresta antes de ver
+os resultados deste capítulo. Como testes de robustez, a floresta prevê o BVRP
+diretamente, como no Capítulo~\ref{chap:previsao_bvrp}, e o Ridge entra
 nas duas formas.
 
-Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, o retorno simples de
-$t$ a $t+h$ é regredido no BVRP previsto, como na
+Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, o capítulo regride o
+retorno simples de $t$ a $t+h$ no BVRP previsto, como na
 equação~\eqref{eq:met-retorno-linear}, nas mesmas 987 datas fora da amostra e
 com a inferência do Capítulo~\ref{chap:retornos_linear}: erro-padrão HAC com
 $h+1$ defasagens e bootstrap em blocos em dois níveis, que incorpora a
@@ -189,7 +189,7 @@ $\hat f(X_t) - \text{IV}_t$, o maior salto varia entre as origens.
 \section{Regime de volatilidade e retornos}
 \label{sec:retnl-regime}
 
-O teste de significância conjunta também é aplicado por horizonte, com a
+O capítulo também aplica o teste de significância conjunta por horizonte, com a
 variável indicadora do regime de alta volatilidade e sua interação com o BVRP
 previsto, como na equação~\eqref{eq:met-retorno-regime}
 (Tabela~\ref{tab:retnl-regime}). Para a forma principal, o teste dos três

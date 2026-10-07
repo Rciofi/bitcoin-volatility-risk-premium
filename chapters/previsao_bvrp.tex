@@ -36,8 +36,8 @@ volatilidade histórica e a data da informação. Trata-se do mesmo
 $\text{BVRP}_t$ dos capítulos anteriores, sem deslocamento para $t+1$: a
 previsão feita em $t$ é comparada com o prêmio cuja IV é a de $t$, e não com o
 prêmio de $t+1$. A equação~\eqref{eq:prev-alvo} é a
-equação~\eqref{eq:met-previsao-bvrp} com a janela explícita; no restante do
-texto, escreve-se $\text{BVRP}_t$.
+equação~\eqref{eq:met-previsao-bvrp} com a janela explícita; o restante do
+texto usa $\text{BVRP}_t$.
 
 Como o alvo de $s$ só se realiza em $s+30$, o modelo da origem $t$ usa apenas
 as datas $s \le t - 30$. As previsões cobrem 987 datas, de 21/06/2023 a
@@ -63,7 +63,8 @@ $t$. Ele é igual à proxy mais a variação da IV em 30 dias,
 $\text{IV}_t - \text{IV}_{t-30}$.
 
 O tratamento segue os testes de raiz unitária. O preço e as médias móveis da IV,
-com evidência robusta de raiz unitária, entram transformados. As volatilidades
+em que o ADF não rejeita a raiz unitária e o KPSS rejeita a estacionariedade,
+entram transformados. As volatilidades
 entram em nível, mesmo quando o teste ADF fica na fronteira, como na
 volatilidade histórica de 90 dias ($p = 0{,}19$) e na IV ($p = 0{,}08$): em
 janelas móveis longas, observações vizinhas compartilham quase todos os
@@ -90,12 +91,12 @@ aleatória \citep{breiman2001randomforest}, com 500 árvores; e o XGBoost
 \citep{chen2016xgboost}. Os três modelos lineares usam as variáveis
 padronizadas com a média e o desvio-padrão do treino de cada origem.
 
-Os hiperparâmetros são escolhidos em cada uma das 33 reestimações, por
-validação cruzada embargada \citep{lopezdeprado2018advances}: cinco dobras
+Em cada uma das 33 reestimações, a validação cruzada embargada
+\citep{lopezdeprado2018advances} escolhe os hiperparâmetros: cinco dobras
 expansivas dentro do treino da origem, em que o treino da dobra termina 30 dias
 antes do início da validação, para que nenhum alvo de treino se sobreponha aos
-de validação. Escolhe-se a combinação de menor erro quadrático médio nas
-dobras. A Tabela~\ref{tab:prev-hiperparametros} mostra as grades e as escolhas.
+de validação. A validação fica com a combinação de menor erro quadrático médio
+nas dobras. A Tabela~\ref{tab:prev-hiperparametros} mostra as grades e as escolhas.
 
 No Ridge e no LASSO, a penalidade escolhida fica sempre no interior da grade. O
 LASSO zera todos os coeficientes em 12 das 33 origens; nelas, prevê
@@ -169,7 +170,7 @@ episódios de prêmio positivo, como o de janeiro de 2026, em que o BVRP chega a
 }{}
 
 Um teste placebo verifica a ausência de vazamento de informação futura: em
-cada origem, o alvo é embaralhado dentro do treino, e o modelo é reestimado
+cada origem, o teste embaralha o alvo dentro do treino e reestima o modelo
 (200 permutações nos lineares, 10 nas árvores). Se o procedimento não usa
 informação do período de teste, o $R^2_{\text{fora}}$ com o alvo embaralhado
 não deve ser positivo. As medianas ficam entre $-0{,}016$ e $0{,}000$ em todos
@@ -248,8 +249,8 @@ desempenho, por encolher a previsão quando o sinal é fraco, e a não linearida
 encontrada dentro da amostra não melhora a previsão.
 
 Os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} usam
-estas previsões, da janela expansiva, como regressor. A escolha foi fixada antes
-de ver os resultados dos retornos: o Ridge é a previsão principal do
+estas previsões, da janela expansiva, como regressor. A dissertação fixou a
+escolha antes de ver os resultados dos retornos: o Ridge é a previsão principal do
 Capítulo~\ref{chap:retornos_linear}, e a floresta aleatória, a do
 Capítulo~\ref{chap:retornos_nao_linear}; em cada capítulo, o outro modelo serve
 de teste de robustez. Como o BVRP previsto é um regressor gerado, a inferência

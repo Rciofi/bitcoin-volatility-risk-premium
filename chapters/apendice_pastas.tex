@@ -1,173 +1,91 @@
-﻿\chapter{Estrutura de Pastas e Reprodutibilidade}
+\chapter{Estrutura de Pastas e Reprodutibilidade}
 \label{app:pastas}
 
-Este apêndice descreve a organização dos arquivos e diretórios do repositório da
-dissertação, bem como os princípios adotados para garantir reprodutibilidade
-empírica, transparência metodológica e rastreabilidade dos resultados
-apresentados nos capítulos principais.
+Este apêndice descreve a organização do repositório da dissertação e a ordem
+em que os scripts reproduzem os resultados. As definições das variáveis estão
+no Apêndice~\ref{app:variaveis}, e os trechos de código, no
+Apêndice~\ref{app:scripts}.
 
 \section{Estrutura de diretórios}
 
-O repositório está organizado de forma modular, separando dados, scripts de
-construção do \textit{pipeline}, scripts de regeneração de resultados, figuras,
-tabelas e os próprios arquivos \LaTeX{} da dissertação. A estrutura abaixo
-reproduz os principais diretórios e arquivos rastreados:
-
 \begin{verbatim}
 bitcoin-volatility-risk-premium/
-│
-├── data/                          # Conjuntos de dados
-│   ├── vrp_with_targets.csv       # Dataset canônico (BVRP + retornos futuros)
-│   ├── vrp_with_regimes.csv       # Dataset com classificação de regimes
-│   ├── ml_dataset.csv             # Dataset dos modelos de ML (Cap. 6)
-│   ├── btc_prices.csv             # Preços diários do Bitcoin (Binance)
-│   ├── dvol_30d_full.csv          # IV30D — índice DVOL da Deribit
-│   └── ...                        # Demais arquivos intermediários
-│
-├── code/                          # Pipeline de construção de dados
-│   ├── download_dvol_deribit.py   # Download do DVOL via API Deribit
-│   ├── update_btc_prices.py       # Atualização dos preços à vista
-│   ├── build_vrp_dataset.py       # Cálculo de RV30D e construção do BVRP
-│   ├── build_targets.py           # Retornos futuros e dataset canônico
-│   ├── analyze_vrp_regimes.py     # Regime do BVRP (tercis, janela expansiva)
-│   ├── build_ml_dataset.py        # Engenharia de features para ML
-│   ├── analyze_magnitude_bvrp.py  # Teste de magnitude (apêndice do Cap. 8)
-│   ├── analyze_bvrp_by_return_sign.py  # Análise por sinal do retorno
-│   ├── run_all.py                 # Execução sequencial do pipeline
-│   └── ...                        # Scripts de exploração e validação
-│
-├── scripts/                       # Regeneração de resultados por capítulo
-│   ├── test_h1_bvrp_mean.py       # Teste de H1 com erro-padrão HAC (Cap. 5)
-│   ├── regenerate_cap6_scatter.py # Figuras de previsão OOS (Cap. 6)
-│   ├── regenerate_cap7.py         # Estratégias de negociação (Cap. 7)
-│   ├── regenerate_cap7_figs.py    # Figuras complementares do Cap. 7
-│   ├── regenerate_cap8.py         # Modelos supervisionados (Cap. 6)
-│   ├── regenerate_cap9.py         # Análise de regimes (Cap. 8)
-│   └── sync_overleaf.py           # Upload de figuras para o Overleaf
-│
-├── chapters/                      # Arquivos LaTeX dos capítulos
-│   ├── cap1_introducao.tex
-│   ├── cap2_referencial.tex
-│   ├── cap3_dados.tex
-│   ├── cap4_metodologia.tex
-│   ├── cap5_resultados_ols.tex
-│   ├── cap6_ml_unificado.tex
-│   ├── cap7_estrategias.tex
-│   ├── cap8_regimes.tex
-│   ├── cap9_conclusao.tex
-│   ├── Nota_metodologica.tex
-│   ├── apendiceA_variaveis.tex
-│   ├── apendiceB_scripts.tex
-│   └── apendiceC_estrutura_pastas.tex
-│
-├── figs/                          # Figuras finais, por diretório de origem
-│   ├── cap3/  cap5/  cap7/        # Descritivas, MQO e estratégias
-│   ├── cap8/                      # Figuras do Cap. 6 (ML)
-│   └── cap9/                      # Figuras do Cap. 8 (regimes)
-│
-├── tables/                        # Tabelas LaTeX finais
-│   ├── cap3/  cap5/  tab7/        # Descritivas, MQO e estratégias
-│   ├── tab8/                      # Tabelas do Cap. 6 (ML)
-│   └── cap9/                      # Tabelas do Cap. 8 (regimes)
-│
-└── frontmatter/                   # Estrutura e preâmbulo do documento
-    ├── main.tex                   # Arquivo raiz do documento LaTeX
-    ├── preamble.tex               # Pacotes, margens e configurações
-    ├── references.bib             # Referências bibliográficas (BibTeX)
-    ├── resumo.tex   abstract.tex
-    ├── capa.tex     folha_rosto.tex   folha_aprovacao.tex
-    └── agradecimentos.tex   epigrafe.tex
+├── data/                      # séries e conjuntos de dados
+│   ├── btc_prices.csv         # preço de fechamento diário (Binance)
+│   ├── dvol_30d_full.csv      # índice DVOL diário (Deribit)
+│   ├── vrp_30d_dataset.csv    # VH, IV, proxy e BVRP
+│   ├── vrp_with_targets.csv   # + retornos futuros: amostra completa
+│   ├── ml_dataset_T4.csv      # alvo e 17 variáveis: amostra de modelagem
+│   ├── regimes_T9.csv         # cortes e regimes de volatilidade
+│   ├── previsoes_bvrp_T5.csv  # BVRP previsto pelos cinco modelos
+│   └── previsoes_bvrp_T11.csv # BVRP previsto pelo modelo em árvore
+├── code/                      # coleta, construção, análises e geradores
+│   ├── *_utils.py             # divisão temporal, Newey-West e avaliação
+│   ├── publicar_*.py          # geradores das tabelas e figuras
+│   └── test_*.py              # testes
+├── scripts/                   # teste de H1 e conferência do LaTeX
+├── outputs/                   # saídas de cada análise, por script
+│   └── T1/ T2/ T4/ T5/ T9/ T10/ T11/ T12/ C3/ C7/ A1/
+├── figs/                      # figuras usadas no texto, por tema
+├── tables/                    # tabelas usadas no texto, por tema
+│   └── dados/ previsao_bvrp/ retornos_linear/
+│       retornos_nao_linear/ estrategias/
+├── chapters/                  # capítulos, nota metodológica e apêndices
+├── frontmatter/               # documento principal, preâmbulo e .bib
+├── docs/                      # registro das decisões metodológicas
+└── archive/                   # arquivos fora do documento
 \end{verbatim}
 
-Cabe registrar que a nomenclatura de alguns diretórios e scripts precede a
-reorganização dos capítulos: \texttt{regenerate\_cap8.py} gera os
-resultados do Capítulo~\ref{chap:previsao_bvrp} e \texttt{regenerate\_cap9.py},
-os do Capítulo~\ref{chap:retornos_nao_linear}, com os diretórios de saída
-correspondentes (\texttt{tab8/}, \texttt{cap9/}). A correspondência é
-indicada nos comentários acima.
+As pastas \texttt{figs/} e \texttt{tables/} têm os mesmos cinco temas: dados
+(Capítulo~\ref{chap:dados}), previsão do BVRP
+(Capítulo~\ref{chap:previsao_bvrp}), retornos com o modelo linear
+(Capítulo~\ref{chap:retornos_linear}) e com o modelo em árvore
+(Capítulo~\ref{chap:retornos_nao_linear}) e estratégias
+(Apêndice~\ref{app:estrategias}). Os demais scripts de \texttt{code/} e
+\texttt{scripts/} não produzem resultados usados no texto.
 
-\section{Fluxo de reprodutibilidade}
-
-O \textit{pipeline} segue a seguinte ordem de execução:
+\section{Ordem de execução}
 
 \begin{enumerate}
-    \item \textbf{Coleta de dados}: \texttt{code/download\_dvol\_deribit.py}
-          obtém a série histórica do índice DVOL via API pública da Deribit e
-          \texttt{code/update\_btc\_prices.py} atualiza os preços à vista via
-          Binance.
-
-    \item \textbf{Construção do BVRP}: \texttt{code/build\_vrp\_dataset.py}
-          calcula a $RV_{30}$ a partir dos retornos logarítmicos diários,
-          alinha com a $IV_{30}$ (DVOL) e gera o dataset principal
-          \texttt{data/vrp\_30d\_dataset.csv}.
-
-    \item \textbf{Variáveis-alvo}: \texttt{code/build\_targets.py} acrescenta
-          os retornos futuros em seis horizontes
-          ($h \in \{1, 5, 10, 20, 30, 60\}$ dias) e produz o dataset canônico
-          \texttt{data/vrp\_with\_targets.csv}, utilizado nas análises do
-          Capítulo~\ref{chap:retornos_linear} e do Apêndice~\ref{app:estrategias}.
-
-    \item \textbf{Execução sequencial}: \texttt{code/run\_all.py} encadeia as
-          etapas 1 a 3 --- coleta, construção do BVRP e geração das
-          variáveis-alvo --- em uma única chamada. Os scripts de regime e de
-          \textit{features} descritos a seguir são executados separadamente, na
-          ordem indicada.
-
-    \item \textbf{Regimes e \textit{features}}:
-          \texttt{code/analyze\_vrp\_regimes.py} classifica o BVRP em tercis
-          por janela expansiva, gerando \texttt{data/vrp\_with\_regimes.csv};
-          \texttt{code/build\_ml\_dataset.py} constrói, a partir dele, as
-          \textit{features} dos modelos supervisionados em
-          \texttt{data/ml\_dataset.csv} (Capítulo~\ref{chap:previsao_bvrp}).
-
-    \item \textbf{Regeneração por capítulo}: cada script em \texttt{scripts/}
-          lê os datasets finais de \texttt{data/} e regenera todas as figuras
-          (\texttt{figs/cap*/}) e tabelas (\texttt{tables/cap*/}) do capítulo
-          correspondente, exportando os arquivos \texttt{.png} e \texttt{.tex}
-          diretamente utilizados no documento.
+    \item \textbf{Coleta}: \texttt{update\_btc\_prices.py} e
+          \texttt{download\_dvol\_deribit.py} gravam
+          \texttt{data/btc\_prices.csv} e \texttt{data/dvol\_30d\_full.csv};
+          \texttt{fix\_btc\_gap\_2023\_03.py --write} completa o mês de março
+          de 2023 na série de preços.
+    \item \textbf{Construção}: \texttt{build\_vrp\_dataset.py},
+          \texttt{build\_targets.py}, \texttt{build\_ml\_dataset\_T4.py} e
+          \texttt{regimes\_T9.py}, nessa ordem. O primeiro interrompe a
+          execução se faltar alguma data nas séries diárias.
+    \item \textbf{Dados e existência do prêmio}:
+          \texttt{build\_desc\_stats\_T1.py}, \texttt{plot\_cap3\_T1.py},
+          \texttt{regimes\_T9.py} e \texttt{plot\_vrp\_vs\_return\_T12.py},
+          com a opção \texttt{--publicar-cap3}, que copia as tabelas e as
+          figuras para \texttt{tables/dados/} e \texttt{figs/dados/};
+          \texttt{scripts/test\_h1\_bvrp\_mean.py} e
+          \texttt{descritivas\_C3\_regimes.py}.
+    \item \textbf{Previsão do BVRP}: \texttt{previsao\_bvrp\_T5.py} e
+          \texttt{interacao\_regime\_T9.py}; depois,
+          \texttt{publicar\_cap5.py}.
+    \item \textbf{Retornos}: \texttt{retorno\_bvrp\_T10.py},
+          \texttt{retorno\_bvrp\_T11.py} e \texttt{descritivas\_C7.py}; depois,
+          \texttt{publicar\_cap6.py} e \texttt{publicar\_cap7.py}. O
+          \texttt{retorno\_bvrp\_T11.py} vem antes do
+          \texttt{publicar\_cap6.py} porque calcula também o teste conjunto
+          do modelo linear.
+    \item \textbf{Estratégias}: \texttt{estrategias\_A1.py}; depois,
+          \texttt{publicar\_apendice.py}.
+    \item \textbf{Conferência}: os testes \texttt{code/test\_*.py} e
+          \texttt{scripts/verificar\_latex.py}, que confere os arquivos
+          incluídos, as referências cruzadas e as citações do documento.
 \end{enumerate}
 
-\section{Reprodutibilidade empírica}
+Salvo indicação, os scripts estão em \texttt{code/} e rodam a partir da raiz
+do repositório, com \texttt{python code/<script>.py}.
 
-Todos os valores numéricos reportados --- tabelas, coeficientes e métricas
---- são gerados por scripts determinísticos, com controle explícito de
-sementes aleatórias (\texttt{random\_state=42}) nos modelos de aprendizado
-de máquina. Figuras e tabelas são exportadas diretamente dos scripts Python
-para os diretórios \texttt{figs/} e \texttt{tables/}, sem intervenções
-manuais. Uma exceção conhecida diz respeito ao posicionamento gráfico dos
-pontos no diagrama de enxame de valores SHAP, cujo deslocamento aleatório
-não é fixado por semente: reexecuções produzem disposições visuais
-ligeiramente distintas, sem alteração dos valores subjacentes.
+\section{Reprodutibilidade}
 
-A ordenação temporal é preservada em todas as etapas: a divisão
-\textit{treino/teste} (70\,\%/30\,\%) respeita a cronologia das observações,
-e os preditores são defasados quando necessário para assegurar ausência de
-\textit{look-ahead bias}, conforme discutido nos
-Capítulos~\ref{chap:metodologia} e~\ref{chap:previsao_bvrp}.
-
-\section{Disponibilidade do código}
-
-O repositório completo está disponível localmente e versionado com
-\texttt{git}. Por razões de licenciamento de dados e uso de fontes externas
-(API da Deribit e Binance), os dados brutos não são redistribuídos
-publicamente; no entanto, os scripts de coleta permitem recriar a base a partir
-das fontes originais, e todas as etapas metodológicas são descritas de forma
-detalhada no texto principal e nos Apêndices~\ref{app:variaveis} e~\ref{app:scripts}.
-
-\section{Resumo}
-
-Este apêndice documenta a estrutura computacional do projeto:
-\begin{itemize}
-    \item \textbf{\texttt{data/}} — datasets finais utilizados nas análises;
-    \item \textbf{\texttt{code/}} — pipeline de coleta e construção das variáveis;
-    \item \textbf{\texttt{scripts/}} — regeneração determinística de figuras e
-          tabelas por capítulo;
-    \item \textbf{\texttt{figs/}} e \textbf{\texttt{tables/}} — resultados
-          organizados por capítulo e prontos para inclusão no documento;
-    \item \textbf{\texttt{chapters/}} — arquivos \LaTeX{} dos capítulos,
-          da nota metodológica e dos apêndices;
-    \item \textbf{\texttt{frontmatter/}} — estrutura e preâmbulo do documento.
-\end{itemize}
-
-Essa organização reforça o compromisso com boas práticas de pesquisa empírica,
-reprodutibilidade e transparência metodológica.
+Os modelos com componente aleatório usam semente fixa: 42 nas árvores e nas
+permutações do placebo, e 20261001 nas reamostragens do bootstrap, as mesmas
+nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. As
+tabelas e as figuras do texto são gravadas pelos scripts, sem edição manual.
+A Nota Metodológica resume as escolhas de implementação.
