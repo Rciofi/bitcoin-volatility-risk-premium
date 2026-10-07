@@ -31,7 +31,8 @@ ele grava as saídas, dentro de \texttt{outputs/}.
           previsão, os treinos embargados e as dobras da validação cruzada;
           \texttt{code/hac\_utils.py} estima o MQO com erro-padrão de
           Newey--West; \texttt{code/avaliacao\_utils.py} calcula o $R^2$ fora
-          da amostra e os testes de Clark--West e de Diebold--Mariano.
+          da amostra e os testes de Clark--West e de Diebold--Mariano;
+          \texttt{code/mcs\_utils.py} calcula o \textit{model confidence set}.
     \item[Capítulo~\ref{chap:dados}.] \texttt{code/build\_desc\_stats\_T1.py}
           (estatísticas descritivas e testes de raiz unitária),
           \texttt{code/plot\_cap3\_T1.py} (séries, histogramas e distribuição
@@ -41,8 +42,9 @@ ele grava as saídas, dentro de \texttt{outputs/}.
           regime).
     \item[Capítulo~\ref{chap:previsao_bvrp}.] \texttt{code/previsao\_bvrp\_T5.py}
           (previsões dos cinco modelos e das referências, validação cruzada e
-          placebo) e \texttt{code/interacao\_regime\_T9.py} (interações com o
-          regime).
+          placebo), \texttt{code/mcs\_previsao\_T5.py} (\textit{model
+          confidence set}) e \texttt{code/interacao\_regime\_T9.py} (interações
+          com o regime).
     \item[Capítulos~\ref{chap:retornos_linear}
           e~\ref{chap:retornos_nao_linear}.] \texttt{code/retorno\_bvrp\_T10.py}
           (modelo linear e bootstrap em dois níveis),
@@ -144,6 +146,26 @@ res = mqo_newey_west(f, h=h)
 t = float(res.tvalues.iloc[0])
 \end{verbatim}
 
+Em \texttt{code/mcs\_utils.py}, o \textit{model confidence set} usa as mesmas
+reamostragens em blocos para todos os modelos, e as variâncias vêm dessas
+reamostragens. Em cada passo, com a estatística $T_{\max}$, sai o modelo de
+maior desvio padronizado em relação à perda média do conjunto. O valor-$p$ do
+passo é a fração das reamostragens em que a estatística é maior ou igual à
+observada, e o valor-$p$ do MCS de cada modelo é o maior valor-$p$ dos passos
+até a sua eliminação:
+
+\begin{verbatim}
+# Lb: perda média de cada modelo; z: médias bootstrap centradas
+d = Lb - Lb.mean()
+zc = z - z.mean(axis=1, keepdims=True)
+var = (zc ** 2).mean(axis=0)
+t, nula = _t(d, var, escala)
+t_boot = np.where(nula, 0.0,
+                  zc / np.sqrt(np.where(nula, 1.0, var)))
+T, T_boot, elimina = t.max(), t_boot.max(axis=1), int(np.argmax(t))
+return float(T), float(np.mean(T_boot >= T)), elimina
+\end{verbatim}
+
 \section{Conferências e testes}
 
 Antes de gravar uma tabela, cada gerador \texttt{publicar\_*} recalcula as
@@ -164,6 +186,9 @@ verificação falhar. Entre outras, eles conferem:
           fim da primeira janela (\texttt{test\_regimes\_T9.py});
     \item as métricas fora da amostra, contra cálculo manual
           (\texttt{test\_T5.py});
+    \item o \textit{model confidence set}, contra um caso pequeno calculado à
+          mão, além dos casos de perdas idênticas e da estabilidade entre
+          sementes (\texttt{test\_mcs\_utils.py});
     \item as regressões dos retornos e a ausência de informação futura nas
           estratégias (\texttt{test\_T10.py}, \texttt{test\_T11.py} e
           \texttt{test\_A1.py}).

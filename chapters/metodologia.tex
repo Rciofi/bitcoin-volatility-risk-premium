@@ -246,14 +246,32 @@ R^2_{\text{fora}} = 1 - \frac{\sum_t (y_t - \hat{y}_t)^2}{\sum_t (y_t - \bar{y}_
 \]
 em que $\hat{y}_t$ é a previsão do modelo e $\bar{y}_t$ é a média dos alvos já
 conhecidos na origem vigente ($s \le t - h$). Um $R^2_{\text{fora}}$ positivo
-indica que o modelo erra menos que a média histórica. Dois testes complementam
-a métrica. O teste de \citet{clark2007approximately} compara cada modelo com a
-média histórica, que é um modelo aninhado, contra a alternativa unilateral de
-que o modelo é melhor. O teste de \citet{diebold1995comparing} compara pares de
-modelos, com perda quadrática e alternativa bilateral. Os dois regridem a série
-de diferenças de perda numa constante, com erro-padrão HAC de $h+1$
-defasagens (Seção~\ref{sec:met-inferencia}). A proxy e o prêmio realizado defasado
-servem de modelos de referência secundários.
+indica que o modelo erra menos que a média histórica. Dois procedimentos
+complementam a métrica. O teste de \citet{clark2007approximately} compara cada
+modelo com a média histórica, que é um modelo aninhado, contra a alternativa
+unilateral de que o modelo é melhor. Ele regride uma série de diferenças de
+perda numa constante, com erro-padrão HAC de $h+1$ defasagens
+(Seção~\ref{sec:met-inferencia}).
+
+O \textit{model confidence set} (MCS) de \citet{hansen2011model} compara todos
+os modelos ao mesmo tempo. A partir do conjunto inicial, o procedimento testa a
+hipótese de que todos têm a mesma perda esperada. Se a hipótese é rejeitada,
+elimina o modelo de pior desempenho relativo e repete o teste com os que
+restam. O conjunto final contém, assintoticamente e com probabilidade de pelo
+menos $1-\alpha$, os modelos de menor perda esperada. Cada modelo recebe um
+valor-$p$ e pertence ao conjunto de nível $\alpha$ sempre que esse valor-$p$ é
+maior ou igual a $\alpha$. A dissertação usa a perda quadrática e a estatística
+$T_{\max}$, o maior desvio padronizado entre a perda média de um modelo e a do
+conjunto. A distribuição vem de um bootstrap com os mesmos blocos móveis de 60
+dias do segundo nível do bootstrap da Seção~\ref{sec:met-inferencia}, mais
+longos que a sobreposição de 30 dias dos alvos, com 9.999 reamostragens; o
+nível principal é de 10\%. Como sensibilidade, a dissertação repete o
+procedimento com blocos de 30 e 90 dias, com a estatística $T_R$ (o maior
+desvio padronizado entre dois modelos) e com o nível de 25\%. O conjunto inicial reúne os cinco modelos e três
+modelos de referência: a média histórica, a proxy e o prêmio realizado
+defasado. O teste de \citet{diebold1995comparing}, com perda quadrática,
+alternativa bilateral e o mesmo erro-padrão HAC, fica para comparações entre
+dois modelos específicos.
 
 % =========================================================
 \section{Regimes de volatilidade}

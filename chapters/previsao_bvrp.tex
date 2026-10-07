@@ -9,15 +9,15 @@ deriva para a volatilidade histórica aproxima mal a realização do prêmio. O
 BVRP previsto aqui é o regressor dos Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}.
 
-Na janela expansiva, os cinco modelos superam a média histórica fora da
-amostra. O melhor, o Ridge,
-reduz o erro quadrático em 22\%, e o teste de \citet{clark2007approximately}
-rejeita a igualdade com a média para quatro dos cinco modelos, mesmo com a
-correção de Bonferroni. A previsibilidade, porém, é modesta: o teste de
-\citet{diebold1995comparing} não rejeita depois da correção, as previsões ficam
-próximas da média e nenhum modelo antecipa os episódios de prêmio positivo. As
-duas referências ingênuas, a proxy e o prêmio realizado defasado, erram mais
-que a média. A relação entre as variáveis e o prêmio muda com o regime de
+Na janela expansiva, os cinco modelos têm erro quadrático fora da amostra
+menor que o da média histórica; o Ridge, com o menor erro, reduz o da média em
+22\%. O teste de \citet{clark2007approximately} rejeita a 5\%, para os cinco, a
+hipótese de que as variáveis não acrescentam informação à média. A
+previsibilidade, porém, é modesta: o \textit{model confidence set} (MCS) de
+\citet{hansen2011model} não separa os cinco modelos entre si nem da média
+histórica, as previsões ficam próximas da média e nenhum modelo antecipa os
+episódios de prêmio positivo. As duas referências ingênuas, a proxy e o prêmio
+realizado defasado, erram mais que a média e ficam fora do conjunto. A relação entre as variáveis e o prêmio muda com o regime de
 volatilidade dentro da amostra, primeira evidência de não linearidade, mas
 essa mudança não melhora a previsão fora dela.
 
@@ -128,27 +128,38 @@ seguintes.
 
 \input{tables/previsao_bvrp/tab_resultados}
 
-O teste de Clark--West contra a média histórica rejeita a igualdade para o
-Ridge ($p = 0{,}0005$), o MQO ($0{,}0007$), a floresta ($0{,}0008$) e o XGBoost
-($0{,}003$), todos abaixo do limite de Bonferroni para cinco modelos,
-$0{,}05/5 = 0{,}01$; o LASSO ($p = 0{,}016$) não passa pela correção. O teste
-de Diebold--Mariano, bilateral, é mais exigente: o menor valor-$p$ é o do
-Ridge, $0{,}041$, e nenhum modelo passa pela correção. Os dois testes respondem
-a perguntas diferentes. O de Clark--West compara modelos aninhados e desconta,
-sob a hipótese nula, o ruído que a estimação de parâmetros desnecessários
-acrescenta ao modelo maior; ele testa se as variáveis contêm informação sobre
-o prêmio. O de Diebold--Mariano compara os erros observados, sem esse ajuste.
-Por isso o Clark--West pode rejeitar mesmo com $R^2_{\text{fora}}$ negativo,
-como no MQO da janela móvel ($R^2_{\text{fora}} = -0{,}037$, $p = 0{,}004$). A
-conclusão principal apoia-se no Clark--West: as variáveis contêm informação
-sobre o BVRP, mas o ganho sobre a média histórica, medido pelo erro observado,
-não é estatisticamente distinguível com esta amostra. As 987 previsões têm
-alvos de 30 dias sobrepostos e equivalem a cerca de 33 observações
-independentes, o que limita o poder dos dois testes.
+O teste de Clark--West contra a média histórica rejeita a igualdade a 5\% para
+os cinco modelos: Ridge ($p = 0{,}0005$), MQO ($0{,}0007$), floresta
+($0{,}0008$), XGBoost ($0{,}003$) e LASSO ($0{,}016$). O MCS, com nível de
+10\%, exclui as duas referências ingênuas ($p < 0{,}001$) e mantém no conjunto
+os cinco modelos e a média histórica. O Ridge, de menor erro, é o último a
+sobrar; a média histórica tem o menor valor-$p$ entre os seis, 0,18.
+
+Os dois procedimentos respondem a perguntas diferentes. O Clark--West compara
+cada modelo com a média histórica, em que ele está aninhado, e desconta, sob a
+hipótese nula, o ruído que a estimação de parâmetros desnecessários acrescenta
+ao modelo maior: testa se as variáveis contêm informação sobre o prêmio. O MCS
+compara a precisão das previsões obtidas, com o erro de estimação incluído. Por
+isso o Clark--West pode rejeitar mesmo com $R^2_{\text{fora}}$ negativo, como no
+MQO da janela móvel ($R^2_{\text{fora}} = -0{,}037$, $p = 0{,}004$). As
+variáveis contêm informação sobre o BVRP, mas o ganho de precisão sobre a média
+histórica não é estatisticamente distinguível com esta amostra: as 987
+previsões têm alvos de 30 dias sobrepostos e equivalem a cerca de 33
+observações independentes, o que limita o poder dos dois procedimentos.
+
+A permanência da média histórica no conjunto está no limite. Com a estatística
+$T_{\max}$, seu valor-$p$ é de 0,25, 0,18 e 0,094 com blocos de 30, 60 e 90
+dias; com a estatística $T_R$, de 0,17, 0,107 e 0,056. A 10\%, ela permanece
+em quatro das seis combinações e sai nas duas com blocos de 90 dias; com a
+$T_R$, o MQO também sai com blocos de 30 e 90 dias (0,087 e 0,078). A 25\%, a
+média só permanece com a $T_{\max}$ e blocos de 30 dias, e, com a $T_R$, só o
+Ridge fica no conjunto. As referências ingênuas ficam fora em todas as
+combinações.
 
 Na janela móvel, os $R^2_{\text{fora}}$ são menores (0,095 no Ridge; $-0{,}037$
-no MQO), e o Clark--West mantém a mesma conclusão: rejeita para os mesmos quatro
-modelos com a correção de Bonferroni e não rejeita para o LASSO. Descartar as
+no MQO). O Clark--West rejeita a 5\% para todos os modelos menos o LASSO
+($p = 0{,}061$), e o MCS mantém os cinco modelos e a média histórica no
+conjunto em todas as combinações de bloco, estatística e nível. Descartar as
 observações mais antigas piora a previsão, o que favorece a janela expansiva.
 
 A Figura~\ref{fig:prev-previsoes} mostra o BVRP e as previsões do Ridge, da
@@ -242,11 +253,15 @@ o BVRP previsto e os retornos.
 \label{sec:prev-sintese}
 
 As variáveis disponíveis em $t$ contêm informação sobre o BVRP dos 30 dias
-seguintes: os modelos superam a média histórica, e o Clark--West rejeita a
-igualdade mesmo com a correção para múltiplas comparações. A previsibilidade é
-modesta, e as previsões ficam próximas da média. O Ridge tem o melhor
-desempenho, por encolher a previsão quando o sinal é fraco, e a não linearidade
-encontrada dentro da amostra não melhora a previsão.
+seguintes: os cinco modelos têm erro fora da amostra menor que o da média
+histórica, e o Clark--West rejeita a 5\% para todos na janela expansiva. A
+previsibilidade é modesta: o MCS exclui as referências ingênuas, mas não separa
+os modelos da média histórica, e as previsões ficam próximas dela. O Ridge tem
+o menor erro, por encolher a previsão quando o sinal é fraco. Os capítulos
+seguintes usam duas previsões que estão no conjunto: a do Ridge, principal no
+Capítulo~\ref{chap:retornos_linear}, e a da floresta aleatória, principal no
+Capítulo~\ref{chap:retornos_nao_linear}. A não linearidade encontrada dentro da
+amostra não melhora a previsão.
 
 Os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} usam
 estas previsões, da janela expansiva, como regressor. A dissertação fixou a
