@@ -3,7 +3,8 @@
 
 Este apêndice lista os scripts que produzem os resultados da dissertação e
 reproduz os trechos centrais do código. Os trechos são copiados dos scripts,
-sem os comentários e com as quebras de linha ajustadas à página. A ordem de
+sem os comentários, com as quebras de linha ajustadas e com linhas não
+essenciais omitidas (indicadas por \texttt{\# ...}). A ordem de
 execução e a estrutura de pastas estão no Apêndice~\ref{app:pastas}.
 
 \section{Scripts por etapa}
@@ -79,7 +80,9 @@ df["rv_30d_fut"] = (
     .mean()
     * 365
 ) ** 0.5 * 100
-
+# ...
+df = pd.merge(df_price, df_iv, on="date", how="inner")
+# ...
 df["vrp_30d"] = df["rv_30d"] - df["iv_30d"]
 df["bvrp_30d_fut"] = df["rv_30d_fut"] - df["iv_30d"]
 \end{verbatim}
@@ -93,6 +96,7 @@ tamanho fixo:
 
 \begin{verbatim}
 t0 = n_inicial - 1 + h0
+# ...
 origens = []
 for t in range(t0, n, freq):
     fim = t - h
@@ -132,7 +136,9 @@ de Newey--West:
 \begin{verbatim}
 return float(1 - np.sum((y - prev) ** 2)
              / np.sum((y - prev_ref) ** 2))
-
+# ...
+# pm: previsão do modelo; pr: previsão da referência
+y, pm, pr = _arr(y, prev_modelo, prev_ref)
 f = (y - pr) ** 2 - ((y - pm) ** 2 - (pr - pm) ** 2)
 res = mqo_newey_west(f, h=h)
 t = float(res.tvalues.iloc[0])

@@ -15,7 +15,8 @@ r_t = \ln\left(\frac{P_t}{P_{t-1}}\right),
 \]
 em que $P_t$ é o preço de fechamento, entra no cálculo da volatilidade
 histórica e, como variável explicativa, nos log-retornos de 1, 5 e 30 dias
-(colunas \texttt{ret} e \texttt{ret\_1d}). O retorno futuro é o retorno simples
+(colunas \texttt{ret} ou \texttt{ret\_1d}, \texttt{ret\_acum\_5d} e
+\texttt{ret\_acum\_30d}). O retorno futuro é o retorno simples
 acumulado em $h$ dias,
 \[
 R_{t+h} = \frac{P_{t+h}}{P_t} - 1, \qquad h \in \{1, 5, 10, 20, 30, 60\},
@@ -107,7 +108,8 @@ duas normais ajustada ao logaritmo da VH de 30 dias, estimada só na primeira
 janela de estimação, de 23/04/2021 a 22/04/2023
 (Seção~\ref{sec:dados-regimes}). Como robustez, a dissertação reestima o corte
 pelo mesmo método em cada origem de previsão, só com os dados até ela
-(Seção~\ref{sec:met-regimes}). O arquivo \texttt{data/regimes\_T9.csv} traz,
+(Seção~\ref{sec:met-regimes}); as datas anteriores à primeira origem usam o
+corte fixo. O arquivo \texttt{data/regimes\_T9.csv} traz,
 para cada data, os dois cortes (\texttt{corte\_fixo} e
 \texttt{corte\_expansivo\_vigente}) e as duas classificações
 (\texttt{regime\_alta\_fixo} e \texttt{regime\_alta\_expansivo}).
