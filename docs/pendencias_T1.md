@@ -258,6 +258,10 @@ previsão média foi +0,6.
 
 ## 9. T5 e T7 — previsão do BVRP prospectivo e ajuste das árvores
 
+> **2ª rodada (07/10/2026):** o critério de avaliação e os testes desta seção foram revistos.
+> O Prof. Marcelo tratou o 0,94 como referência, não como critério, e o MCS substitui o
+> Diebold–Mariano com Bonferroni na comparação conjunta. Ver seção 25.
+
 Script: `code/previsao_bvrp_T5.py`; métricas em `code/avaliacao_utils.py`; testes em
 `code/test_T5.py`. Previsões em `data/previsoes_bvrp_T5.csv` (date, origem, janela, modelo,
 previsao; **sem o alvo**, que vira regressor no T10); tabelas e figuras em `outputs/T5/`.
@@ -283,6 +287,10 @@ t+1) e não se aplica ao alvo prospectivo. Adotado:
 | Grades (2ª rodada) | Na 1ª rodada, o escolhido caía no limite da grade (LASSO em α = 10; floresta e XGBoost no canto mais regularizado). As grades foram estendidas: Ridge até 10⁵; LASSO até 10²; floresta com profundidade {1, 2, 3, 6, sem limite}, folha mínima {5, 20, 50, 100, 200} e `max_features` {0,2; 1/3; 1} (75 combinações); XGBoost com `n_estimators` {50, 100, 200, 500}, `learning_rate` {0,01; 0,03; 0,1}, `max_depth` {1, 2, 4} e `min_child_weight` {1, 10} (72). A validação cruzada das árvores passou a distribuir os ajustes (combinação × dobra) entre os núcleos, com o mesmo resultado |
 
 ### 9.1 Resultados (2ª rodada, grades estendidas; 987 previsões, 21/06/2023 a 03/03/2026)
+
+> **2ª rodada (07/10/2026):** o achado "Comparação múltipla" abaixo (Bonferroni no Clark–West e no
+> Diebold–Mariano) foi substituído: Clark–West sem Bonferroni e MCS para a comparação conjunta.
+> Ver seção 25.2.
 
 | Modelo | R² vs. média (expansiva) | R² vs. média (móvel) | CW p (expansiva) | DM p vs. média (expansiva) | R² dentro da amostra | % negativas | Média nos 290 dias com realizado > 0 |
 |---|---|---|---|---|---|---|---|
@@ -967,7 +975,7 @@ completa (capítulos, 23 figuras, 29 tabelas, 31 itens de legado e 115 rótulos)
 | Item | Registro | Tarefa |
 |---|---|---|
 | **[Para o relatório ao orientador.] Hoang e Baur (2023)** | Não localizado (nem pelo usuário). Decisão do usuário: a entrada `hoang2023cryptoVRP` saiu do .bib, e a única citação (`referencial.tex`, frase dos "três trabalhos") virou "Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit (Alexander e Imeraj; Almeida et al.) e um trabalho relacionado (Han, 2026) são discutidos na introdução" | F4, F7 → reunião |
-| **[Para o relatório ao orientador.] Título** | Capa, folha de rosto e folha de aprovação: "Prêmio de Risco de Volatilidade em Bitcoin: Estrutura, Regimes e Previsão com Machine Learning". Proposta, **não aplicada** (o título pode ter implicações formais no programa): "Prêmio de Risco de Volatilidade do Bitcoin: Estrutura, Regimes e Previsão com Aprendizado de Máquina" | F7 → reunião |
+| **[Para o relatório ao orientador.] Título** | Capa, folha de rosto e folha de aprovação: "Prêmio de Risco de Volatilidade em Bitcoin: Estrutura, Regimes e Previsão com Machine Learning". Proposta, **não aplicada** (o título pode ter implicações formais no programa): "Prêmio de Risco de Volatilidade do Bitcoin: Estrutura, Regimes e Previsão com Aprendizado de Máquina". **Aplicado na T1** (seção 25.3): título novo nas três folhas e em `pdftitle` | F7 → reunião |
 | Voz passiva | Critério do usuário: converter quando o agente (a dissertação, o teste, o modelo) pode ser sujeito sem forçar; manter as estativas ("só é conhecido em t+30") e as definições | F7 |
 | "Volatilidade realizada" | Fora dos apêndices, todos os usos seguem a seção 14 (RV teórica, alta frequência e a "variância realizada" de Almeida et al. e de Bollerslev et al.); os usos para a medida empírica estavam nos Apêndices B e C e na Nota, reescritos | F7 |
 | Gradient boosting × XGBoost | Cap. 2: *gradient boosting* como a família (Friedman, 2001) e XGBoost como o modelo usado; subseção "*Gradient boosting* e XGBoost". Resolve o item da seção 19 | F7 |
@@ -982,3 +990,161 @@ completa (capítulos, 23 figuras, 29 tabelas, 31 itens de legado e 115 rótulos)
 | Disponibilidade | Repositório **privado** (decisão do usuário). A Nota Metodológica ganhou a seção "Disponibilidade": "O código e os dados estão disponíveis mediante solicitação ao autor." | F8 |
 | Títulos no .bib | O `apalike` passa para minúsculas os títulos de `article`, `inproceedings`, `techreport` e `misc`. Ganharam chaves de proteção: `{XGBoost}`, `{Cboe Volatility Index}`, `{Deribit Volatility Index}` e `{DVOL}`, `{Bitcoin}` (Nakamoto) e `{Sharpe}`; `{VIX}`, `{Bitcoin}`, `{Lasso}` e `{GARCH}` já estavam protegidos, e nenhum título tem "S&P". `cboe2019vix` fica sem data de acesso (*white paper* datado; decisão do usuário) | F7 |
 | Frase sobre microestrutura (`referencial.tex`) | "também afetam a formação da curva de IV" → "também podem afetar a formação da curva de IV" (decisão do usuário), por ser leitura do autor, sem citação | F7 |
+
+## 25. 2ª rodada: comentários de 07/10/2026 e MCS no Cap. 5
+
+Ramo `rodada2-mcs`, criado a partir de `fase2-reescrita` (`4a38e6e`). Ordem das tarefas: **P0**
+preparação · **25** esta seção · **M1** `code/mcs_utils.py` e `code/test_mcs_utils.py` · **M2**
+`code/mcs_previsao_T5.py` (saídas em `outputs/MCS/`; comparação com o Cap. 5 atual; parada para
+revisão) · **M3** tabela do Cap. 5 em `publicar_cap5.py` (com backup) · **M4** texto dos Caps. 4 e
+5, Apêndice C e referência · **M5** resumo, abstract, introdução e considerações finais, só se a
+leitura mudar · **T1** título · **F** `verificar_latex`, pacote do Overleaf e commits.
+
+**P0 (07/10/2026):** árvore limpa; Python 3.14.4 (`C:\Python314\python.exe`); as 12 bibliotecas
+do `requirements.txt` instaladas nas versões fixadas. O `arch` não está instalado e não será usado.
+
+### 25.1 Comentários do Prof. Marcelo (07/10/2026)
+
+| Tema | Comentário (por extenso) | Encaminhamento |
+|---|---|---|
+| R² de 0,94 | "Não entendo exatamente o que seja um critério de R2 de 0,94. Antes era uma referência e não um critério. Esse número mudou naturalmente porque agora está tudo olhando para a janela entre t+1 e t+30." | Responde à pendência das seções 2.1 e 9 ("a validar com o Prof. Marcelo"): o 0,94 era referência do alvo antigo, não critério. O texto atual não usa o 0,94 como critério (só aparece como autocorrelação da proxy em `dados.tex:64`). Resposta enviada pelo usuário e aprovada pelo Prof. Marcelo: com o alvo entre t+1 e t+30, a persistência que dá para usar em t é o prêmio de t−30; fora da amostra ela é pior que a média histórica (R² de −1,00), assim como a proxy retrospectiva (−0,51); por isso a referência principal do Cap. 5 é a média histórica, e as outras duas ficam como secundárias |
+| Comparação de modelos | "Em vez de Diebold-Mariano com Bonferroni, que é muito conservador, dá para usar model confidence set (MCS). É o padrão ouro!" | Seção 25.2 |
+| Bimodalidade | ok | — |
+| Regularização | ok | — |
+| Bootstrap | "você em vez de sr, de resto tranquilo, faz sentido" | Os dois parágrafos do Cap. 6 (seção 20, C6.2/C6.7) ficam. "Você" vale para as mensagens ao orientador, não para o texto |
+| Proxy | "Vou ler para ver se entendo melhor." | Em espera (25.4) |
+| Reversão à média | ok | — |
+| Assimetria | "para câmbio, as evidências em geral são de simetria, mas para cripto muda. Já pego algumas referências." | Em espera (25.4). Coerente com o resultado atual: o BVRP não depende do sinal do retorno, mas a IV reage às quedas e não às altas. Quando as referências chegarem, reescrever o trecho do Cap. 7 que hoje se apoia no argumento da moeda de cotação e em Hansen e Lunde (2005) |
+| Gráfico (C3.4) | "preciso olhar." | Em espera (25.4) |
+| Referências | ok | Hoang e Baur fora e Han (2026) como trabalho relacionado ficam como estão |
+| Título | "prefiro em português naturalmente." | Seção 25.3 |
+
+### 25.2 Decisões para o MCS (Hansen, Lunde e Nason, 2011)
+
+| Item | Decisão |
+|---|---|
+| Escopo | Só a comparação das previsões do BVRP (Cap. 5). Os Caps. 6 e 7 não mudam |
+| Conjunto inicial | As 8 previsões de `data/previsoes_bvrp_T5.csv`: MQO, Ridge, LASSO, floresta aleatória, XGBoost, média histórica, persistência viável e proxy retrospectiva; janelas expansiva e móvel, cada uma com seu MCS |
+| Perda | Erro quadrático |
+| Bootstrap | Blocos móveis não circulares, a mesma função `indices_blocos` do T10, copiada para `mcs_utils.py` com comentário de origem (o T10 não é importado: a importação muda a codificação do console e o backend do matplotlib e carrega scikit-learn e xgboost). Teste de equivalência com o T10 em pelo menos três combinações de n e b. Bloco de 60; 30 e 90 como sensibilidade. B = 9.999 (sem reestimação; volta a 999 se demorar mais que alguns minutos). Semente `default_rng([20261001, b, r])`, como no T10 |
+| Estatística | T_max (principal); T_R (sensibilidade) |
+| Nível | 10% (principal); 25% (sensibilidade) |
+| Implementação | `code/mcs_utils.py`, só com numpy e pandas, sem o `arch`; `avaliacao_utils.py` e `retorno_bvrp_T10.py` não mudam. Conferência por testes: modelo claramente pior eliminado, perdas idênticas ficam juntas, estabilidade entre sementes e um caso pequeno calculado à mão |
+| LASSO = média histórica | O LASSO prevê exatamente a média histórica em 12 das 33 origens (expansiva) e em 26 das 33 (móvel). `mcs_utils` trata a diferença de perda com variância zero sem dividir por zero; o M2 reporta em quantas datas as duas previsões coincidem em cada janela, e a leitura diz explicitamente se os dois saem ou ficam juntos |
+| Clark–West | Continua, **sem Bonferroni**: teste individual de cada modelo contra a média histórica, com os valores-p como estão (inclusive o 0,016 do LASSO). A comparação conjunta fica com o MCS. O texto não diz "mesmo com a correção" nem conta quantos "sobrevivem". Decisão do usuário, a validar com o Prof. Marcelo: o comentário dele foi sobre o Diebold–Mariano |
+| Diebold–Mariano | Sai a coluna contra a média do painel principal da tabela de resultados, que dá lugar ao MCS. Fica nos pares isolados: Ridge × MQO (`previsao_bvrp.tex:188`), com × sem regime (Painel B e `previsao_bvrp.tex:223-226`) e os três trechos do Cap. 7 |
+| Texto (M4) | Cap. 4, Seção "Avaliação fora da amostra" (`sec:met-avaliacao`); Apêndice C, linhas 34 e 132; Cap. 5: abertura, discussão, síntese e tabela |
+| Referência (M4) | Hansen, P. R., Lunde, A. e Nason, J. M. (2011), "The Model Confidence Set", *Econometrica* 79(2), 453–497, doi 10.3982/ECTA5771. **Metadados a conferir pelo usuário** antes de entrar no .bib |
+
+### 25.3 Título (T1)
+
+"Prêmio de Risco de Volatilidade do Bitcoin: Estrutura, Regimes e Previsão com Aprendizado de
+Máquina", aprovado pelo Prof. Marcelo. Trâmite na secretaria: sem pendência; alteração aprovada
+pelo orientador. Arquivos: `capa.tex`, `folha_rosto.tex` e `folha_aprovacao.tex`. Resolve o item
+"Título" da seção 24.
+
+### 25.4 Em espera
+
+| Item | Origem |
+|---|---|
+| Referências do Prof. Marcelo sobre assimetria em câmbio e em cripto (Cap. 7) | Seção 21, C7.3 (a) |
+| Gráfico do C3.4 (possível duplicata do C3.2) | Seção 16 |
+| Leitura do Prof. Marcelo sobre proxy × BVRP prospectivo (correlação ≈ 0; inversão de sinal por regime) | Seções 2.1 e 23 (BVRP por regime) |
+
+### 25.5 Resultado do M2 (07/10/2026)
+
+Script `code/mcs_previsao_T5.py`; saídas em `outputs/MCS/` (`mcs_T5.csv`, `coincidencias_lasso_T5.csv`,
+`comparacao_cap5_MCS.csv`, `execucao_MCS.txt`). RMSE das 8 previsões conferido com `metricas_T5.csv` nas
+duas janelas; B = 9.999, de 1 a 1,5 s por rodada (janela × bloco). Testes de `mcs_utils` em
+`code/test_mcs_utils.py` (todos passam). Valores-p com a regra do `publicar_cap5.py` (três casas;
+abaixo de 0,001, "< 0,001").
+
+**LASSO = média histórica** (igualdade exata, diferença 0):
+
+| Janela | Datas iguais | Origens iguais | Texto |
+|---|---|---|---|
+| Expansiva | 360 de 987 | 12 de 33 | 12/33 ✓ |
+| Móvel | 777 de 987 | 26 de 33 | 26/33 ✓ |
+
+**Comparação com o Cap. 5 anterior (bloco de 60).** DM p (anterior): na janela expansiva, como na
+tabela publicada; na janela móvel, a coluna não foi publicada, e os valores vêm de
+`outputs/T5/diebold_mariano_T5.csv`.
+
+| Janela | Modelo | R² vs. média | CW p | DM p (anterior) | DM passa Bonferroni | p MCS T_max | p MCS T_R |
+|---|---|---|---|---|---|---|---|
+| Expansiva | Ridge | 0,223 | 0,0005 | 0,041 | não | 1,000 | 1,000 |
+| | Floresta aleatória | 0,143 | 0,0008 | 0,050 | não | 0,707 | 0,229 |
+| | LASSO | 0,123 | 0,016 | 0,071 | não | 0,707 | 0,163 |
+| | XGBoost | 0,100 | 0,003 | 0,064 | não | 0,652 | 0,163 |
+| | MQO | 0,097 | 0,0007 | 0,517 | não | 0,707 | 0,107 |
+| | Média histórica | — | — | — | — | 0,184 | 0,107 |
+| | Persistência viável | −1,003 | 0,53 | < 0,001 (pior) | sim (pior) | < 0,001 | < 0,001 |
+| | Proxy retrospectiva | −0,506 | 0,23 | < 0,001 (pior) | sim (pior) | < 0,001 | < 0,001 |
+| Móvel | Ridge | 0,095 | 0,002 | 0,163 (não publicado) | não | 1,000 | 1,000 |
+| | Floresta aleatória | 0,073 | 0,008 | 0,342 (não publicado) | não | 0,687 | 0,687 |
+| | XGBoost | 0,066 | 0,009 | 0,221 (não publicado) | não | 0,647 | 0,687 |
+| | LASSO | 0,039 | 0,061 | 0,434 (não publicado) | não | 0,647 | 0,443 |
+| | MQO | −0,037 | 0,004 | 0,743 (não publicado) | não | 0,647 | 0,443 |
+| | Média histórica | — | — | — | — | 0,647 | 0,443 |
+| | Persistência viável | −1,197 | 0,87 | < 0,001 (pior; não publicado) | sim (pior) | < 0,001 | 0,002 |
+| | Proxy retrospectiva | −0,652 | 0,73 | < 0,001 (pior; não publicado) | sim (pior) | < 0,001 | < 0,001 |
+
+**Conjuntos, janela expansiva** (as duas referências ingênuas ficam fora em todas as combinações):
+
+| Bloco | Estatística | MCS 10% | MCS 25% |
+|---|---|---|---|
+| 60 | T_max | 5 modelos + média | 5 modelos (média fora) |
+| 60 | T_R | 5 modelos + média | só o Ridge |
+| 30 | T_max | 5 modelos + média | 5 modelos + média |
+| 30 | T_R | Ridge, floresta, LASSO, XGBoost + média (MQO fora) | só o Ridge |
+| 90 | T_max | 5 modelos (média fora) | 5 modelos (média fora) |
+| 90 | T_R | Ridge, floresta, LASSO, XGBoost (MQO e média fora) | só o Ridge |
+
+**Janela móvel:** os 5 modelos e a média ficam em todas as combinações de bloco, estatística e nível
+(menor valor-p do MCS entre eles: 0,35).
+
+**Valor-p do MCS da média histórica (expansiva):**
+
+| Estatística | Bloco 30 | Bloco 60 | Bloco 90 |
+|---|---|---|---|
+| T_max | 0,25 | 0,18 | 0,094 |
+| T_R | 0,17 | 0,107 | 0,056 |
+
+**LASSO × média histórica:** na especificação principal (expansiva, bloco 60, T_max, 10%), ficam juntos.
+Separam-se (LASSO dentro, média fora) com a T_max a 25% e com o bloco de 90 a 10%; com a T_R a 25%,
+saem juntos. Na janela móvel, ficam juntos em todas as combinações.
+
+**Decisão de redação (usuário, 07/10/2026):**
+- Especificação principal mantida como na seção 25.2 (expansiva, bloco de 60, T_max, 10%), sem troca de
+  bloco ou nível por causa do resultado. As sensibilidades (blocos de 30 e 90, T_R, 25% e janela móvel)
+  entram em tabela compacta ou em frase com os valores-p da média histórica.
+- Leitura: o MCS exclui a persistência viável e a proxy em todas as combinações; não separa os cinco
+  modelos entre si nem da média histórica; o Ridge tem o menor erro e é o último a sobrar. A média
+  histórica é a primeira a sair entre os seis (0,18) e fica no limite: sai a 25% e a 10% com bloco de 90;
+  na janela móvel, fica em todas as combinações.
+- Clark–West × MCS: perguntas diferentes (conteúdo preditivo das variáveis × precisão das previsões com
+  o erro de estimação incluído), em duas ou três frases, sem tratar um como correção do outro. Nível
+  explícito: na janela expansiva, o Clark–West rejeita a 5% para os cinco modelos; na móvel, o LASSO não
+  rejeita (p = 0,061). Sem contar quantos "sobrevivem".
+- Previsões dos capítulos seguintes, ambas dentro do conjunto (seção 9.2): Ridge, principal no Cap. 6 e
+  de robustez no Cap. 7; floresta aleatória, principal no Cap. 7. (Corrigido em 07/10/2026: a primeira
+  redação dizia "o Ridge segue como a previsão dos Caps. 6 e 7".)
+- O texto não diz que os modelos "preveem melhor que a média histórica" sem qualificação.
+- **M5 acionado**: resumo, abstract, introdução e considerações finais revistos depois do M4. Frase
+  proposta para o resumo: "têm erro de previsão fora da amostra menor que o da média histórica, mas o
+  model confidence set não os separa dela" (resumo com até 100 palavras).
+
+**M3:** `code/publicar_cap5.py` (backup em `publicar_cap5.py.bak`) refaz o MCS principal e confere com
+`outputs/MCS/mcs_T5.csv`; na tabela de resultados, a coluna do DM contra a média deu lugar ao valor-p do
+MCS (T_max, bloco de 60) nas duas janelas, com † no conjunto a 10%. A nota cita `hansen2011model`, que
+entra no .bib no fim do M4.
+
+### 25.6 M3, M4, M5 e T1 concluídos (07/10/2026)
+
+| Tarefa | Arquivos | Registro |
+|---|---|---|
+| M3 | `code/publicar_cap5.py` (backup `.bak`), `tables/previsao_bvrp/tab_resultados.tex` | Coluna do DM contra a média substituída pelo valor-p do MCS (T_max, bloco de 60) nas duas janelas, † no conjunto a 10%; o gerador refaz o MCS e confere com `outputs/MCS/mcs_T5.csv` (10⁻⁹); console com quatro casas. As outras três tabelas e a figura do Cap. 5 não mudaram |
+| M4 | `chapters/metodologia.tex`, `chapters/previsao_bvrp.tex`, `chapters/apendice_scripts.tex`, `frontmatter/references.bib` | Cap. 4: Clark–West e MCS em `sec:met-avaliacao` (blocos de 60 dias "mais longos que a sobreposição de 30 dias", sem justificativa adicional; DM só para pares). Cap. 5: abertura, discussão (Clark–West a 5%, MCS, diferença entre os dois, sensibilidades com os seis valores-p da média histórica), janela móvel e síntese (Ridge principal no Cap. 6, floresta no Cap. 7); sem Bonferroni. Apêndice C: `mcs_utils`, `mcs_previsao_T5`, trecho do T_max e `test_mcs_utils`. .bib: `hansen2011model` (metadados conferidos pelo usuário; sem doi, como a maioria das entradas (39 de 46); título sem proteção). No commit, o .bib vai com o M3, para todo commit compilar |
+| M5 | `frontmatter/resumo.tex`, `frontmatter/abstract.tex`, `chapters/introducao.tex`, `chapters/consideracoes_finais.tex` | "Superam/preveem melhor que a média" → erro menor que o da média, mas o MCS não os separa dela; Clark–West a 5%. Resumo com 100 palavras (contagem que conta "($-8{,}76$" e "p.p.)" como duas; o registro anterior de 97 usava outro critério e daria 99), sem "índice" antes de DVOL; abstract com 97. `metodologia.tex:31-32` (pergunta "melhor que a média histórica?") mantida por decisão do usuário |
+| T1 | `frontmatter/capa.tex`, `folha_rosto.tex`, `folha_aprovacao.tex`, `preamble.tex` | Título novo nas três folhas; `pdftitle` e `pdfauthor` no `\hypersetup`. Não alterados: `archive/chapters/Cap6_ML.ipynb` (título antigo em inglês, legado) e o registro histórico da seção 24 |
+| F | — | `verificar_latex.py` sem problemas; `requirements.txt` sem mudança. **Conferir no Overleaf**: segunda linha do título nas três folhas, tabela de resultados com †, Hansen, Lunde e Nason na bibliografia, trechos alterados |
