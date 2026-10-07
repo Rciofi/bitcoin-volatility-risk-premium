@@ -3,22 +3,22 @@
 \small
 \caption{Previsão do BVRP fora da amostra.}
 \label{tab:prev-resultados}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrrrr}
 \toprule
- & \multicolumn{2}{c}{$R^2_{\text{fora}}$} & \multicolumn{2}{c}{Clark--West ($p$)} & DM ($p$) & $R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Modelo & expansiva & móvel & expansiva & móvel & expansiva & expansiva \\
+ & \multicolumn{2}{c}{$R^2_{\text{fora}}$} & \multicolumn{2}{c}{Clark--West ($p$)} & \multicolumn{2}{c}{MCS ($p$)} & $R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Modelo & expansiva & móvel & expansiva & móvel & expansiva & móvel & expansiva \\
 \midrule
-Média histórica & -- & -- & -- & -- & -- & -- \\
-$\text{BVRP}^{\text{proxy}}_t$ & $-$0{,}506 & $-$0{,}652 & 0{,}226 & 0{,}730 & $<$0{,}001 & -- \\
-$\text{BVRP}_{t-30}$ (persistência viável) & $-$1{,}003 & $-$1{,}197 & 0{,}525 & 0{,}868 & $<$0{,}001 & -- \\
+Média histórica & -- & -- & -- & -- & 0{,}184$^{\dagger}$ & 0{,}647$^{\dagger}$ & -- \\
+$\text{BVRP}^{\text{proxy}}_t$ & $-$0{,}506 & $-$0{,}652 & 0{,}226 & 0{,}730 & $<$0{,}001 & $<$0{,}001 & -- \\
+$\text{BVRP}_{t-30}$ (persistência viável) & $-$1{,}003 & $-$1{,}197 & 0{,}525 & 0{,}868 & $<$0{,}001 & $<$0{,}001 & -- \\
 \addlinespace
-MQO & 0{,}097 & $-$0{,}037 & $<$0{,}001 & 0{,}004 & 0{,}517 & 0{,}291 \\
-Ridge & 0{,}223 & 0{,}095 & $<$0{,}001 & 0{,}002 & 0{,}041 & 0{,}211 \\
-LASSO & 0{,}123 & 0{,}039 & 0{,}016 & 0{,}061 & 0{,}071 & 0{,}088 \\
-Floresta aleatória & 0{,}143 & 0{,}073 & $<$0{,}001 & 0{,}008 & 0{,}050 & 0{,}194 \\
-XGBoost & 0{,}100 & 0{,}066 & 0{,}003 & 0{,}009 & 0{,}064 & 0{,}156 \\
+MQO & 0{,}097 & $-$0{,}037 & $<$0{,}001 & 0{,}004 & 0{,}707$^{\dagger}$ & 0{,}647$^{\dagger}$ & 0{,}291 \\
+Ridge & 0{,}223 & 0{,}095 & $<$0{,}001 & 0{,}002 & 1{,}000$^{\dagger}$ & 1{,}000$^{\dagger}$ & 0{,}211 \\
+LASSO & 0{,}123 & 0{,}039 & 0{,}016 & 0{,}061 & 0{,}707$^{\dagger}$ & 0{,}647$^{\dagger}$ & 0{,}088 \\
+Floresta aleatória & 0{,}143 & 0{,}073 & $<$0{,}001 & 0{,}008 & 0{,}707$^{\dagger}$ & 0{,}687$^{\dagger}$ & 0{,}194 \\
+XGBoost & 0{,}100 & 0{,}066 & 0{,}003 & 0{,}009 & 0{,}652$^{\dagger}$ & 0{,}647$^{\dagger}$ & 0{,}156 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: 987 previsões, de 21/06/2023 a 03/03/2026. $R^2_{\text{fora}}$: contra a média histórica dos alvos conhecidos em cada origem ($s \le t - 30$). Clark--West: unilateral, contra a média histórica. DM: Diebold--Mariano bilateral contra a média histórica; nas duas referências ingênuas, rejeita porque elas erram mais que a média. Nos dois testes, erro-padrão HAC com $h + 1 = 31$ defasagens. Com cinco modelos, o limite de Bonferroni é $0{,}05/5 = 0{,}01$. $R^2$ dentro da amostra: média das 33 reestimações.}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: 987 previsões, de 21/06/2023 a 03/03/2026. $R^2_{\text{fora}}$: contra a média histórica dos alvos conhecidos em cada origem ($s \le t - 30$). Clark--West: unilateral, contra a média histórica, com erro-padrão HAC de $h + 1 = 31$ defasagens. MCS: valor-$p$ do \textit{model confidence set} de \citet{hansen2011model}, com perda quadrática, estatística $T_{\max}$ e bootstrap em blocos móveis de 60 dias (9.999 reamostragens), sobre os oito modelos de cada janela; $^{\dagger}$: no conjunto a 10\%. $R^2$ dentro da amostra: média das 33 reestimações.}
 \end{table}

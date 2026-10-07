@@ -12,7 +12,9 @@ docs/pendencias_T1.md (VH, BVRP, BVRP^proxy):
 Conferência (sai com erro se algo não bater): recalcula, a partir de
 data/previsoes_bvrp_T5.csv e do alvo de data/ml_dataset_T4.csv, o R² fora da
 amostra, o Clark–West e o Diebold–Mariano contra a média histórica nas duas
-janelas e confere com outputs/T5/metricas_T5.csv e diebold_mariano_T5.csv; o
+janelas e confere com outputs/T5/metricas_T5.csv e diebold_mariano_T5.csv; refaz
+o model confidence set da tabela de resultados (T_max, bloco de 60, B = 9.999,
+mcs_utils) e confere os valores-p com outputs/MCS/mcs_T5.csv (M2, seção 25); o
 mesmo para o R² com regime contra outputs/T9/metricas_interacao_T9.csv; e
 confere a contagem de escolhas e de origens no limite da grade com
 outputs/T5/limites_grade_T5.csv. Imprime os números citados no texto.
@@ -33,11 +35,13 @@ import pandas as pd  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from avaliacao_utils import clark_west, diebold_mariano, r2_fora_da_amostra  # noqa: E402
+import mcs_utils  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALVO = "alvo_bvrp_30d_fut"
 H = 30
 TOL = 1e-9
+MCS_BLOCO, MCS_B, MCS_ALFA = 60, 9999, 0.10   # especificação principal do MCS (seção 25.2)
 COR_REAL, COR_PREV = "#2b6cb0", "#d95f02"   # mesmo par das figuras do T5
 MODELOS = ["MQO", "Ridge", "LASSO", "floresta_aleatoria", "XGBoost"]
 REFERENCIAS = ["media_historica", "proxy_retrospectiva", "persistencia_viavel"]
@@ -134,6 +138,8 @@ def main():
     tf = pd.read_csv(os.path.join(t9, "teste_F_T9.csv"))
     mi = pd.read_csv(os.path.join(t9, "metricas_interacao_T9.csv")).set_index(["regime", "modelo"])
     pi = pd.read_csv(os.path.join(t9, "previsoes_interacao_T9.csv"), parse_dates=["date"])
+    mcs = pd.read_csv(os.path.join(ROOT, "outputs", "MCS", "mcs_T5.csv"))
+    mcs = mcs[(mcs.bloco == MCS_BLOCO) & (mcs.estatistica == "T_max")].set_index(["janela", "modelo"])
 
     def dm_media(janela, modelo):
         r = dm[(dm.janela == janela) & (((dm.modelo_1 == modelo) & (dm.modelo_2 == "media_historica"))
@@ -156,13 +162,22 @@ def main():
             conferir(abs(cw - met.loc[(j, m), "cw_p_unilateral_vs_media_historica"]) < TOL, f"CW {j} {m}")
             d = diebold_mariano(y, w[m], w["media_historica"], h=H)["dm_p_bilateral"]
             conferir(abs(d - dm_media(j, m)) < TOL, f"DM {j} {m}")
+        # mesma ordem de colunas do mcs_previsao_T5.py (M2)
+        perdas = w[MODELOS + ["media_historica", "persistencia_viavel", "proxy_retrospectiva"]].sub(y, axis=0) ** 2
+        idx = mcs_utils.sortear_indices(len(perdas), bloco=MCS_BLOCO, B=MCS_B)
+        r = mcs_utils.mcs(perdas, medias_boot=mcs_utils.medias_bootstrap(perdas, idx),
+                          estatistica="max").set_index("modelo")
+        for m in MODELOS + REFERENCIAS:
+            conferir(int(mcs.loc[(j, m), "B"]) == MCS_B, f"MCS {j} {m}: B")
+            conferir(abs(r.loc[m, "p_mcs"] - mcs.loc[(j, m), "p_mcs"]) < TOL, f"MCS {j} {m}")
     w = largo["expansiva"]
     y = df.loc[w.index, ALVO]
     for (reg, mod), row in mi.iterrows():
         p = pi[(pi.regime == reg) & (pi.modelo == mod)].set_index("date").previsao.sort_index()
         r2 = r2_fora_da_amostra(y.loc[p.index], p, w.loc[p.index, "media_historica"])
         conferir(abs(r2 - row.r2_oos_vs_media) < TOL, f"R² com regime {reg} {mod}")
-    print("Conferência: R², Clark–West e Diebold–Mariano recalculados batem com outputs/T5 e outputs/T9.")
+    print("Conferência: R², Clark–West, Diebold–Mariano e MCS recalculados batem com outputs/T5, "
+          "outputs/MCS e outputs/T9.")
 
     # ---------------- Dicionário (T4) ----------------
     linhas = []
@@ -242,28 +257,35 @@ def main():
                         r"Modelo & Grade & Mais frequente & No limite", linhas, nota))
 
     # ---------------- Resultados (T5) ----------------
+    def p_mcs(janela, m):
+        s = mcs.loc[(janela, m)]
+        marca = r"$^{\dagger}$" if s.p_mcs >= MCS_ALFA else ""
+        return fmt_p(s.p_mcs) + marca
+
     linhas = []
     for m in REFERENCIAS + MODELOS:
         e, mv = met.loc[("expansiva", m)], met.loc[("movel", m)]
         if m == "media_historica":
-            linhas.append(rf"{NOMES[m]} & -- & -- & -- & -- & -- & -- \\")
+            linhas.append(rf"{NOMES[m]} & -- & -- & -- & -- & {p_mcs('expansiva', m)} & {p_mcs('movel', m)} & -- \\")
             continue
         linhas.append(rf"{NOMES[m]} & {fmt(e.r2_oos_vs_media_historica)} & {fmt(mv.r2_oos_vs_media_historica)} & "
                       rf"{fmt_p(e.cw_p_unilateral_vs_media_historica)} & {fmt_p(mv.cw_p_unilateral_vs_media_historica)} & "
-                      rf"{fmt_p(dm_media('expansiva', m))} & {fmt(e.r2_dentro_amostra_media)} \\")
+                      rf"{p_mcs('expansiva', m)} & {p_mcs('movel', m)} & {fmt(e.r2_dentro_amostra_media)} \\")
         if m == "persistencia_viavel":
             linhas.append(r"\addlinespace")
-    cab = (r" & \multicolumn{2}{c}{$R^2_{\text{fora}}$} & \multicolumn{2}{c}{Clark--West ($p$)} & DM ($p$) & "
-           r"$R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}" "\n"
-           r"Modelo & expansiva & móvel & expansiva & móvel & expansiva & expansiva")
+    cab = (r" & \multicolumn{2}{c}{$R^2_{\text{fora}}$} & \multicolumn{2}{c}{Clark--West ($p$)} & "
+           r"\multicolumn{2}{c}{MCS ($p$)} & $R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}"
+           "\n"
+           r"Modelo & expansiva & móvel & expansiva & móvel & expansiva & móvel & expansiva")
     nota = (r"987 previsões, de 21/06/2023 a 03/03/2026. $R^2_{\text{fora}}$: contra a média histórica dos "
             r"alvos conhecidos em cada origem ($s \le t - 30$). Clark--West: unilateral, contra a média "
-            r"histórica. DM: Diebold--Mariano bilateral contra a média histórica; nas duas referências "
-            r"ingênuas, rejeita porque elas erram mais que a média. Nos dois testes, "
-            r"erro-padrão HAC com $h + 1 = 31$ defasagens. Com cinco modelos, o limite de Bonferroni é "
-            r"$0{,}05/5 = 0{,}01$. $R^2$ dentro da amostra: média das 33 reestimações.")
+            r"histórica, com erro-padrão HAC de $h + 1 = 31$ defasagens. MCS: valor-$p$ do "
+            r"\textit{model confidence set} de \citet{hansen2011model}, com perda quadrática, estatística "
+            r"$T_{\max}$ e bootstrap em blocos móveis de 60 dias (9.999 reamostragens), sobre os oito "
+            r"modelos de cada janela; $^{\dagger}$: no conjunto a 10\%. $R^2$ dentro da amostra: média das "
+            r"33 reestimações.")
     with open(os.path.join(dir_tab, "tab_resultados.tex"), "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(tabela("Previsão do BVRP fora da amostra.", "tab:prev-resultados", "lrrrrrr", cab, linhas, nota))
+        fh.write(tabela("Previsão do BVRP fora da amostra.", "tab:prev-resultados", "lrrrrrrr", cab, linhas, nota))
 
     # ---------------- Regime (T9) ----------------
     linhas = [r"\multicolumn{5}{l}{\textit{Painel A: interações dentro da amostra (MQO, $N = 1.776$)}} \\"]
@@ -317,6 +339,9 @@ def main():
     print(f"Treino: {he.n_treino.min()} a {he.n_treino.max()} obs.")
     print(f"LASSO × MQO: dif. máx. {lvm.loc['expansiva', 'max_dif_abs']:.1f}; corr. {lvm.loc['expansiva', 'corr']:.2f}")
     print(f"DM MQO × Ridge (expansiva): p = {float(dm[(dm.janela == 'expansiva') & (dm.modelo_1 == 'MQO') & (dm.modelo_2 == 'Ridge')].dm_p_bilateral.iloc[0]):.4f}")
+    for j in ("expansiva", "movel"):
+        s = mcs.loc[j].sort_values("ordem_eliminacao")
+        print(f"MCS ({j}, T_max, bloco {MCS_BLOCO}): " + "; ".join(f"{m} {p:.4f}" for m, p in s.p_mcs.items()))
     print(f"Placebo, medianas: {pla.r2_placebo_mediana.min():.4f} a {pla.r2_placebo_mediana.max():.4f}")
     print(f"Gravado em {dir_tab} e {dir_fig}")
 
