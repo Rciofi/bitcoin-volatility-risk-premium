@@ -1,5 +1,5 @@
-\chapter*{Nota Metodológica: Reprodutibilidade}
-\addcontentsline{toc}{chapter}{Nota Metodológica: Reprodutibilidade}
+\chapter*{Nota metodológica: reprodutibilidade}
+\addcontentsline{toc}{chapter}{Nota metodológica: reprodutibilidade}
 \label{chap:nota_metodologica}
 
 Esta nota reúne as escolhas de implementação que permitem reproduzir os
@@ -42,11 +42,15 @@ erro-padrão de Newey--West: núcleo de Bartlett com $h+1$ defasagens, sem
 correção de amostra pequena e com valor-$p$ pela distribuição normal. O
 bootstrap em blocos em dois níveis usa 999 reamostragens e blocos de 60 dias,
 com blocos de 30 e de 90 dias como robustez (Seção~\ref{sec:met-inferencia}).
+O \textit{model confidence set} do Capítulo~\ref{chap:previsao_bvrp} usa 9.999
+reamostragens em blocos de 60 dias, com 30 e 90 dias como sensibilidade
+(Seção~\ref{sec:met-avaliacao}).
 
 \section*{Reprodutibilidade}
 
 As sementes são fixas: 42 nos modelos em árvore e nas permutações do placebo,
-e 20261001 nas reamostragens do bootstrap. As tabelas e as figuras do texto
+e 20261001 nas reamostragens do bootstrap e do \textit{model confidence set}. As
+tabelas e as figuras do texto
 são gravadas pelos scripts, sem edição manual; os geradores recalculam as
 estatísticas reportadas a partir das saídas gravadas e interrompem a execução
 se a diferença passar de $10^{-9}$. O ambiente usado tem Python 3.14.4,

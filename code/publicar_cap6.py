@@ -99,6 +99,10 @@ def main():
     tc = pd.read_csv(os.path.join(t11, "teste_conjunto_T10.csv"))
     th = pd.read_csv(os.path.join(t11, "teste_conjunto_hac_T11.csv")).set_index("regressor")
     mt = pd.read_csv(os.path.join(t11, "max_t_por_horizonte_T10.csv"))
+    # floresta: valores-p do bootstrap do T11 (mesmo procedimento do T10, 999 reamostragens em vez de 199)
+    rb11 = pd.read_csv(os.path.join(t11, "bootstrap_resumo_T11.csv"))
+    rb11 = rb11[(rb11.regressor == "floresta_direta") & (rb11.variante == "dois_niveis")
+                & (rb11.bloco == 60)].set_index("h")
 
     # ---------------- Conferência ----------------
     warnings.filterwarnings("ignore")
@@ -109,7 +113,15 @@ def main():
                 ["b_bvrp_previsto", "b_interacao", "p_interacao", "p_conjunto"], "regime")
     conferir_df(T10.resumo_bootstrap(boot, pr), rb, ["variante", "bloco", "h"],
                 ["razao_media_beta", "ep_corrigido", "p_boot", "ic_inf", "ic_sup"], "resumo do bootstrap")
-    print("Conferência: regressões e resumo do bootstrap recalculados batem com outputs/T10.")
+    rb10f = rb[(rb.variante == "floresta_hiperparametros_fixos") & (rb.bloco == 60)].set_index("h")
+    for h in HS:
+        for c in ("beta", "p_hac"):
+            if abs(rb11.loc[h, c] - rb10f.loc[h, c]) > TOL:
+                raise SystemExit(f"CONFERÊNCIA FALHOU: floresta T11 × T10, h = {h}, {c}")
+        if int(rb11.loc[h, "B"]) != 999:
+            raise SystemExit(f"CONFERÊNCIA FALHOU: floresta T11, h = {h}, B = {rb11.loc[h, 'B']}")
+    print("Conferência: regressões e resumo do bootstrap recalculados batem com outputs/T10; "
+          "floresta do T11 com o mesmo β̂ e p HAC do T10 (B = 999).")
 
     rp = rb[(rb.variante == PRINCIPAL[0]) & (rb.bloco == PRINCIPAL[1])].set_index("h")
     ridge = pr[pr.modelo == "Ridge"].set_index("h")
@@ -167,16 +179,17 @@ def main():
     # ---------------- Robustez ----------------
     linhas = []
     for (chave, nome) in VARIANTES:
-        g = rb[(rb.variante == chave[0]) & (rb.bloco == chave[1])].set_index("h")
+        g = rb11 if chave == ("floresta_hiperparametros_fixos", 60) else \
+            rb[(rb.variante == chave[0]) & (rb.bloco == chave[1])].set_index("h")
         linhas.append(nome + " & " + " & ".join(fmt_p(g.loc[h, "p_boot"]) for h in HS) + r" \\")
     linhas += [r"\addlinespace",
                r"Floresta aleatória: $\hat\beta_h$ & " + " & ".join(fmt(100 * flor.loc[h, "beta"]) for h in HS) + r" \\",
                r"Floresta aleatória: $p$ HAC & " + " & ".join(fmt_p(flor.loc[h, "p_hac"]) for h in HS) + r" \\"]
-    nota = (r"Valores-$p$ do bootstrap em dois níveis na escala corrigida da atenuação (999 reamostragens; "
-            r"199 na floresta). Principal: Ridge com o $\alpha$ de cada origem fixo e blocos de 60 dias "
+    nota = (r"Valores-$p$ do bootstrap em dois níveis na escala corrigida da atenuação (999 reamostragens). "
+            r"Principal: Ridge com o $\alpha$ de cada origem fixo e blocos de 60 dias "
             r"(Tabela~\ref{tab:retlin-principal}). $\alpha$ reescolhido: validação cruzada refeita em cada "
-            r"treino reamostrado. Só o 2º nível: previsões originais fixas, sem correção. Floresta: $\hat\beta_h$ "
-            r"em p.p. por p.p.")
+            r"treino reamostrado. Só o 2º nível: previsões originais fixas, sem correção. Floresta: as mesmas "
+            r"reamostragens da Tabela~\ref{tab:retnl-robustez}; $\hat\beta_h$ em p.p. por p.p.")
     gravar(os.path.join(dir_tab, "tab_robustez.tex"),
            tabela("Testes de robustez: valores-$p$ por horizonte.", "tab:retlin-robustez", "l" + "r" * 6,
                   "Variante & " + " & ".join(rf"$h = {h}$" for h in HS), linhas, nota))

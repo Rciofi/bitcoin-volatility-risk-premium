@@ -5,7 +5,8 @@
 \label{tab:retnl-conjunto}
 \begin{tabular}{lrrrrr}
 \toprule
-Regressor & $W$ & $p$ (Wald) & $p$ (max-$|t|$) & $p$ (HAC empilhado) & $p$ (só 2º nível) \\
+Regressor & $W$ & \multicolumn{4}{c}{Valor-$p$} \\ \cmidrule(lr){3-6}
+ & & Wald & max-$|t|$ & HAC empilhado & só 2º nível \\
 \midrule
 Floresta, $\hat f(X_t) - \text{IV}_t$ (principal) & 1{,}45 & 0{,}963 & 0{,}791 & 0{,}925 & 0{,}952 \\
 \quad blocos de 30 dias & 1{,}63 & 0{,}950 & 0{,}670 & & \\

@@ -1,4 +1,4 @@
-\chapter{Estrutura de Pastas e Reprodutibilidade}
+\chapter{Estrutura de pastas e reprodutibilidade}
 \label{app:pastas}
 
 Este apêndice descreve a organização do repositório da dissertação e a ordem
@@ -25,7 +25,7 @@ bitcoin-volatility-risk-premium/
 │   └── test_*.py              # testes
 ├── scripts/                   # teste de H1 e conferência do LaTeX
 ├── outputs/                   # saídas de cada análise, por script
-│   └── T1/ T2/ T4/ T5/ T9/ T10/ T11/ T12/ C3/ C7/ A1/
+│   └── T1/ T2/ T4/ T5/ T9/ T10/ T11/ T12/ C3/ C7/ A1/ MCS/
 ├── figs/                      # figuras usadas no texto, por tema
 ├── tables/                    # tabelas usadas no texto, por tema
 │   └── dados/ previsao_bvrp/ retornos_linear/
@@ -36,56 +36,57 @@ bitcoin-volatility-risk-premium/
 └── archive/                   # arquivos fora do documento
 \end{verbatim}
 
-As pastas \texttt{figs/} e \texttt{tables/} têm os mesmos cinco temas: dados
+As pastas \arq{figs/} e \arq{tables/} têm os mesmos cinco temas: dados
 (Capítulo~\ref{chap:dados}), previsão do BVRP
 (Capítulo~\ref{chap:previsao_bvrp}), retornos com o modelo linear
 (Capítulo~\ref{chap:retornos_linear}) e com o modelo em árvore
 (Capítulo~\ref{chap:retornos_nao_linear}) e estratégias
-(Apêndice~\ref{app:estrategias}). Os demais scripts de \texttt{code/} e
-\texttt{scripts/} não produzem resultados usados no texto.
+(Apêndice~\ref{app:estrategias}). Os demais scripts de \arq{code/} e
+\arq{scripts/} não produzem resultados usados no texto.
 
 \section{Ordem de execução}
 
 \begin{enumerate}
-    \item \textbf{Coleta}: \texttt{update\_btc\_prices.py} e
-          \texttt{download\_dvol\_deribit.py} gravam
-          \texttt{data/btc\_prices.csv} e \texttt{data/dvol\_30d\_full.csv};
-          \texttt{fix\_btc\_gap\_2023\_03.py --write} completa o mês de março
+    \item \textbf{Coleta}: \arq{update_btc_prices.py} e
+          \arq{download_dvol_deribit.py} gravam
+          \arq{data/btc_prices.csv} e \arq{data/dvol_30d_full.csv};
+          \arq{fix_btc_gap_2023_03.py} \arq{--write} completa o mês de março
           de 2023 na série de preços.
-    \item \textbf{Construção}: \texttt{build\_vrp\_dataset.py},
-          \texttt{build\_targets.py}, \texttt{build\_ml\_dataset\_T4.py} e
-          \texttt{regimes\_T9.py}, nessa ordem. O primeiro interrompe a
+    \item \textbf{Construção}: \arq{build_vrp_dataset.py},
+          \arq{build_targets.py}, \arq{build_ml_dataset_T4.py} e
+          \arq{regimes_T9.py}, nessa ordem. O primeiro interrompe a
           execução se faltar alguma data nas séries diárias.
     \item \textbf{Dados e existência do prêmio}:
-          \texttt{build\_desc\_stats\_T1.py}, \texttt{plot\_cap3\_T1.py},
-          \texttt{regimes\_T9.py} e \texttt{plot\_vrp\_vs\_return\_T12.py},
-          com a opção \texttt{--publicar-cap3}, que copia as tabelas e as
-          figuras para \texttt{tables/dados/} e \texttt{figs/dados/};
-          \texttt{scripts/test\_h1\_bvrp\_mean.py} e
-          \texttt{descritivas\_C3\_regimes.py}.
-    \item \textbf{Previsão do BVRP}: \texttt{previsao\_bvrp\_T5.py} e
-          \texttt{interacao\_regime\_T9.py}; depois,
-          \texttt{publicar\_cap5.py}.
-    \item \textbf{Retornos}: \texttt{retorno\_bvrp\_T10.py},
-          \texttt{retorno\_bvrp\_T11.py} e \texttt{descritivas\_C7.py}; depois,
-          \texttt{publicar\_cap6.py} e \texttt{publicar\_cap7.py}. O
-          \texttt{retorno\_bvrp\_T11.py} vem antes do
-          \texttt{publicar\_cap6.py} porque calcula também o teste conjunto
+          \arq{build_desc_stats_T1.py}, \arq{plot_cap3_T1.py},
+          \arq{regimes_T9.py} e \arq{plot_vrp_vs_return_T12.py},
+          com a opção \arq{--publicar-cap3}, que copia as tabelas e as
+          figuras para \arq{tables/dados/} e \arq{figs/dados/};
+          \arq{scripts/test_h1_bvrp_mean.py} e
+          \arq{descritivas_C3_regimes.py}.
+    \item \textbf{Previsão do BVRP}: \arq{previsao_bvrp_T5.py} e
+          \arq{interacao_regime_T9.py}; depois, \arq{mcs_previsao_T5.py} e
+          \arq{publicar_cap5.py}.
+    \item \textbf{Retornos}: \arq{retorno_bvrp_T10.py},
+          \arq{retorno_bvrp_T11.py} e \arq{descritivas_C7.py}; depois,
+          \arq{publicar_cap6.py} e \arq{publicar_cap7.py}. O
+          \arq{retorno_bvrp_T11.py} vem antes do
+          \arq{publicar_cap6.py} porque calcula também o teste conjunto
           do modelo linear.
-    \item \textbf{Estratégias}: \texttt{estrategias\_A1.py}; depois,
-          \texttt{publicar\_apendice.py}.
-    \item \textbf{Conferência}: os testes \texttt{code/test\_*.py} e
-          \texttt{scripts/verificar\_latex.py}, que confere os arquivos
+    \item \textbf{Estratégias}: \arq{estrategias_A1.py}; depois,
+          \arq{publicar_apendice.py}.
+    \item \textbf{Conferência}: os testes \arq{code/test_*.py} e
+          \arq{scripts/verificar_latex.py}, que confere os arquivos
           incluídos, as referências cruzadas e as citações do documento.
 \end{enumerate}
 
-Salvo indicação, os scripts estão em \texttt{code/} e rodam a partir da raiz
+Salvo indicação, os scripts estão em \arq{code/} e rodam a partir da raiz
 do repositório, com \texttt{python code/<script>.py}.
 
 \section{Reprodutibilidade}
 
 Os modelos com componente aleatório usam semente fixa: 42 nas árvores e nas
 permutações do placebo, e 20261001 nas reamostragens do bootstrap, as mesmas
-nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. As
+nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}, e nas
+do \textit{model confidence set}. As
 tabelas e as figuras do texto são gravadas pelos scripts, sem edição manual.
 A Nota Metodológica resume as escolhas de implementação.

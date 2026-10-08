@@ -86,6 +86,16 @@ def fmt_p(p):
     return r"$<$0{,}001" if p < 0.001 else fmt(p, 3)
 
 
+def fmt_m(v, d=3):
+    """Número para uso dentro de $...$ (sinal de menos matemático, sem $ aninhado)."""
+    return f"{v:.{d}f}".replace(".", "{,}")
+
+
+def p_m(p):
+    """'= 0{,}958' ou '< 0{,}001', para uso dentro de $p ...$."""
+    return r"< 0{,}001" if p < 0.001 else f"= {fmt_m(p, 3)}"
+
+
 def tabela(legenda, rotulo, colunas, cabecalho, linhas, nota, tamanho=r"\small"):
     corpo = [r"\begin{table}[H]", r"\centering", tamanho, rf"\caption{{{legenda}}}", rf"\label{{{rotulo}}}",
              rf"\begin{{tabular}}{{{colunas}}}", r"\toprule", cabecalho + r" \\", r"\midrule"]
@@ -261,7 +271,8 @@ def main():
             r"últimas colunas ignoram a estimação do BVRP previsto.")
     gravar(os.path.join(dir_tab, "tab_conjunto.tex"),
            tabela("Teste conjunto nos seis horizontes.", "tab:retnl-conjunto", "lrrrrr",
-                  r"Regressor & $W$ & $p$ (Wald) & $p$ (max-$|t|$) & $p$ (HAC empilhado) & $p$ (só 2º nível)",
+                  r"Regressor & $W$ & \multicolumn{4}{c}{Valor-$p$} \\ \cmidrule(lr){3-6}" "\n"
+                  r" & & Wald & max-$|t|$ & HAC empilhado & só 2º nível",
                   linhas, nota, tamanho=r"\footnotesize"))
 
     # ---------------- F1: regime ----------------
@@ -300,7 +311,7 @@ def main():
                                   ("quartil_superior_expansivo", r"Quartil superior em janela expansiva",
                                    "Demais", "Extrema")):
         g = rr[rr.definicao == defin].set_index("h")
-        n0, n1 = int(g.n_baixa.iloc[0]), int(g.n_alta.iloc[0])
+        n0, n1 = (f"{int(x):,}".replace(",", "{.}") for x in (g.n_baixa.iloc[0], g.n_alta.iloc[0]))
         linhas.append(rf"\multicolumn{{5}}{{l}}{{\textit{{{titulo}}}: {b0}, $N = {n0}$; {b1}, $N = {n1}$}} \\")
         for h in HS:
             r = g.loc[h]
@@ -325,13 +336,14 @@ def main():
               rf"{fmt(d.diferenca_neg_menos_pos, 2)} & {fmt_p(d.p_hac)} \\",
               r"\addlinespace",
               rf"\multicolumn{{5}}{{l}}{{$\Delta_1\text{{IV}}_t$ sobre $r_t^+$ e $r_t^-$: "
-              rf"$\hat b^+ = {fmt(ri.loc['r_pos', 'estimativa'], 3)}$ ($p = {fmt_p(ri.loc['r_pos', 'p_hac'])}$); "
-              rf"$\hat b^- = {fmt(ri.loc['r_neg', 'estimativa'], 3)}$ ($p = {fmt_p(ri.loc['r_neg', 'p_hac'])}$); "
-              rf"$b^+ + b^- = 0$: $p = {fmt_p(ri.loc['simetria_b_pos_mais_b_neg', 'p_hac'])}$}} \\"]
+              rf"$\hat b^+ = {fmt_m(ri.loc['r_pos', 'estimativa'], 3)}$ ($p {p_m(ri.loc['r_pos', 'p_hac'])}$); "
+              rf"$\hat b^- = {fmt_m(ri.loc['r_neg', 'estimativa'], 3)}$ ($p {p_m(ri.loc['r_neg', 'p_hac'])}$)}} \\",
+              rf"\multicolumn{{5}}{{l}}{{Simetria, $b^+ + b^- = 0$: "
+              rf"$p {p_m(ri.loc['simetria_b_pos_mais_b_neg', 'p_hac'])}$}} \\"]
     nota = (rf"Amostra de modelagem; {int(b.n_pos)} dias com $r_t > 0$ e {int(b.n_neg)} com $r_t < 0$. "
             r"Diferença: dias de queda menos dias de alta, pela regressão numa indicadora de $r_t < 0$, com HAC "
             r"de 31 defasagens para o BVRP (alvos de 30 dias sobrepostos) e de 2 para $\Delta_1\text{IV}_t$. "
-            r"Última linha: $\Delta_1\text{IV}_t = a + b^+ r_t^+ + b^- r_t^- + u_t$, com "
+            r"Duas últimas linhas: $\Delta_1\text{IV}_t = a + b^+ r_t^+ + b^- r_t^- + u_t$, com "
             r"$r_t^+ = \max(r_t, 0)$ e $r_t^- = \min(r_t, 0)$ em \%, HAC de 2 defasagens; a simetria é "
             r"$b^+ = -b^-$.")
     gravar(os.path.join(dir_tab, "tab_sinal.tex"),

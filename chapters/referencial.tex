@@ -1,4 +1,4 @@
-\chapter{Referencial Teórico}
+\chapter{Referencial teórico}
 \label{chap:referencial}
 
 Este capítulo apresenta o conjunto de conceitos fundamentais necessários para
@@ -189,7 +189,7 @@ previsão da variância. Nesta dissertação, a proxy aproxima a expectativa do
 prêmio, e não sua realização: ela entra como variável explicativa disponível
 em $t$, enquanto o Capítulo~\ref{chap:previsao_bvrp} prevê o próprio BVRP.
 
-A literatura empírica sobre prêmios de risco de volatilidade tem documentado esse fato estilizado em múltiplos mercados e horizontes. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para mercados de equity, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários --- achado replicado em diversos índices acionários internacionais \citep{bollerslev2014international}. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
+A literatura empírica sobre prêmios de risco de volatilidade tem documentado esse fato estilizado em múltiplos mercados e horizontes. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para o mercado de ações, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários --- achado replicado em diversos índices acionários internacionais \citep{bollerslev2014international}. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
 
 Esta dissertação adota a convenção $\text{VH} - \text{IV}$ seguindo essa literatura. Sob esta convenção, valores negativos do BVRP correspondem ao estado típico em que a volatilidade implícita supera a volatilidade que efetivamente se realiza --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de BVRP positivo ($\text{VH} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
 
@@ -205,7 +205,7 @@ quedas abruptas e contra choques de volatilidade
 \citep{bollerslev2011VRP, pan2006jumpRisk, carr2009variance, bollerslev2009expected}.
 
 No mercado de Bitcoin, entretanto, \citet{alexanderImeraj2019} documentam,
-sobretudo no início do mercado, que o BVRP apresenta dinâmica mais instável que a documentada em equity. Entre os
+sobretudo no início do mercado, que o BVRP apresenta dinâmica mais instável que a documentada no mercado de ações. Entre os
 fatores frequentemente associados a essa instabilidade, estão:
 
 \begin{enumerate}
@@ -234,7 +234,7 @@ Capítulo~\ref{chap:retornos_nao_linear}, o próprio modelo escolhe os cortes.
 
 A combinação destes fatores produz três características empíricas relevantes para
 a análise conduzida nesta dissertação: (i) o BVRP do Bitcoin é negativo em média
-mas exibe distribuição assimétrica, com cauda direita mais pesada que em equity;
+mas exibe distribuição assimétrica, com cauda direita mais pesada que no mercado de ações;
 (ii) o sinal do prêmio é instável em horizontes curtos, com episódios
 significativos de inversão; e (iii) os limiares estatísticos do BVRP variam
 substancialmente ao longo do tempo, motivando o uso de janelas expansivas para
@@ -283,7 +283,7 @@ tradicionais; sobre superfícies de volatilidade em geral, ver
 \subsection{O índice DVOL e a comparação com o VIX}
 \label{sec:refer-dvol}
 
-O índice DVOL da Deribit constitui medida de volatilidade implícita análoga, em sua intenção, ao VIX da CBOE. Conceitualmente, ambos buscam sintetizar a expectativa de mercado sobre a variabilidade futura do ativo subjacente em horizonte de 30 dias, extraída dos preços de opções vivas por um método livre de modelo. Formalmente, o DVOL é construído via integração ponderada dos preços de opções fora do dinheiro com vencimentos próximos a 30 dias, de modo análogo à formulação proposta por \citet{carr2009variance} para o conceito de variância neutra ao risco:
+O índice DVOL da Deribit constitui medida de volatilidade implícita análoga, em sua intenção, ao VIX da Cboe. Conceitualmente, ambos buscam sintetizar a expectativa de mercado sobre a variabilidade futura do ativo subjacente em horizonte de 30 dias, extraída dos preços de opções vivas por um método livre de modelo. Formalmente, o DVOL é construído via integração ponderada dos preços de opções fora do dinheiro com vencimentos próximos a 30 dias, de modo análogo à formulação proposta por \citet{carr2009variance} para o conceito de variância neutra ao risco:
 
 \begin{equation}
 \text{DVOL}_t^2 = \frac{2}{\tau} \cdot e^{r\tau} \int_0^{\infty} \frac{Q(K)}{K^2} \, dK,
@@ -291,7 +291,7 @@ O índice DVOL da Deribit constitui medida de volatilidade implícita análoga, 
 \end{equation}
 em que $\tau = 30/365$, $Q(K)$ é o preço de mercado da opção fora do dinheiro com preço de exercício $K$ (opção de venda para $K < F$ e opção de compra para $K > F$, em que $F$ é o preço a termo), e $r$ é a taxa de juros livre de risco. A integral é aproximada na prática por uma soma discreta sobre os preços de exercício negociados, com interpolação para tratar lacunas na superfície de preços.
 
-Quatro diferenças metodológicas e institucionais distinguem o DVOL do VIX. Primeiro, o subjacente do DVOL é o Bitcoin (preço à vista agregado da Deribit), enquanto o VIX reflete o índice S\&P~500 --- ativos com naturezas estruturalmente distintas em termos de regulação e composição de fluxo. Segundo, o DVOL utiliza opções da própria Deribit, plataforma não regulada por autoridade financeira tradicional, ao passo que o VIX emprega opções listadas na CBOE sob supervisão da SEC. Terceiro, o DVOL é atualizado continuamente em frequência intradiária (24/7), refletindo a operação contínua do mercado de Bitcoin; o VIX, em contraste, opera segundo o horário de pregão da CBOE. Quarto, a profundidade de preços de exercício ativos é menor no DVOL do que no VIX, o que pode amplificar ruído de microestrutura em períodos de baixa liquidez. Essas diferenças justificam tratar o DVOL como medida de volatilidade implícita do Bitcoin sem assumir equivalência direta com o VIX em propriedades estatísticas ou comportamento sob estresse de mercado.
+Quatro diferenças metodológicas e institucionais distinguem o DVOL do VIX. Primeiro, o subjacente do DVOL é o Bitcoin (preço à vista agregado da Deribit), enquanto o VIX reflete o índice S\&P~500 --- ativos com naturezas estruturalmente distintas em termos de regulação e composição de fluxo. Segundo, o DVOL utiliza opções da própria Deribit, plataforma não regulada por autoridade financeira tradicional, ao passo que o VIX emprega opções listadas na Cboe sob supervisão da SEC. Terceiro, o DVOL é atualizado continuamente em frequência intradiária (24/7), refletindo a operação contínua do mercado de Bitcoin; o VIX, em contraste, opera segundo o horário de pregão da Cboe. Quarto, a profundidade de preços de exercício ativos é menor no DVOL do que no VIX, o que pode amplificar ruído de microestrutura em períodos de baixa liquidez. Essas diferenças justificam tratar o DVOL como medida de volatilidade implícita do Bitcoin sem assumir equivalência direta com o VIX em propriedades estatísticas ou comportamento sob estresse de mercado.
 
 \section{Aprendizado de máquina em finanças}
 
@@ -308,9 +308,9 @@ Esta dissertação emprega cinco modelos supervisionados, organizados em duas
 famílias: modelos lineares --- MQO, Ridge e LASSO, em que os dois
 últimos introduzem regularização sobre a versão não penalizada ---; e métodos
 baseados em árvores (floresta aleatória e XGBoost),
-utilizados pela capacidade de capturar não linearidades, interações entre
-variáveis e de quantificar a importância relativa de preditores como o BVRP em
-um ambiente multivariado. Em todos os modelos com hiperparâmetros, a validação
+utilizados pela capacidade de capturar não linearidades e interações entre
+variáveis sem especificá-las de antemão, e de medir a importância de cada
+variável explicativa na previsão. Em todos os modelos com hiperparâmetros, a validação
 cruzada embargada faz a escolha a cada reestimação: a janela de treino de
 cada dobra termina 30 dias antes da janela de validação, de modo que nenhum
 alvo de treino se sobreponha aos de validação (Capítulo~\ref{chap:previsao_bvrp}).

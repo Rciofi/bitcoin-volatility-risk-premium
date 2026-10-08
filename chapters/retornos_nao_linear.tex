@@ -79,7 +79,7 @@ $R^2$ não passa de 0,0014.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figs/retornos_nao_linear/fig_betas.png}
-    \caption{Coeficiente do retorno futuro sobre o BVRP previsto, por horizonte e regressor, com intervalos de confiança de 95\% pelo erro-padrão HAC com $h+1$ defasagens.}
+    \caption[Coeficiente do retorno futuro sobre o BVRP previsto, por regressor]{Coeficiente do retorno futuro sobre o BVRP previsto, por horizonte e regressor, com intervalos de confiança de 95\% pelo erro-padrão HAC com $h+1$ defasagens.}
     \label{fig:retnl-betas}
 \end{figure}
 }{}
@@ -128,8 +128,9 @@ A Figura~\ref{fig:retnl-importancia} mostra a importância das variáveis nas
 duas formas da floresta, pela redução de impureza dentro da amostra, média
 das 33 origens, e pelo aumento do erro quadrático médio fora da amostra
 quando a variável é permutada. Na forma direta, a volatilidade histórica dos
-30 dias anteriores é a variável mais importante pelos dois critérios, seguida
-da de 90 dias. Na forma $\hat f(X_t) - \text{IV}_t$, a previsão do BVRP é
+30 dias anteriores é a variável mais importante pelos dois critérios; em
+seguida vêm, na redução de impureza, a IV e a VH de 60 dias e, na permutação,
+a VH de 90 dias. Na forma $\hat f(X_t) - \text{IV}_t$, a previsão do BVRP é
 dominada pela IV, que entra com coeficiente $-1$ por construção, e pela
 $\text{BVRP}^{\text{proxy}}_t$, as duas variáveis cuja permutação mais aumenta
 o erro. Dentro do modelo da VH, a volatilidade histórica de 90 dias tem a
@@ -142,17 +143,18 @@ $R^2_{\text{fora}}$ baixo dessa forma.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_importancia.png}
-    \caption{Importância das variáveis nas duas formas da floresta: redução de impureza dentro da amostra (média das 33 origens) e aumento do erro quadrático médio do BVRP previsto fora da amostra quando a variável é permutada (barras laranja: permutar reduz o erro).}
+    \caption[Importância das variáveis nas duas formas da floresta]{Importância das variáveis nas duas formas da floresta: redução de impureza dentro da amostra (média das 33 origens) e aumento do erro quadrático médio do BVRP previsto fora da amostra quando a variável é permutada (barras laranja: permutar reduz o erro).}
     \label{fig:retnl-importancia}
 \end{figure}
 }{}
 
 A Figura~\ref{fig:retnl-cortes} mostra onde as árvores cortam as
 volatilidades. Na forma direta, a floresta corta a VH de 30 dias entre 55\% e
-58\% a.a. (mediana ponderada de 56,1\%), e nenhuma redução de impureza vem de
+58\% a.a. (mediana, entre as origens, do corte mediano de cada origem ponderado
+pela redução de impureza: 56,1\%), e nenhuma redução de impureza vem de
 cortes entre 35\% e 40\%. Na forma $\hat f(X_t) - \text{IV}_t$, a VH de 30
-dias aparece em 23 das 33 origens, com cortes entre 45\% e 49\% (mediana
-ponderada de 48,5\%), e a redução de impureza se concentra na VH de 90 dias,
+dias aparece em 23 das 33 origens, com cortes entre 45\% e 49\% (48,5\% pela
+mesma medida), e a redução de impureza se concentra na VH de 90 dias,
 com cortes entre 60\% e 63\%, e na de 60 dias, perto de 63\%. As árvores
 cortam a VH de 30 dias entre 45\% e 58\% a.a., não em $37{,}3\%$: na ponta de
 cima ou acima da faixa do corte reestimado em cada origem (de 27,0\% a
@@ -164,7 +166,7 @@ floresta separam a volatilidade alta da muito alta.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_cortes.png}
-    \caption{Limiares escolhidos pelas árvores nas volatilidades históricas de 30, 60 e 90 dias, nas duas formas da floresta: redução de impureza por faixa de 1 p.p., somada nas 33 origens. Na VH de 30 dias, a linha pontilhada marca o corte fixo de $37{,}3\%$ a.a., e a faixa sombreada, o intervalo do corte reestimado em cada origem.}
+    \caption[Limiares escolhidos pelas árvores nas volatilidades históricas]{Limiares escolhidos pelas árvores nas volatilidades históricas de 30, 60 e 90 dias, nas duas formas da floresta: redução de impureza por faixa de 1 p.p., somada nas 33 origens. Na VH de 30 dias, a linha pontilhada marca o corte fixo de $37{,}3\%$ a.a., e a faixa sombreada, o intervalo do corte reestimado em cada origem.}
     \label{fig:retnl-cortes}
 \end{figure}
 }{}
@@ -180,7 +182,7 @@ $\hat f(X_t) - \text{IV}_t$, o maior salto varia entre as origens.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figs/retornos_nao_linear/fig_dependencia_parcial.png}
-    \caption{Dependência parcial do BVRP previsto na volatilidade histórica de 30 dias, nas duas formas da floresta, com a $\text{BVRP}^{\text{proxy}}_t$ recalculada a cada valor da VH. Linhas cinza: as 33 origens; linha azul: a última origem.}
+    \caption[Dependência parcial do BVRP previsto na VH de 30 dias]{Dependência parcial do BVRP previsto na volatilidade histórica de 30 dias, nas duas formas da floresta, com a $\text{BVRP}^{\text{proxy}}_t$ recalculada a cada valor da VH. Linhas cinza: as 33 origens; linha azul: a última origem.}
     \label{fig:retnl-dependencia}
 \end{figure}
 }{}
@@ -242,11 +244,20 @@ ruído dos horizontes longos.
 
 Em ações, a volatilidade aumenta mais depois de quedas de preço que depois de
 altas, o efeito alavancagem \citep{black1976studies, christie1982stochastic}.
-No câmbio, o sinal do retorno depende da moeda de cotação --- a queda de uma
-moeda é a alta da outra ---, e não há uma direção que corresponda à queda do
-ativo. \citet{hansen2005forecast} mostram que, no câmbio marco--dólar, modelos
-com efeito alavancagem não superam o GARCH(1,1), ao contrário do que ocorre
-com as ações da IBM.
+No câmbio, uma taxa e a sua inversa desempenham papéis simétricos
+\citep{alexander2006normal}: a queda de uma moeda é a alta da outra, e não há
+uma direção que corresponda à queda do ativo. A assimetria que a literatura
+encontra em câmbio está na distribuição dos retornos de algumas moedas, e não
+na resposta da volatilidade ao sinal do retorno. \citet{wang2001flexible}, com
+seis moedas contra o dólar, mostram que acomodar a assimetria na distribuição
+importa mais que a resposta assimétrica da variância condicional, e
+\citet{hansen2005forecast} mostram que, no câmbio marco--dólar, modelos com
+efeito alavancagem não superam o GARCH(1,1), ao contrário do que ocorre com as
+ações da IBM. No mercado de opções de câmbio, a demanda por opções de venda
+fora do dinheiro ainda inclina o sorriso de volatilidade
+\citep{alexander2006normal}. O Bitcoin é cotado em dólares, mas não tem esse
+papel simétrico; os dados mostram se ele se comporta como uma moeda ou como uma
+ação.
 
 A Tabela~\ref{tab:retnl-sinal} divide a amostra de modelagem pelo sinal do
 log-retorno do dia. O BVRP médio é praticamente o mesmo nos dias de alta e de

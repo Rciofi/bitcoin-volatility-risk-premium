@@ -117,7 +117,13 @@ as datas $s \le t - h$ --- o embargo: o alvo de $s$ olha $h$ dias à frente e s�
 seguinte, sempre com as variáveis explicativas da própria data. No
 Capítulo~\ref{chap:previsao_bvrp}, $h = 30$, o horizonte do BVRP. O modelo é
 reestimado a cada 30 dias. A primeira origem é 21/06/2023, e o período fora da
-amostra tem 987 datas (de 21/06/2023 a 03/03/2026), em 33 origens. Esse período
+amostra tem 987 datas (de 21/06/2023 a 03/03/2026), em 33 origens. A primeira
+origem fica 60 dias depois do fim da primeira janela, o maior horizonte dos
+Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}: com
+qualquer $h \le 60$, o treino da primeira origem contém a janela inteira, e o
+período fora da amostra é o mesmo em todos os horizontes. Com $h = 30$, o
+primeiro treino vai até $t - 30$ e tem 760 observações: as 730 da primeira
+janela e as 30 seguintes, cujos alvos já se realizaram. Esse período
 é o mesmo nos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}, porque o
 regressor dos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} é o BVRP
 previsto no Capítulo~\ref{chap:previsao_bvrp}.

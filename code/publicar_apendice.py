@@ -3,12 +3,12 @@ publicar_apendice.py — tabelas e figuras do Apêndice A (estratégias de negoc
 
 Lê as saídas do A1 (outputs/A1/series_diarias_A1.csv e metricas_A1.csv, gravadas
 por code/estrategias_A1.py) e grava, na notação da seção 14 de docs/pendencias_T1.md:
-  tables/estrategias/tab_principal.tex   Ridge, q80: comprado/neutro e vendido/neutro (0, 10, 30 bps) e C&M
+  tables/estrategias/tab_principal.tex   Ridge, q80: comprada/neutra e vendida/neutra (0, 10, 30 bps) e C&M
   tables/estrategias/tab_quantis.tex     Ridge, q60 a q90, nas duas direções
   tables/estrategias/tab_robustez.tex    burn-in 126, proxy na amostra completa e ponte (datas do Ridge)
   tables/estrategias/tab_regimes.tex     por regime de volatilidade, com o C&M de cada regime
   figs/estrategias/fig_principal.png     valor acumulado e drawdown (Ridge, q80, sem custos)
-  figs/estrategias/fig_quantis.png       valor acumulado por quantil, (a) comprado e (b) vendido
+  figs/estrategias/fig_quantis.png       valor acumulado por quantil, (a) comprada e (b) vendida
   figs/estrategias/fig_proxy.png         proxy na amostra completa, com o início da negociação do Ridge
 A decomposição do publicado ao atual (tab_A1_decomposicao, tab_A1_compra_manutencao)
 fica em outputs/A1, para o relatório ao orientador, e não entra no apêndice.
@@ -41,6 +41,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENTRADA = os.path.join(ROOT, "outputs", "A1")
 TOL = 1e-9
 CHAVES = ["variante", "regime", "direcao", "quantil", "custo_bps"]
+# rótulos no feminino ("regra"), como no texto; o estrategias_A1.py (saídas do relatório) não muda
+ROTULO_DIRECAO = {**A.ROTULO_DIRECAO, "comprado": "Comprada/neutra", "vendido": "Vendida/neutra"}
 ROTULO_SINAL = {"ridge": r"$\widehat{\text{BVRP}}_t$ (Ridge), burn-in de 252",
                 "ridge_b126": r"$\widehat{\text{BVRP}}_t$ (Ridge), burn-in de 126",
                 "proxy": r"$\text{BVRP}^{\text{proxy}}_t$, amostra completa",
@@ -176,11 +178,11 @@ def tabelas(m, raiz):
     for direcao in A.DIRECOES:
         for c in A.CUSTOS:
             a = sel("ridge", direcao, custo=c)
-            linhas.append([A.ROTULO_DIRECAO[direcao] if c == 0 else "", f"{c}", pct(a.ret_anual), pct(a.vol_anual),
+            linhas.append([ROTULO_DIRECAO[direcao] if c == 0 else "", f"{c}", pct(a.ret_anual), pct(a.vol_anual),
                            n(a.sharpe), n(a.sortino), pct(a.max_drawdown), A._n(a.giro_anual, 1),
                            A._int(a.n_operacoes), pct(a.pct_tempo)])
         linhas.append("MIDRULE")
-    linhas.append([A.ROTULO_DIRECAO["compra_e_manutencao"], "--", pct(bh.ret_anual), pct(bh.vol_anual),
+    linhas.append([ROTULO_DIRECAO["compra_e_manutencao"], "--", pct(bh.ret_anual), pct(bh.vol_anual),
                    n(bh.sharpe), n(bh.sortino), pct(bh.max_drawdown), "--", "--", pct(bh.pct_tempo)])
     _tabela(raiz, "tab_principal.tex",
             rf"Estratégias com o BVRP previsto pelo Ridge (quantil 80\%, {periodo}, {A._int(bh.n_dias)} dias).",
@@ -194,11 +196,11 @@ def tabelas(m, raiz):
     for direcao in A.DIRECOES:
         for q in A.QUANTIS:
             a = [sel("ridge", direcao, q, c) for c in A.CUSTOS]
-            linhas.append([A.ROTULO_DIRECAO[direcao] if q == A.QUANTIS[0] else "", f"q{int(q * 100)}"]
+            linhas.append([ROTULO_DIRECAO[direcao] if q == A.QUANTIS[0] else "", f"q{int(q * 100)}"]
                           + [n(x.sharpe) for x in a]
                           + [n(a[0].sortino), pct(a[0].max_drawdown), A._n(a[0].giro_anual, 1), pct(a[0].pct_tempo)])
         linhas.append("MIDRULE")
-    linhas.append([A.ROTULO_DIRECAO["compra_e_manutencao"], "--", n(bh.sharpe), "--", "--", n(bh.sortino),
+    linhas.append([ROTULO_DIRECAO["compra_e_manutencao"], "--", n(bh.sharpe), "--", "--", n(bh.sortino),
                    pct(bh.max_drawdown), "--", pct(bh.pct_tempo)])
     _tabela(raiz, "tab_quantis.tex", rf"Estratégias com o BVRP previsto pelo Ridge, por quantil ({periodo}).",
             "tab:estr-quantis", "llrrrrrrr",
@@ -214,7 +216,7 @@ def tabelas(m, raiz):
             a = [sel(v, direcao, custo=c) for c in (A.CUSTOS if direcao != "compra_e_manutencao" else [0])]
             sh = [n(x.sharpe) for x in a] + ["--"] * (3 - len(a))
             linhas.append([ROTULO_SINAL[v] if i == 0 else "", _periodo(b_, "--") if i == 0 else "",
-                           A._int(b_.n_dias) if i == 0 else "", A.ROTULO_DIRECAO[direcao]] + sh
+                           A._int(b_.n_dias) if i == 0 else "", ROTULO_DIRECAO[direcao]] + sh
                           + [pct(a[0].max_drawdown), pct(a[0].pct_tempo)])
         linhas.append("MIDRULE")
     _tabela(raiz, "tab_robustez.tex", r"Testes de robustez: burn-in e proxy retrospectiva (quantil 80\%).",
@@ -234,7 +236,7 @@ def tabelas(m, raiz):
                 s30 = n(sel(v, direcao, custo=30, regime=rg).sharpe) if direcao != "compra_e_manutencao" else "--"
                 linhas.append([(r"$\widehat{\text{BVRP}}_t$ (Ridge)" if v == "ridge"
                                 else r"$\text{BVRP}^{\text{proxy}}_t$") if (rg == "baixa" and i == 0) else "",
-                               f"{rg.capitalize()} volatilidade" if i == 0 else "", A.ROTULO_DIRECAO[direcao],
+                               f"{rg.capitalize()} volatilidade" if i == 0 else "", ROTULO_DIRECAO[direcao],
                                A._int(a.n_dias_posicionado), pct(a.ret_anual), n(a.sharpe), s30,
                                pct(a.max_drawdown)])
         linhas.append("MIDRULE")
@@ -257,8 +259,8 @@ def figuras(series, datas, raiz):
     plt.rcParams.update({"axes.spines.top": False, "axes.spines.right": False, "axes.grid": True,
                          "grid.alpha": 0.3})
     destino = os.path.join(raiz, "figs", "estrategias")
-    trio = lambda v: [((v, A.Q_REF, "comprado"), A.AZUL, "Comprado/neutro"),  # noqa: E731
-                      ((v, A.Q_REF, "vendido"), A.LARANJA, "Vendido/neutro"),
+    trio = lambda v: [((v, A.Q_REF, "comprado"), A.AZUL, "Comprada/neutra"),  # noqa: E731
+                      ((v, A.Q_REF, "vendido"), A.LARANJA, "Vendida/neutra"),
                       ((v, None, "compra_e_manutencao"), A.CINZA, "Compra e manutenção")]
 
     fig, ax = plt.subplots(2, 1, figsize=(9, 6), sharex=True, gridspec_kw={"height_ratios": [2, 1]})

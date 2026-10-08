@@ -46,12 +46,12 @@ COR_REAL, COR_PREV = "#2b6cb0", "#d95f02"   # mesmo par das figuras do T5
 MODELOS = ["MQO", "Ridge", "LASSO", "floresta_aleatoria", "XGBoost"]
 REFERENCIAS = ["media_historica", "proxy_retrospectiva", "persistencia_viavel"]
 NOMES = {"media_historica": "Média histórica", "proxy_retrospectiva": r"$\text{BVRP}^{\text{proxy}}_t$",
-         "persistencia_viavel": r"$\text{BVRP}_{t-30}$ (persistência viável)", "MQO": "MQO",
+         "persistencia_viavel": r"$\text{BVRP}_{t-30}$", "MQO": "MQO",
          "Ridge": "Ridge", "LASSO": "LASSO", "floresta_aleatoria": "Floresta aleatória", "XGBoost": "XGBoost"}
 
 ROTULOS_FIG = {"Ridge": "Ridge", "floresta_aleatoria": "Floresta aleatória",
                "proxy_retrospectiva": r"$\mathrm{BVRP}^{\mathrm{proxy}}_t$",
-               "persistencia_viavel": r"Persistência viável, $\mathrm{BVRP}_{t-30}$"}
+               "persistencia_viavel": r"Prêmio realizado defasado, $\mathrm{BVRP}_{t-30}$"}
 
 # Dicionário: grupo, símbolo e definição na notação do texto (a janela e o ADF vêm do T4)
 DICIONARIO = [
@@ -192,8 +192,9 @@ def main():
     conferir(len(DICIONARIO) == 17 and set(c for _, c, _, _ in DICIONARIO) == set(dic.index) - {ALVO},
              "dicionário com as 17 variáveis do T4")
     nota = (r"$r_t$ é o log-retorno diário e $P_t$, o preço de fechamento. Volatilidades em \% a.a. "
-            r"Valor-$p$ do teste ADF na amostra de modelagem ($N = 1.776$). As séries com evidência robusta "
-            r"de raiz unitária (o preço e as médias móveis da IV) entram transformadas; as volatilidades "
+            r"Valor-$p$ do teste ADF na amostra de modelagem ($N = 1.776$). As séries em que o ADF não rejeita "
+            r"a raiz unitária e o KPSS rejeita a estacionariedade (o preço e as médias móveis da IV) entram "
+            r"transformadas; as volatilidades "
             r"entram em nível, inclusive $\text{VH}_{t-89:t}$ e $\text{IV}_t$, cujo ADF fica na fronteira. "
             r"Os modelos lineares excluem $\text{VH}_{t-29:t}$, porque "
             r"$\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$.")
@@ -239,7 +240,7 @@ def main():
         r" & folha mínima: 5, 20, 50, 100, 200 & & \\",
         r" & fração de variáveis por corte: 0{,}2; 1/3; 1 & & \\",
         r"\addlinespace",
-        r"XGBoost & taxa de aprendizagem: 0{,}01; 0{,}03; 0{,}1 & 0{,}01 (" + str(n_lr) + r") & "
+        r"XGBoost & taxa de aprendizado: 0{,}01; 0{,}03; 0{,}1 & 0{,}01 (" + str(n_lr) + r") & "
         + str(n_lr) + r" \\",
         r" & profundidade máxima: 1, 2, 4 & 1 (" + str(n_d_xgb) + r") & " + str(n_d_xgb) + r" \\",
         r" & número de árvores: 50, 100, 200, 500 & 50 (" + str(n_n_xgb) + r") & " + str(n_n_xgb) + r" \\",
@@ -277,7 +278,8 @@ def main():
            r"\multicolumn{2}{c}{MCS ($p$)} & $R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}"
            "\n"
            r"Modelo & expansiva & móvel & expansiva & móvel & expansiva & móvel & expansiva")
-    nota = (r"987 previsões, de 21/06/2023 a 03/03/2026. $R^2_{\text{fora}}$: contra a média histórica dos "
+    nota = (r"$\text{BVRP}^{\text{proxy}}_t$: proxy retrospectiva; $\text{BVRP}_{t-30}$: prêmio realizado "
+            r"defasado. 987 previsões, de 21/06/2023 a 03/03/2026. $R^2_{\text{fora}}$: contra a média histórica dos "
             r"alvos conhecidos em cada origem ($s \le t - 30$). Clark--West: unilateral, contra a média "
             r"histórica, com erro-padrão HAC de $h + 1 = 31$ defasagens. MCS: valor-$p$ do "
             r"\textit{model confidence set} de \citet{hansen2011model}, com perda quadrática, estatística "
@@ -285,7 +287,8 @@ def main():
             r"modelos de cada janela; $^{\dagger}$: no conjunto a 10\%. $R^2$ dentro da amostra: média das "
             r"33 reestimações.")
     with open(os.path.join(dir_tab, "tab_resultados.tex"), "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(tabela("Previsão do BVRP fora da amostra.", "tab:prev-resultados", "lrrrrrrr", cab, linhas, nota))
+        fh.write(tabela("Previsão do BVRP fora da amostra.", "tab:prev-resultados", "lrrrrrrr", cab, linhas, nota,
+                        tamanho=r"\small\setlength{\tabcolsep}{4pt}"))
 
     # ---------------- Regime (T9) ----------------
     linhas = [r"\multicolumn{5}{l}{\textit{Painel A: interações dentro da amostra (MQO, $N = 1.776$)}} \\"]
@@ -304,7 +307,7 @@ def main():
     nota = (r"$D_t = 1$ se $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. (corte fixo, estimado na primeira janela); "
             r"no corte expansivo, reestimado em cada origem. Painel A: MQO com as 16 variáveis, $D_t$ e as 16 "
             r"interações $D_t X_t$; estatística de Wald $\chi^2(q)$ com erro-padrão HAC de 31 defasagens. "
-            r"Painel B: modelos com as interações, mesmas origens do T5; DM: Diebold--Mariano bilateral "
+            r"Painel B: modelos com as interações, mesmas origens da Tabela~\ref{tab:prev-resultados}; DM: Diebold--Mariano bilateral "
             r"contra o mesmo modelo sem regime.")
     with open(os.path.join(dir_tab, "tab_regime.tex"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(tabela("Regime de volatilidade e previsão do BVRP.", "tab:prev-regime", "llrrr",

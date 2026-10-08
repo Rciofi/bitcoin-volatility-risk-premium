@@ -10,7 +10,7 @@ Variante & $h = 1$ & $h = 5$ & $h = 10$ & $h = 20$ & $h = 30$ & $h = 60$ \\
 Blocos de 30 dias & 0{,}042 & 0{,}080 & 0{,}130 & 0{,}167 & 0{,}201 & 0{,}060 \\
 Blocos de 90 dias & 0{,}050 & 0{,}098 & 0{,}225 & 0{,}326 & 0{,}423 & 0{,}205 \\
 $\alpha$ reescolhido & 0{,}068 & 0{,}156 & 0{,}300 & 0{,}442 & 0{,}573 & 0{,}432 \\
-Floresta aleatória & 0{,}498 & 0{,}631 & 0{,}783 & 0{,}808 & 0{,}838 & 0{,}700 \\
+Floresta aleatória & 0{,}438 & 0{,}597 & 0{,}770 & 0{,}794 & 0{,}834 & 0{,}720 \\
 Só o 2º nível (ignora o 1º estágio) & 0{,}003 & 0{,}022 & 0{,}058 & 0{,}108 & 0{,}178 & 0{,}080 \\
 \addlinespace
 Floresta aleatória: $\hat\beta_h$ & $-$0{,}057 & $-$0{,}113 & $-$0{,}142 & $-$0{,}294 & $-$0{,}357 & $-$1{,}235 \\
@@ -18,5 +18,5 @@ Floresta aleatória: $p$ HAC & 0{,}148 & 0{,}342 & 0{,}487 & 0{,}493 & 0{,}606 &
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Valores-$p$ do bootstrap em dois níveis na escala corrigida da atenuação (999 reamostragens; 199 na floresta). Principal: Ridge com o $\alpha$ de cada origem fixo e blocos de 60 dias (Tabela~\ref{tab:retlin-principal}). $\alpha$ reescolhido: validação cruzada refeita em cada treino reamostrado. Só o 2º nível: previsões originais fixas, sem correção. Floresta: $\hat\beta_h$ em p.p. por p.p.}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Valores-$p$ do bootstrap em dois níveis na escala corrigida da atenuação (999 reamostragens). Principal: Ridge com o $\alpha$ de cada origem fixo e blocos de 60 dias (Tabela~\ref{tab:retlin-principal}). $\alpha$ reescolhido: validação cruzada refeita em cada treino reamostrado. Só o 2º nível: previsões originais fixas, sem correção. Floresta: as mesmas reamostragens da Tabela~\ref{tab:retnl-robustez}; $\hat\beta_h$ em p.p. por p.p.}
 \end{table}

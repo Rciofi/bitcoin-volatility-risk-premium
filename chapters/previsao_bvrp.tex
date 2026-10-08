@@ -102,7 +102,7 @@ No Ridge e no LASSO, a penalidade escolhida fica sempre no interior da grade. O
 LASSO zera todos os coeficientes em 12 das 33 origens; nelas, prevê
 exatamente a média histórica do treino. As árvores ficam no extremo de menor
 capacidade: a floresta usa árvores de profundidade 1 em todas as origens, e o
-XGBoost usa a menor taxa de aprendizagem em todas, profundidade 1 em 28 e o
+XGBoost usa a menor taxa de aprendizado em todas, profundidade 1 em 28 e o
 menor número de árvores em 22. Esse limite não é uma deficiência da grade.
 Árvores de um único corte, com aprendizagem lenta, já produzem previsões
 próximas da média histórica: o desvio-padrão das previsões fora da amostra é de
@@ -175,7 +175,7 @@ episódios de prêmio positivo, como o de janeiro de 2026, em que o BVRP chega a
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{figs/previsao_bvrp/fig_previsoes.png}
-    \caption{BVRP e previsões fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026): Ridge, floresta aleatória, $\text{BVRP}^{\text{proxy}}_t$ e prêmio realizado defasado, $\text{BVRP}_{t-30}$. Na legenda, o $R^2$ fora da amostra contra a média histórica.}
+    \caption[BVRP e previsões fora da amostra]{BVRP e previsões fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026): Ridge, floresta aleatória, $\text{BVRP}^{\text{proxy}}_t$ e prêmio realizado defasado, $\text{BVRP}_{t-30}$. Na legenda, o $R^2$ fora da amostra contra a média histórica.}
     \label{fig:prev-previsoes}
 \end{figure}
 }{}

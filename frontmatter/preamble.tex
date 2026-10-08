@@ -32,6 +32,8 @@
 % Referências e links
 \usepackage[round,authoryear]{natbib}
 \usepackage{hyperref}
+\usepackage{xurl}                       % quebra de linha em qualquer caractere de \url e afins
+\DeclareUrlCommand\arq{\urlstyle{tt}}   % nome de arquivo: tipografia de \texttt, quebrável, sem link
 
 % ----------------------------------------------------
 % CONFIGURAÇÃO DE PÁGINA
@@ -48,6 +50,9 @@
 \setlength{\parskip}{0.2cm}
 
 \onehalfspacing
+
+% Título da bibliografia igual ao do sumário
+\addto\captionsbrazilian{\renewcommand{\bibname}{Referências}}
 
 % ----------------------------------------------------
 % HIPERLINKS

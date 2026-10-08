@@ -69,7 +69,7 @@ VOL_ROWS = [
 ADF_LABELS = {
     "I(1)": "I(1)",
     "I(0)": "I(0)",
-    "persistente": "Longa memória",
+    "persistente": "Alta persistência",
     "inconclusivo": "Inconclusivo",
 }
 
@@ -82,6 +82,12 @@ _MESES = ["jan.", "fev.", "mar.", "abr.", "mai.", "jun.",
 # ---------------------------------------------------------------------------
 def fmt_br(x, d):
     return f"{x:.{d}f}".replace(".", ",")
+
+
+def fmt_txt(x, d):
+    """Número em texto de tabela: vírgula decimal e sinal de menos tipográfico."""
+    s = fmt_br(x, d)
+    return "$-$" + s[1:] if s.startswith("-") else s
 
 
 def fmt_m(x, d):
@@ -168,7 +174,7 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\begin{table}[H]",
         r"\centering",
         r"\small",
-        r"\caption{Estatísticas descritivas das variáveis principais.",
+        r"\caption[Estatísticas descritivas das variáveis principais]{Estatísticas descritivas das variáveis principais.",
         f"Período: {periodo} ($N={fmt_n(n)}$ observações diárias).",
         r"BVRP e volatilidades em pontos percentuais anualizados;",
         r"log-retorno diário em fração decimal.",
@@ -181,19 +187,19 @@ def tab_3_1(df, out_dir, bvrp_cols):
     ]
     for label, r, d in tex_rows:
         vals = [r[k] for k in ["Média", "Desv. Pad.", "Mínimo", "p5", "p25", "p75", "p95", "Máximo"]]
-        cells = " & ".join(fmt_br(v, d) for v in vals)
-        lines.append(f"{label} & {cells} & {fmt_br(r['Assimetria'], 3)} & {fmt_br(r['Curtose'], 3)} \\\\")
+        cells = " & ".join(fmt_txt(v, d) for v in vals)
+        lines.append(f"{label} & {cells} & {fmt_txt(r['Assimetria'], 3)} & {fmt_txt(r['Curtose'], 3)} \\\\")
     lines += [
         r"\bottomrule",
         r"\end{tabular}}",
         r"\par\smallskip",
-        r"\footnotesize\textit{Nota}: VH 30d (volatilidade histórica) calculada como raiz da média"
+        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: VH 30d (volatilidade histórica) calculada como raiz da média"
         r" dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os"
         r" retornos de $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$."
         r" IV 30d: índice DVOL da Deribit, observado em $t$."
         + (r" BVRP: $\text{VH}_{t+1:t+30} - \text{IV}_t$;"
            r" $\text{BVRP}^{\text{proxy}}$: $\text{VH}_{t-29:t} - \text{IV}_t$."
-           if "bvrp_30d_fut" in bvrp_cols else ""),
+           if "bvrp_30d_fut" in bvrp_cols else "") + "}",
         r"\end{table}",
     ]
     with open(os.path.join(out_dir, "tab_3_1_desc_stats.tex"), "w", encoding="utf-8") as f:
@@ -203,7 +209,7 @@ def tab_3_1(df, out_dir, bvrp_cols):
 def tab_3_2(df, out_dir, bvrp_cols):
     series = []
     if "close" in df.columns:
-        series.append(("close", r"Preço (\textit{close})", df["close"]))
+        series.append(("close", "Preço de fechamento", df["close"]))
     series.append(("ret", "Log-retorno diário", df["ret"]))
     for col, label, _ in VOL_ROWS:
         if col in df.columns and col != "ret":
@@ -234,7 +240,7 @@ def tab_3_2(df, out_dir, bvrp_cols):
         r"\begin{table}[H]",
         r"\centering",
         r"\small",
-        r"\caption{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação."
+        r"\caption[Testes de estacionariedade ADF e KPSS]{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação."
         r" Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade."
         f" Período: {periodo} ($N = {fmt_n(n)}$ observações diárias).}}",
         r"\label{tab:dados-adf-kpss}",
@@ -242,15 +248,16 @@ def tab_3_2(df, out_dir, bvrp_cols):
         r"\toprule",
         r"Variável & \multicolumn{2}{c}{ADF} & \multicolumn{2}{c}{KPSS} & Conclusão \\",
         r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}",
-        r" & Estat. & $p$-valor & Estat. & $p$-valor & \\",
+        r" & Estat. & Valor-$p$ & Estat. & Valor-$p$ & \\",
         r"\midrule",
         *lines_body,
         r"\bottomrule",
         r"\end{tabular}",
         r"\par\smallskip",
-        r"\footnotesize\textit{Nota}: ADF com seleção de defasagens por AIC; KPSS com constante e"
-        r" defasagens automáticas. \textit{Longa memória}: ADF rejeita (ou está na fronteira) e"
-        r" KPSS rejeita a estacionariedade.",
+        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: ADF com seleção de defasagens por AIC; KPSS com"
+        r" constante e defasagens automáticas. \textit{Alta persistência}: o KPSS rejeita a estacionariedade,"
+        r" e o ADF rejeita a raiz unitária ou fica na fronteira; os testes não distinguem longa memória de"
+        r" raiz próxima da unitária.}",
         r"\end{table}",
     ]
     with open(os.path.join(out_dir, "tab_3_2_adf_kpss.tex"), "w", encoding="utf-8") as f:

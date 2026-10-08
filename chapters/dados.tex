@@ -14,7 +14,7 @@ estritamente descritivo e exploratório, não implicando inferências causais.
 Ainda assim, ela é fundamental para compreender a dinâmica temporal, a
 distribuição estatística e a heterogeneidade do prêmio de risco de volatilidade
 ao longo da amostra, estabelecendo o pano de fundo empírico para os modelos
-apresentados nos Capítulos~\ref{chap:metodologia} e~\ref{chap:retornos_linear}.
+apresentados nos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}.
 
 A amostra cobre 1.806 observações diárias, de 24 de março de 2021 a 3 de março de 2026.\footnote{A amostra termina em 3 de março de 2026 por construção: o horizonte máximo de previsão avaliado no Capítulo~\ref{chap:retornos_linear} é de 60 dias, e as últimas 60 observações da série não dispõem de retorno futuro válido nesse horizonte. Embora as análises descritivas deste capítulo e a caracterização por regimes do Capítulo~\ref{chap:retornos_nao_linear} não dependam do alvo de 60 dias, a dissertação adota a mesma amostra em todos os capítulos para assegurar comparabilidade entre os resultados.} Os preços diários do Bitcoin vêm da API pública da Binance (par BTCUSDT), e a volatilidade implícita, do índice DVOL da Deribit. A base de preços original não tinha os dias de 1º a 31 de março de 2023; esta dissertação completa o intervalo com as velas diárias da mesma fonte. Sem essa correção, o retorno registrado em 1º de abril de 2023 acumularia 32 dias e inflaria a volatilidade histórica e o prêmio de abril de 2023. O período inclui a aprovação dos ETFs de Bitcoin à vista pela \textit{Securities and Exchange Commission} (SEC), em janeiro de 2024 --- evento institucional cujo potencial efeito estrutural sobre a dinâmica do BVRP o Capítulo~\ref{chap:retornos_nao_linear} discute como limitação.
 
@@ -47,14 +47,14 @@ $-8{,}76$ p.p., e a proxy, de $-8{,}63$ p.p., consistente com a existência de
 uma compensação paga pelos investidores para se protegerem do risco de
 volatilidade no mercado de opções de Bitcoin: a volatilidade implícita supera
 a volatilidade histórica dos 30 dias seguintes em 72\% das datas, configurando
-um prêmio de seguro. O BVRP é mais disperso que a proxy (desvio padrão de
+um prêmio de seguro. O BVRP é mais disperso que a proxy (desvio-padrão de
 $17{,}3$ contra $11{,}9$ p.p.), com mínimo de $-75{,}8$ p.p., em novembro de
 2022.
 
 \IfFileExists{tables/dados/desc_stats.tex}{
   \input{tables/dados/desc_stats.tex}
 }{}
-Os testes formais de estacionariedade confirmam que o preço de fechamento do Bitcoin é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (VH 30d e IV 30d) e as duas versões do prêmio apresentam resultados inconclusivos --- o ADF rejeita a raiz unitária, mas o KPSS também rejeita a estacionariedade (no BVRP, com valor-$p$ de $0{,}015$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. A dissertação mantém essas séries em nível (Tabela~\ref{tab:dados-adf-kpss}).
+Os testes formais de estacionariedade confirmam que o preço de fechamento do Bitcoin é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (VH 30d e IV 30d) e as duas versões do prêmio apresentam resultados inconclusivos --- o KPSS rejeita a estacionariedade (no BVRP, com valor-$p$ de $0{,}015$), e o ADF rejeita a raiz unitária a 5\%, exceto na IV, que fica na fronteira (valor-$p$ de $0{,}071$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. A dissertação mantém essas séries em nível (Tabela~\ref{tab:dados-adf-kpss}).
 
 \IfFileExists{tables/dados/adf_kpss_table.tex}{
   \input{tables/dados/adf_kpss_table.tex}
@@ -109,7 +109,7 @@ inferior), com anotações dos principais eventos de mercado do período.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figs/dados/vrp_timeseries.png}
-    \caption{Evolução temporal das séries de volatilidade do Bitcoin. Painel (a): volatilidade histórica de 30 dias nas janelas retrospectiva ($t-29$ a $t$) e prospectiva ($t+1$ a $t+30$) e volatilidade implícita (IV, índice DVOL da Deribit). Só a volatilidade histórica prospectiva cobre a mesma janela que a IV de $t$; a retrospectiva é a da proxy, conhecida em $t$, e sua comparação com a IV mistura janelas diferentes. Painel (b): BVRP ($\text{VH}_{t+1:t+30} - \text{IV}_t$) e $\text{BVRP}^{\text{proxy}}$ ($\text{VH}_{t-29:t} - \text{IV}_t$). Anotações verticais: colapso do TerraUSD/LUNA (maio/2022), liquidação da Three Arrows Capital e suspensão de saques na Celsius (junho/2022), falência da FTX (novembro/2022), crise bancária dos Estados Unidos --- SVB e Signature (março/2023), e aprovação dos ETFs de Bitcoin à vista pela SEC (janeiro/2024).}
+    \caption[Evolução da volatilidade e do prêmio de risco de volatilidade]{Evolução temporal das séries de volatilidade do Bitcoin. Painel (a): volatilidade histórica de 30 dias nas janelas retrospectiva ($t-29$ a $t$) e prospectiva ($t+1$ a $t+30$) e volatilidade implícita (IV, índice DVOL da Deribit). Só a volatilidade histórica prospectiva cobre a mesma janela que a IV de $t$; a retrospectiva é a da proxy, conhecida em $t$, e sua comparação com a IV mistura janelas diferentes. Painel (b): BVRP ($\text{VH}_{t+1:t+30} - \text{IV}_t$) e $\text{BVRP}^{\text{proxy}}$ ($\text{VH}_{t-29:t} - \text{IV}_t$). Anotações verticais: colapso do TerraUSD/LUNA (maio/2022), liquidação da Three Arrows Capital e suspensão de saques na Celsius (junho/2022), falência da FTX (novembro/2022), crise bancária dos Estados Unidos --- SVB e Signature (março/2023), e aprovação dos ETFs de Bitcoin à vista pela SEC (janeiro/2024).}
     \label{fig:dados-series}
 \end{figure}
 }{}
@@ -182,7 +182,7 @@ oscilar.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{figs/dados/vh_bimodalidade.png}
-    \caption{Volatilidade histórica de 30 dias na primeira janela de estimação (23/04/2021 a 22/04/2023), em escala logarítmica: histograma, mistura de duas normais e corte de $37{,}3\%$ a.a. entre os regimes de baixa e de alta volatilidade.}
+    \caption[Volatilidade histórica na primeira janela e corte entre os regimes]{Volatilidade histórica de 30 dias na primeira janela de estimação (23/04/2021 a 22/04/2023), em escala logarítmica: histograma, mistura de duas normais e corte de $37{,}3\%$ a.a. entre os regimes de baixa e de alta volatilidade.}
     \label{fig:dados-vh-bimodal}
 \end{figure}
 }{}
@@ -216,7 +216,7 @@ distribuição do BVRP e da proxy em cada subperíodo.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{figs/dados/vrp_boxplot.png}
-    \caption{Distribuição anual do prêmio de risco de volatilidade do Bitcoin: BVRP e $\text{BVRP}^{\text{proxy}}$. O primeiro e o último anos estão incompletos: 2021 cobre de 24/03 a 31/12/2021 ($N = 283$), e 2026, apenas de 1º/01 a 03/03/2026 ($N = 62$); a distribuição de 2026 não é comparável à dos anos completos.}
+    \caption[Distribuição anual do BVRP e da proxy]{Distribuição anual do prêmio de risco de volatilidade do Bitcoin: BVRP e $\text{BVRP}^{\text{proxy}}$. O primeiro e o último anos estão incompletos: 2021 cobre de 24/03 a 31/12/2021 ($N = 283$), e 2026, apenas de 1º/01 a 03/03/2026 ($N = 62$); a distribuição de 2026 não é comparável à dos anos completos.}
     \label{fig:dados-boxplot-anual}
 \end{figure}
 }{}
@@ -242,7 +242,7 @@ dinâmica do BVRP, justificando a adoção de abordagens que permitam variação
 temporal e efeitos de regime nos capítulos subsequentes.
 
 % =========================================================
-\section{Relações iniciais entre prêmio de risco de volatilidade e retornos}
+\section[Relações iniciais entre prêmio de risco de volatilidade e retornos]{Relações iniciais entre prêmio de risco de \mbox{volatilidade} e retornos}
 \label{sec:dados-bvrp-retornos}
 
 Por fim, esta seção examina a relação exploratória entre o prêmio de risco de
@@ -258,7 +258,7 @@ futuro, e a relação entre os dois seria em parte mecânica.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/dados/vrp_vs_return_30d.png}
-    \caption{Relação exploratória entre a $\text{BVRP}^{\text{proxy}}$ em $t$ e o
+    \caption[Proxy e retorno do Bitcoin nos 30 dias seguintes]{Relação exploratória entre a $\text{BVRP}^{\text{proxy}}$ em $t$ e o
     retorno do Bitcoin nos 30 dias seguintes ($N = 1.806$). Reta de MQO, com
     erro-padrão de Newey--West de 31 defasagens.}
     \label{fig:dados-bvrp-retorno-30d}

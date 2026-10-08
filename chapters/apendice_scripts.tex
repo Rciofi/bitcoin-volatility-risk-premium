@@ -10,51 +10,51 @@ execução e a estrutura de pastas estão no Apêndice~\ref{app:pastas}.
 \section{Scripts por etapa}
 
 O sufixo de cada script de análise (T1, T5, T10 etc.) é o nome da pasta em que
-ele grava as saídas, dentro de \texttt{outputs/}.
+ele grava as saídas, dentro de \arq{outputs/}.
 
 \begin{description}
-    \item[Coleta.] \texttt{code/update\_btc\_prices.py} baixa o preço de
+    \item[Coleta.] \arq{code/update_btc_prices.py} baixa o preço de
           fechamento diário do Bitcoin (par BTCUSDT) da API pública da Binance,
-          e \texttt{code/fix\_btc\_gap\_2023\_03.py} completa, com a mesma
+          e \arq{code/fix_btc_gap_2023_03.py} completa, com a mesma
           fonte, o intervalo de 1º a 31 de março de 2023.
-          \texttt{code/download\_dvol\_deribit.py} baixa o DVOL da API pública
+          \arq{code/download_dvol_deribit.py} baixa o DVOL da API pública
           da Deribit.
-    \item[Construção.] \texttt{code/build\_vrp\_dataset.py} confere a
+    \item[Construção.] \arq{code/build_vrp_dataset.py} confere a
           continuidade diária das séries, calcula a volatilidade histórica nas
           duas janelas e as duas medidas do prêmio;
-          \texttt{code/build\_targets.py} acrescenta os retornos futuros e
-          forma a amostra completa; \texttt{code/build\_ml\_dataset\_T4.py}
+          \arq{code/build_targets.py} acrescenta os retornos futuros e
+          forma a amostra completa; \arq{code/build_ml_dataset_T4.py}
           forma a amostra de modelagem, com o alvo e as 17 variáveis
-          explicativas; \texttt{code/regimes\_T9.py} estima os cortes e
+          explicativas; \arq{code/regimes_T9.py} estima os cortes e
           classifica os regimes.
-    \item[Utilitários.] \texttt{code/split\_utils.py} gera as origens de
+    \item[Utilitários.] \arq{code/split_utils.py} gera as origens de
           previsão, os treinos embargados e as dobras da validação cruzada;
-          \texttt{code/hac\_utils.py} estima o MQO com erro-padrão de
-          Newey--West; \texttt{code/avaliacao\_utils.py} calcula o $R^2$ fora
+          \arq{code/hac_utils.py} estima o MQO com erro-padrão de
+          Newey--West; \arq{code/avaliacao_utils.py} calcula o $R^2$ fora
           da amostra e os testes de Clark--West e de Diebold--Mariano;
-          \texttt{code/mcs\_utils.py} calcula o \textit{model confidence set}.
-    \item[Capítulo~\ref{chap:dados}.] \texttt{code/build\_desc\_stats\_T1.py}
+          \arq{code/mcs_utils.py} calcula o \textit{model confidence set}.
+    \item[Capítulo~\ref{chap:dados}.] \arq{code/build_desc_stats_T1.py}
           (estatísticas descritivas e testes de raiz unitária),
-          \texttt{code/plot\_cap3\_T1.py} (séries, histogramas e distribuição
-          anual), \texttt{code/plot\_vrp\_vs\_return\_T12.py} (dispersão entre
-          a proxy e o retorno de 30 dias), \texttt{scripts/test\_h1\_bvrp\_mean.py}
-          (teste de H1) e \texttt{code/descritivas\_C3\_regimes.py} (prêmio por
+          \arq{code/plot_cap3_T1.py} (séries, histogramas e distribuição
+          anual), \arq{code/plot_vrp_vs_return_T12.py} (dispersão entre
+          a proxy e o retorno de 30 dias), \arq{scripts/test_h1_bvrp_mean.py}
+          (teste de H1) e \arq{code/descritivas_C3_regimes.py} (prêmio por
           regime).
-    \item[Capítulo~\ref{chap:previsao_bvrp}.] \texttt{code/previsao\_bvrp\_T5.py}
+    \item[Capítulo~\ref{chap:previsao_bvrp}.] \arq{code/previsao_bvrp_T5.py}
           (previsões dos cinco modelos e das referências, validação cruzada e
-          placebo), \texttt{code/mcs\_previsao\_T5.py} (\textit{model
-          confidence set}) e \texttt{code/interacao\_regime\_T9.py} (interações
+          placebo), \arq{code/mcs_previsao_T5.py} (\textit{model
+          confidence set}) e \arq{code/interacao_regime_T9.py} (interações
           com o regime).
     \item[Capítulos~\ref{chap:retornos_linear}
-          e~\ref{chap:retornos_nao_linear}.] \texttt{code/retorno\_bvrp\_T10.py}
+          e~\ref{chap:retornos_nao_linear}.] \arq{code/retorno_bvrp_T10.py}
           (modelo linear e bootstrap em dois níveis),
-          \texttt{code/retorno\_bvrp\_T11.py} (modelo em árvore, testes
-          conjuntos e quebras) e \texttt{code/descritivas\_C7.py} (retorno por
+          \arq{code/retorno_bvrp_T11.py} (modelo em árvore, testes
+          conjuntos e quebras) e \arq{code/descritivas_C7.py} (retorno por
           regime e sinal do retorno).
-    \item[Apêndice~\ref{app:estrategias}.] \texttt{code/estrategias\_A1.py}.
-    \item[Geradores.] \texttt{code/publicar\_cap5.py},
-          \texttt{code/publicar\_cap6.py}, \texttt{code/publicar\_cap7.py} e
-          \texttt{code/publicar\_apendice.py} gravam as tabelas e as figuras
+    \item[Apêndice~\ref{app:estrategias}.] \arq{code/estrategias_A1.py}.
+    \item[Geradores.] \arq{code/publicar_cap5.py},
+          \arq{code/publicar_cap6.py}, \arq{code/publicar_cap7.py} e
+          \arq{code/publicar_apendice.py} gravam as tabelas e as figuras
           dos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
           e do Apêndice~\ref{app:estrategias} a partir das saídas gravadas, sem
           reestimar modelos.
@@ -62,7 +62,7 @@ ele grava as saídas, dentro de \texttt{outputs/}.
 
 \section{Volatilidade histórica e prêmio}
 
-Em \texttt{code/build\_vrp\_dataset.py}, a volatilidade histórica de 30 dias é
+Em \arq{code/build_vrp_dataset.py}, a volatilidade histórica de 30 dias é
 calculada nas duas janelas, em \% a.a., e as duas medidas do prêmio saem da
 diferença com a IV:
 
@@ -91,7 +91,7 @@ df["bvrp_30d_fut"] = df["rv_30d_fut"] - df["iv_30d"]
 
 \section{Origens de previsão e embargo}
 
-Em \texttt{code/split\_utils.py}, cada origem $t$ estima o modelo com as
+Em \arq{code/split_utils.py}, cada origem $t$ estima o modelo com as
 posições até $t - h$ e prevê as datas até a véspera da origem seguinte. Na
 janela expansiva, o treino começa na primeira observação; na móvel, tem
 tamanho fixo:
@@ -114,7 +114,7 @@ amostra tem 987 datas em 33 origens (Seção~\ref{sec:met-amostras}).
 
 \section{Erro-padrão de Newey--West}
 
-Todas as regressões usam a mesma função de \texttt{code/hac\_utils.py}, com
+Todas as regressões usam a mesma função de \arq{code/hac_utils.py}, com
 \texttt{maxlags} $= h + 1$, núcleo de Bartlett, sem correção de amostra
 pequena e com inferência pela distribuição normal:
 
@@ -130,7 +130,7 @@ res = sm.OLS(y, exog).fit(
 
 \section{Avaliação fora da amostra}
 
-Em \texttt{code/avaliacao\_utils.py}, o $R^2$ fora da amostra compara a soma
+Em \arq{code/avaliacao_utils.py}, o $R^2$ fora da amostra compara a soma
 dos erros quadráticos do modelo com a da referência, e o teste de Clark--West
 regride a diferença de perdas ajustada numa constante, com o mesmo erro-padrão
 de Newey--West:
@@ -146,7 +146,7 @@ res = mqo_newey_west(f, h=h)
 t = float(res.tvalues.iloc[0])
 \end{verbatim}
 
-Em \texttt{code/mcs\_utils.py}, o \textit{model confidence set} usa as mesmas
+Em \arq{code/mcs_utils.py}, o \textit{model confidence set} usa as mesmas
 reamostragens em blocos para todos os modelos, e as variâncias vêm dessas
 reamostragens. Em cada passo, com a estatística $T_{\max}$, sai o modelo de
 maior desvio padronizado em relação à perda média do conjunto. O valor-$p$ do
@@ -168,28 +168,28 @@ return float(T), float(np.mean(T_boot >= T)), elimina
 
 \section{Conferências e testes}
 
-Antes de gravar uma tabela, cada gerador \texttt{publicar\_*} recalcula as
+Antes de gravar uma tabela, cada gerador \arq{publicar_*} recalcula as
 estatísticas que ela reporta a partir das previsões e das séries gravadas e
 interrompe a execução se a diferença em relação às saídas da análise passar de
-$10^{-9}$. Os testes em \texttt{code/test\_*.py} saem com erro se alguma
+$10^{-9}$. Os testes em \arq{code/test_*.py} saem com erro se alguma
 verificação falhar. Entre outras, eles conferem:
 \begin{itemize}
     \item que a VH prospectiva de $t$ é a retrospectiva de $t+30$
-          (\texttt{test\_T1\_alinhamento.py});
+          (\arq{test_T1_alinhamento.py});
     \item que nenhuma variável explicativa muda quando os dados brutos são
-          cortados em $t$ (\texttt{test\_T4\_vazamento.py});
+          cortados em $t$ (\arq{test_T4_vazamento.py});
     \item o embargo de todas as origens, com as datas reais
-          (\texttt{test\_split\_utils.py});
+          (\arq{test_split_utils.py});
     \item a convenção do erro-padrão de Newey--West
-          (\texttt{test\_hac\_utils.py});
+          (\arq{test_hac_utils.py});
     \item o corte fixo dos regimes, recalculado dos dados brutos cortados no
-          fim da primeira janela (\texttt{test\_regimes\_T9.py});
+          fim da primeira janela (\arq{test_regimes_T9.py});
     \item as métricas fora da amostra, contra cálculo manual
-          (\texttt{test\_T5.py});
+          (\arq{test_T5.py});
     \item o \textit{model confidence set}, contra um caso pequeno calculado à
           mão, além dos casos de perdas idênticas e da estabilidade entre
-          sementes (\texttt{test\_mcs\_utils.py});
+          sementes (\arq{test_mcs_utils.py});
     \item as regressões dos retornos e a ausência de informação futura nas
-          estratégias (\texttt{test\_T10.py}, \texttt{test\_T11.py} e
-          \texttt{test\_A1.py}).
+          estratégias (\arq{test_T10.py}, \arq{test_T11.py} e
+          \arq{test_A1.py}).
 \end{itemize}
