@@ -1014,7 +1014,7 @@ do `requirements.txt` instaladas nas versões fixadas. O `arch` não está insta
 | Bootstrap | "você em vez de sr, de resto tranquilo, faz sentido" | Os dois parágrafos do Cap. 6 (seção 20, C6.2/C6.7) ficam. "Você" vale para as mensagens ao orientador, não para o texto |
 | Proxy | "Vou ler para ver se entendo melhor." | Em espera (25.4) |
 | Reversão à média | ok | — |
-| Assimetria | "para câmbio, as evidências em geral são de simetria, mas para cripto muda. Já pego algumas referências." | Em espera (25.4). Coerente com o resultado atual: o BVRP não depende do sinal do retorno, mas a IV reage às quedas e não às altas. Quando as referências chegarem, reescrever o trecho do Cap. 7 que hoje se apoia no argumento da moeda de cotação e em Hansen e Lunde (2005) |
+| Assimetria | "para câmbio, as evidências em geral são de simetria, mas para cripto muda. Já pego algumas referências." | **Resolvida (07/10/2026, 25.4).** Coerente com o resultado atual: o BVRP não depende do sinal do retorno, mas a IV reage às quedas e não às altas |
 | Gráfico (C3.4) | "preciso olhar." | Em espera (25.4) |
 | Referências | ok | Hoang e Baur fora e Han (2026) como trabalho relacionado ficam como estão |
 | Título | "prefiro em português naturalmente." | Seção 25.3 |
@@ -1047,9 +1047,10 @@ pelo orientador. Arquivos: `capa.tex`, `folha_rosto.tex` e `folha_aprovacao.tex`
 
 | Item | Origem |
 |---|---|
-| Referências do Prof. Marcelo sobre assimetria em câmbio e em cripto (Cap. 7) | Seção 21, C7.3 (a) |
+| ~~Referências do Prof. Marcelo sobre assimetria em câmbio e em cripto (Cap. 7)~~ **Resolvida (E1, 07/10/2026).** O Prof. Marcelo enviou Wang, Fawson, Barrett e McDonald (2001) e Alexander e Lazar (2006), entradas `wang2001flexible` e `alexander2006normal` no .bib (prenomes completos, conferidos nos PDFs pelo usuário). Os dois artigos tratam de câmbio, não de cripto, embora o comentário dele tenha sido "para cripto muda". O primeiro parágrafo da Seção "Sinal do retorno" (`sec:retnl-sinal`) foi reescrito: papéis simétricos de uma taxa e da sua inversa, assimetria na distribuição e não na resposta da volatilidade, Hansen e Lunde (2005) mantido. No texto, o comportamento do Bitcoin se apoia no resultado da própria dissertação (a IV reage às quedas e não às altas), e não em uma referência de cripto; se o Prof. Marcelo indicar um artigo de cripto depois, ele entra nesse parágrafo. O segundo parágrafo e a Tabela 7.8 não mudam. Síntese do Cap. 7, introdução, considerações finais, resumo e abstract conferidos, sem ajuste. PDFs em `Papers/`, copiados pelo usuário | Seção 21, C7.3 (a) |
 | Gráfico do C3.4 (possível duplicata do C3.2) | Seção 16 |
 | Leitura do Prof. Marcelo sobre proxy × BVRP prospectivo (correlação ≈ 0; inversão de sinal por regime) | Seções 2.1 e 23 (BVRP por regime) |
+| Numeração das páginas pré-textuais: hoje cada `titlepage` zera o contador, a epígrafe fica com a página 1 sem número impresso e os Agradecimentos com a 2. O usuário vai conferir a norma da FGV EESP antes de qualquer mudança no `main.tex` | Auditoria do PDF, 07/10/2026 (Grupo 1, item 5) |
 
 ### 25.5 Resultado do M2 (07/10/2026)
 
@@ -1148,3 +1149,44 @@ entra no .bib no fim do M4.
 | M5 | `frontmatter/resumo.tex`, `frontmatter/abstract.tex`, `chapters/introducao.tex`, `chapters/consideracoes_finais.tex` | "Superam/preveem melhor que a média" → erro menor que o da média, mas o MCS não os separa dela; Clark–West a 5%. Resumo com 100 palavras (contagem que conta "($-8{,}76$" e "p.p.)" como duas; o registro anterior de 97 usava outro critério e daria 99), sem "índice" antes de DVOL; abstract com 97. `metodologia.tex:31-32` (pergunta "melhor que a média histórica?") mantida por decisão do usuário |
 | T1 | `frontmatter/capa.tex`, `folha_rosto.tex`, `folha_aprovacao.tex`, `preamble.tex` | Título novo nas três folhas; `pdftitle` e `pdfauthor` no `\hypersetup`. Não alterados: `archive/chapters/Cap6_ML.ipynb` (título antigo em inglês, legado) e o registro histórico da seção 24 |
 | F | — | `verificar_latex.py` sem problemas; `requirements.txt` sem mudança. **Conferir no Overleaf**: segunda linha do título nas três folhas, tabela de resultados com †, Hansen, Lunde e Nason na bibliografia, trechos alterados |
+
+### 25.7 Auditoria do PDF compilado (pacote `7d01e4e`, 07/10/2026)
+
+| Item | Registro |
+|---|---|
+| 8. Floresta na Tabela 6.3 | A linha "Floresta aleatória" da Tabela 6.3 (`tab:retlin-robustez`) passou a usar os valores-p do bootstrap do T11 (`bootstrap_resumo_T11.csv`, `floresta_direta`, dois níveis, bloco 60, **B = 999**), os mesmos da Tabela 7.4, no lugar dos do T10 (**B = 199**). Mesmo procedimento e mesma semente; β̂ e p HAC idênticos (conferidos pelo `publicar_cap6.py`, backup `.R2.bak`). Valores-p do bootstrap, h = 1, 5, 10, 20, 30, 60: antes 0,498; 0,631; 0,783; 0,808; 0,838; 0,700 → agora 0,438; 0,597; 0,770; 0,794; 0,834; 0,720. Nenhum abaixo de 0,0083 nas duas versões. Nota: "(999 reamostragens; 199 na floresta)" → "(999 reamostragens)", com "Floresta: as mesmas reamostragens da Tabela~\ref{tab:retnl-robustez}". O texto dos Caps. 6 e 7 cita só a faixa do HAC (0,15 a 0,61), que não muda; a faixa do bootstrap não entra no texto (decisão do usuário) |
+| 9. Apêndice D e Nota | `mcs_previsao_T5.py` na ordem de execução, antes do `publicar_cap5.py`; `MCS/` na árvore de `outputs/`; semente 20261001 também nas reamostragens do MCS (Apêndice D e Nota); a Nota cita as 9.999 reamostragens do MCS em blocos de 60 dias (30 e 90 como sensibilidade) |
+| 10. .bib | `cboe2019vix`: autor institucional protegido, `{{Cboe Global Markets}}`. `almeida2024cryptoVRP`: `howpublished = {arXiv:2410.15195 [econ.GN]}`, que o `apalike` imprime em `@misc` (ignora `eprint` e `url`); `apalike-pt.bst` sem mudança |
+| 11. Códigos de tarefa | Nota da Tabela 5.4: "mesmas origens do T5" → "mesmas origens da Tabela~\ref{tab:prev-resultados}". Fora do Apêndice C, os códigos só aparecem como nomes de arquivo e pastas no Apêndice D (mantidos). Rótulos gravados nos PNGs não puderam ser verificados |
+| 12. Tabela 5.1 | "evidência robusta de raiz unitária" → "em que o ADF não rejeita a raiz unitária e o KPSS rejeita a estacionariedade" |
+| 13. `dados.tex` | "Capítulos 4 e 6" → Capítulos 5 a 7 (`\ref`) |
+| 14. Estacionariedade | `dados.tex`: o KPSS rejeita a estacionariedade, e o ADF rejeita a raiz unitária a 5%, exceto na IV (fronteira, p = 0,071). Tabela 3.2 (`build_desc_stats_T1.py`, backup `.R2.bak`): "Longa memória" → "Alta persistência", com a nota "o KPSS rejeita a estacionariedade, e o ADF rejeita a raiz unitária ou fica na fronteira; os testes não distinguem longa memória de raiz próxima da unitária" |
+| 15. `referencial.tex` | "quantificar a importância relativa de preditores como o BVRP em um ambiente multivariado" → "capturar não linearidades e interações entre variáveis sem especificá-las de antemão, e de medir a importância de cada variável explicativa na previsão" |
+| 16. Seção 4.3 | Frase nova, conferida no `split_utils.py` (t0 = 730 − 1 + 60, posição 789 = 21/06/2023): a primeira origem fica 60 dias depois do fim da primeira janela, o maior horizonte dos Caps. 6 e 7, para que o treino da primeira origem contenha a janela inteira com qualquer h ≤ 60 e o período fora da amostra seja o mesmo em todos os horizontes; com h = 30, o primeiro treino tem 760 observações (as 730 da janela e as 30 seguintes, cujos alvos já se realizaram) |
+| 17–18 | Tabela 7.8 corrigida no Grupo 1; `--write` e `--publicar-cap3` conferidos no código e em `\arq` (sem ligadura) |
+| 19. Persistência viável | Não restava no texto nem nas tabelas; a legenda gravada na Figura 5.1 (`publicar_cap5.py`) passou a "Prêmio realizado defasado, BVRP_{t−30}" |
+| 20. Taxa de aprendizado | "taxa de aprendizagem" → "taxa de aprendizado" no Cap. 5 e na Tabela 5.2 (o Cap. 2 já usava "aprendizado") |
+| 21. Termos | "$p$-valor" → "Valor-$p$" (cabeçalho da Tabela 3.2); "desvio padrão" → "desvio-padrão" (`dados.tex`); "equity" → "mercado de ações" (3× no Cap. 2); "Preço (close)" → "Preço de fechamento" (Tabela 3.2); "CBOE" → "Cboe" (3× no Cap. 2). Mantidos: `df["close"]` no código do Apêndice C e as chaves internas do dicionário do `publicar_cap5.py` |
+| 22. Números | Tabela 3.1: 13 negativos com `$-$` (`fmt_txt` no `build_desc_stats_T1.py`); Tabela 7.6: N com separador de milhar ("1{.}382") no `publicar_cap7.py` |
+| 23. Direção das regras | "Comprada/neutra" e "Vendida/neutra" nas tabelas e figuras do Apêndice A, como no texto: `ROTULO_DIRECAO` local no `publicar_apendice.py` (backup `.R2.bak`); o `estrategias_A1.py` e as saídas de `outputs/A1` não mudaram. Regeneradas as quatro tabelas e `fig_principal.png` e `fig_proxy.png` (a `fig_quantis.png` não tem rótulo de direção) |
+| 24. Títulos | Só a primeira palavra em maiúscula: "Referencial teórico", "Considerações finais", "Nota metodológica: reprodutibilidade" (título e sumário), "Construção das variáveis", "Estrutura de pastas e reprodutibilidade". Bibliografia: `\addto\captionsbrazilian{\renewcommand{\bibname}{Referências}}` no preamble |
+| 25. Legendas curtas | 13 legendas com mais de duas linhas no texto ganharam legenda curta para as listas: Figs. 3.1, 3.3 e 3.4 (pelas linhas do `.tex`; a 3.2, dos histogramas, tem duas linhas e ficou sem), Tabs. 3.1 e 3.2, Fig. 5.1, Fig. 6.1, Figs. 7.2–7.4 e Figs. A.1–A.3. Tabelas A.1, A.2 e A.4 têm até duas linhas nas listas (92, 82 e 122 caracteres) e ficaram sem. A figura de dispersão do Cap. 3 (163 caracteres) e a Fig. 7.1 (155), que devem passar de duas linhas nas listas, também ganharam legenda curta (decisão do usuário): "Proxy e retorno do Bitcoin nos 30 dias seguintes" e "Coeficiente do retorno futuro sobre o BVRP previsto, por regressor" |
+| Grupo 1 | Tabela 5.3 com `\tabcolsep` de 4 pt e rótulo curto (nota explica o prêmio realizado defasado); `xurl` e `\arq` nos nomes de arquivo dos Apêndices C e D (84 ocorrências: 45 no C e 39 no D); Tabela 7.3 com cabeçalho agrupado; Tabela 7.8 em duas linhas; título em três linhas; espaços da folha de aprovação reduzidos; `\mbox{volatilidade}` na Seção 3.6; notas das Tabelas 3.1 e 3.2 em `\parbox`. Backups `.R2.bak` de `publicar_cap5`, `publicar_cap6`, `publicar_cap7` e `build_desc_stats_T1` |
+
+### 25.8 Auditoria final e correções (07/10/2026)
+
+Auditoria só de leitura da árvore (itens A a F): Tabela 5.3 conferida com `outputs/MCS/mcs_T5.csv`;
+os quatro geradores (`publicar_cap5`, `publicar_cap6`, `publicar_cap7` e `publicar_apendice`), rodados
+com `--raiz` numa pasta temporária, gravam 30 arquivos idênticos byte a byte aos da árvore. Correções:
+
+| # | Arquivo | Registro |
+|---|---|---|
+| 1 | `chapters/retornos_linear.tex:178` | Corte reestimado: "teste conjunto com p ≥ 0,16" → "p ≥ 0,15" (o menor Wald na Tabela 6.5, `tab:retlin-regime`, é 0,159 em h = 60). A faixa não aparece em outro lugar do texto |
+| 2 | `chapters/retornos_nao_linear.tex:130-133` | Importância na forma direta, conferida em `outputs/T11/importancia_T11.csv`: a VH de 30 dias é a primeira pelos dois critérios (redução de impureza 0,217; permutação 4,48); em seguida, na redução de impureza, vêm a IV (0,171) e a VH de 60 dias (0,154), e a VH de 90 dias fica em 4º (0,103); na permutação, vem a VH de 90 dias (3,03). A frase dizia "seguida da de 90 dias" pelos dois critérios |
+| 3 | `chapters/retornos_nao_linear.tex:152-156` | "Mediana ponderada de 56,1%" e "de 48,5%" eram a mediana, entre as origens, do corte mediano de cada origem ponderado pela redução de impureza (`retorno_bvrp_T11.py:660`, `publicar_cap7.py:468`). Redação: "(mediana, entre as origens, do corte mediano de cada origem ponderado pela redução de impureza: 56,1%)" e "(48,5% pela mesma medida)" |
+| 4 | `code/test_log_transform_cap5.py` → `archive/code/` | Teste de legado (falhava por falta de `data/dataset_bvrp_with_skew.csv`, arquivado) movido com `git mv`, para que "os testes em `code/test_*.py`" dos Apêndices C e D sejam só os atuais. Nenhum texto o cita; o nome fica na docstring de `analyze_magnitude_bvrp.py` e nos registros das seções 4.1 e 18 (históricos). O `ROOT` do script, relativo ao próprio arquivo, passa a apontar para `archive/`; ele não roda de lá sem ajuste |
+| 5 | Este arquivo | Registros corrigidos: contagem de `\arq` (84) no Grupo 1 da 25.7; item 10 da 25.7 sem "Cboe fica para o Grupo 3" (a troca está no item 21); linha "Assimetria" da 25.1 sem a instrução antiga de reescrever o Cap. 7 |
+
+Ficam como estão: o ADF da IV com p = 0,08 no Cap. 5 (Tabela 5.1, amostra de modelagem) e 0,071 no
+Cap. 3 (Tabela 3.2, amostra de 1.806), cada um coerente com a sua tabela; o Apêndice C não cita a pasta
+`outputs/MCS` nem as 9.999 reamostragens, e o Apêndice D não cita as 9.999 (estão no Cap. 4 e na Nota).
