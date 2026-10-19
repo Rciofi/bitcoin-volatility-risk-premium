@@ -7,20 +7,18 @@ VIX, transformam a incerteza sobre o preço futuro em algo que se compra e se
 vende \citep{carr2009variance, alexanderImeraj2019}. Nos criptoativos, essa
 incerteza é muito maior que nos mercados tradicionais. Entre 2017 e 2022, a
 volatilidade implícita média das opções de Bitcoin foi de 82\% a.a., muito
-acima da do S\&P~500 \citep{almeida2024cryptoVRP}; na amostra desta
-dissertação, de março de 2021 a março de 2026, foi de $61{,}9\%$ a.a. As
+acima da do S\&P~500 \citep{almeida2024cryptoVRP}. As
 opções de Bitcoin se concentram na Deribit, a maior bolsa de derivativos de
 criptoativos e a principal fonte de dados dos estudos sobre essas opções
-\citep{almeida2024cryptoVRP}; em 2019 e 2020, quase toda a negociação de opções
+\citep{almeida2024cryptoVRP}. Em 2019 e 2020, quase toda a negociação de opções
 de Bitcoin ocorria nela \citep{alexanderImeraj2019}. Desde 24 de março de 2021,
 a Deribit publica o DVOL, índice de volatilidade implícita de 30 dias
-construído a partir dos preços dessas opções \citep{han2026price}
-(Seção~\ref{sec:refer-dvol}).
+construído a partir dos preços dessas opções \citep{han2026price}.
 
 O preço da volatilidade nas opções não é uma previsão neutra. Em ações, a
 volatilidade implícita supera, em média, a que se realiza depois: os
 compradores de opções pagam um prêmio para se proteger do risco de
-volatilidade, e esse prêmio prevê os retornos futuros do índice
+volatilidade, e esse prêmio ajuda a prever os retornos futuros do índice
 \citep{bollerslev2009expected}. Esta dissertação estuda o prêmio de risco de
 volatilidade do Bitcoin (BVRP), a diferença entre a volatilidade histórica (VH)
 dos 30 dias seguintes e a volatilidade implícita (IV) de 30 dias dada pelo
@@ -33,7 +31,7 @@ Um modelo não linear encontra a relação que o linear não encontra?
 \section*{Roteiro e resultados}
 \label{sec:intro-roteiro}
 
-\textbf{Existência do prêmio.} A dissertação mede o prêmio com a VH dos 30 dias
+\noindent\textbf{Existência do prêmio.} A dissertação mede o prêmio com a VH dos 30 dias
 seguintes, e não com a dos 30 anteriores, porque a IV de $t$ precifica a
 volatilidade de $t+1$ a $t+30$: só a janela prospectiva cobre o mesmo período.
 A versão com a VH passada,
@@ -51,7 +49,7 @@ com informação posterior a ela. No regime de baixa volatilidade, a IV supera a
 dos 30 dias anteriores, mas não a dos 30 seguintes: a proxy registra um prêmio
 maior nesse regime, e o BVRP, nenhum.
 
-\textbf{Previsão do prêmio.} O BVRP de $t$ só é conhecido em $t+30$ e não pode
+\noindent\textbf{Previsão do prêmio.} O BVRP de $t$ só é conhecido em $t+30$ e não pode
 ser usado como variável explicativa, e a proxy aproxima mal a sua realização: a
 correlação entre as duas na mesma data é de $-0{,}02$. Por isso, antes de
 relacionar o prêmio aos retornos, a dissertação prevê o BVRP fora da amostra,
@@ -69,7 +67,7 @@ previsões ficam próximas dela e não antecipam os episódios de prêmio positi
 entre as variáveis e o prêmio muda entre os regimes dentro da amostra, mas essa
 mudança não melhora a previsão fora dela.
 
-\textbf{Previsibilidade linear dos retornos.} Com o BVRP previsto, a
+\noindent\textbf{Previsibilidade linear dos retornos.} Com o BVRP previsto, a
 dissertação estima a regressão de \citet{bollerslev2009expected}: o retorno do
 Bitcoin nos $h$ dias seguintes, com $h$ de 1 a 60 dias, sobre o prêmio em $t$.
 O BVRP previsto é um regressor gerado, e o erro-padrão usual ignora a incerteza
@@ -83,7 +81,7 @@ não rejeita ($p = 0{,}37$); ele só rejeita quando ignora a estimação do BVRP
 previsto. A inclinação é mais negativa no regime de baixa volatilidade, mas a
 diferença entre os regimes depende da posição do corte.
 
-\textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende
+\noindent\textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende
 de um corte fixado de antemão, a dissertação repete o teste com uma floresta
 aleatória, que escolhe sozinha os cortes nas volatilidades e gera o BVRP
 previsto. O coeficiente fica perto de zero em todos os horizontes, e o teste
@@ -145,7 +143,7 @@ informação posterior às datas classificadas. Com a proxy, retrospectiva como 
 medida deles, o prêmio é maior no regime de baixa volatilidade --- média de
 $-13{,}56$ p.p., contra $-7{,}26$ p.p. no de alta, lembrando que prêmio maior é
 BVRP mais negativo ---, o mesmo padrão que eles encontram; com o BVRP
-prospectivo, a diferença se inverte (Seção~\ref{sec:dados-regimes}).
+prospectivo, a diferença se inverte.
 
 \section*{Organização}
 \label{sec:intro-organizacao}

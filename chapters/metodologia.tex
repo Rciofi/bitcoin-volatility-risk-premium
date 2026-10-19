@@ -40,8 +40,8 @@ Quatro questões guiam a análise empírica, cada uma tratada em um capítulo:
           linear não encontra? O Capítulo~\ref{chap:retornos_nao_linear} responde.
 \end{enumerate}
 
-As estratégias de negociação baseadas no prêmio ficam em apêndice
-(Apêndice~\ref{app:estrategias}), como análise exploratória.
+As estratégias de negociação baseadas no prêmio ficam no
+Apêndice~\ref{app:estrategias}, como análise exploratória.
 
 % =========================================================
 \section{Definição das variáveis e horizontes de previsão}
@@ -77,7 +77,7 @@ simplificação. Na amostra completa, a correlação entre a proxy e o BVRP na
 mesma data é de $-0{,}02$: a proxy aproxima mal a realização do prêmio, o que
 motiva prevê-lo com um conjunto mais amplo de variáveis.
 
-As variáveis explicativas, todas conhecidas em $t$, são 17, em quatro grupos:
+As 17 variáveis explicativas, todas conhecidas em $t$, formam quatro grupos:
 (i) a volatilidade histórica de 1, 5, 30, 60 e 90 dias, em que as três
 primeiras seguem a estrutura diária, semanal e mensal do modelo HAR de
 \citet{corsi2009har}; (ii) a volatilidade implícita de 30 dias, suas variações
@@ -142,7 +142,7 @@ começa em $v$, o treino da dobra usa $s \le v - h$.
 Um modelo é uma especificação com suas premissas; o método de mínimos
 quadrados ordinários (MQO) é um estimador. Nas especificações lineares desta
 seção, o MQO é o estimador padrão, adequado sob a condição de ortogonalidade
-$E(\varepsilon \mid X) = 0$, em que $\varepsilon$ é o erro e $X$, o vetor de
+$\mathbb{E}(\varepsilon \mid X) = 0$, em que $\varepsilon$ é o erro e $X$, o vetor de
 regressores.
 
 \subsection{Previsão do prêmio}
@@ -155,9 +155,9 @@ explicativas,
 \end{equation}
 em que $X_t$ reúne as 17 variáveis da Seção~\ref{sec:met-variaveis}. No
 modelo linear, $f(X_t) = X_t'\gamma$, estimado por MQO, Ridge ou LASSO; nos
-modelos em árvore, $f$ é estimada por floresta aleatória ou por XGBoost
-(Capítulo~\ref{chap:referencial}). As referências são a média histórica, a
-proxy e o prêmio realizado defasado (Seção~\ref{sec:met-avaliacao}).
+modelos em árvore, $f$ é estimada por floresta aleatória ou por XGBoost.
+As referências são a média histórica, a
+proxy e o prêmio realizado defasado.
 
 \subsection{Retornos e BVRP previsto: modelo linear}
 

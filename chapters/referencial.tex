@@ -14,11 +14,11 @@ retornos do Bitcoin.
 
 \section{Volatilidade implícita}
 
-A volatilidade implícita (\textit{Implied Volatility}, IV) representa a
+A volatilidade implícita (IV) representa a
 expectativa de mercado, no mundo neutro ao risco, sobre a variabilidade futura
-do preço do ativo subjacente: $\text{IV}_t = E^*(\text{RV}_{t+1:t+h} \mid I_t)$,\footnote{A
+do preço do ativo subjacente: $\text{IV}_t = \mathbb{E}^*(\text{RV}_{t+1:t+h} \mid I_t)$,\footnote{A
 rigor, o DVOL, como o VIX, é a raiz da variância esperada no mundo neutro ao
-risco, $\text{IV}_t = \sqrt{E^*(\text{RV}^2_{t+1:t+h} \mid I_t)}$; a notação do
+risco, $\text{IV}_t = \sqrt{\mathbb{E}^*(\text{RV}^2_{t+1:t+h} \mid I_t)}$; a notação do
 texto ignora a diferença de Jensen entre a raiz da esperança e a esperança da
 raiz.}
 em que o asterisco denota a expectativa no mundo neutro ao risco e $I_t$, a
@@ -26,7 +26,7 @@ informação disponível em $t$ (Seção~\ref{sec:refer-vrp-teorico}). Nesta dis
 a IV não vem da inversão de um modelo de precificação, como o de Black--Scholes:
 o índice DVOL da Deribit, assim como o VIX, é uma estimativa livre de modelo,
 extraída diretamente dos preços de opções fora do dinheiro
-\citep{carr2009variance, cboe2019vix} (Seção~\ref{sec:refer-dvol}).
+\citep{carr2009variance, cboe2019vix}.
 
 Diferentemente da volatilidade histórica, a volatilidade implícita não é uma
 estimativa estatística no sentido clássico. Ela pode ser interpretada como um
@@ -34,7 +34,7 @@ estimativa estatística no sentido clássico. Ela pode ser interpretada como um
 Como a estimativa livre de modelo mede a variação quadrática esperada dos
 retornos, e não apenas a volatilidade de um processo de difusão contínuo, ela
 incorpora também os saltos e, por isso, reflete assimetria, curtose e risco de
-cauda \citep{carr2009variance}. Assim, fatores como os seguintes influenciam a IV:
+cauda \citep{carr2009variance}. Assim, os seguintes fatores podem influenciar a IV:
 
 \begin{itemize}
     \item \textbf{demanda por proteção}: a procura por proteção contra quedas,
@@ -79,7 +79,7 @@ logarítmicos diários, numa janela móvel de \(h\) dias:
 \text{VH}_t^{(h)} = \sqrt{ \frac{365}{h} \sum_{j=0}^{h-1} r_{t-j}^2 },
 \]
 em que \(r_{t-j} = \ln\left(\frac{P_{t-j}}{P_{t-j-1}}\right)\) representa o retorno
-logarítmico diário do ativo, e o fator de anualização por 365 dias reflete a
+logarítmico diário do ativo, e o fator de anualização de 365 dias reflete a
 negociação contínua do mercado de Bitcoin.
 
 O nome segue a distinção usual da literatura. A volatilidade realizada
@@ -149,13 +149,13 @@ Formalmente, um prêmio de risco é a diferença entre a expectativa no mundo
 físico e a expectativa no mundo neutro ao risco. Para um horizonte de $h$ dias,
 
 \begin{equation}
-\text{VRP}_t = E(\text{RV}_{t+1:t+h} \mid I_t) - E^*(\text{RV}_{t+1:t+h} \mid I_t),
+\text{VRP}_t = \mathbb{E}(\text{RV}_{t+1:t+h} \mid I_t) - \mathbb{E}^*(\text{RV}_{t+1:t+h} \mid I_t),
 \label{eq:refer-vrp-def}
 \end{equation}
 em que $\text{RV}_{t+1:t+h}$ é a volatilidade realizada entre $t+1$ e $t+h$,
 $I_t$ é a informação disponível em $t$ e o asterisco denota a expectativa no
 mundo neutro ao risco. O segundo termo é a volatilidade implícita,
-$\text{IV}_t = E^*(\text{RV}_{t+1:t+h} \mid I_t)$.
+$\text{IV}_t = \mathbb{E}^*(\text{RV}_{t+1:t+h} \mid I_t)$.
 
 O BVRP é o prêmio de risco de volatilidade do Bitcoin, com $h = 30$ dias. Como
 a expectativa física não é observável, a variável-alvo desta dissertação é a
@@ -177,15 +177,15 @@ volatilidade observada no passado recente: \citet{bollerslev2009expected}, por
 exemplo, medem o prêmio de variância com a variância realizada do mês
 anterior. A hipótese subjacente é a de passeio aleatório sem deriva para a
 volatilidade --- a melhor previsão da VH dos próximos 30 dias é a VH dos
-últimos 30, $E(\text{VH}_{t+1:t+30} \mid I_t) = \text{VH}_{t-29:t}$. Sob essa
+últimos 30, $\mathbb{E}(\text{VH}_{t+1:t+30} \mid I_t) = \text{VH}_{t-29:t}$. Sob essa
 hipótese, o prêmio esperado é aproximado por
 
 \[
 \text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t,
 \]
-conhecido em $t$. A hipótese é uma simplificação, e \citet{bekaert2014vix}
-discutem suas limitações, estimando a expectativa física com modelos de
-previsão da variância. Nesta dissertação, a proxy aproxima a expectativa do
+conhecido em $t$. \citet{bekaert2014vix}
+discutem as limitações dessa simplificação, considerando modelos mais gerais
+de previsão da variância. Nesta dissertação, a proxy aproxima a expectativa do
 prêmio, e não sua realização: ela entra como variável explicativa disponível
 em $t$, enquanto o Capítulo~\ref{chap:previsao_bvrp} prevê o próprio BVRP.
 
@@ -193,7 +193,7 @@ A literatura empírica sobre prêmios de risco de volatilidade tem documentado e
 
 Esta dissertação adota a convenção $\text{VH} - \text{IV}$ seguindo essa literatura. Sob esta convenção, valores negativos do BVRP correspondem ao estado típico em que a volatilidade implícita supera a volatilidade que efetivamente se realiza --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de BVRP positivo ($\text{VH} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
 
-A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}, característica que tem implicações relevantes para a inferência estatística em modelos preditivos. Como VH e IV compartilham esse componente persistente, a diferença $\text{VH} - \text{IV}$ tende a cancelar boa parte dele; o Capítulo~\ref{chap:dados} mede esse padrão na amostra. No BVRP há, além disso, uma fonte mecânica de autocorrelação: alvos de datas vizinhas compartilham até 29 dos 30 retornos da janela. Esse padrão justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte, intervalos de confiança via reamostragem em blocos e janelas expansivas para qualquer cálculo de limiares estatísticos. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita, o que permite avaliar a inferência quando há o viés de \citet{stambaugh1999}: quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés.
+A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}. Como VH e IV compartilham esse componente persistente, a diferença $\text{VH} - \text{IV}$ tende a cancelar boa parte dele; o Capítulo~\ref{chap:dados} mede esse padrão na amostra. No BVRP há, além disso, uma fonte mecânica de autocorrelação: alvos de datas vizinhas compartilham até 29 dos 30 retornos da janela. Esse padrão justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte, intervalos de confiança via reamostragem em blocos e janelas expansivas para qualquer cálculo de limiares estatísticos. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita, o que permite avaliar a inferência quando há o viés de \citet{stambaugh1999}: quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés.
 
 Do ponto de vista teórico, a distinção entre medida neutra ao risco (associada a
 preços de opções) e medida física (associada a retornos observados) implica que
@@ -202,7 +202,7 @@ componentes relacionados a risco de cauda e a preferências por proteção. Em
 mercados tradicionais, como o S\&P 500, a evidência empírica documenta que o VRP
 apresenta sinal sistematicamente negativo, associado à demanda por proteção contra
 quedas abruptas e contra choques de volatilidade
-\citep{bollerslev2011VRP, pan2006jumpRisk, carr2009variance, bollerslev2009expected}.
+\citep{pan2006jumpRisk, bollerslev2009expected, carr2009variance, bollerslev2011VRP}.
 
 No mercado de Bitcoin, entretanto, \citet{alexanderImeraj2019} documentam,
 sobretudo no início do mercado, que o BVRP apresenta dinâmica mais instável que a documentada no mercado de ações. Entre os
