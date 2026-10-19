@@ -2,9 +2,9 @@
 plot_cap3_T1.py — figuras do Cap. 3 com as duas definições do BVRP (T1)
 
 Versões T1 das três figuras de code/plot_vrp_timeseries.py, com a definição
-prospectiva (bvrp_30d_fut, VH de t+1 a t+30 - IV_t) e a retrospectiva
-(vrp_30d, proxy; VH de t-29 a t - IV_t) lado a lado. Notação da seção 14 de
-docs/pendencias_T1.md (VH, BVRP, BVRP^proxy). Grava em --out-dir; com
+prospectiva (bvrp_30d_fut, RBVRP = RV de t+1 a t+30 - IV_t) e a retrospectiva
+(vrp_30d, HBVRP = VH de t-29 a t - IV_t) lado a lado. Notação do B1 da
+Rodada 3 (RV, VH, RBVRP, HBVRP). Grava em --out-dir; com
 --publicar-cap3, copia também as figuras usadas pelo Cap. 3 para figs/dados/
 (vrp_timeseries.png, vrp_histogram_kde.png, vrp_boxplot.png).
 
@@ -32,8 +32,8 @@ COR_PROSP = "#d95f02"
 COR_RETRO = "#2b6cb0"
 COR_IV = "#6b6b6b"
 ROTULO = {
-    "bvrp_30d_fut": "BVRP: VH(t+1 a t+30) − IV(t)",
-    "vrp_30d":      r"BVRP$^{\mathrm{proxy}}$: VH(t−29 a t) − IV(t)",
+    "bvrp_30d_fut": "RBVRP: RV(t+1 a t+30) − IV(t)",
+    "vrp_30d":      "HBVRP: VH(t−29 a t) − IV(t)",
 }
 COR = {"bvrp_30d_fut": COR_PROSP, "vrp_30d": COR_RETRO}
 
@@ -51,13 +51,13 @@ def fig_serie(df, out):
 
     ax = axes[0]
     ax.plot(df["date"], df["rv_30d"], color=COR_RETRO, linewidth=0.8,
-            label="VH 30d retrospectiva (t−29 a t)")
+            label="VH 30d (t−29 a t)")
     ax.plot(df["date"], df["rv_30d_fut"], color=COR_PROSP, linewidth=0.8,
-            label="VH 30d prospectiva (t+1 a t+30)")
+            label="RV 30d (t+1 a t+30)")
     ax.plot(df["date"], df["iv_30d"], color=COR_IV, linewidth=0.8, linestyle="--",
             label="IV 30d (DVOL Deribit)")
     ax.set_ylabel("Volatilidade (% a.a.)")
-    ax.set_title("(a) Volatilidade histórica (retrospectiva e prospectiva) e implícita",
+    ax.set_title("(a) Volatilidades histórica, realizada e implícita",
                  loc="left", fontsize=10)
     ax.legend(loc="upper right", fontsize=8)
     ax.grid(True, alpha=0.3)
@@ -66,8 +66,8 @@ def fig_serie(df, out):
     for col in ["bvrp_30d_fut", "vrp_30d"]:
         ax.plot(df["date"], df[col], color=COR[col], linewidth=0.8, label=ROTULO[col])
     ax.axhline(0, color="gray", linestyle="--", linewidth=0.8)
-    ax.set_ylabel("BVRP 30D (p.p. de vol.)")
-    ax.set_title(r"(b) Prêmio de risco de volatilidade: BVRP e BVRP$^{\mathrm{proxy}}$",
+    ax.set_ylabel("Prêmio de 30 dias (p.p. de vol.)")
+    ax.set_title("(b) Prêmio de risco de volatilidade: RBVRP e HBVRP",
                  loc="left", fontsize=10)
     ax.legend(loc="lower right", fontsize=8)
     ax.grid(True, alpha=0.3)
@@ -102,7 +102,7 @@ def fig_histograma(df, out):
         ax.plot(grade, stats.gaussian_kde(s)(grade), color=COR[col], linewidth=2,
                 label=f"{ROTULO[col]} — média {s.mean():.2f}".replace(".", ","))
     ax.axvline(0, color="gray", linewidth=0.7, linestyle=":")
-    ax.set_xlabel("BVRP 30D (p.p. de vol.)")
+    ax.set_xlabel("Prêmio de 30 dias (p.p. de vol.)")
     ax.set_ylabel("Densidade")
     ax.legend(fontsize=8, loc="upper left")
     ax.grid(True, alpha=0.4)
@@ -137,7 +137,7 @@ def fig_boxplot_ano(df, out):
         rotulos[-1] = f"{anos[-1]}\n(1º/01 a {ult.day:02d}/{ult.month:02d})"
     ax.set_xticklabels(rotulos)
     ax.set_xlabel("Ano")
-    ax.set_ylabel("BVRP 30D (p.p. de vol.)")
+    ax.set_ylabel("Prêmio de 30 dias (p.p. de vol.)")
     ax.legend(fontsize=8, loc="lower right")
     ax.grid(True, axis="y", alpha=0.4)
     fig.tight_layout()

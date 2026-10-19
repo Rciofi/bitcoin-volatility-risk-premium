@@ -1,16 +1,16 @@
 """
-plot_vrp_vs_return_T12.py — dispersão BVRP x retorno futuro de 30 dias (T12)
+plot_vrp_vs_return_T12.py — dispersão HBVRP x retorno futuro de 30 dias (T12)
 
 Substitui, para o Cap. 3, a figura de code/plot_vrp_vs_return.py com h = 20
 (figs/dados/vrp_vs_return_20d.png) por h = 30, alinhando o horizonte ao do BVRP
-(plano, T12). Figura descritiva: usa a proxy vrp_30d (conhecida em t) e a
+(plano, T12). Figura descritiva: usa o HBVRP, coluna vrp_30d (conhecido em t) e a
 amostra descritiva (data/vrp_with_targets.csv, N = 1.806). A reta é de MQO, e
 a legenda traz b com erro-padrão de Newey–West com h+1 = 31 defasagens
 (hac_utils), no lugar da correlação simples da versão antiga.
 
 Grava em outputs/T12/; com --publicar-cap3, copia a figura para
 figs/dados/vrp_vs_return_30d.png, o nome usado no Cap. 3. Rótulo do eixo na
-notação da seção 14 de docs/pendencias_T1.md (BVRP^proxy).
+notação do B1 da Rodada 3 (HBVRP).
 
 Uso:  python code/plot_vrp_vs_return_T12.py [--publicar-cap3]
 """
@@ -64,7 +64,7 @@ def main():
                   f"R² = {br(res.rsquared, 3)}")
     ax.axhline(0, color="gray", linewidth=0.7, linestyle=":")
     ax.axvline(0, color="gray", linewidth=0.7, linestyle=":")
-    ax.set_xlabel(r"BVRP$^{\mathrm{proxy}}$ em $t$ (p.p.)")
+    ax.set_xlabel(r"HBVRP em $t$ (p.p.)")
     ax.set_ylabel(f"Retorno futuro de {H} dias (%)")
     ax.legend(fontsize=8, loc="upper left")
     ax.grid(True, alpha=0.3)

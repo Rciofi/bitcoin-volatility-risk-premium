@@ -5,7 +5,7 @@ Gera as Tabs. 3.1 (estatisticas descritivas) e 3.2 (ADF/KPSS) e a tabela
 comparativa das definicoes do BVRP. Todas as saidas vao para --out-dir; com
 --publicar-cap3, as Tabs. 3.1 e 3.2 (.tex e .csv) sao copiadas tambem para
 tables/dados/ (desc_stats.*, adf_kpss_table.*), os nomes usados no Cap. 3.
-Rotulos na notacao da secao 14 de docs/pendencias_T1.md (VH, BVRP, BVRP^proxy).
+Rotulos na notacao do B1 da Rodada 3 (RV, VH, RBVRP, HBVRP).
 
 Criado no T0/T1 do plano de revisao (set/2026): as Tabs. 3.1 e 3.2 nao
 tinham gerador versionado. A partir do T1, as duas definicoes do BVRP saem
@@ -53,15 +53,15 @@ DATA = os.path.join(ROOT, "data")
 # Definicoes do BVRP comparadas lado a lado. So entram as colunas presentes
 # no dataset.
 BVRP_DEFS = {
-    "bvrp_30d_fut": "BVRP (p.p.)",
-    "vrp_30d":      r"BVRP$^{\text{proxy}}$ (p.p.)",
+    "bvrp_30d_fut": "RBVRP (p.p.)",
+    "vrp_30d":      "HBVRP (p.p.)",
 }
 
 # Demais linhas da Tab. 3.1: (coluna, rotulo, casas decimais). So entram as
 # colunas presentes no dataset.
 VOL_ROWS = [
-    ("rv_30d_fut", "VH 30d prospectiva (p.p.)", 2),
-    ("rv_30d",     "VH 30d retrospectiva (p.p.)", 2),
+    ("rv_30d_fut", "RV 30d (p.p.)", 2),
+    ("rv_30d",     "VH 30d (p.p.)", 2),
     ("iv_30d",     "IV 30d (p.p.)", 2),
     ("ret",        "Log-retorno diário", 4),
 ]
@@ -176,7 +176,7 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\small",
         r"\caption[Estatísticas descritivas das variáveis principais]{Estatísticas descritivas das variáveis principais.",
         f"Período: {periodo} ($N={fmt_n(n)}$ observações diárias).",
-        r"BVRP e volatilidades em pontos percentuais anualizados;",
+        r"RBVRP, HBVRP e volatilidades em pontos percentuais anualizados;",
         r"log-retorno diário em fração decimal.",
         r"Curtose reportada como excesso (Fisher): distribuição normal $= 0$.}",
         r"\label{tab:dados-descritivas}",
@@ -193,12 +193,13 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\bottomrule",
         r"\end{tabular}}",
         r"\par\smallskip",
-        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: VH 30d (volatilidade histórica) calculada como raiz da média"
-        r" dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): retrospectiva sobre os"
-        r" retornos de $t-29$ a $t$; prospectiva sobre os retornos de $t+1$ a $t+30$."
+        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: RV 30d (volatilidade realizada) e VH 30d"
+        r" (volatilidade histórica) calculadas como raiz da média"
+        r" dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): a RV sobre os"
+        r" retornos de $t+1$ a $t+30$; a VH sobre os retornos de $t-29$ a $t$."
         r" IV 30d: índice DVOL da Deribit, observado em $t$."
-        + (r" BVRP: $\text{VH}_{t+1:t+30} - \text{IV}_t$;"
-           r" $\text{BVRP}^{\text{proxy}}$: $\text{VH}_{t-29:t} - \text{IV}_t$."
+        + (r" RBVRP: $\text{RV}_{t+1:t+30} - \text{IV}_t$;"
+           r" HBVRP: $\text{VH}_{t-29:t} - \text{IV}_t$."
            if "bvrp_30d_fut" in bvrp_cols else "") + "}",
         r"\end{table}",
     ]

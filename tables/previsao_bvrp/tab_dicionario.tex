@@ -28,11 +28,11 @@ $r_{t-29:t}$ & $\sum_{j=0}^{29} r_{t-j}$ & \texttt{ret\_acum\_30d} & $<$0{,}001 
 $\ln(P_t/\overline{P}_{t-29:t})$ & preço relativo à média móvel de 30 dias & \texttt{log\_close\_ma30d} & $<$0{,}001 & razão com a média móvel \\
 \addlinespace
 \multicolumn{5}{l}{\textit{Prêmio}} \\
-$\text{BVRP}^{\text{proxy}}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $<$0{,}001 & nível \\
-$\Delta_1\text{BVRP}^{\text{proxy}}_t$ & $\text{BVRP}^{\text{proxy}}_t - \text{BVRP}^{\text{proxy}}_{t-1}$ & \texttt{d\_vrp\_1d} & $<$0{,}001 & diferença \\
-$\text{BVRP}_{t-30}$ & $\text{VH}_{t-29:t} - \text{IV}_{t-30}$ & \texttt{bvrp\_realizado\_defasado} & $<$0{,}001 & nível \\
+$\text{HBVRP}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $<$0{,}001 & nível \\
+$\Delta_1\text{HBVRP}_t$ & $\text{HBVRP}_t - \text{HBVRP}_{t-1}$ & \texttt{d\_vrp\_1d} & $<$0{,}001 & diferença \\
+$\text{RBVRP}_{t-30}$ & $\text{VH}_{t-29:t} - \text{IV}_{t-30}$ & \texttt{bvrp\_realizado\_defasado} & $<$0{,}001 & nível \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $r_t$ é o log-retorno diário e $P_t$, o preço de fechamento. Volatilidades em \% a.a. Valor-$p$ do teste ADF na amostra de modelagem ($N = 1.776$). As séries em que o ADF não rejeita a raiz unitária e o KPSS rejeita a estacionariedade (o preço e as médias móveis da IV) entram transformadas; as volatilidades entram em nível, inclusive $\text{VH}_{t-89:t}$ e $\text{IV}_t$, cujo ADF fica na fronteira. Os modelos lineares excluem $\text{VH}_{t-29:t}$, porque $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$.}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $r_t$ é o log-retorno diário e $P_t$, o preço de fechamento. Volatilidades em \% a.a. Valor-$p$ do teste ADF na amostra de modelagem ($N = 1.776$). O preço e as médias móveis da IV nunca entram sozinhos em nível: o preço entra por log-retornos e pelo log da razão com a sua média móvel, e as médias móveis da IV, pelo desvio da IV em relação a elas. As volatilidades entram em nível, inclusive $\text{VH}_{t-89:t}$ e $\text{IV}_t$, cujo ADF fica na fronteira. Os modelos lineares excluem $\text{VH}_{t-29:t}$, porque $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$.}
 \end{table}

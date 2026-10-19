@@ -1,7 +1,7 @@
 \begin{table}[H]
 \centering
 \small
-\caption{Estratégias por regime de volatilidade (quantil 80\%): Ridge de 27/02/2024 a 02/03/2026 e proxy de 21/06/2023 a 02/03/2026.}
+\caption{Estratégias por regime de volatilidade (quantil 80\%): Ridge de 27/02/2024 a 02/03/2026 e HBVRP de 21/06/2023 a 02/03/2026.}
 \label{tab:estr-regimes}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lllrrrrr}
@@ -15,7 +15,7 @@ $\widehat{\text{BVRP}}_t$ (Ridge) & Baixa volatilidade & Comprada/neutra & 221 &
  &  & Vendida/neutra & 80 & $-$4{,}0 & $-$0{,}20 & $-$0{,}76 & $-$28{,}4 \\
  &  & Compra e manutenção & 508 & 23{,}0 & 0{,}69 & -- & $-$39{,}4 \\
 \midrule
-$\text{BVRP}^{\text{proxy}}_t$ & Baixa volatilidade & Comprada/neutra & 0 & 0{,}0 & -- & -- & 0{,}0 \\
+$\text{HBVRP}_t$ & Baixa volatilidade & Comprada/neutra & 0 & 0{,}0 & -- & -- & 0{,}0 \\
  &  & Vendida/neutra & 0 & 0{,}0 & -- & -- & 0{,}0 \\
  &  & Compra e manutenção & 310 & 0{,}2 & 0{,}12 & -- & $-$22{,}5 \\
  & Alta volatilidade & Comprada/neutra & 238 & 2{,}7 & 0{,}23 & $-$0{,}08 & $-$27{,}3 \\
@@ -24,5 +24,5 @@ $\text{BVRP}^{\text{proxy}}_t$ & Baixa volatilidade & Comprada/neutra & 0 & 0{,}
 \bottomrule
 \end{tabular}}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Posição definida com informação até o fim de $t$ e aplicada ao retorno simples de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe: média $\times$ 365 / (desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino: média $\times$ 365 / ($\sqrt{\text{média}(\min(r_t, 0)^2)} \times \sqrt{365}$), com todos os dias. DD máx.: drawdown máximo a partir do valor inicial 1. Compra e manutenção nas mesmas datas, sem custo. Sem custos, o retorno diário da regra vendida/neutra é o da comprada/neutra com o sinal trocado. Regime de alta volatilidade: $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. (Seção~\ref{sec:met-regimes}). Em cada regime, a regra e o compra e manutenção ficam neutros nos dias do outro regime; no compra e manutenção, os dias posicionados são os dias do regime. Com o Ridge, o período é o da negociação (depois do burn-in de 252 previsões); a proxy é avaliada desde a primeira data das previsões do Ridge. Sem dias posicionados, Sharpe indefinido (--).}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Posição definida com informação até o fim de $t$ e aplicada ao retorno simples de $t$ a $t+1$; limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais sobre $|\Delta \text{posição}|$. Sharpe: média $\times$ 365 / (desvio-padrão $\times \sqrt{365}$), sem taxa livre de risco; Sortino: média $\times$ 365 / ($\sqrt{\text{média}(\min(r_t, 0)^2)} \times \sqrt{365}$), com todos os dias. DD máx.: drawdown máximo a partir do valor inicial 1. Compra e manutenção nas mesmas datas, sem custo. Sem custos, o retorno diário da regra vendida/neutra é o da comprada/neutra com o sinal trocado. Regime de alta volatilidade: $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. (Seção~\ref{sec:met-regimes}). Em cada regime, a regra e o compra e manutenção ficam neutros nos dias do outro regime; no compra e manutenção, os dias posicionados são os dias do regime. Com o Ridge, o período é o da negociação (depois do burn-in de 252 previsões); o HBVRP é avaliado desde a primeira data das previsões do Ridge. Sem dias posicionados, Sharpe indefinido (--).}
 \end{table}

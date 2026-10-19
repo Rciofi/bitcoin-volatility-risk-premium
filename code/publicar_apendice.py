@@ -2,19 +2,19 @@
 publicar_apendice.py — tabelas e figuras do Apêndice A (estratégias de negociação), sem reestimar nada
 
 Lê as saídas do A1 (outputs/A1/series_diarias_A1.csv e metricas_A1.csv, gravadas
-por code/estrategias_A1.py) e grava, na notação da seção 14 de docs/pendencias_T1.md:
+por code/estrategias_A1.py) e grava, na notação do B1 da Rodada 3:
   tables/estrategias/tab_principal.tex   Ridge, q80: comprada/neutra e vendida/neutra (0, 10, 30 bps) e C&M
   tables/estrategias/tab_quantis.tex     Ridge, q60 a q90, nas duas direções
-  tables/estrategias/tab_robustez.tex    burn-in 126, proxy na amostra completa e ponte (datas do Ridge)
+  tables/estrategias/tab_robustez.tex    burn-in 126, HBVRP na amostra completa e ponte (datas do Ridge)
   tables/estrategias/tab_regimes.tex     por regime de volatilidade, com o C&M de cada regime
   figs/estrategias/fig_principal.png     valor acumulado e drawdown (Ridge, q80, sem custos)
   figs/estrategias/fig_quantis.png       valor acumulado por quantil, (a) comprada e (b) vendida
-  figs/estrategias/fig_proxy.png         proxy na amostra completa, com o início da negociação do Ridge
+  figs/estrategias/fig_proxy.png         HBVRP na amostra completa, com o início da negociação do Ridge
 A decomposição do publicado ao atual (tab_A1_decomposicao, tab_A1_compra_manutencao)
 fica em outputs/A1, para o relatório ao orientador, e não entra no apêndice.
 
 Conferência (sai com erro se algo não bater; tolerância 1e-9): com o sinal do
-Ridge, a proxy, o retorno seguinte e o regime gravados em series_diarias_A1.csv,
+Ridge, o HBVRP, o retorno seguinte e o regime gravados em series_diarias_A1.csv,
 refaz as regras com as funções do estrategias_A1 (só quantis expansivos e médias;
 o Ridge não é reestimado) e confere todas as linhas de metricas_A1.csv e as
 posições e limiares do q80 gravados. Confere também, sem as funções do A1, as
@@ -45,8 +45,8 @@ CHAVES = ["variante", "regime", "direcao", "quantil", "custo_bps"]
 ROTULO_DIRECAO = {**A.ROTULO_DIRECAO, "comprado": "Comprada/neutra", "vendido": "Vendida/neutra"}
 ROTULO_SINAL = {"ridge": r"$\widehat{\text{BVRP}}_t$ (Ridge), burn-in de 252",
                 "ridge_b126": r"$\widehat{\text{BVRP}}_t$ (Ridge), burn-in de 126",
-                "proxy": r"$\text{BVRP}^{\text{proxy}}_t$, amostra completa",
-                "ponte": r"$\text{BVRP}^{\text{proxy}}_t$, datas do Ridge"}
+                "proxy": r"$\text{HBVRP}_t$, amostra completa",
+                "ponte": r"$\text{HBVRP}_t$, datas do Ridge"}
 NOTA_COMUM = (r"Posição definida com informação até o fim de $t$ e aplicada ao retorno simples de $t$ a $t+1$; "
               r"limiar no quantil $q$ do sinal em janela expansiva (observações até $t$). Custos unilaterais "
               r"sobre $|\Delta \text{posição}|$. Sharpe: média $\times$ 365 / (desvio-padrão $\times \sqrt{365}$), "
@@ -219,12 +219,12 @@ def tabelas(m, raiz):
                            A._int(b_.n_dias) if i == 0 else "", ROTULO_DIRECAO[direcao]] + sh
                           + [pct(a[0].max_drawdown), pct(a[0].pct_tempo)])
         linhas.append("MIDRULE")
-    _tabela(raiz, "tab_robustez.tex", r"Testes de robustez: burn-in e proxy retrospectiva (quantil 80\%).",
+    _tabela(raiz, "tab_robustez.tex", r"Testes de robustez: burn-in e HBVRP (quantil 80\%).",
             "tab:estr-robustez", "lllrrrrrr",
             r"Sinal & Período & Dias & Regra & Sharpe (0) & Sharpe (10) & Sharpe (30) & DD máx. (\%) & "
             r"Tempo posic. (\%)", linhas[:-1],
-            NOTA_COMUM + r" $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$, conhecida em $t$. "
-            r"Nas datas do Ridge, o limiar da proxy usa todo o histórico dela desde 2021.")
+            NOTA_COMUM + r" $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$, conhecido em $t$. "
+            r"Nas datas do Ridge, o limiar do HBVRP usa todo o histórico dele desde 2021.")
 
     # 4. Regimes, com o C&M de cada regime
     linhas, per = [], {}
@@ -235,20 +235,20 @@ def tabelas(m, raiz):
                 a = sel(v, direcao, regime=rg)
                 s30 = n(sel(v, direcao, custo=30, regime=rg).sharpe) if direcao != "compra_e_manutencao" else "--"
                 linhas.append([(r"$\widehat{\text{BVRP}}_t$ (Ridge)" if v == "ridge"
-                                else r"$\text{BVRP}^{\text{proxy}}_t$") if (rg == "baixa" and i == 0) else "",
+                                else r"$\text{HBVRP}_t$") if (rg == "baixa" and i == 0) else "",
                                f"{rg.capitalize()} volatilidade" if i == 0 else "", ROTULO_DIRECAO[direcao],
                                A._int(a.n_dias_posicionado), pct(a.ret_anual), n(a.sharpe), s30,
                                pct(a.max_drawdown)])
         linhas.append("MIDRULE")
     _tabela(raiz, "tab_regimes.tex",
-            rf"Estratégias por regime de volatilidade (quantil 80\%): Ridge de {per['ridge']} e proxy de "
+            rf"Estratégias por regime de volatilidade (quantil 80\%): Ridge de {per['ridge']} e HBVRP de "
             rf"{per['proxy']}.", "tab:estr-regimes", "lllrrrrr",
             r"Sinal & Regime & Regra & Dias posic. & Ret. anual (\%) & Sharpe (0) & Sharpe (30) & DD máx. (\%)",
             linhas[:-1],
             NOTA_COMUM + r" Regime de alta volatilidade: $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. "
             r"(Seção~\ref{sec:met-regimes}). Em cada regime, a regra e o compra e manutenção ficam neutros nos "
             r"dias do outro regime; no compra e manutenção, os dias posicionados são os dias do regime. Com o "
-            r"Ridge, o período é o da negociação (depois do burn-in de 252 previsões); a proxy é avaliada desde "
+            r"Ridge, o período é o da negociação (depois do burn-in de 252 previsões); o HBVRP é avaliado desde "
             r"a primeira data das previsões do Ridge. Sem dias posicionados, Sharpe indefinido (--).")
 
 
