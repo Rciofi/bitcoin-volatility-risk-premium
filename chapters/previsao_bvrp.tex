@@ -1,11 +1,11 @@
 \chapter{Previsão do prêmio de risco de volatilidade}
 \label{chap:previsao_bvrp}
 
-Este capítulo prevê o BVRP fora da amostra, apenas com a informação disponível
-em $t$. A previsão é necessária porque a versão do prêmio conhecida em $t$, a
-$\text{BVRP}^{\text{proxy}}$, tem correlação de $-0{,}02$ com o BVRP na mesma
+Este capítulo prevê o RBVRP fora da amostra, apenas com a informação disponível
+em $t$. A previsão é necessária porque a estimativa do prêmio conhecida em $t$,
+o HBVRP, tem correlação de $-0{,}02$ com o RBVRP na mesma
 data: a hipótese de passeio aleatório sem
-deriva para a volatilidade histórica aproxima mal a realização do prêmio. O
+deriva para a volatilidade aproxima mal a realização do prêmio. O
 BVRP previsto aqui é o regressor dos Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}.
 
@@ -16,7 +16,7 @@ hipótese de que as variáveis não acrescentam informação à média. A
 previsibilidade, porém, é modesta: o \textit{model confidence set} (MCS) de
 \citet{hansen2011model} não separa os cinco modelos entre si nem da média
 histórica, as previsões ficam próximas da média e nenhum modelo antecipa os
-episódios de prêmio positivo. As duas referências ingênuas, a proxy e o prêmio
+episódios de prêmio positivo. As duas referências ingênuas, o HBVRP e o prêmio
 realizado defasado, erram mais que a média e ficam fora do conjunto. A relação entre as variáveis e o prêmio muda com o regime de
 volatilidade dentro da amostra, primeira evidência de não linearidade, mas
 essa mudança não melhora a previsão fora dela.
@@ -25,19 +25,12 @@ essa mudança não melhora a previsão fora dela.
 \section{Alvo e informação disponível}
 \label{sec:prev-alvo}
 
-O alvo é o prêmio da janela de 30 dias que começa no dia seguinte à previsão:
-\begin{equation}
-\text{BVRP}_{t+1:t+30\,|\,t} = \text{VH}_{t+1:t+30} - \text{IV}_t = f(X_t) + u_t,
-\label{eq:prev-alvo}
-\end{equation}
-em que $X_t$ reúne as variáveis explicativas conhecidas no fim do dia $t$
-(Seção~\ref{sec:prev-variaveis}). O índice $t+1:t+30\,|\,t$ separa a janela da
-volatilidade histórica e a data da informação. Trata-se do mesmo
-$\text{BVRP}_t$ dos capítulos anteriores, sem deslocamento para $t+1$: a
+O alvo é o prêmio realizado nos próximos 30 dias,
+$\text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t$, modelado pela
+equação~\eqref{eq:met-previsao-bvrp}, em que $X_t$ reúne as variáveis
+explicativas conhecidas no fim do dia $t$ (Seção~\ref{sec:prev-variaveis}). A
 previsão feita em $t$ é comparada com o prêmio cuja IV é a de $t$, e não com o
-prêmio de $t+1$. A equação~\eqref{eq:prev-alvo} é a
-equação~\eqref{eq:met-previsao-bvrp} com a janela explícita; o restante do
-texto usa $\text{BVRP}_t$.
+prêmio de $t+1$.
 
 Como o alvo de $s$ só se realiza em $s+30$, o modelo da origem $t$ usa apenas
 as datas $s \le t - 30$. As previsões cobrem 987 datas, de 21/06/2023 a
@@ -55,20 +48,18 @@ do modelo HAR de \citet{corsi2009har}, com componentes diário, semanal e
 mensal; as de 60 e 90 dias estendem essa estrutura para horizontes mais
 longos. A IV entra em nível, em variação de 1 e 5 dias e como desvio em relação
 às médias móveis de 5 e 30 dias. O preço entra por log-retornos de 1, 5 e 30
-dias e pela razão com a média móvel de 30 dias. O último grupo traz a proxy, sua
-variação diária e o prêmio realizado defasado, $\text{BVRP}_{t-30} =
+dias e pela razão com a média móvel de 30 dias. O último grupo traz o HBVRP, sua
+variação diária e o prêmio realizado defasado, $\text{RBVRP}_{t-30} =
 \text{VH}_{t-29:t} - \text{IV}_{t-30}$, o prêmio mais recente já realizado em
-$t$. Ele é igual à proxy mais a variação da IV em 30 dias,
+$t$. Ele é igual ao HBVRP mais a variação da IV em 30 dias,
 $\text{IV}_t - \text{IV}_{t-30}$.
 
-O tratamento segue os testes de raiz unitária. O preço e as médias móveis da IV,
-em que o ADF não rejeita a raiz unitária e o KPSS rejeita a estacionariedade,
-entram transformados. As volatilidades
+O tratamento das volatilidades segue os testes de raiz unitária: elas
 entram em nível, mesmo quando o teste ADF fica na fronteira, como na
 volatilidade histórica de 90 dias ($p = 0{,}19$) e na IV ($p = 0{,}08$): em
 janelas móveis longas, observações vizinhas compartilham quase todos os
 retornos (89 de 90 dias), o que gera mecanicamente persistência e reduz o poder do
-teste. Como $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$,
+teste. Como $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$,
 os modelos lineares excluem a volatilidade histórica de 30 dias; as árvores
 usam as 17 variáveis.
 
@@ -84,7 +75,7 @@ variáveis construídas, e não nos retornos.
 \label{sec:prev-modelos}
 
 A dissertação compara cinco modelos para $f$ na
-equação~\eqref{eq:prev-alvo}: o MQO; o Ridge \citep{hoerl1970ridge} e o LASSO
+equação~\eqref{eq:met-previsao-bvrp}: o MQO; o Ridge \citep{hoerl1970ridge} e o LASSO
 \citep{tibshirani1996lasso}, que penalizam os coeficientes do MQO; a floresta
 aleatória \citep{breiman2001randomforest}, com 500 árvores; e o XGBoost
 \citep{chen2016xgboost}. Os três modelos lineares usam as variáveis
@@ -120,7 +111,7 @@ A Tabela~\ref{tab:prev-resultados} resume o desempenho; a
 Seção~\ref{sec:met-avaliacao} define as métricas e os testes. Na janela
 expansiva, todos os modelos têm $R^2_{\text{fora}}$ positivo: 0,223 no Ridge,
 0,143 na floresta aleatória, 0,123 no LASSO, 0,100 no XGBoost e 0,097 no MQO.
-As duas referências ingênuas erram mais que a média histórica: a proxy tem
+As duas referências ingênuas erram mais que a média histórica: o HBVRP tem
 $R^2_{\text{fora}} = -0{,}51$, e o prêmio realizado defasado, $-1{,}00$. O
 prêmio dos 30 dias anteriores, sozinho, informa pouco sobre o dos 30 dias
 seguintes.
@@ -141,7 +132,7 @@ ao modelo maior: testa se as variáveis contêm informação sobre o prêmio. O 
 compara a precisão das previsões obtidas, com o erro de estimação incluído. Por
 isso o Clark--West pode rejeitar mesmo com $R^2_{\text{fora}}$ negativo, como no
 MQO da janela móvel ($R^2_{\text{fora}} = -0{,}037$, $p = 0{,}004$). As
-variáveis contêm informação sobre o BVRP, mas o ganho de precisão sobre a média
+variáveis contêm informação sobre o RBVRP, mas o ganho de precisão sobre a média
 histórica não é estatisticamente distinguível com esta amostra: as 987
 previsões têm alvos de 30 dias sobrepostos e equivalem a cerca de 33
 observações independentes, o que limita o poder dos dois procedimentos.
@@ -161,20 +152,20 @@ no MQO). O Clark--West rejeita a 5\% para todos os modelos menos o LASSO
 conjunto em todas as combinações de bloco, estatística e nível. Descartar as
 observações mais antigas piora a previsão, o que favorece a janela expansiva.
 
-A Figura~\ref{fig:prev-previsoes} mostra o BVRP e as previsões do Ridge, da
+A Figura~\ref{fig:prev-previsoes} mostra o RBVRP e as previsões do Ridge, da
 floresta e das duas referências ingênuas. As previsões dos modelos ficam
-próximas da média e não acompanham os picos. Fora da amostra, o BVRP tem média
+próximas da média e não acompanham os picos. Fora da amostra, o RBVRP tem média
 de $-5{,}3$ p.p. e é positivo em 290 das 987 datas (29\%); nessas datas, a
 previsão média é negativa em todos os modelos, de $-2{,}3$ p.p. no MQO a
 $-8{,}7$ p.p. no LASSO ($-5{,}1$ p.p. no Ridge). Nenhum modelo antecipa os
-episódios de prêmio positivo, como o de janeiro de 2026, em que o BVRP chega a
+episódios de prêmio positivo, como o de janeiro de 2026, em que o RBVRP chega a
 46 p.p. As previsões encolhem para a média porque a previsibilidade é baixa.
 
 \IfFileExists{figs/previsao_bvrp/fig_previsoes.png}{
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{figs/previsao_bvrp/fig_previsoes.png}
-    \caption[BVRP e previsões fora da amostra]{BVRP e previsões fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026): Ridge, floresta aleatória, $\text{BVRP}^{\text{proxy}}_t$ e prêmio realizado defasado, $\text{BVRP}_{t-30}$. Na legenda, o $R^2$ fora da amostra contra a média histórica.}
+    \caption[RBVRP e previsões fora da amostra]{RBVRP e previsões fora da amostra (janela expansiva, 21/06/2023 a 03/03/2026): Ridge, floresta aleatória, $\text{HBVRP}_t$ e prêmio realizado defasado, $\text{RBVRP}_{t-30}$. Na legenda, o $R^2$ fora da amostra contra a média histórica.}
     \label{fig:prev-previsoes}
 \end{figure}
 }{}
@@ -197,7 +188,7 @@ dimensão, e a motivação usual da regularização --- muitas variáveis em rel
 ao número de observações --- não se aplica. Ainda assim, o Ridge supera o MQO
 ($R^2_{\text{fora}}$ de 0,223 contra 0,097; Diebold--Mariano entre os dois,
 $p = 0{,}017$). A explicação está nas variáveis construídas. As volatilidades
-históricas de janelas diferentes compartilham retornos; a proxy, sua variação e
+históricas de janelas diferentes compartilham retornos; o HBVRP, sua variação e
 o prêmio realizado defasado são combinações da volatilidade histórica e da IV.
 Com regressores tão relacionados, os coeficientes do MQO têm variância alta: o
 $R^2$ dentro da amostra do MQO (0,29) é três vezes o de fora (0,10). O Ridge
@@ -243,7 +234,7 @@ encontrar sozinha o corte entre os regimes, ou outro qualquer. Mesmo assim, a
 validação cruzada escolhe quase sempre árvores de um único corte
 (Seção~\ref{sec:prev-modelos}), que não combinam variáveis, e as duas
 famílias de árvores ficam abaixo do Ridge fora da amostra. A não linearidade
-existe dentro da amostra, mas é fraca demais para melhorar a previsão do BVRP.
+existe dentro da amostra, mas é fraca demais para melhorar a previsão do RBVRP.
 O Capítulo~\ref{chap:retornos_nao_linear} volta às árvores para a relação entre
 o BVRP previsto e os retornos.
 
@@ -251,7 +242,7 @@ o BVRP previsto e os retornos.
 \section{Síntese}
 \label{sec:prev-sintese}
 
-As variáveis disponíveis em $t$ contêm informação sobre o BVRP dos 30 dias
+As variáveis disponíveis em $t$ contêm informação sobre o RBVRP dos 30 dias
 seguintes: os cinco modelos têm erro fora da amostra menor que o da média
 histórica, e o Clark--West rejeita a 5\% para todos na janela expansiva. A
 previsibilidade é modesta: o MCS exclui as referências ingênuas, mas não separa

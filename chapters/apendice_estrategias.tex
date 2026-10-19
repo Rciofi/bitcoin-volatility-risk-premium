@@ -19,9 +19,9 @@ mercado à vista, antes e depois dos custos de transação.
 do Ridge em janela expansiva do Capítulo~\ref{chap:previsao_bvrp}, a mesma que
 serve de regressor no Capítulo~\ref{chap:retornos_linear}; a previsão de $t$ só
 usa informação disponível até $t$. Como teste de robustez, a mesma regra é
-aplicada à proxy retrospectiva,
-$\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$, também
-conhecida em $t$.
+aplicada ao HBVRP,
+$\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$, também
+conhecido em $t$.
 
 \paragraph{Regra.} Em cada data, o limiar $q(t)$ é o quantil $q$ do sinal nas
 observações até $t$, em janela expansiva, e o sinal é alto quando
@@ -146,16 +146,16 @@ Bitcoin, e o Sharpe do compra e manutenção sobe para 0,85.
 
 \input{tables/estrategias/tab_robustez}
 
-Com a proxy na amostra completa (1.554 dias, de 30/11/2021 a 02/03/2026), a
+Com o HBVRP na amostra completa (1.554 dias, de 30/11/2021 a 02/03/2026), a
 direção se inverte: a comprada tem Sharpe de 0,13 sem custos, 0,03 com 10 bps e
 $-0{,}17$ com 30 bps, e a vendida, $-0{,}13$. O ganho é pequeno, fica abaixo do
 Sharpe de 0,34 do compra e manutenção e desaparece com custos; o que se mantém
 é o \textit{drawdown} menor ($-36{,}4\%$ contra $-72{,}4\%$), com a regra
 posicionada em 26\% dos dias (Figura~\ref{fig:estr-proxy}).
 
-Para separar o efeito do sinal do efeito do período, o apêndice avalia a proxy
+Para separar o efeito do sinal do efeito do período, o apêndice avalia o HBVRP
 também nas mesmas 735 datas do Ridge, com o limiar calculado sobre todo o histórico
-dela desde 2021. Nessas datas, a comprada com a proxy tem Sharpe de 0,02,
+dele desde 2021. Nessas datas, a comprada com o HBVRP tem Sharpe de 0,02,
 contra $-0{,}25$ com o Ridge, e o compra e manutenção é o mesmo (0,43). A
 diferença entre as duas regras vem do sinal, e não do período.
 
@@ -163,7 +163,7 @@ diferença entre as duas regras vem do sinal, e não do período.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figs/estrategias/fig_proxy.png}
-    \caption[Valor acumulado das regras com a proxy (quantil 80\%)]{Valor acumulado das regras com $\text{BVRP}^{\text{proxy}}_t$ (quantil 80\%, sem custos) e do compra e manutenção, de 30/11/2021 a 02/03/2026. A linha tracejada marca o início da negociação com o BVRP previsto pelo Ridge (27/02/2024).}
+    \caption[Valor acumulado das regras com o HBVRP (quantil 80\%)]{Valor acumulado das regras com o $\text{HBVRP}_t$ (quantil 80\%, sem custos) e do compra e manutenção, de 30/11/2021 a 02/03/2026. A linha tracejada marca o início da negociação com o BVRP previsto pelo Ridge (27/02/2024).}
     \label{fig:estr-proxy}
 \end{figure}
 }{}
@@ -174,7 +174,7 @@ diferença entre as duas regras vem do sinal, e não do período.
 
 A Tabela~\ref{tab:estr-regimes} aplica as regras em cada regime. Os períodos
 diferem: com o Ridge, a análise cobre os mesmos 735 dias de negociação, de
-27/02/2024 a 02/03/2026; com a proxy, começa em 21/06/2023, a primeira data das
+27/02/2024 a 02/03/2026; com o HBVRP, começa em 21/06/2023, a primeira data das
 previsões do Capítulo~\ref{chap:previsao_bvrp}, posterior à janela em que o
 corte de $37{,}3\%$ a.a. foi estimado (986 dias).
 
@@ -188,8 +188,8 @@ o ganho reflete a queda do Bitcoin nesses dias, e não uma seleção feita pelo
 sinal. No regime de alta, a comprada fica posicionada em 80 dias, com Sharpe de
 0,20 ($-0{,}36$ com 30 bps), abaixo do 0,69 do compra e manutenção no regime.
 
-Com a proxy, nenhum dia do regime de baixa tem sinal alto. Quando a VH de 30
-dias é baixa, $\text{BVRP}^{\text{proxy}}_t = \text{VH}_{t-29:t} - \text{IV}_t$
+Com o HBVRP, nenhum dia do regime de baixa tem sinal alto. Quando a VH de 30
+dias é baixa, $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$
 é muito negativo e fica abaixo do quantil de 80\% do histórico. No regime de
 alta, a comprada fica posicionada em 238 dias, com Sharpe de 0,23, contra 0,93
 do compra e manutenção no regime. Fora a vendida no regime de baixa, explicada
@@ -202,7 +202,7 @@ regime.
 
 Nenhuma das regras testadas supera o compra e manutenção em índice de Sharpe
 no mesmo período. A direção que parece funcionar depende do sinal --- a vendida
-com o BVRP previsto pelo Ridge, a comprada, fraca, com a proxy --- e, no
+com o BVRP previsto pelo Ridge, a comprada, fraca, com o HBVRP --- e, no
 quantil de referência, desaparece com custos de 30 bps. O que se mantém é o
 \textit{drawdown} menor, que vem de ficar fora do mercado em 59\% a 74\% dos
 dias, e não de informação sobre a direção dos retornos. O resultado é coerente

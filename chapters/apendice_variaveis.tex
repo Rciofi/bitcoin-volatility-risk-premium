@@ -13,8 +13,8 @@ O log-retorno diário,
 \[
 r_t = \ln\left(\frac{P_t}{P_{t-1}}\right),
 \]
-em que $P_t$ é o preço de fechamento, entra no cálculo da volatilidade
-histórica e, como variável explicativa, nos log-retornos de 1, 5 e 30 dias
+em que $P_t$ é o preço de fechamento, entra no cálculo das volatilidades
+realizada e histórica e, como variável explicativa, nos log-retornos de 1, 5 e 30 dias
 (colunas \texttt{ret} ou \texttt{ret\_1d}, \texttt{ret\_acum\_5d} e
 \texttt{ret\_acum\_30d}). O retorno futuro é o retorno simples
 acumulado em $h$ dias,
@@ -28,26 +28,28 @@ dois tipos de retorno não se misturam: a volatilidade usa log-retornos, e os
 retornos futuros e as estratégias do Apêndice~\ref{app:estrategias}, retornos
 simples.
 
-\section{Volatilidade histórica}
+\section{Volatilidades realizada e histórica}
 
-A volatilidade histórica de $k$ dias, em \% a.a., é
+As volatilidades de uma janela de $k$ dias, em \% a.a., são
 \[
-\text{VH}^{(k)}_t = 100 \sqrt{\frac{365}{k} \sum_{j=0}^{k-1} r_{t-j}^2},
+\text{RV}_{t+1:t+k} = 100 \sqrt{\frac{365}{k} \sum_{j=1}^{k} r_{t+j}^2}
+\qquad \text{e} \qquad
+\text{VH}_{t-k+1:t} = 100 \sqrt{\frac{365}{k} \sum_{j=0}^{k-1} r_{t-j}^2},
 \]
 sem subtrair a média dos retornos, com anualização por 365 dias porque o
-mercado funciona todos os dias. Com dados diários, a VH é o estimador da
-volatilidade realizada (RV) que entra na definição do prêmio
-(Seção~\ref{sec:refer-vrp-teorico}). A janela de 30 dias aparece em duas
-posições:
+mercado funciona todos os dias. As duas usam a mesma fórmula
+(Seção~\ref{sec:refer-rv}): a volatilidade realizada (RV) cobre os $k$ dias
+seguintes a $t$, e a histórica (VH), os $k$ dias que terminam em $t$. A janela
+de 30 dias aparece nas duas posições:
 \begin{itemize}
     \item retrospectiva, $\text{VH}_{t-29:t}$, com os retornos de $t-29$ a
           $t$, conhecida em $t$ (colunas \texttt{rv\_30d} e \texttt{vh\_30d});
-    \item prospectiva, $\text{VH}_{t+1:t+30}$, com os retornos de $t+1$ a
+    \item prospectiva, $\text{RV}_{t+1:t+30}$, com os retornos de $t+1$ a
           $t+30$, conhecida só em $t+30$ (coluna \texttt{rv\_30d\_fut}). Por
-          construção, a VH prospectiva de $t$ é a retrospectiva de $t+30$.
+          construção, a RV de $t$ é a VH de $t+30$.
 \end{itemize}
-As janelas de 1, 5, 60 e 90 dias entram só como variáveis explicativas
-(\texttt{vh\_1d}, \texttt{vh\_5d}, \texttt{vh\_60d} e \texttt{vh\_90d}).
+As janelas de 1, 5, 60 e 90 dias entram só como variáveis explicativas,
+sempre retrospectivas (\texttt{vh\_1d}, \texttt{vh\_5d}, \texttt{vh\_60d} e \texttt{vh\_90d}).
 
 \section{Volatilidade implícita}
 
@@ -59,8 +61,8 @@ interpola vencimentos.
 \section{Prêmio de risco de volatilidade}
 
 A Tabela~\ref{tab:var-premio} resume as três medidas do prêmio. Com a
-convenção $\text{VH} - \text{IV}$, um valor negativo indica que a IV supera a
-volatilidade histórica, e um prêmio maior corresponde a um valor mais
+convenção da volatilidade física menos a implícita, um valor negativo indica
+que a IV supera a volatilidade realizada ou a histórica, conforme a medida, e um prêmio maior corresponde a um valor mais
 negativo.
 
 \begin{table}[H]
@@ -73,18 +75,18 @@ arquivos de dados e data em que a medida é conhecida.}
 \toprule
 Símbolo & Definição & Coluna & Conhecido em \\
 \midrule
-$\text{BVRP}_t$ & $\text{VH}_{t+1:t+30} - \text{IV}_t$ & \texttt{bvrp\_30d\_fut} & $t+30$ \\
-$\text{BVRP}^{\text{proxy}}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $t$ \\
-$\text{BVRP}_{t-30}$ & $\text{VH}_{t-29:t} - \text{IV}_{t-30}$ & \texttt{bvrp\_realizado\_defasado} & $t$ \\
+$\text{RBVRP}_t$ & $\text{RV}_{t+1:t+30} - \text{IV}_t$ & \texttt{bvrp\_30d\_fut} & $t+30$ \\
+$\text{HBVRP}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $t$ \\
+$\text{RBVRP}_{t-30}$ & $\text{VH}_{t-29:t} - \text{IV}_{t-30}$ & \texttt{bvrp\_realizado\_defasado} & $t$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O BVRP é a variável-alvo do Capítulo~\ref{chap:previsao_bvrp} (no arquivo da
-amostra de modelagem, coluna \texttt{alvo\_bvrp\_30d\_fut}). A proxy supõe um
-passeio aleatório sem deriva para a volatilidade histórica e entra como
-variável explicativa. O prêmio realizado defasado é o BVRP de $t-30$, que se
-realiza em $t$; ele é igual à proxy mais a variação da IV em 30 dias,
+O RBVRP é a variável-alvo do Capítulo~\ref{chap:previsao_bvrp} (no arquivo da
+amostra de modelagem, coluna \texttt{alvo\_bvrp\_30d\_fut}). O HBVRP supõe um
+passeio aleatório sem deriva para a volatilidade e entra como
+variável explicativa. O prêmio realizado defasado é o RBVRP de $t-30$, que se
+realiza em $t$; ele é igual ao HBVRP mais a variação da IV em 30 dias,
 $\text{IV}_t - \text{IV}_{t-30}$.
 
 \section{Variáveis explicativas}
@@ -120,5 +122,5 @@ As variáveis explicativas de cada data são as da própria data, todas
 conhecidas no fim de $t$. O alvo de uma data $s$ olha $h$ dias à frente e só
 é conhecido em $s+h$; por isso, o modelo estimado na origem $t$ usa apenas as
 datas $s \le t - h$, e a validação cruzada repete o mesmo embargo dentro do
-treino (Seção~\ref{sec:met-amostras}). O BVRP nunca entra como variável
+treino (Seção~\ref{sec:met-amostras}). O RBVRP nunca entra como variável
 explicativa.

@@ -13,7 +13,7 @@ bitcoin-volatility-risk-premium/
 ├── data/                      # séries e conjuntos de dados
 │   ├── btc_prices.csv         # preço de fechamento diário (Binance)
 │   ├── dvol_30d_full.csv      # índice DVOL diário (Deribit)
-│   ├── vrp_30d_dataset.csv    # VH, IV, proxy e BVRP
+│   ├── vrp_30d_dataset.csv    # VH, RV, IV, HBVRP e RBVRP
 │   ├── vrp_with_targets.csv   # + retornos futuros: amostra completa
 │   ├── ml_dataset_T4.csv      # alvo e 17 variáveis: amostra de modelagem
 │   ├── regimes_T9.csv         # cortes e regimes de volatilidade
@@ -37,7 +37,7 @@ bitcoin-volatility-risk-premium/
 \end{verbatim}
 
 As pastas \arq{figs/} e \arq{tables/} têm os mesmos cinco temas: dados
-(Capítulo~\ref{chap:dados}), previsão do BVRP
+(Capítulo~\ref{chap:dados}), previsão do RBVRP
 (Capítulo~\ref{chap:previsao_bvrp}), retornos com o modelo linear
 (Capítulo~\ref{chap:retornos_linear}) e com o modelo em árvore
 (Capítulo~\ref{chap:retornos_nao_linear}) e estratégias
@@ -63,7 +63,7 @@ As pastas \arq{figs/} e \arq{tables/} têm os mesmos cinco temas: dados
           figuras para \arq{tables/dados/} e \arq{figs/dados/};
           \arq{scripts/test_h1_bvrp_mean.py} e
           \arq{descritivas_C3_regimes.py}.
-    \item \textbf{Previsão do BVRP}: \arq{previsao_bvrp_T5.py} e
+    \item \textbf{Previsão do RBVRP}: \arq{previsao_bvrp_T5.py} e
           \arq{interacao_regime_T9.py}; depois, \arq{mcs_previsao_T5.py} e
           \arq{publicar_cap5.py}.
     \item \textbf{Retornos}: \arq{retorno_bvrp_T10.py},

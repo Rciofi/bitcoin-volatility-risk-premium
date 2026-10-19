@@ -4,20 +4,21 @@ Origem: PDF `Dissertação_v3_3_2` (97 páginas) anotado pelo Prof. Marcelo (aut
 
 Páginas citadas são as do PDF (a página 15 é o início do Capítulo 1).
 
-## 0. Status em 18/10 (23h55)
+## 0. Status em 19/10 (tarde)
 
 | Item | Situação |
 |---|---|
 | Banca e remoção do Osvaldo | **Feito** (folha de aprovação e folha de rosto) |
 | **Lote 1 (43 itens previstos)** | **Aplicado, sem commit.** 34 feitos + #57 (extra, texto do Marcelo), 1 sem ação (#40) e 8 adiados. Falta conferir o PDF no Overleaf |
-| Bootstrap da atenuação (D7) | **Em espera** pela resposta do Marcelo; e-mail com 6 perguntas redigido |
-| D1 (definição/notação do BVRP) | Aguardando você: confirmar que as regras 7 e 8 e o Fase0 estão superados |
-| D2, D3, D4, D5 | Aguardando você |
+| Bootstrap da atenuação (D7) | **Marcelo respondeu em 19/10** (ver D7 abaixo). Passa a robustez/apêndice; análise principal = previsores direto (D3) |
+| D1 (definição/notação do BVRP) | **Decidida em 19/10:** definição do texto atual (prospectiva); RBVRP (medida) e HBVRP (proxy); BVRP = prêmio teórico. Fase0 e regras 7 e 8 superados |
+| D3 (regressor gerado) | **Decidida em 19/10:** previsores direto como análise principal (teste F e ganho de EQM, com regularização); bootstrap como apêndice. Executa no B2 |
+| D2, D4, D5 | Aguardando você |
 | Blocos B1 a B4, B8, B9 e o restante do B5 | Não iniciados |
 
 **Lote 1, adiados:** #43, #44, #45, #120 (D1); #94 (D4); #143, #144 (D7); #157 (tabela gerada por script). Os cortes de #107 e #108 e a nova citação de Almeida et al. (2026, no prelo) já estão no texto. Pontos de atenção em `docs/rodada3/pontos_de_atencao.md` (#74 e #100).
 
-Próximo passo sugerido: decidir D1 e D3, que destravam B1, B2 e o Cap. 7.
+Próximo passo: executar o Lote B1 (prompt em `docs/rodada3/PROMPT_loteB1_Claude_Code.md`), depois o B2 em dois passos (regressão direta + correlação erro de previsão × inovação; depois reescrita dos Caps. 6 e 7 e apêndice do bootstrap).
 
 ## 1. Panorama
 
@@ -63,7 +64,23 @@ Próximo passo sugerido: decidir D1 e D3, que destravam B1, B2 e o Cap. 7.
 
 **D6 — Banca (#1, #2, EM4). FEITO em 18/10.** Banca: Marcelo Fernandes (orientador), Matheus Carrijo e Fernando Chague, todos professores doutores da FGV EESP. O Osvaldo saiu (não pode participar da banca). Alterações no ramo `rodada2-mcs`, com backup `.bak`: `frontmatter/folha_aprovacao.tex` (Osvaldo → Matheus Carrijo; campo livre → Fernando Chague) e `frontmatter/folha_rosto.tex` (linha de co-orientador removida). Não restam outras menções ao Osvaldo nos `.tex`, `.md` e `.bib`. A compilação completa não rodou no ambiente (falta o pacote `brazilian` do babel), mas as páginas de rosto saem com os nomes certos. Falta só conferir no Overleaf.
 
-**D7 — Bootstrap do viés de atenuação (#145–#150, EM3, Cap. 6, pág. 55). EM ESPERA até a resposta do Marcelo.** Perguntas já redigidas (objetivo do bootstrap, geração dos erros, retornos fixos ou simulados, fim da reamostragem dos pares, alternativa com os previsores direto e teste F/EQM, papel no texto). Hoje o texto faz o seguinte: em cada reamostragem, reestima o modelo de previsão em cada origem com treino reamostrado em blocos e reestima β com os pares (previsão, retorno) das 987 datas, também reamostrados em blocos. Define λ = média dos β* / β̂ (entre 0,59 e 0,70) e usa o erro-padrão do bootstrap dividido por λ, afirmando que β̂ "não é atenuado" e é uma medida conservadora. As objeções dele: (i) reamostrar os pares previsão-retorno não faz muito sentido; (ii) **o viés de atenuação está exatamente no β̂**, então a frase "β̂ não atenuado" está errada; (iii) não está claro como a atenuação afeta o β* nem se dá para corrigir β̂ com o bootstrap; (iv) Künsch (1989) é referência geral e não trata de atenuação. Ele propõe um bootstrap paramétrico: simular erros de previsão do BVRP, gerar séries alternativas condicionais aos previsores (uma por modelo), reestimar cada modelo, tratar a previsão original como "verdade", regredir o retorno na original e em cada alternativa e comparar a média dos β* com o β̂ original. Opções: (a) reimplementar como ele descreve (muda λ, erros-padrão, valores-p e as Tabelas 6.1–6.2); (b) manter o método e reescrever a justificativa, sem "não atenuado" nem "conservador"; (c) eliminar o problema pela D3(a). Ele mesmo disse que pode não ter entendido bem, então vale perguntar a ele depois de decidirmos.
+**D7 — Bootstrap do viés de atenuação (#145–#150, EM3, Cap. 6, pág. 55). Marcelo respondeu em 19/10; ver respostas abaixo.** Perguntas já redigidas (objetivo do bootstrap, geração dos erros, retornos fixos ou simulados, fim da reamostragem dos pares, alternativa com os previsores direto e teste F/EQM, papel no texto). Hoje o texto faz o seguinte: em cada reamostragem, reestima o modelo de previsão em cada origem com treino reamostrado em blocos e reestima β com os pares (previsão, retorno) das 987 datas, também reamostrados em blocos. Define λ = média dos β* / β̂ (entre 0,59 e 0,70) e usa o erro-padrão do bootstrap dividido por λ, afirmando que β̂ "não é atenuado" e é uma medida conservadora. As objeções dele: (i) reamostrar os pares previsão-retorno não faz muito sentido; (ii) **o viés de atenuação está exatamente no β̂**, então a frase "β̂ não atenuado" está errada; (iii) não está claro como a atenuação afeta o β* nem se dá para corrigir β̂ com o bootstrap; (iv) Künsch (1989) é referência geral e não trata de atenuação. Ele propõe um bootstrap paramétrico: simular erros de previsão do BVRP, gerar séries alternativas condicionais aos previsores (uma por modelo), reestimar cada modelo, tratar a previsão original como "verdade", regredir o retorno na original e em cada alternativa e comparar a média dos β* com o β̂ original. Opções: (a) reimplementar como ele descreve (muda λ, erros-padrão, valores-p e as Tabelas 6.1–6.2); (b) manter o método e reescrever a justificativa, sem "não atenuado" nem "conservador"; (c) eliminar o problema pela D3(a). Ele mesmo disse que pode não ter entendido bem, então vale perguntar a ele depois de decidirmos.
+
+**RESPOSTAS DO MARCELO (19/10), às seis perguntas do e-mail:**
+1. Corrigir o viés do β̂ **e** o erro-padrão/valor-p ("os dois").
+2. Erros da simulação: a proposta dele só vale para erro iid. Como o alvo se sobrepõe em 29 de 30 dias, o erro de previsão tem estrutura MA(29). Duas saídas: estimar os coeficientes MA e proceder igual, ou **aproximar o MA por um AR** (mais fácil, dá para fazer em duas etapas).
+3. Se o erro de previsão for correlacionado com a inovação do retorno, MQO não serve e é preciso **variável instrumental**. A proposta dele só vale na ausência dessa correlação.
+4. O erro-padrão **vem direto do bootstrap** (sem dividir por λ).
+5. Teste F **e** ganho de EQM, "ambos"; e **regulariza-se** (não escolher subconjunto à mão).
+6. A correção da atenuação como robustez/apêndice: "não é ideal, mas é aceitável certamente, especialmente se rodar direto com todos os previsores".
+
+**Consequências (propostas, aguardam seu OK):**
+- **D3 = previsores direto.** Análise principal dos Caps. 6 e 7: regredir o retorno nos 17 previsores (regularizados) em vez do BVRP previsto; reportar teste F e ganho de EQM fora da amostra. O BVRP previsto + bootstrap vira robustez/apêndice.
+- **D7 = reimplementar só como robustez**, com este desenho: (i) por modelo, ajustar um AR(p) ao erro de previsão (p por BIC, p ≥ 29) para obter inovações iid; (ii) reamostrar as inovações (iid, sem blocos), regenerar o erro e a série de BVRP, reestimar cada modelo; (iii) tratar a previsão original como verdade e regredir o retorno na original e em cada alternativa; (iv) β̂ corrigido = β̂ / λ, com λ = média dos β* / β̂ original; (v) erro-padrão = desvio-padrão dos β* corrigidos, direto do bootstrap; (vi) fim da reamostragem dos pares (previsão, retorno).
+- **Ponto a testar antes (pergunta 3 dele):** o BVRP realizado de t+1 a t+30 usa os mesmos retornos que formam o retorno acumulado de t+1 a t+h. Por isso é plausível haver correlação entre o erro de previsão e a inovação do retorno (assimetria, efeito alavancagem). Medir essa correlação nos dados antes de implementar; se existir, usar variável instrumental ou simular retornos e erro de previsão em conjunto.
+- **Dúvida de interpretação (resposta 5):** o teste F é um teste de Wald com erro-padrão HAC no MQO com os 17 previsores; a "regularização" entraria no ganho de EQM (Ridge/LASSO). Se ele quis outra coisa, ajustar. Vale uma linha de confirmação com ele, sem travar o trabalho.
+- Cortes #143, #144 e a citação Künsch (#148): podem ser feitos junto com a reescrita da seção do bootstrap, que agora vira apêndice.
+
 
 ## 4. Blocos de trabalho, na ordem proposta
 
@@ -84,9 +101,9 @@ Regras do projeto mantidas: mostrar cada alteração antes de aplicar, backup `.
 
 Por que essa ordem: B1 e B2 definem definições e números; B3 move e corta; depois vale polir frases (B4–B5), LaTeX e referências (B6–B7). O B9 vem depois dos resultados e a varredura de primeira pessoa (B8) fica por último.
 
-Dependências: D3 antes de D7; B2 depende de D2, D3, D5, D7. #65 (persistência), #76 e #78 tratam do mesmo assunto e devem ser feitos juntos. #101 e #126 são o mesmo comentário (ADF/KPSS).
+Dependências: D3 antes de D7 (D3 já respondida pelo Marcelo, aguarda seu OK); B2 depende de D2, D3, D5, D7. #65 (persistência), #76 e #78 tratam do mesmo assunto e devem ser feitos juntos. #101 e #126 são o mesmo comentário (ADF/KPSS).
 
-Banca (B7: #1, #2, EM4): concluída. Bootstrap (#145–#150, EM3): em espera. Os demais itens do B7 (#68, #82, #148, #160, #161) seguem abertos.
+Banca (B7: #1, #2, EM4): concluída. Bootstrap (#145–#150, EM3): destravado em 19/10 (vira robustez/apêndice, ver D7). Os demais itens do B7 (#68, #82, #148, #160, #161) seguem abertos.
 
 ## 5. Inventário completo por bloco
 

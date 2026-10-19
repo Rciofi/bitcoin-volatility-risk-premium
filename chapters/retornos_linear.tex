@@ -120,9 +120,9 @@ do regressor gerado.
 \input{tables/retornos_linear/tab_conjunto}
 
 A direção do resultado é a mesma de \citet{bollerslev2009expected}. Com
-$\text{BVRP} = \text{VH} - \text{IV}$, um $\beta_h$ negativo equivale a dizer
-que um prêmio de variância maior, com a IV acima da volatilidade histórica
-futura, antecede retornos maiores. A evidência aqui, porém, é fraca: nenhum
+$\text{BVRP}_t = \mathbb{E}(\text{RV}_{t+1:t+30} \mid I_t) - \text{IV}_t$, um
+$\beta_h$ negativo equivale a dizer que um prêmio maior, com a IV acima da
+volatilidade esperada para os 30 dias seguintes, antecede retornos maiores. A evidência aqui, porém, é fraca: nenhum
 horizonte é significante depois das correções.
 
 % =========================================================
@@ -148,13 +148,13 @@ Bonferroni ($h = 1$, $p = 0{,}003$). O sinal é estável; a significância não
 A equação~\eqref{eq:met-retorno-componentes} substitui o prêmio por seus
 componentes observados em $t$, a volatilidade histórica dos 30 dias anteriores
 e a IV. Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença
-$\text{VH}_{t-29:t} - \text{IV}_t$, que é a $\text{BVRP}^{\text{proxy}}_t$,
+$\text{VH}_{t-29:t} - \text{IV}_t$, que é o $\text{HBVRP}_t$,
 resume o conteúdo das duas medidas. A Tabela~\ref{tab:retlin-componentes}
 mostra que os coeficientes têm sinais opostos de $h = 1$ a $h = 20$, a IV com
 sinal positivo, e que o teste só rejeita a restrição em $h = 1$ ($p = 0{,}039$;
 nos demais horizontes, $p \ge 0{,}18$). Nenhum coeficiente individual é
 significante depois da correção de Bonferroni. O teste usa a volatilidade
-histórica retrospectiva, a da proxy, e não o BVRP previsto: ele diz se a
+histórica, a do HBVRP, e não o BVRP previsto: ele diz se a
 diferença entre as duas volatilidades observadas em $t$ é uma forma adequada
 de combiná-las, não se o prêmio prospectivo prevê o retorno.
 

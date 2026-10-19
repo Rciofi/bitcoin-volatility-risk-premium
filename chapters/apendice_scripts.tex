@@ -37,7 +37,7 @@ ele grava as saídas, dentro de \arq{outputs/}.
           (estatísticas descritivas e testes de raiz unitária),
           \arq{code/plot_cap3_T1.py} (séries, histogramas e distribuição
           anual), \arq{code/plot_vrp_vs_return_T12.py} (dispersão entre
-          a proxy e o retorno de 30 dias), \arq{scripts/test_h1_bvrp_mean.py}
+          o HBVRP e o retorno de 30 dias), \arq{scripts/test_h1_bvrp_mean.py}
           (teste de H1) e \arq{code/descritivas_C3_regimes.py} (prêmio por
           regime).
     \item[Capítulo~\ref{chap:previsao_bvrp}.] \arq{code/previsao_bvrp_T5.py}
@@ -174,7 +174,7 @@ interrompe a execução se a diferença em relação às saídas da análise pas
 $10^{-9}$. Os testes em \arq{code/test_*.py} saem com erro se alguma
 verificação falhar. Entre outras, eles conferem:
 \begin{itemize}
-    \item que a VH prospectiva de $t$ é a retrospectiva de $t+30$
+    \item que a RV de $t$ é a VH de $t+30$
           (\arq{test_T1_alinhamento.py});
     \item que nenhuma variável explicativa muda quando os dados brutos são
           cortados em $t$ (\arq{test_T4_vazamento.py});
