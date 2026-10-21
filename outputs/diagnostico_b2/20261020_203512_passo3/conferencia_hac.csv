@@ -1,0 +1,6 @@
+item,numpy,referencia,bate
+"q16 completa, R_log, L = 31: W numpy × hac_utils",20.00807768406186,20.008077684062627,True
+"q16 completa, R_log, L = 61: W numpy × hac_utils",23.279356783894556,23.279356783880097,True
+"q16 completa, L = 31: W arredondado = 20,01",20.00807768406186,20.01,True
+"q16 completa, L = 31: p χ² arredondado = 0,220",0.21985705122807775,0.22,True
+"q1 Ridge, R_simples, L = 31: p = p HAC do T10 (0,0909109)",0.09091088669377213,0.0909109,True

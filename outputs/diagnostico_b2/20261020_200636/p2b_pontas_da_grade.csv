@@ -1,0 +1,5 @@
+y,modelo,n_origens,alpha_min_grade,n_no_menor,alpha_max_grade,n_no_maior,coef_nao_nulos_mediana,coef_nao_nulos_min,coef_nao_nulos_max
+R_log,Ridge,33,0.001,0,100000.0,33,16.0,16,16
+R_log,LASSO,33,0.001,0,100.0,0,0.0,0,0
+R_simples,Ridge,33,0.001,0,100000.0,33,16.0,16,16
+R_simples,LASSO,33,0.001,0,100.0,0,0.0,0,0
