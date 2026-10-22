@@ -1,0 +1,13 @@
+item,dif,tol,bate
+h = 1: média histórica = Etapa A (máx. |dif|),9.901801600875615e-15,1e-09,True
+h = 1: realizado = 100·log1p(ret_fut) (máx. |dif|),9.992007221626409e-15,1e-09,True
+h = 5: média histórica = Etapa A (máx. |dif|),9.811595980124821e-15,1e-09,True
+h = 5: realizado = 100·log1p(ret_fut) (máx. |dif|),9.971190539914687e-15,1e-09,True
+h = 10: média histórica = Etapa A (máx. |dif|),9.492406860545088e-15,1e-09,True
+h = 10: realizado = 100·log1p(ret_fut) (máx. |dif|),1.0658141036401503e-14,1e-09,True
+h = 20: média histórica = Etapa A (máx. |dif|),9.325873406851315e-15,1e-09,True
+h = 20: realizado = 100·log1p(ret_fut) (máx. |dif|),1.0658141036401503e-14,1e-09,True
+h = 30: média histórica = Etapa A (máx. |dif|),9.769962616701378e-15,1e-09,True
+h = 30: realizado = 100·log1p(ret_fut) (máx. |dif|),1.0658141036401503e-14,1e-09,True
+h = 60: média histórica = Etapa A (máx. |dif|),1.021405182655144e-14,1e-09,True
+h = 60: realizado = 100·log1p(ret_fut) (máx. |dif|),1.0658141036401503e-14,1e-09,True
