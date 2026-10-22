@@ -1,19 +1,102 @@
-\chapter{BVRP previsto e retornos futuros: modelo não linear}
+\chapter{Retornos futuros e previsores: modelo não linear}
 \label{chap:retornos_nao_linear}
 
-Este capítulo repete o teste do Capítulo~\ref{chap:retornos_linear} com um
-único modelo em árvore no lugar dos regimes construídos à mão: uma floresta
-aleatória, que escolhe sozinha os cortes nas volatilidades, gera o BVRP
-previsto, e o capítulo regride o retorno futuro nele. O coeficiente é praticamente
-nulo em todos os horizontes, e o teste conjunto nos seis horizontes não
-rejeita ($p = 0{,}96$). O resultado se repete com as outras formas e modelos
-de previsão e com a floresta aplicada direto ao retorno.
+Este capítulo repete a análise do Capítulo~\ref{chap:retornos_linear} com a
+floresta aleatória, que permite relações não lineares e interações entre as
+variáveis explicativas e o retorno sem especificá-las de antemão. As
+Seções~\ref{sec:retnl-especificacao} e~\ref{sec:retnl-oos} trazem a análise
+principal: a floresta aplicada diretamente ao log-retorno de $h$ dias,
+avaliada fora da amostra contra a média histórica e contra os modelos
+lineares do Capítulo~\ref{chap:retornos_linear}. A
+Seção~\ref{sec:retnl-complementares} reúne as análises complementares, que
+passam pelo BVRP previsto: a previsão do RBVRP nas duas formas, o BVRP
+previsto da floresta como fator único, os cortes que as árvores escolhem nas
+volatilidades e o retorno médio por regime de volatilidade. A
+Seção~\ref{sec:retnl-sinal} examina a resposta da IV e do prêmio ao sinal do
+retorno do dia. A floresta aplicada diretamente ao retorno não supera a média
+histórica em nenhum horizonte depois do ajuste para os seis horizontes. Seu
+$R^2$ dentro da amostra vai de 2\% a 18\%, enquanto o de fora da amostra,
+contra a média histórica, não passa de 0,036 e fica negativo em $h = 30$ e $h = 60$: a floresta se ajusta ao
+ruído do treino. O Diebold--Mariano não distingue a floresta da média
+histórica nem dos modelos lineares em nenhum horizonte ($p \ge 0{,}35$).
 
 % =========================================================
 \section{Especificação}
 \label{sec:retnl-especificacao}
 
-A forma principal do BVRP previsto é
+Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$ dias, uma floresta
+aleatória prevê o log-retorno de $t$ a $t+h$ diretamente:
+\begin{equation}
+R^{\log}_{t,h} = g_h(X_t) + \varepsilon_{t+h},
+\label{eq:retnl-direto}
+\end{equation}
+em que $g_h$ é a floresta do horizonte $h$ e $X_t$ reúne as 17 variáveis
+explicativas do Capítulo~\ref{chap:previsao_bvrp}, em nível. Ao contrário do
+MQO do Capítulo~\ref{chap:retornos_linear}, a floresta não depende da
+inversão de uma matriz, e a colinearidade entre a volatilidade histórica de
+30 dias, o HBVRP e a IV não impede que as 17 entrem juntas. Em cada divisão, a
+árvore escolhe a variável e o ponto de corte que mais reduzem o erro
+quadrático; efeitos de limiar e interações, como uma diferença entre regimes
+de volatilidade, saem do próprio modelo, sem corte nem variável indicadora
+fixados de antemão.
+
+Cada floresta tem 500 árvores. Os hiperparâmetros são escolhidos em cada uma
+das 33 origens da janela expansiva do Capítulo~\ref{chap:previsao_bvrp}, por
+validação cruzada de cinco dobras com embargo de $h$ dias, e o treino usa só
+os alvos conhecidos na origem ($s \le t-h$). As previsões cobrem as mesmas
+987 datas do Capítulo~\ref{chap:retornos_linear}, de 21/06/2023 a 03/03/2026.
+O modelo de referência é a média histórica do log-retorno de $h$ dias nos
+alvos conhecidos na origem. A avaliação usa o $R^2_{\text{fora}}$ contra a
+média histórica e contra a previsão de retorno zero, o teste de Clark--West,
+unilateral, e o de Diebold--Mariano, bilateral, contra a média histórica e
+contra o Ridge e o MQO do Capítulo~\ref{chap:retornos_linear}, com HAC de
+$h+1$ defasagens e ajuste de Holm para os seis horizontes. Um placebo
+reestima a floresta, com os mesmos hiperparâmetros, depois de permutar o alvo
+dentro do treino, dez vezes por horizonte: sem relação entre o alvo e as
+variáveis, o $R^2_{\text{fora}}$ deve ficar perto de zero.
+
+% =========================================================
+\section{Resultados fora da amostra}
+\label{sec:retnl-oos}
+
+A Tabela~\ref{tab:retnl-oos-floresta} apresenta os resultados. Até
+$h = 20$, o $R^2_{\text{fora}}$ contra a média histórica é praticamente nulo
+em $h = 1$ ($-0{,}00005$) e positivo e pequeno de $h = 5$ a $h = 20$ (de
+0,005 a 0,036); em $h = 30$ e $h = 60$, é
+negativo ($-0{,}029$ e $-0{,}110$). O Clark--West fica no limite de 5\% só
+em $h = 20$ ($p = 0{,}050$), e não depois do ajuste de Holm: o menor
+valor-$p$ ajustado é 0,300. O Diebold--Mariano não distingue a floresta da
+média histórica (valores-$p$ entre 0,40 e 0,99), do Ridge (entre 0,40 e
+0,81) nem do MQO (entre 0,35 e 0,90). Contra a previsão de retorno zero, a
+floresta só não perde em $h = 20$ ($R^2_{\text{fora}}$ de 0,0012).
+
+\input{tables/retornos_nao_linear/tab_oos_floresta}
+
+O $R^2$ dentro da amostra cresce com o horizonte, de 0,023 em $h = 1$ a
+0,182 em $h = 30$ e 0,176 em $h = 60$, enquanto o de fora fica negativo
+nesses dois horizontes. Com alvos de $h$ dias sobrepostos, as datas vizinhas
+do treino têm quase o mesmo alvo, e a floresta se ajusta ao ruído comum a
+elas: em $h = 60$, as 987 datas contêm só cerca de 16 períodos sem
+sobreposição. O placebo não indica vazamento entre treino e teste: seu
+$R^2_{\text{fora}}$ mediano fica entre $-0{,}004$ e $0{,}006$, e o maior das
+dez permutações, entre 0,002 e 0,015. Como no modelo linear, nenhum método
+supera a média histórica fora da amostra.
+
+% =========================================================
+\section{Análises complementares}
+\label{sec:retnl-complementares}
+
+As análises desta seção passam pelo BVRP previsto e descrevem como a
+floresta usa as volatilidades. Elas não testam a previsibilidade do retorno
+com tamanho controlado e servem para interpretar o resultado da
+Seção~\ref{sec:retnl-oos}.
+
+\subsection{Previsão do RBVRP nas duas formas}
+\label{sec:retnl-previsao}
+
+Além da forma direta do Capítulo~\ref{chap:previsao_bvrp}, em que o modelo
+prevê o RBVRP, a floresta pode prever a volatilidade realizada e subtrair a
+IV:
 \begin{equation}
 \widehat{\text{BVRP}}_t = \hat f(X_t) - \text{IV}_t,
 \label{eq:retnl-forma}
@@ -22,26 +105,8 @@ em que $\hat f$ é uma floresta aleatória que prevê a volatilidade realizada n
 30 dias seguintes, $\text{RV}_{t+1:t+30}$, com as 17 variáveis $X_t$, as
 origens, o embargo e a janela expansiva do Capítulo~\ref{chap:previsao_bvrp}.
 Como $\text{BVRP}_t = \mathbb{E}(\text{RV}_{t+1:t+30} \mid I_t) - \text{IV}_t$,
-subtrair a IV de $t$ da previsão da RV dá uma estimativa do prêmio. A floresta entra com todas as
-volatilidades em nível e escolhe, em cada divisão, a variável e o ponto de
-corte que mais reduzem o erro; os cortes que separam regimes de volatilidade
-saem do próprio modelo, sem corte nem variável indicadora fixados de antemão.
-A dissertação fixou a forma~\eqref{eq:retnl-forma} e a floresta antes de ver
-os resultados deste capítulo. Como testes de robustez, a floresta prevê o RBVRP
-diretamente, como no Capítulo~\ref{chap:previsao_bvrp}, e o Ridge entra
-nas duas formas.
-
-Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, o capítulo regride o
-retorno simples de $t$ a $t+h$ no BVRP previsto, como na
-equação~\eqref{eq:met-retorno-linear}, nas mesmas 987 datas fora da amostra e
-com a inferência do Capítulo~\ref{chap:retornos_linear}: erro-padrão HAC com
-$h+1$ defasagens e bootstrap em blocos em dois níveis, que incorpora a
-estimação do BVRP previsto. As reamostragens são as mesmas em todos os
-horizontes e nos quatro regressores.
-
-% =========================================================
-\section{Previsão do RBVRP nas duas formas}
-\label{sec:retnl-previsao}
+subtrair a IV de $t$ da previsão da RV dá uma estimativa do prêmio.
+O Ridge também entra nas duas formas.
 
 A Tabela~\ref{tab:retnl-previsao} compara as previsões do RBVRP. Na forma
 $\hat f(X_t) - \text{IV}_t$, a floresta tem $R^2_{\text{fora}}$ de 0,009,
@@ -58,72 +123,27 @@ sem ela, $p = 0{,}005$).
 
 \input{tables/retornos_nao_linear/tab_previsao_formas}
 
-A forma principal prevê o RBVRP pior, mas a conclusão sobre os retornos não
-depende dela: as Seções~\ref{sec:retnl-resultados}
-e~\ref{sec:retnl-robustez} mostram que nenhuma das quatro combinações de forma
-e modelo prevê o retorno.
+A forma $\hat f(X_t) - \text{IV}_t$ prevê o RBVRP pior, e o BVRP previsto por
+ela também não prevê o retorno (Seção~\ref{sec:retnl-fator}).
 
-% =========================================================
-\section{Resultados}
-\label{sec:retnl-resultados}
+\subsection{BVRP previsto da floresta como fator único}
+\label{sec:retnl-fator}
 
-A Tabela~\ref{tab:retnl-principal} e a Figura~\ref{fig:retnl-betas}
-apresentam os resultados da forma principal. O coeficiente fica entre
-$-0{,}076$ e $0{,}070$ p.p. de retorno por p.p. de BVRP previsto, troca de
-sinal entre os horizontes, e os valores-$p$ HAC ficam entre 0,55 e 0,94. O
-$R^2$ não passa de 0,0014.
+O painel B da Tabela~\ref{tab:retlin-um-fator} regride o log-retorno no BVRP
+previsto pela floresta na forma $\hat f(X_t) - \text{IV}_t$, com os testes
+do Capítulo~\ref{chap:retornos_linear}. O coeficiente fica perto de zero e
+troca de sinal entre os horizontes, de $-0{,}106$ a $0{,}049$, e nenhum teste
+rejeita ($p \ge 0{,}64$; nos seis horizontes de uma vez, $p = 0{,}89$). Ao
+contrário do BVRP previsto pelo Ridge, o da floresta não tem relação com o
+retorno em nenhum horizonte. Os resultados da versão anterior, com o retorno
+simples e o bootstrap em dois níveis, estão na
+Seção~\ref{sec:apb2-provisoria}.
 
-\input{tables/retornos_nao_linear/tab_principal}
-
-\IfFileExists{figs/retornos_nao_linear/fig_betas.png}{
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figs/retornos_nao_linear/fig_betas.png}
-    \caption[Coeficiente do retorno futuro sobre o BVRP previsto, por regressor]{Coeficiente do retorno futuro sobre o BVRP previsto, por horizonte e regressor, com intervalos de confiança de 95\% pelo erro-padrão HAC com $h+1$ defasagens.}
-    \label{fig:retnl-betas}
-\end{figure}
-}{}
-
-Com $\hat\beta_h$ perto de zero, a correção de escala do bootstrap deixa de
-funcionar. A razão $\lambda_h$ entre a média dos $\beta^*$ e $\hat\beta_h$,
-que no Capítulo~\ref{chap:retornos_linear} mede a atenuação, divide por um
-número próximo de zero: fica entre $-2{,}75$ e $3{,}45$ e é negativa em 5 das
-18 combinações de horizonte e tamanho de bloco, casos em que o erro-padrão
-corrigido não é definido. Nesses casos, a inferência se apoia no erro-padrão
-HAC e no teste conjunto, que não usa $\lambda_h$.
-
-O teste conjunto é um teste de significância conjunta de Wald, cuja
-estatística dividida pelo número de restrições é a estatística $F$. Ele testa
-$\beta_h = 0$ nos seis horizontes com a covariância dos $\beta^*$ do bootstrap
-(Tabela~\ref{tab:retnl-conjunto}). Para a forma principal, $\chi^2(6) = 1{,}45$
-e $p = 0{,}96$, e o resultado se repete com blocos de 30 e de 90 dias
-($p = 0{,}95$ e $0{,}96$), com o max-$|t|$ ($p = 0{,}79$) e com o HAC das seis
-regressões empilhadas ($p = 0{,}93$). Ao contrário do Ridge direto, para o qual
-os testes que ignoram a estimação do BVRP previsto rejeitam
-(Capítulo~\ref{chap:retornos_linear}), nenhum teste rejeita com a floresta,
-nas duas formas.
-
-\input{tables/retornos_nao_linear/tab_conjunto}
-
-% =========================================================
-\section{Testes de robustez}
-\label{sec:retnl-robustez}
-
-A Tabela~\ref{tab:retnl-robustez} repete a regressão com o BVRP previsto pelos
-outros três regressores. Com a floresta na forma direta, o coeficiente é
-negativo em todos os horizontes, como no Capítulo~\ref{chap:retornos_linear},
-mas nenhum é significante (valores-$p$ HAC entre 0,15 e 0,61). Com o Ridge na
-forma $\hat f(X_t) - \text{IV}_t$, os valores-$p$ HAC ficam entre 0,12 e 0,90.
-O Ridge direto reproduz o Capítulo~\ref{chap:retornos_linear}. O teste conjunto
-não rejeita com nenhum dos três quando a estimação do BVRP previsto é
-considerada ($p$ entre 0,37 e 0,98).
-
-\input{tables/retornos_nao_linear/tab_robustez}
-
-% =========================================================
-\section{Como a árvore escolhe as quebras}
+\subsection{Como a árvore escolhe as quebras}
 \label{sec:retnl-quebras}
 
+Esta subseção descreve as florestas que preveem o RBVRP
+(Seção~\ref{sec:retnl-previsao}), e não as do retorno.
 A Figura~\ref{fig:retnl-importancia} mostra a importância das variáveis nas
 duas formas da floresta, pela redução de impureza dentro da amostra, média
 das 33 origens, e pelo aumento do erro quadrático médio fora da amostra
@@ -187,56 +207,24 @@ $\hat f(X_t) - \text{IV}_t$, o maior salto varia entre as origens.
 \end{figure}
 }{}
 
-% =========================================================
-\section{Regime de volatilidade e retornos}
+\subsection{Regime de volatilidade e retornos}
 \label{sec:retnl-regime}
 
-O capítulo também aplica o teste de significância conjunta por horizonte, com a
-variável indicadora do regime de alta volatilidade e sua interação com o BVRP
-previsto, como na equação~\eqref{eq:met-retorno-regime}
-(Tabela~\ref{tab:retnl-regime}). Para a forma principal, o teste dos três
-coeficientes tem valores-$p$ entre 0,36 e 0,89 com o corte fixo e entre 0,42
-e 0,73 com o corte expansivo. Nos quatro regressores, só 3 das 48
-combinações de regressor, corte e horizonte ficam abaixo do limite de
-Bonferroni, sem padrão: o Ridge direto em $h = 60$, com os dois cortes, e a
-floresta direta em $h = 20$, só com o corte expansivo. A diferença entre os
-regimes continua sugestiva e frágil, como no
-Capítulo~\ref{chap:retornos_linear}, e esses valores-$p$ são do HAC, que
-ignora a estimação do BVRP previsto.
-
-\input{tables/retornos_nao_linear/tab_regime}
-
-A Tabela~\ref{tab:retnl-retorno-regime} descreve o retorno futuro médio por
-regime, sem o BVRP previsto. Com o corte fixo, o retorno médio é menor no
-regime de alta volatilidade em todos os horizontes, de $-0{,}03$ p.p. em
-$h = 1$ a $-3{,}23$ p.p. em $h = 30$, e continua menor em $h = 60$
-($-2{,}45$ p.p.). Só com a volatilidade extrema, definida pelo quartil
-superior da VH com os dados disponíveis até $t$, os retornos ficam perto de
-zero ou negativos de $h = 10$ a $h = 30$ e superam os das demais datas em
-$h = 60$ ($11{,}46\%$ contra $7{,}64\%$), um padrão de reversão à média.
-Nenhuma diferença é significante (valores-$p$ entre 0,20 e 0,82 nas duas
+A Tabela~\ref{tab:retnl-retorno-regime} descreve o log-retorno médio por
+regime, sem o BVRP previsto. Com o corte fixo, o log-retorno médio é menor
+no regime de alta volatilidade em todos os horizontes, de $-0{,}06$ p.p. em
+$h = 1$ a $-2{,}95$ p.p. em $h = 30$, e continua menor em $h = 60$
+($-2{,}75$ p.p.). Só com a volatilidade extrema, definida pelo quartil
+superior da VH com os dados disponíveis até $t$, os log-retornos ficam perto
+de zero ou negativos de $h = 10$ a $h = 30$ e superam os das demais datas em
+$h = 60$ ($10{,}48\%$ contra $5{,}23\%$), um padrão de reversão à média.
+Nenhuma diferença é significante (valores-$p$ entre 0,27 e 0,76 nas duas
 definições), e as 64 datas de volatilidade extrema formam só quatro episódios
 (março e abril de 2024, agosto de 2024, março de 2025 e fevereiro e março de
-2026).
+2026). A regressão do retorno no BVRP previsto com inclinações diferentes nos
+dois regimes está na Seção~\ref{sec:retlin-um-fator}.
 
 \input{tables/retornos_nao_linear/tab_retorno_regime}
-
-% =========================================================
-\section{Floresta direto no retorno}
-\label{sec:retnl-arvore-retorno}
-
-Uma alternativa às duas etapas é a floresta aplicada direto ao retorno,
-$R_{t+h} = g_h(X_t) + \varepsilon_{t+h}$, com uma floresta por horizonte e as
-mesmas variáveis e origens, que escolhe as quebras sem passar pelo BVRP
-(Tabela~\ref{tab:retnl-arvore-retorno}). O $R^2_{\text{fora}}$ contra a média
-histórica do retorno fica entre $-0{,}358$ e $0{,}021$, e nenhum horizonte é
-significante no Clark--West (valores-$p$ entre 0,11 e 0,94). Em $h = 60$, a
-floresta erra mais que a média histórica (Diebold--Mariano, $p = 0{,}014$). O
-$R^2$ dentro da amostra cresce com o horizonte, de 0,02 a 0,39, enquanto o de
-fora fica negativo: com alvos de $h$ dias sobrepostos, a floresta se ajusta ao
-ruído dos horizontes longos.
-
-\input{tables/retornos_nao_linear/tab_arvore_retorno}
 
 % =========================================================
 \section{Sinal do retorno}
@@ -274,15 +262,21 @@ do retorno muda a IV, mas não o prêmio.
 \section{Síntese}
 \label{sec:retnl-sintese}
 
-O modelo único em árvore não encontra a previsibilidade que o modelo linear
-não encontrou. Com a floresta escolhendo os cortes nas volatilidades, o BVRP
-previsto tem coeficiente praticamente nulo em todos os horizontes, e o teste
-conjunto não rejeita em nenhuma das formas e modelos; a floresta aplicada
-direto ao retorno também não supera a média histórica. As árvores cortam a
-VH de 30 dias entre 45\% e 58\% a.a., acima do corte de $37{,}3\%$ entre os
-regimes, e preferem as volatilidades de 60 e de 90 dias. A diferença de
-retornos entre regimes não é significante em nenhuma definição.
-O sinal do retorno do dia move a IV, como nas ações, mas não o prêmio.
+A floresta aleatória, que permite relações não lineares e interações entre
+as variáveis e o retorno, não encontra a previsibilidade que o modelo linear
+não encontrou. Aplicada diretamente ao log-retorno, ela não supera a média
+histórica em nenhum horizonte depois do ajuste de Holm, nem se distingue dos
+modelos lineares do Capítulo~\ref{chap:retornos_linear}; o $R^2$ dentro da
+amostra de 2\% a 18\%, com $R^2_{\text{fora}}$ negativo em 30 e 60 dias,
+indica que a floresta se ajusta ao ruído dos alvos sobrepostos. O BVRP
+previsto pela floresta não tem relação com o retorno. As árvores que preveem
+o RBVRP cortam a VH de 30 dias entre 45\% e 58\% a.a., acima do corte de
+$37{,}3\%$ entre os regimes, e preferem as volatilidades de 60 e de 90 dias;
+a diferença de log-retornos entre os regimes não é significante em nenhuma
+definição. O sinal do retorno do dia move a IV, como nas ações, mas não o
+prêmio. Como no Capítulo~\ref{chap:retornos_linear}, com poucas observações
+independentes fora da amostra, a falta de rejeição é ausência de evidência,
+e não evidência de ausência de previsibilidade.
 
 A amostra inclui a aprovação dos ETFs de Bitcoin à vista pela SEC, em janeiro
 de 2024 (Capítulo~\ref{chap:referencial}). A análise trata o período como um

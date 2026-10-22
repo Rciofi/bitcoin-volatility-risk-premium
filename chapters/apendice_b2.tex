@@ -5,7 +5,8 @@ Este apêndice complementa os Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}: traz as simulações de tamanho e poder dos
 testes, a regressão com o regime de volatilidade, a correlação entre o erro de
 previsão do RBVRP e a inovação do retorno e, provisoriamente, os resultados da
-versão anterior do Capítulo~\ref{chap:retornos_linear}.
+versão anterior dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear}.
 
 % =========================================================
 \section{Tamanho e poder dos testes}
@@ -53,9 +54,10 @@ amostra.
 
 \textit{Nota: resultados da versão anterior, com retorno simples e bootstrap
 em dois níveis, mantidos até a reescrita do apêndice do regressor gerado
-(D7).} Esta seção reproduz, sem alteração de números, o texto, as tabelas e a
-figura da versão anterior do Capítulo~\ref{chap:retornos_linear}, que
-regredia o retorno simples no BVRP previsto e usava o bootstrap em blocos em
+(D7).} Esta seção reproduz, sem alteração de números, o texto, as tabelas e as
+figuras da versão anterior dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear}, que regrediam o retorno simples no BVRP
+previsto e usavam o bootstrap em blocos em
 dois níveis para o regressor gerado.
 
 % =========================================================
@@ -199,3 +201,107 @@ depende da posição do corte, e esses valores-$p$ são do HAC, que ignora a
 estimação do BVRP previsto.
 
 \input{tables/retornos_linear/tab_regime}
+
+% =========================================================
+\subsection{BVRP previsto pela floresta e retorno simples}
+\label{sec:apb2-antigo-retnl-resultados}
+
+Os resultados a seguir reproduzem, sem alteração de números, a versão
+anterior do Capítulo~\ref{chap:retornos_nao_linear}, cuja forma principal era
+o BVRP previsto pela floresta na forma $\hat f(X_t) - \text{IV}_t$
+(equação~\eqref{eq:retnl-forma}). Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, a versão anterior regredia o
+retorno simples de $t$ a $t+h$ no BVRP previsto, como na
+equação~\eqref{eq:met-retorno-linear}, nas mesmas 987 datas fora da amostra e
+com a inferência da Seção~\ref{sec:apb2-antigo-inferencia}: erro-padrão HAC com
+$h+1$ defasagens e bootstrap em blocos em dois níveis, que incorpora a
+estimação do BVRP previsto. As reamostragens são as mesmas em todos os
+horizontes e nos quatro regressores.
+
+A Tabela~\ref{tab:retnl-principal} e a Figura~\ref{fig:retnl-betas}
+apresentam os resultados da forma principal. O coeficiente fica entre
+$-0{,}076$ e $0{,}070$ p.p. de retorno por p.p. de BVRP previsto, troca de
+sinal entre os horizontes, e os valores-$p$ HAC ficam entre 0,55 e 0,94. O
+$R^2$ não passa de 0,0014.
+
+\input{tables/retornos_nao_linear/tab_principal}
+
+\IfFileExists{figs/retornos_nao_linear/fig_betas.png}{
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figs/retornos_nao_linear/fig_betas.png}
+    \caption[Coeficiente do retorno futuro sobre o BVRP previsto, por regressor]{Coeficiente do retorno futuro sobre o BVRP previsto, por horizonte e regressor, com intervalos de confiança de 95\% pelo erro-padrão HAC com $h+1$ defasagens.}
+    \label{fig:retnl-betas}
+\end{figure}
+}{}
+
+Com $\hat\beta_h$ perto de zero, a correção de escala do bootstrap deixa de
+funcionar. A razão $\lambda_h$ entre a média dos $\beta^*$ e $\hat\beta_h$,
+que na Seção~\ref{sec:apb2-antigo-inferencia} mede a atenuação, divide por um
+número próximo de zero: fica entre $-2{,}75$ e $3{,}45$ e é negativa em 5 das
+18 combinações de horizonte e tamanho de bloco, casos em que o erro-padrão
+corrigido não é definido. Nesses casos, a inferência se apoia no erro-padrão
+HAC e no teste conjunto, que não usa $\lambda_h$.
+
+O teste conjunto é um teste de significância conjunta de Wald, cuja
+estatística dividida pelo número de restrições é a estatística $F$. Ele testa
+$\beta_h = 0$ nos seis horizontes com a covariância dos $\beta^*$ do bootstrap
+(Tabela~\ref{tab:retnl-conjunto}). Para a forma principal, $\chi^2(6) = 1{,}45$
+e $p = 0{,}96$, e o resultado se repete com blocos de 30 e de 90 dias
+($p = 0{,}95$ e $0{,}96$), com o max-$|t|$ ($p = 0{,}79$) e com o HAC das seis
+regressões empilhadas ($p = 0{,}93$). Ao contrário do Ridge direto, para o qual
+os testes que ignoram a estimação do BVRP previsto rejeitam
+(Seção~\ref{sec:apb2-antigo-resultados}), nenhum teste rejeita com a floresta,
+nas duas formas.
+
+\input{tables/retornos_nao_linear/tab_conjunto}
+
+% =========================================================
+\subsection{Testes de robustez com a floresta}
+\label{sec:apb2-antigo-retnl-robustez}
+
+A Tabela~\ref{tab:retnl-robustez} repete a regressão com o BVRP previsto pelos
+outros três regressores. Com a floresta na forma direta, o coeficiente é
+negativo em todos os horizontes, como na Seção~\ref{sec:apb2-antigo-resultados},
+mas nenhum é significante (valores-$p$ HAC entre 0,15 e 0,61). Com o Ridge na
+forma $\hat f(X_t) - \text{IV}_t$, os valores-$p$ HAC ficam entre 0,12 e 0,90.
+O Ridge direto reproduz a Seção~\ref{sec:apb2-antigo-resultados}. O teste conjunto
+não rejeita com nenhum dos três quando a estimação do BVRP previsto é
+considerada ($p$ entre 0,37 e 0,98).
+
+\input{tables/retornos_nao_linear/tab_robustez}
+
+% =========================================================
+\subsection{Regime de volatilidade com a floresta}
+\label{sec:apb2-antigo-retnl-regime}
+
+A versão anterior também aplicava o teste de significância conjunta por horizonte, com a
+variável indicadora do regime de alta volatilidade e sua interação com o BVRP
+previsto, como na equação~\eqref{eq:met-retorno-regime}
+(Tabela~\ref{tab:retnl-regime}). Para a forma principal, o teste dos três
+coeficientes tem valores-$p$ entre 0,36 e 0,89 com o corte fixo e entre 0,42
+e 0,73 com o corte expansivo. Nos quatro regressores, só 3 das 48
+combinações de regressor, corte e horizonte ficam abaixo do limite de
+Bonferroni, sem padrão: o Ridge direto em $h = 60$, com os dois cortes, e a
+floresta direta em $h = 20$, só com o corte expansivo. A diferença entre os
+regimes continua sugestiva e frágil, como na
+Seção~\ref{sec:apb2-antigo-regime}, e esses valores-$p$ são do HAC, que
+ignora a estimação do BVRP previsto.
+
+\input{tables/retornos_nao_linear/tab_regime}
+
+% =========================================================
+\subsection{Floresta direto no retorno simples}
+\label{sec:apb2-antigo-retnl-arvore-retorno}
+
+Uma alternativa às duas etapas é a floresta aplicada direto ao retorno,
+$R_{t+h} = g_h(X_t) + \varepsilon_{t+h}$, com uma floresta por horizonte e as
+mesmas variáveis e origens, que escolhe as quebras sem passar pelo BVRP
+(Tabela~\ref{tab:retnl-arvore-retorno}). O $R^2_{\text{fora}}$ contra a média
+histórica do retorno fica entre $-0{,}358$ e $0{,}021$, e nenhum horizonte é
+significante no Clark--West (valores-$p$ entre 0,11 e 0,94). Em $h = 60$, a
+floresta erra mais que a média histórica (Diebold--Mariano, $p = 0{,}014$). O
+$R^2$ dentro da amostra cresce com o horizonte, de 0,02 a 0,39, enquanto o de
+fora fica negativo: com alvos de $h$ dias sobrepostos, a floresta se ajusta ao
+ruído dos horizontes longos.
+
+\input{tables/retornos_nao_linear/tab_arvore_retorno}
