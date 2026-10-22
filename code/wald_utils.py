@@ -22,9 +22,13 @@ inclinações testadas; W = nan se Z'Z ou V for singular.
   postos(W0, Wk)                                 p de cada elemento no conjunto {W0} ∪ {Wk}
   min_p(Wobs, Wk)                                min_h p_h com o mesmo k em todos os h
   holm(p)                                        p ajustados de Holm
+  hac_wald_lin(y, Z, Ls, Rs, ZZi=None, b0=None)  W de H0: R b = R b0 (ou 0), restrições lineares
+  rotacoes_freedman_lane_lin(y, Z, Ls, R, ks)    Freedman–Lane com restrito Z·N, N = base do núcleo de R
+  bootstrap_pares_lin(y, Z, Ls, Rs, bloco, B, chave)  W* das restrições R, mesmas sementes de bootstrap_pares
 """
 import numpy as np
 from joblib import Parallel, delayed
+from scipy.linalg import null_space
 
 SEMENTE = 20261020
 N_PEDACOS = 32                   # nº fixo de pedaços paralelos: o resultado não depende do nº de núcleos
@@ -193,3 +197,60 @@ def holm(p):
     out = np.empty(m)
     out[o] = adj
     return out
+
+
+# ---------------------------------------------------------------------------
+# Restrições lineares (H0: R b = 0)
+# ---------------------------------------------------------------------------
+def _matriz(R):
+    return np.atleast_2d(np.asarray(R, float))
+
+
+def hac_wald_lin(y, Z, Ls, Rs, ZZi=None, b0=None):
+    """
+    W de H0: R (b − b0) = 0 (b0 = 0 se None) para cada matriz R de Rs (dict nome -> R, q × k) e cada L:
+    W = d' (R V R')⁻¹ d, d = R (b − b0). Com R que seleciona colunas, é igual a hac_wald_sub.
+    Retorna (len(Rs) × L, b).
+    """
+    if ZZi is None:
+        ZZi = inv_ou_none(Z)
+        if ZZi is None:
+            return np.full((len(Rs), len(Ls)), np.nan), None
+    b, Vs = _hac(y, Z, Ls, ZZi)
+    d = b - (0.0 if b0 is None else b0)
+    W = np.array([[_forma(R @ d, R @ V @ R.T) for V in Vs] for R in map(_matriz, Rs.values())])
+    return W, b
+
+
+def _rot_fl_lin(ajustado, resid, Z, ZZi, Ls, R, ks):
+    return np.array([hac_wald_lin(ajustado + np.roll(resid, k), Z, Ls, {"h": R}, ZZi)[0][0] for k in ks])
+
+
+def rotacoes_freedman_lane_lin(y, Z, Ls, R, ks, ZZi=None, n_jobs=-1):
+    """
+    Freedman–Lane para H0: R b = 0, restrição linear homogênea: o modelo restrito é Z·N, com N uma base
+    do núcleo de R (b = N c). y* = ajustado restrito + roll(resíduo restrito, k); W da restrição na
+    regressão completa. Com R que seleciona colunas, é igual a rotacoes_freedman_lane. K × L.
+    """
+    ZZi = np.linalg.inv(Z.T @ Z) if ZZi is None else ZZi
+    R = _matriz(R)
+    Zr = Z @ null_space(R)
+    ajustado = Zr @ np.linalg.lstsq(Zr, y, rcond=None)[0]
+    resid = y - ajustado
+    return np.concatenate(Parallel(n_jobs=n_jobs)(delayed(_rot_fl_lin)(ajustado, resid, Z, ZZi, Ls, R, p)
+                                                  for p in _pedacos(ks)))
+
+
+def _boot_lin(y, Z, Ls, Rs, bloco, b_hat, reps, semente):
+    rng = np.random.default_rng(semente)
+    return np.array([hac_wald_lin(y[j], Z[j], Ls, Rs, b0=b_hat)[0]
+                     for j in (idx_circ(len(y), bloco, rng) for _ in range(reps))])
+
+
+def bootstrap_pares_lin(y, Z, Ls, Rs, bloco, B, chave, semente=SEMENTE, n_jobs=-1):
+    """W (len(Rs) × L) e W* (B × len(Rs) × L) de pares (Z, y) em blocos circulares, centrado em β̂.
+    Mesmas sementes e pedaços de bootstrap_pares: os índices sorteados não dependem de Rs."""
+    W, b_hat = hac_wald_lin(y, Z, Ls, Rs)
+    res = Parallel(n_jobs=n_jobs)(delayed(_boot_lin)(y, Z, Ls, Rs, bloco, b_hat, reps, [semente, *chave, k])
+                                  for k, reps in enumerate(dividir(B)))
+    return W, np.concatenate(res)

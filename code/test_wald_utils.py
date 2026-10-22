@@ -14,6 +14,10 @@ Confere:
   5. Freedman–Lane com idx = todas as inclinações = rotação de y (mesmos W).
   6. p_mc ignora não finitos; postos dá o p_mc do observado e trata empates; min_p num
      exemplo calculado à mão; holm = statsmodels.multipletests(method = "holm").
+  7. Restrições lineares: hac_wald_lin com R de seleção = hac_wald_sub; β + γ = 0 = t² do
+     statsmodels (t_test); Freedman–Lane linear com R de seleção = rotacoes_freedman_lane e, em
+     β + γ = 0, = o modelo restrito reparametrizado à mão; bootstrap_pares_lin com R de todas as
+     inclinações = bootstrap_pares (mesmos W*).
 
 Uso:  python code/test_wald_utils.py   (sai com código 1 se algo falhar)
 """
@@ -132,6 +136,35 @@ p, T, pobs = wu.min_p(Wobs, Wk)
 check(T == 0.25 and np.allclose(pobs, [0.25, 1.0]) and p == 0.5, "min_p: p = (1 + 1)/(3 + 1)")
 for pv in ([0.01, 0.04, 0.03, 0.2, 0.5, 0.04], [0.3, 0.3, 0.3], [0.001, 0.9, 0.02, 0.011, 0.049, 0.7]):
     check(np.allclose(wu.holm(pv), multipletests(pv, method="holm")[1], rtol=0, atol=1e-15), f"holm {pv}")
+
+print("7) Restrições lineares")
+R_gama = np.array([[0, 0, 0, 1.0]])
+R_soma = np.array([[0, 1.0, 0, 1.0]])
+R_todas = np.eye(4)[1:]
+Wl, bl = wu.hac_wald_lin(rs, Zr, (31, 61), {"g": R_gama, "c": np.eye(4)[[2, 3]], "t": R_todas})
+Ws, _ = wu.hac_wald_sub(rs, Zr, (31, 61), {"g": [3], "c": [2, 3], "t": [1, 2, 3]})
+check(np.allclose(Wl, Ws, rtol=1e-12, atol=0), "R de seleção = hac_wald_sub (γ; δ e γ; todas)")
+Xr = pd.DataFrame({"b": ridge.to_numpy(float), "D": D, "DB": D * ridge.to_numpy(float)}, index=d987.index)
+res_r = sensibilidade_defasagens(pd.Series(rs, index=d987.index), Xr, lags=[31])[31]
+tt = res_r.t_test("b + DB = 0")
+Wsoma, _ = wu.hac_wald_lin(rs, Zr, (31,), {"s": R_soma})
+check(rel(Wsoma[0, 0], float(np.squeeze(tt.tvalue)) ** 2) < 1e-8, f"β + γ = 0: W = t² do statsmodels ({Wsoma[0, 0]:.6f})")
+check(abs(bl[1] + bl[3] - float(np.squeeze(tt.effect))) < 1e-10, "β̂ + γ̂ = efeito do t_test")
+ks = np.arange(90, 300)
+check(np.allclose(wu.rotacoes_freedman_lane_lin(y987, Z1, (31,), [[0, 1.0]], ks),
+                  wu.rotacoes_freedman_lane(y987, Z1, (31,), [1], ks), rtol=1e-9, atol=0),
+      "Freedman–Lane linear com R de seleção = rotacoes_freedman_lane")
+yr = d987.R_log.to_numpy(float)
+Zrest = np.column_stack([np.ones(len(D)), ridge.to_numpy(float) * (1 - D), D])      # β + γ = 0 reparametrizado
+aj = Zrest @ np.linalg.lstsq(Zrest, yr, rcond=None)[0]
+ZZi_r = np.linalg.inv(Zr.T @ Zr)
+manual = np.array([wu.hac_wald_lin(aj + np.roll(yr - aj, k), Zr, (31,), {"s": R_soma}, ZZi_r)[0][0] for k in ks])
+check(np.allclose(wu.rotacoes_freedman_lane_lin(yr, Zr, (31,), R_soma, ks), manual, rtol=1e-9, atol=0),
+      "Freedman–Lane em β + γ = 0 = modelo restrito reparametrizado à mão")
+W1, Wb1 = wu.bootstrap_pares(yr, Zr, (31,), 60, 199, [9, 9])
+W2, Wb2 = wu.bootstrap_pares_lin(yr, Zr, (31,), {"t": R_todas}, 60, 199, [9, 9])
+check(np.allclose(W1, W2[0], rtol=1e-12, atol=0) and np.allclose(Wb1, Wb2[:, 0, :], rtol=1e-12, atol=0, equal_nan=True),
+      "bootstrap_pares_lin com R de todas as inclinações = bootstrap_pares (mesmos W*)")
 
 print(f"\n{'Tudo OK' if not falhas else f'{len(falhas)} FALHA(S)'}")
 sys.exit(1 if falhas else 0)
