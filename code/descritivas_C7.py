@@ -4,8 +4,9 @@ descritivas_C7.py — descritivas do Cap. 7 (Fase 2, C7.2 e C7.3)
 Duas análises na amostra de modelagem (data/ml_dataset_T4.csv, N = 1.776),
 sem reestimar nenhum modelo:
 
-1. Retorno futuro médio por regime (C7.2), h = 1, 5, 10, 20, 30, 60.
-   Diferença entre regimes por MQO de ret_fut_h numa dummy, EP de Newey–West
+1. Log-retorno futuro médio por regime (C7.2), h = 1, 5, 10, 20, 30, 60:
+   R_log = 100 · log1p(ret_fut_h), em % (ret_fut_h é o retorno simples).
+   Diferença entre regimes por MQO de R_log numa dummy, EP de Newey–West
    com h+1 defasagens (hac_utils).
    (i)  principal: regime de alta pelo corte fixo de 37,3% a.a.
         (regime_alta_fixo de data/regimes_T9.csv);
@@ -67,7 +68,7 @@ def quartil_expansivo(vh):
 def diferenca_por_regime(df, dummy, definicao):
     linhas = []
     for h in HORIZONTES:
-        y = df[f"ret_fut_{h}d"] * 100  # % de retorno simples
+        y = np.log1p(df[f"ret_fut_{h}d"]) * 100  # log-retorno de t a t+h, em %
         d = df[dummy]
         res = mqo_newey_west(y, d, h=h)
         g0, g1 = y[d == 0], y[d == 1]

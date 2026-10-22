@@ -59,7 +59,7 @@ NOME_FIG = {"floresta_rv_menos_iv": r"Floresta, $\hat f(X_t)-\mathrm{IV}_t$ (pri
             "Ridge_direto": "Ridge, direta"}
 FORMA_FIG = {"rv_menos_iv": r"Floresta, $\hat f(X_t)-\mathrm{IV}_t$", "direta": "Floresta, direta"}
 MODELOS_PREV = [("Ridge_direto", "Ridge, direta"), ("floresta_direta", "Floresta, direta"),
-                ("floresta_rv_menos_iv", r"Floresta, $\hat f(X_t) - \text{IV}_t$ (principal)"),
+                ("floresta_rv_menos_iv", r"Floresta, $\hat f(X_t) - \text{IV}_t$"),
                 ("floresta_rv_menos_iv_com_regime", r"Floresta, $\hat f(X_t) - \text{IV}_t$, com $D_t$"),
                 ("Ridge_rv_menos_iv", r"Ridge, $\hat f(X_t) - \text{IV}_t$"),
                 ("media_rv_menos_iv", r"Média histórica da VH $-\ \text{IV}_t$")]
@@ -319,7 +319,7 @@ def main():
                           rf"{fmt(r.diferenca_alta_menos_baixa, 2)} & {fmt_p(r.p_hac)} \\")
         if defin == "corte_fixo_37_3":
             linhas.append(r"\addlinespace")
-    nota = (r"Retorno simples médio de $t$ a $t+h$, em \%. Diferença: regime de alta (ou volatilidade extrema) "
+    nota = (r"Log-retorno médio de $t$ a $t+h$, $R^{\log}_{t,h}$, em \%. Diferença: regime de alta (ou volatilidade extrema) "
             r"menos o outro grupo, estimada pela regressão do retorno numa indicadora do regime, com HAC de $h+1$ "
             r"defasagens. Corte fixo: amostra de modelagem, 23/04/2021 a 03/03/2026. Quartil superior: "
             r"$\text{VH}_{t-29:t}$ acima do terceiro quartil da própria série com dados até $t$, a partir de "
