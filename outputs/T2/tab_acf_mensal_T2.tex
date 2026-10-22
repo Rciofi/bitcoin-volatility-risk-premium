@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Autocorrelação do prêmio e de seus insumos: série diária e série mensal sem sobreposição.}
+\label{tab:dados-acf-mensal}
+\begin{tabular}{lrrrrr}
+\toprule
+ & \multicolumn{2}{c}{Diária} & \multicolumn{3}{c}{Mensal, 1ª ordem} \\ \cmidrule(lr){2-3}\cmidrule(lr){4-6}
+Série & $\rho_1$ & $\rho_{30}$ & Mediana & Mín. & Máx. \\
+\midrule
+RBVRP & 0,96 & $-$0,11 & $-$0,11 & $-$0,20 & $-$0,03 \\
+HBVRP & 0,94 & 0,02 & 0,00 & $-$0,11 & 0,28 \\
+$\text{RV}_{t+1:t+30}$ & 0,99 & 0,38 & 0,39 & 0,31 & 0,46 \\
+$\text{VH}_{t-29:t}$ & 0,99 & 0,39 & 0,40 & 0,32 & 0,47 \\
+IV & 0,98 & 0,80 & 0,82 & 0,70 & 0,88 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Diária: autocorrelação da série diária (1.806 datas, de 24/03/2021 a 03/03/2026) nas defasagens de 1 e 30 dias. Mensal: autocorrelação de primeira ordem da série com uma data a cada 30 dias, em que as janelas de 30 dias de datas consecutivas não se sobrepõem, em cada um dos 30 pontos de partida ($N$ = 60 ou 61); mediana, mínimo e máximo entre os pontos de partida. Erro-padrão aproximado da autocorrelação mensal: $1/\sqrt{N} \approx 0,13$.}
+\end{table}

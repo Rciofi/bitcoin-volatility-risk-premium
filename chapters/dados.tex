@@ -63,16 +63,23 @@ Os testes formais de estacionariedade confirmam que o preço de fechamento do Bi
   \input{tables/dados/adf_kpss_table.tex}
 }{}
 
-A persistência aparece diretamente nas autocorrelações. A autocorrelação de
-primeira ordem é de $0{,}96$ no RBVRP e de $0{,}94$ no HBVRP; na defasagem de
-30 dias, ela cai para $-0{,}11$ e $0{,}02$, respectivamente. Os insumos do
-prêmio são bem mais persistentes: na mesma defasagem, a autocorrelação é de
-$0{,}38$ na volatilidade realizada, de $0{,}39$ na histórica e de $0{,}80$ na
-volatilidade implícita. A diferença entre a volatilidade realizada e a implícita
-cancela, portanto, boa parte do componente persistente comum às duas séries,
-como antecipado na Seção~\ref{sec:refer-vrp-teorico}. No RBVRP, a
-autocorrelação elevada nas primeiras defasagens é em parte mecânica: alvos de
-datas vizinhas compartilham retornos da mesma janela.
+A persistência do prêmio depende da frequência em que é medida. Na série
+diária, a autocorrelação de primeira ordem é de $0{,}96$ no RBVRP e de $0{,}94$
+no HBVRP, alta em parte porque as volatilidades de datas vizinhas compartilham
+29 dos 30 retornos diários. A Tabela~\ref{tab:dados-acf-mensal} elimina essa
+sobreposição: com uma data a cada 30 dias, há 30 pontos de partida possíveis,
+cada um com 60 ou 61 observações. Nessa série mensal, a autocorrelação de
+primeira ordem (mediana entre os pontos de partida) é de $-0{,}11$ no RBVRP e
+de cerca de zero no HBVRP, dentro de um erro-padrão aproximado
+($1/\sqrt{N} \approx 0{,}13$) de zero, contra cerca de $0{,}40$ na volatilidade
+realizada e na histórica e $0{,}82$ na volatilidade implícita. A diferença
+entre a volatilidade realizada, ou a histórica, e a implícita cancela,
+portanto, boa parte do componente persistente comum às duas séries, como
+antecipado na Seção~\ref{sec:refer-vrp-teorico}.
+
+\IfFileExists{tables/dados/acf_mensal.tex}{
+  \input{tables/dados/acf_mensal.tex}
+}{}
 
 % =========================================================
 \section{Existência do prêmio}
