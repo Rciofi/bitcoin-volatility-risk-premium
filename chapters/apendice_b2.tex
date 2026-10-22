@@ -4,7 +4,8 @@
 Este apêndice complementa os Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}: traz as simulações de tamanho e poder dos
 testes, a regressão com o regime de volatilidade, a correlação entre o erro de
-previsão do RBVRP e a inovação do retorno e, provisoriamente, os resultados da
+previsão do RBVRP e a inovação do retorno, a comparação da floresta com o
+retorno simples e com o log-retorno e, provisoriamente, os resultados da
 versão anterior dos Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}.
 
@@ -47,6 +48,33 @@ Tabela~\ref{tab:apb2-corr-e-u} mede essa correlação nas 987 datas fora da
 amostra.
 
 \input{tables/apendice_b2/tab_corr_e_u}
+
+% =========================================================
+\section{Ponte com o retorno simples}
+\label{sec:apb2-ponte}
+
+A versão anterior do Capítulo~\ref{chap:retornos_nao_linear} aplicava a
+floresta ao retorno simples de $h$ dias. A
+Tabela~\ref{tab:apb2-ponte-retorno} compara as duas versões, com o mesmo
+protocolo e só o alvo trocado. Em $h = 60$, o valor-$p$ de 0,014 do
+Diebold--Mariano com o retorno simples não indicava previsibilidade: a
+floresta errava mais que a média histórica, com $R^2_{\text{fora}}$ de
+$-0{,}358$. A perda se espalha por 168 datas, e não por poucas observações
+isoladas: são elas que respondem por metade da soma dos erros quadráticos da
+floresta, entre as 987, e nas maiores altas de 60 dias, de 63\% a 75\% em
+janeiro de 2024, a floresta erra menos que a média. Com o retorno realizado
+winsorizado a 1\% e 99\%, o resultado não muda ($R^2_{\text{fora}}$ de
+$-0{,}362$; $p = 0{,}014$). A diferença vem do alvo, por meio dos
+hiperparâmetros escolhidos pela validação cruzada. Com o retorno simples,
+mais assimétrico, a validação cruzada escolhe em $h = 60$ árvores mais
+profundas, sem limite de profundidade em 7 das 33 origens, contra nenhuma com
+o log-retorno, e o $R^2$ dentro da amostra, em média nas 33 origens, chega a
+0,39, contra 0,18. A previsão da floresta treinada no log-retorno, convertida
+por $\exp(\cdot) - 1$, tem $R^2_{\text{fora}}$ de $-0{,}113$ contra a média
+histórica do retorno simples e $p = 0{,}19$ no Diebold--Mariano, perto do
+resultado com o log-retorno ($-0{,}110$; $p = 0{,}40$).
+
+\input{tables/apendice_b2/tab_ponte_retorno_simples}
 
 % =========================================================
 \section{Resultados originais com retorno simples (provisória)}

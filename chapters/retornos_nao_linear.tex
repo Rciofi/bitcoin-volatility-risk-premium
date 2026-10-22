@@ -80,7 +80,13 @@ elas: em $h = 60$, as 987 datas contêm só cerca de 16 períodos sem
 sobreposição. O placebo não indica vazamento entre treino e teste: seu
 $R^2_{\text{fora}}$ mediano fica entre $-0{,}004$ e $0{,}006$, e o maior das
 dez permutações, entre 0,002 e 0,015. Como no modelo linear, nenhum método
-supera a média histórica fora da amostra.
+supera a média histórica fora da amostra. Com o retorno simples, a versão
+anterior desta análise encontrava em $h = 60$ um Diebold--Mariano
+significante ($p = 0{,}014$), mas porque a floresta errava mais que a média
+histórica ($R^2_{\text{fora}}$ de $-0{,}358$). A Seção~\ref{sec:apb2-ponte}
+mostra que a diferença vem do treino da floresta no retorno simples, com os
+hiperparâmetros escolhidos pela validação cruzada, e não de poucas datas
+extremas.
 
 % =========================================================
 \section{Análises complementares}

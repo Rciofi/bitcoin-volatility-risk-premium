@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Floresta direto no retorno: retorno simples e log-retorno.}
+\label{tab:apb2-ponte-retorno}
+\begin{tabular}{rrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{Retorno simples} & \multicolumn{3}{c}{Log-retorno} \\ \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+$h$ & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM \\
+\midrule
+\multicolumn{7}{l}{\textit{Painel A: floresta treinada em cada retorno, contra a média histórica do mesmo retorno}} \\
+1 & 0{,}0008 & 0{,}133 & 0{,}850 & 0{,}0000 & 0{,}183 & 0{,}992 \\
+5 & $-$0{,}0006 & 0{,}186 & 0{,}964 & 0{,}0050 & 0{,}116 & 0{,}757 \\
+10 & 0{,}0001 & 0{,}196 & 0{,}997 & 0{,}0103 & 0{,}122 & 0{,}747 \\
+20 & 0{,}0207 & 0{,}108 & 0{,}758 & 0{,}0355 & 0{,}050 & 0{,}587 \\
+30 & $-$0{,}0754 & 0{,}197 & 0{,}549 & $-$0{,}0290 & 0{,}103 & 0{,}813 \\
+60 & $-$0{,}3580 & 0{,}935 & 0{,}014 & $-$0{,}1097 & 0{,}443 & 0{,}399 \\
+\midrule
+\multicolumn{7}{l}{\textit{Painel B: $h = 60$, avaliação no retorno simples}} \\
+\multicolumn{4}{l}{Previsão $\times$ referência} & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM \\
+\multicolumn{4}{l}{Floresta no retorno simples $\times$ média do simples} & $-$0{,}358 & 0{,}935 & 0{,}014 \\
+\multicolumn{4}{l}{$\exp(\text{previsão log}) - 1$ $\times$ média do simples} & $-$0{,}113 & 0{,}704 & 0{,}191 \\
+\multicolumn{4}{l}{$\exp(\text{previsão log}) - 1$ $\times$ $\exp(\text{média do log}) - 1$} & $-$0{,}056 & 0{,}304 & 0{,}642 \\
+\multicolumn{4}{l}{Floresta no log-retorno $\times$ média do log (painel A)} & $-$0{,}110 & 0{,}443 & 0{,}399 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Floresta aleatória direto no retorno de $h$ dias, nas 987 datas fora da amostra, com o mesmo protocolo nos dois retornos (17 variáveis, mesma grade, 500 árvores, validação cruzada de cinco dobras com embargo $h$, 33 origens, mesma semente); só o alvo muda. Retorno simples: as previsões da versão anterior do Capítulo~\ref{chap:retornos_nao_linear} (Tabela~\ref{tab:retnl-arvore-retorno}); log-retorno: Tabela~\ref{tab:retnl-oos-floresta}. CW unilateral e DM bilateral contra a média histórica, com HAC de $h+1$ defasagens. Painel B: a previsão do log-retorno convertida para retorno simples. Com o realizado winsorizado a 1\% e 99\% e as previsões inalteradas, o $R^2_{\text{fora}}$ em $h = 60$ fica em $-$0{,}362 ($p$ DM 0{,}014). Em $h = 60$, metade da soma dos erros quadráticos da floresta vem de 168 das 987 datas e 80\%, de 363 no retorno simples (168 e 335 no log-retorno). Maiores retornos simples de 60 dias: 25/01/2024, 74{,}9\%; 14/01/2024, 71{,}1\%; 13/01/2024, 70{,}5\%; 28/01/2024, 68{,}4\%; 24/01/2024, 67{,}7\%. Em $h = 60$, a validação cruzada escolhe árvores de profundidade 1 em 18 das 33 origens com o retorno simples e em 31 com o log-retorno, e árvores sem limite de profundidade em 7 e 0; o $R^2$ dentro da amostra, em média nas 33 origens, é 0{,}390 e 0{,}176.}
+\end{table}

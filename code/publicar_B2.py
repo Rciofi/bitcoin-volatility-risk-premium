@@ -10,6 +10,7 @@ Lê as cópias das saídas agregadas dos diagnósticos do B2 em outputs/B2/ e gr
   tables/apendice_b2/tab_tamanho_poder.tex         tamanho e poder por simulação (apêndice)
   tables/apendice_b2/tab_regime.tex                regime de volatilidade, com α, β, δ, γ e β + γ (apêndice)
   tables/apendice_b2/tab_corr_e_u.tex              corr(erro de previsão do RBVRP, inovação do retorno)
+  tables/apendice_b2/tab_ponte_retorno_simples.tex floresta direto no retorno: simples × log (passo 6)
 Não toca nos .tex dos capítulos nem nas tabelas do publicar_cap6.py e do publicar_cap7.py.
 
 Conferência (sai com erro na primeira falha):
@@ -24,7 +25,9 @@ Conferência (sai com erro na primeira falha):
      sensibilidade_g* = o da variante; p da χ² do regime = chi2.sf(W, gl); corr(e, u) do
      passo 2 = a do passo 1; IC HAC = corr ± 1,96·EP; rejeições em [0, 1]; placebo da
      floresta com mediana <= 0,01; componentes e regime do passo 5: p da χ² = chi2.sf(W, gl), Holm
-     refeito e W de cada restrição de uma linha = (estimativa/EP)² dos coeficientes. Tolerância de 1e-9.
+     refeito e W de cada restrição de uma linha = (estimativa/EP)² dos coeficientes; ponte do passo 6:
+     conferência do passo 6 toda verdadeira, linhas do log-retorno = floresta_retorno_metricas,
+     n_50pct <= n_80pct <= n_datas e log-retorno = 100·log1p(retorno simples/100). Tolerância de 1e-9.
 Cada número impresso vem dos DataFrames já conferidos.
 
 Uso:  python code/publicar_B2.py [--raiz DIR] [--b2 DIR]
@@ -213,8 +216,19 @@ def conferir_coerencia(d):
         for hip, (est, ep) in pares.items():
             x = m[m.hipotese == hip]
             checar(len(x) > 0 and np.allclose(x.W, (x[est] / x[ep]) ** 2, rtol=TOL, atol=0), f"{nome_t}: W de {hip} = (est/EP)²")
-    print("Coerência interna: χ², F, Holm, um fator, min-p, regime, corr(e, u), tamanho, placebo, componentes e "
-          "regime do passo 5 conferidos.")
+    # ponte do passo 6
+    checar(d["conferencia_passo6"].bate.all(), "passo 6: conferência")
+    pl = d["ponte_dois_retornos"].query("retorno == 'log'").set_index("h").loc[HS]
+    fm = d["floresta_retorno_metricas"].set_index("h").loc[HS]
+    for a, b in (("r2_fora", "r2_oos_vs_media"), ("p_cw", "cw_p_unilateral"), ("p_dm", "dm_p_bilateral")):
+        checar(np.isclose(pl[a], fm[b], rtol=0, atol=TOL), f"ponte: {a} do log ≠ floresta_retorno_metricas")
+    cc = d["ponte_concentracao_h60"].dropna(subset=["n_50pct"])
+    checar((cc.n_50pct <= cc.n_80pct) & (cc.n_80pct <= cc.n_datas), "ponte: concentração")
+    mr = d["ponte_maiores_retornos_h60"]
+    checar(np.isclose(mr.log_retorno_pct, 100 * np.log1p(mr.retorno_simples_pct / 100), rtol=0, atol=TOL),
+           "ponte: log-retorno ≠ log1p do simples")
+    print("Coerência interna: χ², F, Holm, um fator, min-p, regime, corr(e, u), tamanho, placebo, componentes, "
+          "regime do passo 5 e ponte do passo 6 conferidos.")
 
 
 # ---------------------------------------------------------------------------
@@ -554,6 +568,56 @@ def tab_corr_e_u(d, raiz):
                   "tab:apb2-corr-e-u", "lrrrccc", cab, linhas, nota, tamanho=r"\footnotesize"))
 
 
+def tab_ponte(d, raiz):
+    a = d["ponte_dois_retornos"].set_index(["h", "retorno"])
+    cv = d["ponte_conversao"].query("h == 60").set_index("variante")
+    cc = d["ponte_concentracao_h60"].set_index(["retorno", "perda"])
+    mr = d["ponte_maiores_retornos_h60"].query("amostra == 'fora_da_amostra_987'").head(5)
+    hp = d["ponte_hiperparametros"].query("h == 60").set_index("retorno")
+    linhas = [r"\multicolumn{7}{l}{\textit{Painel A: floresta treinada em cada retorno, contra a média histórica do mesmo retorno}} \\"]
+    for hh in HS:
+        s, l_ = a.loc[(hh, "simples")], a.loc[(hh, "log")]
+        linhas.append(rf"{hh} & {fmt(s.r2_fora, 4)} & {fmt_p(s.p_cw)} & {fmt_p(s.p_dm)} & "
+                      rf"{fmt(l_.r2_fora, 4)} & {fmt_p(l_.p_cw)} & {fmt_p(l_.p_dm)} \\")
+    linhas += [r"\midrule", r"\multicolumn{7}{l}{\textit{Painel B: $h = 60$, avaliação no retorno simples}} \\",
+               r"\multicolumn{4}{l}{Previsão $\times$ referência} & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM \\"]
+    s60, l60 = a.loc[(60, "simples")], a.loc[(60, "log")]
+    for rot, r in ((r"Floresta no retorno simples $\times$ média do simples", s60),
+                   (r"$\exp(\text{previsão log}) - 1$ $\times$ média do simples", cv.loc["expm1_log_vs_media_simples"]),
+                   (r"$\exp(\text{previsão log}) - 1$ $\times$ $\exp(\text{média do log}) - 1$",
+                    cv.loc["expm1_log_vs_expm1_media_log"])):
+        linhas.append(rf"\multicolumn{{4}}{{l}}{{{rot}}} & {fmt(r.r2_fora, 3)} & {fmt_p(r.p_cw)} & {fmt_p(r.p_dm)} \\")
+    linhas.append(rf"\multicolumn{{4}}{{l}}{{Floresta no log-retorno $\times$ média do log (painel A)}} & "
+                  rf"{fmt(l60.r2_fora, 3)} & {fmt_p(l60.p_cw)} & {fmt_p(l60.p_dm)} \\")
+    w = cv.loc["winsor_1_99"]
+    datas = "; ".join(rf"{r.date[8:10]}/{r.date[5:7]}/{r.date[:4]}, {fmt(r.retorno_simples_pct, 1)}\%" for r in mr.itertuples())
+    n = lambda ret, perda, c: int(cc.loc[(ret, perda), c])  # noqa: E731
+    cab = (r" & \multicolumn{3}{c}{Retorno simples} & \multicolumn{3}{c}{Log-retorno} \\ "
+           r"\cmidrule(lr){2-4}\cmidrule(lr){5-7}" "\n"
+           r"$h$ & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM")
+    nota = (r"Floresta aleatória direto no retorno de $h$ dias, nas 987 datas fora da amostra, com o mesmo "
+            r"protocolo nos dois retornos (17 variáveis, mesma grade, 500 árvores, validação cruzada de cinco dobras "
+            r"com embargo $h$, 33 origens, mesma semente); só o alvo muda. Retorno simples: as previsões da versão "
+            r"anterior do Capítulo~\ref{chap:retornos_nao_linear} (Tabela~\ref{tab:retnl-arvore-retorno}); "
+            r"log-retorno: Tabela~\ref{tab:retnl-oos-floresta}. CW unilateral e DM bilateral contra a média "
+            r"histórica, com HAC de $h+1$ defasagens. Painel B: a previsão do "
+            r"log-retorno convertida para retorno simples. Com o realizado winsorizado a 1\% e 99\% e as "
+            rf"previsões inalteradas, o $R^2_{{\text{{fora}}}}$ em $h = 60$ fica em {fmt(w.r2_fora, 3)} ($p$ DM "
+            rf"{fmt_p(w.p_dm)}). Em $h = 60$, metade da soma dos erros quadráticos da floresta vem de "
+            rf"{n('simples', 'e2_floresta', 'n_50pct')} das 987 datas e 80\%, de "
+            rf"{n('simples', 'e2_floresta', 'n_80pct')} no retorno simples "
+            rf"({n('log', 'e2_floresta', 'n_50pct')} e {n('log', 'e2_floresta', 'n_80pct')} no log-retorno). "
+            rf"Maiores retornos simples de 60 dias: {datas}. Em $h = 60$, a validação cruzada escolhe árvores de "
+            rf"profundidade 1 em {int(hp.loc['simples', 'max_depth_1'])} das 33 origens com o retorno simples e em "
+            rf"{int(hp.loc['log', 'max_depth_1'])} com o log-retorno, e árvores sem limite de profundidade em "
+            rf"{int(hp.loc['simples', 'max_depth_None'])} e {int(hp.loc['log', 'max_depth_None'])}; o $R^2$ "
+            rf"dentro da amostra, em média nas 33 origens, é {fmt(hp.loc['simples', 'r2_dentro_media'], 3)} e "
+            rf"{fmt(hp.loc['log', 'r2_dentro_media'], 3)}.")
+    gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_ponte_retorno_simples.tex"),
+           tabela("Floresta direto no retorno: retorno simples e log-retorno.", "tab:apb2-ponte-retorno",
+                  "rrrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
+
+
 def main():
     global B2
     ap = argparse.ArgumentParser()
@@ -564,7 +628,7 @@ def main():
     d = carregar_e_conferir_procedencia()
     conferir_coerencia(d)
     for f in (tab_wald_direto, tab_um_fator, tab_oos_retorno, tab_oos_floresta, tab_componentes, tab_tamanho_poder,
-              tab_regime, tab_corr_e_u):
+              tab_regime, tab_corr_e_u, tab_ponte):
         f(d, args.raiz)
         print(f"  {f.__name__}: ok")
     print(f"Tabelas gravadas em {os.path.join(args.raiz, 'tables')}")
