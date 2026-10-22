@@ -1,0 +1,6 @@
+item,dif,tol,bate
+"h = 1, R_simples: previsao = T11 (máx. |dif|)",9.974659986866641e-17,1e-09,True
+"h = 1, R_simples: media_historica = T11 (máx. |dif|)",9.942133921692076e-17,1e-09,True
+"h = 1, R_simples: realizado = T11 (máx. |dif|)",0.0,1e-09,True
+h = 1: origens com parâmetros diferentes do T11,0.0,0.0,True
+h = 1: mse_cv = T11 (máx. |dif|),9.73613550891983e-17,1e-09,True

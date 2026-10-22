@@ -1,0 +1,41 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Retorno de $h$ dias sobre os 16 previsores: teste de Wald de significância conjunta, por horizonte.}
+\label{tab:retlin-wald-direto}
+\begin{tabular}{rrrrrrrr}
+\toprule
+ & & & & & \multicolumn{3}{c}{Holm} \\ \cmidrule(lr){6-8}
+$h$ & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\
+\midrule
+\multicolumn{8}{l}{\textit{Painel A: 1.776 datas, $L = h+1$}} \\
+1 & 22{,}67 & 0{,}123 & 0{,}201 & 0{,}167 & 0{,}584 & 1{,}000 & 0{,}999 \\
+5 & 20{,}22 & 0{,}210 & 0{,}516 & 0{,}453 & 0{,}631 & 1{,}000 & 1{,}000 \\
+10 & 25{,}52 & 0{,}061 & 0{,}305 & 0{,}263 & 0{,}367 & 1{,}000 & 1{,}000 \\
+20 & 22{,}89 & 0{,}117 & 0{,}394 & 0{,}467 & 0{,}584 & 1{,}000 & 1{,}000 \\
+30 & 20{,}01 & 0{,}220 & 0{,}422 & 0{,}608 & 0{,}631 & 1{,}000 & 1{,}000 \\
+60 & 18{,}91 & 0{,}273 & 0{,}529 & 0{,}599 & 0{,}631 & 1{,}000 & 1{,}000 \\
+\multicolumn{8}{l}{\textit{Entre horizontes (rotação, $g^* = 180$)}: mín.\ $p$ em $h = 1$, $p$ = 0{,}494; máx.\ $W$ em $h = 10$, $p$ = 0{,}551} \\
+\midrule
+\multicolumn{8}{l}{\textit{Painel B: 987 datas, $L = h+1$}} \\
+1 & 22{,}29 & 0{,}134 & 0{,}231 & 0{,}181 & 0{,}403 & 1{,}000 & 1{,}000 \\
+5 & 20{,}98 & 0{,}179 & 0{,}514 & 0{,}486 & 0{,}403 & 1{,}000 & 1{,}000 \\
+10 & 26{,}53 & 0{,}047 & 0{,}377 & 0{,}451 & 0{,}235 & 1{,}000 & 1{,}000 \\
+20 & 26{,}43 & 0{,}048 & 0{,}392 & 0{,}567 & 0{,}235 & 1{,}000 & 1{,}000 \\
+30 & 33{,}39 & 0{,}007 & 0{,}195 & 0{,}469 & 0{,}039 & 1{,}000 & 1{,}000 \\
+60 & 17{,}70 & 0{,}342 & 0{,}750 & 0{,}784 & 0{,}403 & 1{,}000 & 1{,}000 \\
+\multicolumn{8}{l}{\textit{Entre horizontes (rotação, $g^* = 180$)}: mín.\ $p$ em $h = 30$, $p$ = 0{,}518; máx.\ $W$ em $h = 30$, $p$ = 0{,}445} \\
+\midrule
+\multicolumn{8}{l}{\textit{Painel C: sensibilidade, $L = 2h+1$ (rotação e bootstrap)}} \\
+$h$ & \multicolumn{2}{c}{1.776 datas: rotação} & \multicolumn{2}{c}{bootstrap} & \multicolumn{2}{c}{987 datas: rotação} & bootstrap \\
+1 & \multicolumn{2}{c}{0{,}121} & \multicolumn{2}{c}{0{,}132} & \multicolumn{2}{c}{0{,}200} & 0{,}160 \\
+5 & \multicolumn{2}{c}{0{,}406} & \multicolumn{2}{c}{0{,}409} & \multicolumn{2}{c}{0{,}368} & 0{,}422 \\
+10 & \multicolumn{2}{c}{0{,}161} & \multicolumn{2}{c}{0{,}206} & \multicolumn{2}{c}{0{,}226} & 0{,}399 \\
+20 & \multicolumn{2}{c}{0{,}277} & \multicolumn{2}{c}{0{,}424} & \multicolumn{2}{c}{0{,}329} & 0{,}530 \\
+30 & \multicolumn{2}{c}{0{,}488} & \multicolumn{2}{c}{0{,}674} & \multicolumn{2}{c}{0{,}200} & 0{,}499 \\
+60 & \multicolumn{2}{c}{0{,}413} & \multicolumn{2}{c}{0{,}594} & \multicolumn{2}{c}{0{,}841} & 0{,}835 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R^{\log}_{t,h} = \alpha_h + X_t'\beta_h + \varepsilon_{t+h}$, com $R^{\log}_{t,h}$ o log-retorno de $t$ a $t+h$ em pontos percentuais e $X_t$ as 16 variáveis explicativas: as 17 do Capítulo~\ref{chap:previsao_bvrp} menos a VH de 30 dias, colinear com o HBVRP e a IV. $H_0$: as 16 inclinações são nulas. $W$: Wald com erro-padrão HAC de Newey--West (núcleo de Bartlett, $h+1$ defasagens, sem correção de amostra pequena); $p_{\chi^2}$ pela $\chi^2(16)$. Rotação: $W$ recalculado com $y$ deslocado circularmente em $k$ dias, $g_h \le k \le n - g_h$, $g_h = \max(90, 3h)$. Bootstrap: pares $(X_t, y_t)$ em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. Holm sobre os seis horizontes. Entre horizontes: mínimo dos valores-$p$ da rotação com o mesmo deslocamento em todos os $h$. Com $2h+1$ defasagens, o $p_{\chi^2}$ fica muito pequeno e não é confiável: nas simulações de tamanho (Apêndice), o teste $\chi^2$ rejeita muito acima do nível nominal; por isso o painel C traz só a rotação e o bootstrap.}
+\end{table}

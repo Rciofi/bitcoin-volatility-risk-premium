@@ -1,0 +1,30 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Retorno de $h$ dias, $\widehat{\text{BVRP}}$ do Ridge e regime de volatilidade.}
+\label{tab:apb2-regime}
+\begin{tabular}{lrrrrr}
+\toprule
+$H_0$ & gl & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\
+\midrule
+\multicolumn{6}{l}{\textit{Corte fixo, $h = 30$}: $\hat\beta$ = $-$2{,}70, $\hat\delta$ = 4{,}88, $\hat\gamma$ = 2{,}30; 68{,}6\% das datas no regime de alta} \\
+$\gamma = 0$ & 1 & 4{,}04 & 0{,}044 & 0{,}101 & 0{,}180 \\
+$\delta = \gamma = 0$ & 2 & 4{,}99 & 0{,}083 & 0{,}240 & 0{,}310 \\
+$\beta = \delta = \gamma = 0$ & 3 & 8{,}60 & 0{,}035 & 0{,}266 & 0{,}287 \\
+\multicolumn{6}{l}{\textit{Corte fixo, $h = 60$}: $\hat\beta$ = $-$4{,}60, $\hat\delta$ = 6{,}13, $\hat\gamma$ = 3{,}43; 68{,}6\% das datas no regime de alta} \\
+$\gamma = 0$ & 1 & 4{,}10 & 0{,}043 & 0{,}156 & 0{,}188 \\
+$\delta = \gamma = 0$ & 2 & 6{,}86 & 0{,}032 & 0{,}254 & 0{,}233 \\
+$\beta = \delta = \gamma = 0$ & 3 & 12{,}44 & 0{,}006 & 0{,}269 & 0{,}242 \\
+\multicolumn{6}{l}{\textit{Corte reestimado em cada origem, $h = 30$}: $\hat\beta$ = $-$1{,}88, $\hat\delta$ = 4{,}20, $\hat\gamma$ = 1{,}46; 74{,}9\% das datas no regime de alta} \\
+$\gamma = 0$ & 1 & 2{,}30 & 0{,}129 & 0{,}300 & 0{,}314 \\
+$\delta = \gamma = 0$ & 2 & 2{,}31 & 0{,}315 & 0{,}689 & 0{,}585 \\
+$\beta = \delta = \gamma = 0$ & 3 & 6{,}95 & 0{,}073 & 0{,}447 & 0{,}398 \\
+\multicolumn{6}{l}{\textit{Corte reestimado em cada origem, $h = 60$}: $\hat\beta$ = $-$3{,}90, $\hat\delta$ = 4{,}81, $\hat\gamma$ = 2{,}69; 74{,}9\% das datas no regime de alta} \\
+$\gamma = 0$ & 1 & 2{,}86 & 0{,}091 & 0{,}237 & 0{,}335 \\
+$\delta = \gamma = 0$ & 2 & 3{,}51 & 0{,}173 & 0{,}682 & 0{,}505 \\
+$\beta = \delta = \gamma = 0$ & 3 & 11{,}12 & 0{,}011 & 0{,}450 & 0{,}358 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R^{\log}_{t,h} = a + \beta\,\widehat{\text{BVRP}}_t + \delta D_t + \gamma D_t\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com o $\widehat{\text{BVRP}}$ do Ridge, nas 987 datas fora da amostra. $D_t = 1$ se $\text{VH}_{t-29:t}$ supera o corte de $37{,}3\%$ a.a. (fixo) ou o corte vigente na origem (reestimado). $W$ com HAC de $h+1$ defasagens. Rotação de Freedman--Lane: o resíduo do modelo restrito, sem as colunas da hipótese, é deslocado circularmente e somado ao ajustado restrito; em $\beta = \delta = \gamma = 0$ equivale à rotação de $y$. $g_h = \max(90, 3h)$. Bootstrap de pares em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. O $\widehat{\text{BVRP}}$ é tratado como dado.}
+\end{table}

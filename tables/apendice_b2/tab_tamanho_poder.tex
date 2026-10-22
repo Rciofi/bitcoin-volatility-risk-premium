@@ -1,0 +1,36 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Tamanho e poder dos testes por simulação.}
+\label{tab:apb2-tamanho-poder}
+\begin{tabular}{llrrrrrrrrr}
+\toprule
+ & & \multicolumn{3}{c}{$h = 1$} & \multicolumn{3}{c}{$h = 30$} & \multicolumn{3}{c}{$h = 60$} \\ \cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}
+Caso & Ruído & $\chi^2$ & rotação & bootstrap & $\chi^2$ & rotação & bootstrap & $\chi^2$ & rotação & bootstrap \\
+\midrule
+\multicolumn{11}{l}{\textit{Painel A: tamanho a 5\% ($\rho = 0$), $L = h+1$}} \\
+16 previsores, 1.776 datas & S1 & 0{,}076 & 0{,}044 & 0{,}045 & 0{,}308 & 0{,}058 & 0{,}021 & 0{,}344 & 0{,}060 & 0{,}011 \\
+16 previsores, 1.776 datas & S3 & 0{,}084 & 0{,}052 & 0{,}041 & 0{,}259 & 0{,}058 & 0{,}016 & 0{,}330 & 0{,}080 & 0{,}015 \\
+16 previsores, 987 datas & S1 & 0{,}116 & 0{,}054 & 0{,}045 & 0{,}552 & 0{,}069 & 0{,}010 & 0{,}659 & 0{,}085 & 0{,}002 \\
+16 previsores, 987 datas & S3 & 0{,}095 & 0{,}048 & 0{,}045 & 0{,}485 & 0{,}056 & 0{,}005 & 0{,}633 & 0{,}103 & 0{,}004 \\
+$\widehat{\text{BVRP}}$ do Ridge & S1 & 0{,}051 & 0{,}052 & 0{,}067 & 0{,}137 & 0{,}068 & 0{,}075 & 0{,}159 & 0{,}062 & 0{,}082 \\
+$\widehat{\text{BVRP}}$ do Ridge & S3 & 0{,}071 & 0{,}060 & 0{,}082 & 0{,}156 & 0{,}056 & 0{,}073 & 0{,}202 & 0{,}073 & 0{,}096 \\
+$\widehat{\text{BVRP}}$ da floresta & S1 & 0{,}049 & 0{,}050 & 0{,}067 & -- & -- & -- & 0{,}204 & 0{,}058 & 0{,}122 \\
+$\widehat{\text{BVRP}}$ da floresta & S3 & 0{,}074 & 0{,}071 & 0{,}098 & -- & -- & -- & 0{,}193 & 0{,}065 & 0{,}113 \\
+\midrule
+\multicolumn{11}{l}{\textit{Painel B: poder a 5\% em $h = 30$, ruído S1}} \\
+Caso & Teste & $\rho = 0{,}5\%$ & 1\% & 2\% & 5\% & & & & & \\
+16 previsores, 1.776 datas & $\chi^2$ ajustado ao tamanho & -- & 0{,}102 & 0{,}200 & 0{,}498 & & & & & \\
+16 previsores, 1.776 datas & rotação & -- & 0{,}114 & 0{,}230 & 0{,}506 & & & & & \\
+16 previsores, 1.776 datas & bootstrap & -- & 0{,}054 & 0{,}084 & 0{,}304 & & & & & \\
+16 previsores, 987 datas & $\chi^2$ ajustado ao tamanho & -- & 0{,}066 & 0{,}128 & 0{,}254 & & & & & \\
+16 previsores, 987 datas & rotação & -- & 0{,}086 & 0{,}168 & 0{,}304 & & & & & \\
+16 previsores, 987 datas & bootstrap & -- & 0{,}028 & 0{,}032 & 0{,}064 & & & & & \\
+$\widehat{\text{BVRP}}$ do Ridge & $\chi^2$ ajustado ao tamanho & 0{,}052 & 0{,}108 & 0{,}192 & 0{,}310 & & & & & \\
+$\widehat{\text{BVRP}}$ do Ridge & rotação & 0{,}066 & 0{,}120 & 0{,}186 & 0{,}316 & & & & & \\
+$\widehat{\text{BVRP}}$ do Ridge & bootstrap & 0{,}094 & 0{,}152 & 0{,}236 & 0{,}330 & & & & & \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Simulação com as variáveis explicativas reais fixas e $y$ = constante + ruído (painel A) ou + sinal com $R^2$ populacional $\rho$ (painel B). Ruído: soma de $h$ log-retornos diários reais, S1 sorteados com reposição, S3 em blocos circulares de $\max(60, 2h)$ dias. 1.000 réplicas com $\rho = 0$ e 500 com $\rho > 0$. Testes como nas Tabelas~\ref{tab:retlin-wald-direto} e~\ref{tab:retlin-um-fator}; o bootstrap usa 199 reamostragens. Poder do $\chi^2$ ajustado ao tamanho: valor crítico igual ao quantil de 95\% de $W$ com $\rho = 0$. Em $h = 30$, o $\widehat{\text{BVRP}}$ da floresta não foi simulado (--). O ruído S2 (rotação sorteada da série real) fica só nos arquivos de saída: suas réplicas são rotações da mesma série e não são independentes, de modo que o tamanho sob S2 não é estimado com a precisão nominal. O poder foi simulado só com o ruído S1; o S3 entra só com $\rho = 0$. Os ruídos não reproduzem a dependência de Stambaugh, entre a inovação do retorno e as inovações futuras das variáveis explicativas.}
+\end{table}

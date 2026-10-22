@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Previsão do retorno de $h$ dias fora da amostra: MQO e Ridge contra a média histórica.}
+\label{tab:retlin-oos}
+\begin{tabular}{rrrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{MQO} & \multicolumn{3}{c}{Ridge} & Média \\ \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+$h$ & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM & $R^2$ contra zero \\
+\midrule
+1 & 0{,}0059 & 0{,}031 & 0{,}569 & 0{,}0012 & 0{,}082 & 0{,}249 & $-$0{,}0014 \\
+5 & $-$0{,}0125 & 0{,}175 & 0{,}514 & 0{,}0003 & 0{,}202 & 0{,}425 & $-$0{,}0079 \\
+10 & $-$0{,}0026 & 0{,}074 & 0{,}934 & 0{,}0004 & 0{,}300 & 0{,}625 & $-$0{,}0176 \\
+20 & $-$0{,}0161 & 0{,}156 & 0{,}788 & $-$0{,}0001 & 0{,}507 & 0{,}961 & $-$0{,}0356 \\
+30 & $-$0{,}0425 & 0{,}282 & 0{,}590 & $-$0{,}0003 & 0{,}552 & 0{,}871 & $-$0{,}0464 \\
+60 & $-$0{,}1245 & 0{,}741 & 0{,}165 & $-$0{,}0020 & 0{,}729 & 0{,}526 & $-$0{,}0669 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Previsão de $R^{\log}_{t,h}$ com as 16 variáveis explicativas nas 987 datas fora da amostra, 33 origens em janela expansiva, treino e validação cruzada com embargo $s \le t-h$. $R^2_{\text{fora}}$ contra o modelo de referência, a média histórica dos alvos conhecidos na origem. CW: Clark--West, unilateral; DM: Diebold--Mariano, bilateral; ambos com HAC de $h+1$ defasagens. Nenhum valor-$p$ da tabela está ajustado por comparações múltiplas; o menor valor-$p$ ajustado por Holm sobre os seis horizontes, contra a média histórica, é 0{,}189 (CW) e 0{,}987 (DM) no MQO e 0{,}491 (CW) e 1{,}000 (DM) no Ridge. A última coluna é o $R^2_{\text{fora}}$ da média histórica contra a previsão zero. O LASSO zera todos os coeficientes em todas as origens e coincide com a média histórica. O $\alpha$ do Ridge fica no maior valor da grade ($10^5$) em 10 de 33 em $h = 1$; 33 de 33 em $h = 5$; 33 de 33 em $h = 10$; 33 de 33 em $h = 20$; 33 de 33 em $h = 30$; 33 de 33 em $h = 60$.}
+\end{table}
