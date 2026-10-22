@@ -1,196 +1,228 @@
-\chapter{BVRP previsto e retornos futuros: modelo linear}
+\chapter{Retornos futuros e previsores: modelo linear}
 \label{chap:retornos_linear}
 
-Este capítulo testa se o BVRP previsto no Capítulo~\ref{chap:previsao_bvrp}
-prevê linearmente os retornos futuros do Bitcoin. O coeficiente é negativo em
-todos os seis horizontes e nos dois modelos de previsão: um BVRP previsto mais
-alto, isto é, um prêmio de variância menor, antecede retornos menores. Nenhum
-horizonte, porém, é significante depois de duas correções necessárias: a da
-incerteza do BVRP previsto, que é um regressor gerado, e a das comparações
-múltiplas. O teste conjunto nos seis horizontes só rejeita quando ignora a
-estimação do BVRP previsto.
+Este capítulo testa se as variáveis disponíveis em $t$ preveem linearmente o
+retorno do Bitcoin nos $h$ dias seguintes. A análise principal regride o
+log-retorno diretamente nas 16 variáveis explicativas, com testes de
+significância conjunta de tamanho controlado, e avalia o ganho de erro
+quadrático fora da amostra; o BVRP previsto entra como fator único, de forma
+complementar. Os testes não rejeitam a hipótese de que as variáveis não
+preveem o retorno em nenhum horizonte, e nenhum método linear supera a média
+histórica fora da amostra. O BVRP previsto pelo Ridge tem relação negativa com
+o retorno nos seis horizontes, com evidência fraca e frágil no horizonte de um
+dia. Com poder baixo, a falta de rejeição é ausência de evidência, e não
+evidência de ausência de previsibilidade.
 
 % =========================================================
 \section{Especificação}
 \label{sec:retlin-especificacao}
 
-Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$ dias, a dissertação
-estima a equação~\eqref{eq:met-retorno-linear},
+Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$ dias, a dissertação estima
+por MQO
 \[
-R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
+R^{\log}_{t,h} = \alpha_h + X_t'\beta_h + \varepsilon_{t+h},
 \]
-por MQO, nas 987 datas fora da amostra do Capítulo~\ref{chap:previsao_bvrp}
-(21/06/2023 a 03/03/2026). $R_{t+h}$ é o retorno simples de $t$ a $t+h$, e
-$\widehat{\text{BVRP}}_t$, a previsão do Ridge na janela expansiva. A previsão
-da floresta aleatória serve de teste de robustez; as duas escolhas foram
-fixadas antes de ver os resultados deste capítulo
-(Seção~\ref{sec:prev-sintese}). As tabelas reportam os coeficientes em pontos
-percentuais de retorno por ponto percentual de BVRP previsto.
+em que $R^{\log}_{t,h}$ é o log-retorno do Bitcoin de $t$ a $t+h$, em pontos
+percentuais, e $X_t$ reúne as 16 variáveis explicativas da
+Seção~\ref{sec:dados-variaveis}: as 17 do Capítulo~\ref{chap:previsao_bvrp}
+menos a volatilidade histórica de 30 dias, colinear com o HBVRP e a IV. O
+log-retorno de $h$ dias é exatamente a soma dos log-retornos diários, o que
+torna os horizontes comparáveis entre si; o retorno simples entra como ponte no
+apêndice. A regressão usa duas amostras: a de modelagem, com 1.776 datas, de
+23/04/2021 a 03/03/2026, e as 987 datas fora da amostra do
+Capítulo~\ref{chap:previsao_bvrp}, de 21/06/2023 a 03/03/2026.
 
-A especificação é preditiva: $\beta_h$ mede se o BVRP previsto em $t$
-antecipa o retorno dos $h$ dias seguintes, e não o efeito causal do prêmio
-sobre o preço. Os retornos de datas vizinhas se sobrepõem em $h-1$ dias, o que
-induz autocorrelação nos erros. A correção para essa sobreposição atua no
-erro-padrão, e não no estimador: o $\hat\beta_h$ é o mesmo do MQO, e o
-erro-padrão de Newey--West com $h+1$ defasagens contorna a autocorrelação sob
-as condições da Seção~\ref{sec:met-inferencia}. Mesmo com essa correção,
-regressões com retornos sobrepostos podem sofrer distorções em amostras
-finitas, que \citet{bollerslev2014international} avaliam por simulação, e os
-testes têm pouco poder nos horizontes longos: em $h = 60$, as 987 datas contêm só cerca de 16
-períodos sem sobreposição.
+A especificação é preditiva: $\beta_h$ mede a capacidade das variáveis
+conhecidas em $t$ de antecipar o retorno dos $h$ dias seguintes. A hipótese
+nula é $\beta_h = 0$, isto é, que as 16 variáveis não preveem, em conjunto, o
+retorno. Os retornos de datas vizinhas se sobrepõem em $h-1$ dias, o que induz
+autocorrelação nos erros e reduz a informação efetiva da amostra: em $h = 60$,
+as 987 datas contêm só cerca de 16 períodos sem sobreposição.
 
 % =========================================================
-\section{Inferência com o BVRP previsto}
+\section{Inferência}
 \label{sec:retlin-inferencia}
 
-O erro-padrão HAC trata $\widehat{\text{BVRP}}_t$ como se fosse observado,
-quando ele é estimado no primeiro estágio \citep{pagan1984}. Por isso, a
-inferência principal usa o bootstrap em blocos em dois níveis da
-Seção~\ref{sec:met-inferencia} \citep{kunsch1989}, um procedimento não
-paramétrico: em cada reamostragem, o bootstrap reestima o modelo de previsão em
-cada origem, com um treino reamostrado em blocos dentro da própria janela de
-treino, e reestima $\beta_h$ com os pares (previsão, retorno) das 987 datas,
-também reamostrados em blocos.\footnote{No principal, o $\alpha$ do
-Ridge fica fixo, em cada origem, no valor escolhido no
-Capítulo~\ref{chap:previsao_bvrp}. Reescolhê-lo por validação cruzada em
-cada treino reamostrado distorce o procedimento: blocos repetidos podem cair
-no treino e na validação da mesma dobra, e a validação passa a favorecer
-penalidades menores. O resultado com o $\alpha$ reescolhido aparece entre os
-testes de robustez (Seção~\ref{sec:retlin-robustez}).} A reestimação do
-primeiro estágio acrescenta ruído à previsão e, como em todo problema de erro
-nas variáveis, atenua o coeficiente: a média dos $\beta^*$ das reamostragens
-fica abaixo de $\hat\beta_h$, em módulo. A razão $\lambda_h$ entre as duas
-mede essa atenuação e fica entre 0,59 e 0,70. O $\hat\beta_h$ estimado com o
-BVRP previsto é, portanto, uma medida conservadora da relação entre o prêmio
-e o retorno futuro.
+A estatística é o teste de Wald das 16 inclinações, $W$, com o erro-padrão
+HAC de Newey--West da Seção~\ref{sec:met-inferencia}: núcleo de Bartlett com
+$h+1$ defasagens. É o equivalente robusto da estatística $F$: testa a mesma
+hipótese conjunta, com a matriz de covariância corrigida para a
+autocorrelação e a heterocedasticidade. Com 16 restrições e retornos
+sobrepostos, a distribuição $\chi^2(16)$ aproxima mal a de $W$. Nas simulações
+da Tabela~\ref{tab:apb2-tamanho-poder}, com as variáveis explicativas reais
+fixas e $y$ independente delas, o teste $\chi^2$ a 5\% rejeita a hipótese nula
+em 7,6\% a 11,6\% das réplicas em $h = 1$; em $h = 30$, em 25,9\% a 30,8\% na
+amostra de modelagem e em 48,5\% a 55,2\% nas 987 datas; e em $h = 60$, em
+33,0\% a 34,4\% e em 63,3\% a 65,9\%, respectivamente, conforme o ruído (S1,
+sorteio dos log-retornos diários reais, ou S3, blocos circulares).
 
-A atenuação também encolhe a dispersão dos $\beta^*$, e comparar
-$\hat\beta_h$, que não é atenuado, com o erro-padrão do bootstrap, que é,
-misturaria escalas e daria valores-$p$ pequenos demais. O teste usa, por
-isso, a mesma escala nos dois termos: o erro-padrão de $\hat\beta_h$ é o do
-bootstrap dividido por $\lambda_h$, e o intervalo de confiança é
-$\hat\beta_h \pm 1{,}96$ vezes esse erro-padrão.\footnote{Com blocos de 60
-dias, o segundo nível reamostra cerca de 16 blocos, e intervalos por
-percentis seriam grosseiros; por isso o intervalo usa o erro-padrão. Nas
-junções entre blocos, a ordem temporal deixa de valer, limitação comum aos
-bootstraps em blocos.} O erro-padrão corrigido fica entre 1,25 e 1,71 vez o
-HAC. Com seis horizontes, o limite de Bonferroni é
-$0{,}05/6 \approx 0{,}0083$.
+Por isso, a inferência usa dois testes alternativos. O primeiro é a rotação
+circular de $y$, cujo tamanho fica próximo do nominal: $W$ recalculado com $y$
+deslocado em $k$ dias em relação a $X$, com $g_h \le k \le n - g_h$ e
+$g_h = \max(90, 3h)$; o valor-$p$ é a posição de $W$ entre os $W$ das
+rotações. A rotação preserva a dependência de $y$ e a de $X$ e rompe só a
+relação entre os dois. Seu tamanho a 5\% fica entre 4,4\% e 6,9\% em $h = 1$
+e $h = 30$ e entre 6,0\% e 10,3\% em $h = 60$ (8,0\% na amostra de modelagem
+com S3; 8,5\% e 10,3\% nas 987 datas com S1 e S3). A rotação testa a
+independência entre $y$ e $X$, hipótese mais forte que $\beta_h = 0$, e pode
+ter tamanho distorcido sob mudanças de regime de volatilidade, que tornam $y$
+não estacionário; o apêndice de tamanho e poder discute esse ponto. O segundo
+é o bootstrap de pares $(X_t, y_t)$ em blocos circulares de $\max(30, 2h)$
+dias, com 1.999 reamostragens e $W^*$ centrado em $\hat\beta_h$, que não
+rejeita demais: seu tamanho fica perto do nominal em $h = 1$, de 4,1\% a 4,5\%
+nos 16 previsores, e é conservador em $h = 30$ e $h = 60$, de 0,2\% a 2,1\%.
+
+Como a dissertação testa seis horizontes, os valores-$p$ são ajustados pelo
+procedimento de Holm, e o mínimo dos valores-$p$ da rotação entre os
+horizontes, com o mesmo deslocamento $k$ em todos eles, testa a hipótese nula
+nos seis de uma vez. O poder dos testes é baixo. Em $h = 30$, com ruído S1 e
+$R^2$ populacional de 5\%, a rotação detecta a relação em 50,6\% das réplicas
+na amostra de modelagem e em 30,4\% nas 987 datas; o $\chi^2$ com o valor
+crítico ajustado ao tamanho, em 49,8\% e 25,4\%; e o bootstrap, em 30,4\% e
+6,4\%. Com $R^2$ de 2\%, a rotação detecta a relação em 17\% a 23\% das
+réplicas (16,8\% nas 987 datas e 23,0\% na amostra de modelagem). As
+simulações não reproduzem a dependência entre a inovação do retorno e as
+inovações futuras das variáveis explicativas \citep{stambaugh1999}.
 
 % =========================================================
-\section{Resultados}
+\section{Previsores e retorno: teste conjunto por horizonte}
 \label{sec:retlin-resultados}
 
-A Tabela~\ref{tab:retlin-principal} e a Figura~\ref{fig:retlin-betas}
-apresentam os resultados. O coeficiente é negativo em todos os horizontes e
-cresce em módulo com $h$, de $-0{,}045$ em $h = 1$ a $-1{,}43$ em $h = 60$.
-Em $h = 30$, um desvio-padrão da previsão do Ridge (4,5 p.p.) corresponde a
-cerca de 2,6 p.p. a menos de retorno em 30 dias. Com o erro-padrão HAC, os
-valores-$p$ ficam entre 0,011 e 0,091; com o bootstrap em dois níveis, entre
-0,043 ($h = 1$) e 0,30. Só $h = 1$ fica abaixo de 0,05 no bootstrap, e nenhum
-horizonte passa pelo limite de Bonferroni, nem com o HAC.
+A Tabela~\ref{tab:retlin-wald-direto} apresenta os resultados. Na amostra de
+modelagem (painel A), nenhum teste rejeita a hipótese nula em nenhum
+horizonte: os valores-$p$ ficam entre 0,20 e 0,53 na rotação, entre 0,17 e
+0,61 no bootstrap e entre 0,06 e 0,27 no $\chi^2$. Nas 987 datas (painel B),
+o $\chi^2$ rejeita a 5\% em $h = 10$, 20 e 30 ($p = 0{,}047$, $0{,}048$ e
+$0{,}007$; o ajuste de Holm deixa só $h = 30$ abaixo de 5\%, com $0{,}039$).
+Esse teste, porém, rejeita em 48,5\% a 55,2\% das réplicas quando a hipótese
+nula é verdadeira, nessa amostra e em $h = 30$, e a rejeição não é evidência
+de previsibilidade. O tamanho do $\chi^2$ não foi simulado em $h = 10$ e
+$h = 20$; o de $h = 30$ é indicativo. A rotação e o bootstrap, com tamanho
+controlado, não rejeitam: os valores-$p$ ficam entre 0,20 e 0,75 e entre 0,18
+e 0,78. O teste nos seis horizontes de uma vez também não rejeita
+($p = 0{,}49$ na amostra de modelagem, com o menor valor-$p$ em $h = 1$, e
+$p = 0{,}52$ nas 987 datas, em $h = 30$). Com $2h+1$ defasagens (painel C), os
+valores-$p$ ficam entre 0,12 e 0,84 na rotação e entre 0,13 e 0,84 no
+bootstrap.
 
-\input{tables/retornos_linear/tab_principal}
+\input{tables/retornos_linear/tab_wald_direto}
 
-\IfFileExists{figs/retornos_linear/fig_betas.png}{
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figs/retornos_linear/fig_betas.png}
-    \caption[Coeficiente do retorno futuro sobre o BVRP previsto (Ridge), por horizonte]{Coeficiente do retorno futuro sobre o BVRP previsto (Ridge), por horizonte, com intervalos de confiança de 95\%: erro-padrão HAC com $h+1$ defasagens, que ignora a estimação do BVRP previsto, e bootstrap em dois níveis com o erro-padrão corrigido da atenuação.}
-    \label{fig:retlin-betas}
-\end{figure}
-}{}
-
-Como os seis horizontes são fortemente correlacionados --- os $\beta^*$ de
-horizontes vizinhos têm correlação de 0,8 a 0,97 ---, a dissertação testa
-também a hipótese conjunta de $\beta_h = 0$ em todos eles
-(Tabela~\ref{tab:retlin-conjunto}). O teste de Wald com a covariância dos
-$\beta^*$ não rejeita ($p = 0{,}37$), e o resultado se mantém com blocos de 30
-e 90 dias ($p = 0{,}21$ e $0{,}27$). O max-$|t|$, um teste de passo único que
-toma o maior $|z_h|$ entre os horizontes e tira o valor crítico da
-distribuição do máximo nas reamostragens \citep{westfall1993resampling}, em
-aplicação com bootstrap em dados dependentes como a de
-\citet{romano2005stepwise}, também não rejeita: o menor valor-$p$ ajustado é
-0,115, em $h = 1$. Os testes só rejeitam a hipótese conjunta quando ignoram a
-estimação do BVRP previsto: com o HAC das seis regressões empilhadas
-($p = 0{,}019$) e com o bootstrap só do segundo nível, que mantém as previsões
-fixas ($p = 0{,}032$). A diferença entre os dois grupos de testes é o efeito
-do regressor gerado.
-
-\input{tables/retornos_linear/tab_conjunto}
-
-A direção do resultado é a mesma de \citet{bollerslev2009expected}. Com
-$\text{BVRP}_t = \mathbb{E}(\text{RV}_{t+1:t+30} \mid I_t) - \text{IV}_t$, um
-$\beta_h$ negativo equivale a dizer que um prêmio maior, com a IV acima da
-volatilidade esperada para os 30 dias seguintes, antecede retornos maiores. A evidência aqui, porém, é fraca: nenhum
-horizonte é significante depois das correções.
+Os testes com tamanho controlado não indicam que as 16 variáveis explicativas
+prevejam, em conjunto, o log-retorno do Bitcoin em nenhum horizonte. Com o
+poder baixo da Seção~\ref{sec:retlin-inferencia}, essa falta de rejeição é
+ausência de evidência, e não evidência de ausência de previsibilidade.
 
 % =========================================================
-\section{Testes de robustez}
-\label{sec:retlin-robustez}
+\section{Ganho de erro quadrático fora da amostra}
+\label{sec:retlin-oos}
 
-A Tabela~\ref{tab:retlin-robustez} reporta os valores-$p$ do bootstrap em
-variantes do procedimento. Com blocos de 30 e de 90 dias, os valores-$p$ ficam
-entre 0,042 e 0,42; com o $\alpha$ do Ridge reescolhido em cada reamostragem,
-entre 0,068 e 0,57. Com a previsão da floresta aleatória, o coeficiente
-também é negativo em todos os horizontes e de magnitude parecida, mas nenhum é
-significante (valores-$p$ HAC entre 0,15 e 0,61). Só o bootstrap do segundo
-nível, que ignora o primeiro estágio, tem um horizonte abaixo do limite de
-Bonferroni ($h = 1$, $p = 0{,}003$). O sinal é estável; a significância não
-é.
+Um coeficiente pode ser significante sem que o modelo preveja melhor. A
+dissertação compara, por isso, o erro quadrático fora da amostra da previsão
+de $R^{\log}_{t,h}$ com o do modelo de referência, a média histórica dos
+alvos conhecidos na origem, nas 33 origens da janela expansiva do
+Capítulo~\ref{chap:previsao_bvrp}, com o embargo $s \le t-h$ no treino e na
+validação cruzada. A Tabela~\ref{tab:retlin-oos} reporta o MQO e o Ridge com
+as 16 variáveis; o LASSO zera todos os coeficientes em todas as origens e
+coincide com a média histórica.
 
-\input{tables/retornos_linear/tab_robustez}
+\input{tables/retornos_linear/tab_oos_retorno}
+
+Nenhum método linear supera a média histórica. O MQO tem $R^2_{\text{fora}}$
+de 0,0059 em $h = 1$ e negativo nos demais horizontes, de $-0{,}0026$ a
+$-0{,}1245$; o teste de Clark--West rejeita a 5\% só em $h = 1$
+($p = 0{,}031$), mas não depois do ajuste de Holm para os seis horizontes (o
+menor valor-$p$ ajustado é 0,189). O Ridge fica praticamente igual à média:
+seu $R^2_{\text{fora}}$ vai de $-0{,}0020$ a $0{,}0012$, porque a validação
+cruzada escolhe a maior penalidade da grade em todas as origens a partir de
+$h = 5$ e em 10 das 33 em $h = 1$, e o
+Clark--West não rejeita em nenhum horizonte ($p$ de 0,082 a 0,729). O
+Diebold--Mariano também não distingue nenhum dos dois da média histórica
+($p \ge 0{,}165$). O Capítulo~\ref{chap:retornos_nao_linear} repete a
+comparação com a floresta aleatória.
+
+% =========================================================
+\section{BVRP previsto como fator único}
+\label{sec:retlin-um-fator}
+
+A análise complementar regride o retorno no BVRP previsto do
+Capítulo~\ref{chap:previsao_bvrp},
+\[
+R^{\log}_{t,h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h},
+\]
+nas 987 datas fora da amostra, com os mesmos testes. O BVRP previsto é um
+regressor gerado; os testes desta seção o tratam como dado, e o apêndice
+trata da estimação do primeiro estágio. A Tabela~\ref{tab:retlin-um-fator}
+reporta o BVRP previsto pelo Ridge, principal, e o da floresta aleatória na
+forma $\hat f(X_t) - \text{IV}_t$.
+
+\input{tables/retornos_linear/tab_um_fator}
+
+Com o Ridge, $\hat\beta_h$ é negativo nos seis horizontes e cresce em módulo
+com $h$, de $-0{,}042$ em $h = 1$ a $-1{,}426$ em $h = 60$: um BVRP previsto
+mais alto, isto é, um prêmio menor, antecede retornos menores, na direção de
+\citet{bollerslev2009expected}. A evidência é fraca e frágil. Só o horizonte
+de um dia fica abaixo de 5\% depois do ajuste de Holm, e só no bootstrap
+($p = 0{,}005$; ajustado, 0,030); a rotação, com tamanho próximo do nominal,
+não rejeita depois do ajuste ($p = 0{,}012$; ajustado, 0,074). O bootstrap do
+fator único rejeita demais sob a hipótese nula: seu tamanho a 5\% vai de
+6,7\% a 8,2\% em $h = 1$ e de 7,3\% a 7,5\% em $h = 30$ com o Ridge, e de 8\%
+a 12\% em $h = 60$. O teste nos seis horizontes de uma vez dá $p = 0{,}073$
+com a rotação, e o resultado depende da janela de exclusão $g^*$ (0,061 com
+$g^* = 120$ e 0,015 com $g^* = 360$). Com a floresta aleatória, o coeficiente
+fica perto de zero e troca de sinal, e nenhum teste rejeita ($p \ge 0{,}64$).
+
+A Tabela~\ref{tab:apb2-regime}, no apêndice, permite inclinações diferentes
+nos regimes de baixa e de alta volatilidade, em $h = 30$ e $h = 60$. A
+inclinação no regime de baixa tem evidência fraca com o corte fixo de
+$37{,}3\%$ a.a.: o valor-$p$ da rotação de Freedman--Lane é 0,027 em $h = 30$
+e 0,022 em $h = 60$, e o do bootstrap fica em 0,086 e 0,076. Com o corte
+reestimado em cada origem, não há evidência (Freedman--Lane 0,185 e 0,119;
+bootstrap 0,227 e 0,213). A inclinação no regime de alta não difere de zero
+em nenhum teste ($p \ge 0{,}20$), nem a diferença entre os regimes
+(Freedman--Lane de 0,101 a 0,300; bootstrap de 0,180 a 0,335). A diferença
+entre os regimes é, assim, sugestiva e frágil: depende da posição do corte.
 
 % =========================================================
 \section{Volatilidade histórica e implícita separadas}
 \label{sec:retlin-componentes}
 
-A equação~\eqref{eq:met-retorno-componentes} substitui o prêmio por seus
-componentes observados em $t$, a volatilidade histórica dos 30 dias anteriores
-e a IV. Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença
-$\text{VH}_{t-29:t} - \text{IV}_t$, que é o $\text{HBVRP}_t$,
-resume o conteúdo das duas medidas. A Tabela~\ref{tab:retlin-componentes}
-mostra que os coeficientes têm sinais opostos de $h = 1$ a $h = 20$, a IV com
-sinal positivo, e que o teste só rejeita a restrição em $h = 1$ ($p = 0{,}039$;
-nos demais horizontes, $p \ge 0{,}18$). Nenhum coeficiente individual é
-significante depois da correção de Bonferroni. O teste usa a volatilidade
-histórica, a do HBVRP, e não o BVRP previsto: ele diz se a
-diferença entre as duas volatilidades observadas em $t$ é uma forma adequada
-de combiná-las, não se o prêmio prospectivo prevê o retorno.
+A última especificação substitui as 16 variáveis pelos dois componentes do
+HBVRP observados em $t$, a volatilidade histórica dos 30 dias anteriores e a
+IV:
+\[
+R^{\log}_{t,h} = \alpha_h + \beta_{1,h}\,\text{VH}_{t-29:t} + \beta_{2,h}\,\text{IV}_t + \varepsilon_{t+h}.
+\]
+Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença
+$\text{VH}_{t-29:t} - \text{IV}_t$, que é o $\text{HBVRP}_t$, resume o
+conteúdo das duas medidas. A Tabela~\ref{tab:retlin-componentes-wald} testa
+essa restrição e a hipótese conjunta $\beta_{1,h} = \beta_{2,h} = 0$, nas 987
+datas.
 
-\input{tables/retornos_linear/tab_componentes}
+\input{tables/retornos_linear/tab_componentes_wald}
 
-% =========================================================
-\section{Regime de volatilidade}
-\label{sec:retlin-regime}
-
-A equação~\eqref{eq:met-retorno-regime} permite inclinações diferentes nos
-regimes de baixa e de alta volatilidade. Com o
-corte fixo, a inclinação é mais negativa no regime de baixa, que reúne 31\%
-das datas fora da amostra ($-2{,}92$ em $h = 30$, $p = 0{,}005$), e fica perto
-de zero no regime de alta ($-0{,}34$; ver Tabela~\ref{tab:retlin-regime}). A
-inclinação no regime de baixa passa pelo limite de Bonferroni de $h = 20$ a
-$h = 60$, mas a diferença entre os regimes, não: a interação é significante a
-5\% de $h = 10$ a $h = 60$, sem passar pelo limite, e o teste conjunto da
-variável de regime e da interação só rejeita a 5\% em $h = 60$
-($p = 0{,}035$). Com o corte reestimado em cada origem, a diferença deixa de
-ser significante (interação com $p \ge 0{,}06$; teste conjunto com
-$p \ge 0{,}15$). A diferença entre os regimes é, assim, sugestiva e frágil:
-depende da posição do corte, e esses valores-$p$ são do HAC, que ignora a
-estimação do BVRP previsto.
-
-\input{tables/retornos_linear/tab_regime}
+O teste conjunto não rejeita em nenhum horizonte: os valores-$p$ ficam entre
+0,056 e 0,902 no bootstrap, entre 0,116 e 0,941 na rotação e entre 0,087 e
+0,850 no $\chi^2$, e o menor valor-$p$ ajustado por Holm, 0,336, é o do
+bootstrap em $h = 1$. A restrição $\beta_{1,h} + \beta_{2,h} = 0$ só fica
+abaixo de 5\% em $h = 1$, na rotação de Freedman--Lane ($p = 0{,}042$) e no
+bootstrap ($0{,}046$), e não sobrevive ao ajuste de Holm (o menor valor
+ajustado fica entre 0,252 e 0,342, conforme o teste). Nos demais horizontes, nenhum teste rejeita a restrição
+($p \ge 0{,}20$).
 
 % =========================================================
 \section{Síntese}
 \label{sec:retlin-sintese}
 
-O BVRP previsto tem relação negativa e estável com os retornos futuros em
-todos os horizontes, na direção prevista pela literatura, mas a relação não é
-significante quando a inferência considera a estimação do BVRP previsto e as
-comparações múltiplas. O modelo linear não prevê os retornos do Bitcoin nesta
-amostra. Os horizontes longos têm pouco poder, e a ausência de significância
-neles não é evidência de ausência de relação. A diferença entre os regimes de
-volatilidade, sugestiva com o corte fixo, motiva o
-Capítulo~\ref{chap:retornos_nao_linear}, em que um modelo em árvore escolhe
-sozinho os cortes.
+As variáveis disponíveis em $t$ não preveem, em conjunto, o log-retorno do
+Bitcoin de 1 a 60 dias: os testes de significância conjunta com tamanho
+controlado não rejeitam em nenhum horizonte, nem nos seis de uma vez, e
+nenhum método linear supera a média histórica fora da amostra depois do
+ajuste para os seis horizontes. O BVRP previsto pelo Ridge tem relação
+negativa com o retorno nos seis horizontes, na direção da literatura, mas a
+evidência é fraca e frágil e se restringe ao horizonte de um dia. A diferença
+entre os regimes de volatilidade depende da posição do corte. Com cerca de 33
+observações independentes fora da amostra, os testes têm pouco poder: a falta
+de rejeição é ausência de evidência, e não evidência de ausência de
+previsibilidade. O Capítulo~\ref{chap:retornos_nao_linear} repete a análise com
+a floresta aleatória, que permite relações não lineares entre as variáveis e
+o retorno.
