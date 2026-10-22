@@ -78,37 +78,45 @@ entre as variáveis e o prêmio muda entre os regimes dentro da amostra, mas ess
 mudança não melhora a previsão fora dela.
 
 \noindent\textbf{Previsibilidade linear dos retornos.} Como em
-\citet{bollerslev2009expected}, a dissertação estima uma regressão preditiva
-para avaliar se o prêmio, medido pelo BVRP previsto, ajuda a prever o retorno
-do Bitcoin nos $h$ dias seguintes, com $h$ de 1 a 60 dias.
-O BVRP previsto é um regressor gerado, e o erro-padrão usual ignora a incerteza
-da sua estimação \citep{pagan1984}; por isso, a inferência principal usa um
-bootstrap em blocos em dois níveis, que reestima o modelo de previsão em cada
-reamostragem. O coeficiente é negativo nos seis horizontes, na direção de
-\citet{bollerslev2009expected}: um prêmio maior antecede retornos maiores.
-Nenhum horizonte, porém, é significante depois das correções para o regressor
-gerado e para as comparações múltiplas, e o teste conjunto nos seis horizontes
-não rejeita ($p = 0{,}37$); ele só rejeita quando ignora a estimação do BVRP
-previsto. A inclinação é mais negativa no regime de baixa volatilidade, mas a
+\citet{bollerslev2009expected}, a dissertação estima regressões preditivas do
+log-retorno do Bitcoin nos $h$ dias seguintes, com $h$ de 1 a 60 dias. A
+análise principal regride o retorno diretamente nas 16 variáveis disponíveis
+em $t$. Com retornos sobrepostos, o teste de Wald com erro-padrão HAC rejeita
+demais, e a inferência usa a rotação circular e o bootstrap em blocos, de
+tamanho controlado, com o ajuste de Holm para os seis horizontes. Nenhum teste
+rejeita a hipótese de que as variáveis não preveem o retorno, em nenhum
+horizonte nem nos seis de uma vez ($p = 0{,}49$ na amostra de modelagem e
+$0{,}52$ nas 987 datas fora da amostra), e nenhum método linear supera a média
+histórica fora da amostra (MQO: Clark--West de $p = 0{,}031$ em $h = 1$;
+ajustado, 0,189). Como fator único, o BVRP previsto pelo Ridge tem relação
+negativa com o retorno nos seis horizontes: um prêmio menor antecede retornos
+menores, na direção de \citet{bollerslev2009expected}. A evidência é fraca e
+frágil: só o horizonte de um dia fica abaixo de 5\% depois do ajuste de Holm,
+e só no bootstrap ($p = 0{,}005$; ajustado, 0,030); a rotação não rejeita
+depois do ajuste (0,074), e o teste nos seis horizontes dá $p = 0{,}073$. A
 diferença entre os regimes depende da posição do corte.
 
 \noindent\textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende
-de um corte fixado de antemão, a dissertação repete o teste com uma floresta
-aleatória, que escolhe sozinha os cortes nas volatilidades e gera o BVRP
-previsto. O coeficiente fica perto de zero em todos os horizontes, e o teste
-conjunto não rejeita ($p = 0{,}96$). As árvores cortam a VH de 30 dias entre
-45\% e 58\% a.a., e não em $37{,}3\%$, e a floresta aplicada direto ao retorno
-também não supera a média histórica de forma significante. O
+de um corte fixado de antemão, a dissertação aplica uma floresta aleatória
+diretamente ao retorno, que escolhe sozinha os cortes nas volatilidades. Ela
+não supera a média histórica em nenhum horizonte depois do ajuste de Holm
+(floresta: Clark--West de $p = 0{,}050$ em $h = 20$; ajustado, 0,300), e o
+$R^2$ dentro da amostra, de 2\% a 18\%, contra o de fora negativo nos
+horizontes longos, indica sobreajuste. O BVRP previsto pela floresta não tem
+relação com o retorno, e as árvores que preveem o RBVRP cortam a VH de 30 dias
+entre 45\% e 58\% a.a., e não em $37{,}3\%$. O
 Apêndice~\ref{app:estrategias} traduz o prêmio previsto em regras de negociação: nenhuma supera o compra e manutenção
 em índice de Sharpe, e a perda máxima menor vem de ficar fora do mercado na
 maior parte dos dias.
 
 Em resumo, o prêmio existe e é grande, e as variáveis disponíveis em $t$
-contêm alguma informação sobre ele, mas o prêmio previsto não prevê os retornos
-do Bitcoin nesta amostra, nem com o modelo linear nem com o não linear. As 987
-previsões, com alvos de 30 dias sobrepostos, equivalem a cerca de 33
-observações independentes; os testes têm pouco poder, e a ausência de
-significância não é evidência de ausência de relação.
+contêm alguma informação sobre ele, mas não preveem o retorno do Bitcoin
+nesta amostra, nem com o modelo linear nem com a floresta aleatória, e a
+relação negativa entre o BVRP previsto e o retorno tem evidência fraca e
+frágil. As 987 previsões, com alvos de 30 dias sobrepostos, equivalem a cerca
+de 33 observações independentes; os testes têm pouco poder, e a falta de
+rejeição é ausência de evidência, e não evidência de ausência de
+previsibilidade.
 
 \section*{Contribuição}
 \label{sec:intro-contribuicao}
@@ -169,9 +177,10 @@ Capítulo~\ref{chap:dados} descreve os dados, testa H1, define os regimes e as v
 Capítulo~\ref{chap:metodologia} formaliza as questões, as amostras, os modelos
 e a inferência. O Capítulo~\ref{chap:previsao_bvrp} prevê o RBVRP, e os
 Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} testam se
-o BVRP previsto prevê os retornos, com o modelo linear e com o modelo em
-árvore. O Capítulo~\ref{chap:consideracoes_finais} conclui, e a Nota
+as variáveis disponíveis em $t$ preveem o log-retorno, com o modelo linear e
+com a floresta aleatória. O Capítulo~\ref{chap:consideracoes_finais} conclui, e a Nota
 Metodológica trata da reprodutibilidade. O Apêndice~\ref{app:estrategias}
 avalia as regras de negociação, e os Apêndices~\ref{app:variaveis},
 \ref{app:scripts} e~\ref{app:pastas} documentam as variáveis, os scripts e a
-estrutura de pastas.
+estrutura de pastas, e o Apêndice~\ref{app:b2} traz o tamanho e o poder dos
+testes e a ponte com o retorno simples.

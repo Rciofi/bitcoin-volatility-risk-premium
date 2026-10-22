@@ -39,9 +39,12 @@ O MQO, o Ridge, o LASSO e a floresta aleatória usam a biblioteca
 lineares usam as variáveis padronizadas com a média e o desvio-padrão do
 treino de cada origem. As regressões usam o MQO do \texttt{statsmodels} com
 erro-padrão de Newey--West: núcleo de Bartlett com $h+1$ defasagens, sem
-correção de amostra pequena e com valor-$p$ pela distribuição normal. O
-bootstrap em blocos em dois níveis usa 999 reamostragens e blocos de 60 dias,
-com blocos de 30 e de 90 dias como robustez (Seção~\ref{sec:met-inferencia}).
+correção de amostra pequena e com valor-$p$ pela distribuição normal. Os
+testes dos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}
+usam a rotação circular e o bootstrap de pares em blocos circulares de
+$\max(30, 2h)$ dias, com 1.999 reamostragens (Seção~\ref{sec:met-inferencia});
+o bootstrap em dois níveis da versão anterior, com 999 reamostragens e blocos
+de 60 dias, fica no Apêndice~\ref{app:b2}.
 O \textit{model confidence set} do Capítulo~\ref{chap:previsao_bvrp} usa 9.999
 reamostragens em blocos de 60 dias, com 30 e 90 dias como sensibilidade
 (Seção~\ref{sec:met-avaliacao}).
@@ -49,7 +52,9 @@ reamostragens em blocos de 60 dias, com 30 e 90 dias como sensibilidade
 \section*{Reprodutibilidade}
 
 As sementes são fixas: 42 nos modelos em árvore e nas permutações do placebo,
-e 20261001 nas reamostragens do bootstrap e do \textit{model confidence set}. As
+20261001 nas reamostragens do bootstrap em dois níveis e do \textit{model
+confidence set}, e 20261020 nas do bootstrap de pares e nas simulações do
+Apêndice~\ref{app:b2}. As
 tabelas e as figuras do texto
 são gravadas pelos scripts, sem edição manual; os geradores recalculam as
 estatísticas reportadas a partir das saídas gravadas e interrompem a execução

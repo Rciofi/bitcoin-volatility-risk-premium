@@ -37,7 +37,8 @@ ele grava as saídas, dentro de \arq{outputs/}.
           (estatísticas descritivas e testes de raiz unitária),
           \arq{code/plot_cap3_T1.py} (séries, histogramas e distribuição
           anual), \arq{code/plot_vrp_vs_return_T12.py} (dispersão entre
-          o HBVRP e o retorno de 30 dias), \arq{scripts/test_h1_bvrp_mean.py}
+          o HBVRP e o log-retorno de 30 dias), \arq{code/acf_mensal_t2.py}
+          (autocorrelação sem sobreposição), \arq{scripts/test_h1_bvrp_mean.py}
           (teste de H1) e \arq{code/descritivas_C3_regimes.py} (prêmio por
           regime).
     \item[Capítulo~\ref{chap:previsao_bvrp}.] \arq{code/previsao_bvrp_T5.py}
@@ -46,17 +47,33 @@ ele grava as saídas, dentro de \arq{outputs/}.
           confidence set}) e \arq{code/interacao_regime_T9.py} (interações
           com o regime).
     \item[Capítulos~\ref{chap:retornos_linear}
-          e~\ref{chap:retornos_nao_linear}.] \arq{code/retorno_bvrp_T10.py}
-          (modelo linear e bootstrap em dois níveis),
-          \arq{code/retorno_bvrp_T11.py} (modelo em árvore, testes
-          conjuntos e quebras) e \arq{code/descritivas_C7.py} (retorno por
-          regime e sinal do retorno).
+          e~\ref{chap:retornos_nao_linear}.]
+          \arq{code/diagnostico_b2/passo4_horizontes_b2.py} (Wald direto,
+          rotação, bootstrap de pares, Holm e min-p; MQO, Ridge e LASSO fora
+          da amostra), \arq{code/diagnostico_b2/passo4_floresta_b2.py}
+          (floresta direto no retorno),
+          \arq{code/diagnostico_b2/passo5_componentes_regime_b2.py}
+          (componentes e regime),
+          \arq{code/diagnostico_b2/passo6_ponte_retorno_b2.py} (ponte com o
+          retorno simples), \arq{code/wald_utils.py} (funções dos testes),
+          \arq{code/retorno_bvrp_T11.py} (floresta para o RBVRP nas duas
+          formas e quebras), \arq{code/descritivas_C7.py} (retorno por regime
+          e sinal do retorno) e \arq{code/retorno_bvrp_T10.py} (versão
+          anterior: retorno simples e bootstrap em dois níveis,
+          Apêndice~\ref{app:b2}).
     \item[Apêndice~\ref{app:estrategias}.] \arq{code/estrategias_A1.py}.
+    \item[Apêndice~\ref{app:b2}.]
+          \arq{code/diagnostico_b2/mc_rotacao_poder_b2.py} e
+          \arq{code/diagnostico_b2/passo4b_tamanho_b2.py} (tamanho e poder),
+          \arq{code/diagnostico_b2/diagnostico_b2.py} e
+          \arq{code/diagnostico_b2/bootstrap_wald_b2.py} (correlação entre o
+          erro de previsão e a inovação do retorno).
     \item[Geradores.] \arq{code/publicar_cap5.py},
-          \arq{code/publicar_cap6.py}, \arq{code/publicar_cap7.py} e
-          \arq{code/publicar_apendice.py} gravam as tabelas e as figuras
-          dos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
-          e do Apêndice~\ref{app:estrategias} a partir das saídas gravadas, sem
+          \arq{code/publicar_cap6.py}, \arq{code/publicar_cap7.py},
+          \arq{code/publicar_B2.py} e \arq{code/publicar_apendice.py} gravam
+          as tabelas e as figuras dos
+          Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
+          e dos Apêndices~\ref{app:estrategias} e~\ref{app:b2} a partir das saídas gravadas, sem
           reestimar modelos.
 \end{description}
 

@@ -16,16 +16,20 @@ previsões não antecipam os episódios de prêmio positivo. A medida também mu
 retrospectivo, o prêmio é maior no regime de baixa volatilidade, como em
 \citet{almeida2024cryptoVRP}; com o RBVRP, prospectivo, a diferença se inverte.
 
-O BVRP previsto não prevê os retornos do Bitcoin nesta amostra. No modelo
-linear, o coeficiente é negativo nos seis horizontes, na direção de
-\citet{bollerslev2009expected}, mas nenhum horizonte é significante depois das
-correções para o regressor gerado e para as comparações múltiplas, e o teste
-conjunto não rejeita ($p = 0{,}37$). A floresta aleatória, que escolhe sozinha
-os cortes nas volatilidades, também não encontra a relação: o coeficiente fica
-perto de zero em todos os horizontes, e o teste conjunto não rejeita
-($p = 0{,}96$). Com cerca de 33 observações independentes fora da amostra, os
-testes têm pouco poder, e a ausência de significância não é evidência de
-ausência de relação.
+As variáveis disponíveis em $t$ não preveem o log-retorno do Bitcoin de 1 a
+60 dias nesta amostra. Os testes de significância conjunta com tamanho
+controlado não rejeitam em nenhum horizonte, nem nos seis de uma vez
+($p = 0{,}49$ e $0{,}52$), e nenhum método supera a média histórica fora da
+amostra depois do ajuste para os seis horizontes (MQO: Clark--West de
+$p = 0{,}031$ em $h = 1$; ajustado, 0,189; floresta: Clark--West de
+$p = 0{,}050$ em $h = 20$; ajustado, 0,300). O BVRP previsto pelo Ridge tem
+relação negativa com o retorno nos seis horizontes, na direção de
+\citet{bollerslev2009expected}, mas a evidência é fraca e frágil: só o
+horizonte de um dia fica abaixo de 5\% depois do ajuste de Holm, e só no
+bootstrap. O BVRP previsto pela floresta não tem relação com o retorno. Com
+cerca de 33 observações independentes fora da amostra, os testes têm pouco
+poder, e a falta de rejeição é ausência de evidência, e não evidência de
+ausência de previsibilidade.
 
 O Apêndice~\ref{app:estrategias} estende a análise a regras simples de negociação com o BVRP previsto, em caráter exploratório: nenhuma delas supera o compra e manutenção em índice de Sharpe no mesmo período, e a menor perda máxima que apresentam decorre da menor exposição ao ativo, não de informação sobre a direção dos retornos.
 

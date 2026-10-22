@@ -238,16 +238,13 @@ histórica, e o Clark--West rejeita a 5\% para todos na janela expansiva. A
 previsibilidade é modesta: o MCS exclui as referências ingênuas, mas não separa
 os modelos da média histórica, e as previsões ficam próximas dela. O Ridge tem
 o menor erro, por encolher a previsão quando o sinal é fraco. Os capítulos
-seguintes usam duas previsões que estão no conjunto: a do Ridge, principal no
-Capítulo~\ref{chap:retornos_linear}, e a da floresta aleatória, principal no
-Capítulo~\ref{chap:retornos_nao_linear}. A não linearidade encontrada dentro da
+seguintes usam duas previsões que estão no conjunto, a do Ridge e a da
+floresta aleatória, como fator único na análise complementar dos
+Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. A não linearidade encontrada dentro da
 amostra não melhora a previsão.
 
 Os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} usam
-estas previsões, da janela expansiva, como regressor. A dissertação fixou a
-escolha antes de ver os resultados dos retornos: o Ridge é a previsão principal do
-Capítulo~\ref{chap:retornos_linear}, e a floresta aleatória, a do
-Capítulo~\ref{chap:retornos_nao_linear}; em cada capítulo, o outro modelo serve
-de teste de robustez. Como o BVRP previsto é um regressor gerado, a inferência
-desses capítulos incorpora a incerteza da previsão
-(Seção~\ref{sec:met-inferencia}).
+estas previsões, da janela expansiva, como fator único: o Ridge é o principal,
+e a floresta aleatória, na forma $\hat f(X_t) - \text{IV}_t$, aparece ao lado.
+Como o BVRP previsto é um regressor gerado, esses testes o tratam como dado, e
+a Seção~\ref{sec:met-inferencia} discute a consequência.

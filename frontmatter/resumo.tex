@@ -7,9 +7,12 @@ do DVOL, da Deribit, com dados diários de março de 2021 a março de 2026.
 Medido pela volatilidade realizada, o prêmio é negativo em média
 ($-8{,}76$ p.p.): a volatilidade implícita supera a realizada. Modelos lineares e de aprendizado de máquina erram menos
 que a média histórica fora da amostra, mas o \textit{model confidence set} não
-os separa dela. O
-BVRP previsto não prevê os retornos do Bitcoin nesta amostra, nem com modelo
-linear nem com floresta aleatória.
+os separa dela. As variáveis disponíveis em $t$ não preveem os log-retornos
+do Bitcoin de 1 a 60 dias, nem com modelo linear nem com floresta aleatória. O
+BVRP previsto pelo Ridge antecede retornos menores, mas a evidência é fraca e
+frágil, restrita ao horizonte de um dia. Com poucas observações independentes,
+a falta de rejeição é ausência de evidência, e não evidência de ausência de
+previsibilidade.
 
 \vspace{0.5cm}
 \noindent\textbf{Palavras-chave:} Bitcoin; prêmio de risco de volatilidade; volatilidade implícita; DVOL; previsibilidade de retornos; aprendizado de máquina.

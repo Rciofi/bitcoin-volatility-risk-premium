@@ -4,9 +4,10 @@
 Este apêndice traduz em regras simples de negociação a relação entre o BVRP
 previsto e os retornos futuros estudada nos
 Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. A
-análise é exploratória. Nenhum dos dois capítulos encontra previsibilidade dos
-retornos que resista às correções para o regressor gerado e para as
-comparações múltiplas, e o apêndice não apresenta as regras a seguir como fonte
+análise é exploratória. Nenhum dos dois capítulos encontra previsibilidade
+robusta dos retornos: as variáveis não preveem o log-retorno em conjunto, e a
+relação negativa com o BVRP previsto pelo Ridge tem evidência fraca e frágil,
+restrita ao horizonte de um dia; o apêndice não apresenta as regras a seguir como fonte
 de retorno excedente. Elas mostram como o coeficiente negativo do
 Capítulo~\ref{chap:retornos_linear} se traduz no desempenho de uma posição no
 mercado à vista, antes e depois dos custos de transação.
@@ -17,7 +18,7 @@ mercado à vista, antes e depois dos custos de transação.
 
 \paragraph{Sinal.} O sinal principal é $\widehat{\text{BVRP}}_t$, a previsão
 do Ridge em janela expansiva do Capítulo~\ref{chap:previsao_bvrp}, a mesma que
-serve de regressor no Capítulo~\ref{chap:retornos_linear}; a previsão de $t$ só
+entra como fator único no Capítulo~\ref{chap:retornos_linear}; a previsão de $t$ só
 usa informação disponível até $t$. Como teste de robustez, a mesma regra é
 aplicada ao HBVRP,
 $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$, também
@@ -72,9 +73,9 @@ A Tabela~\ref{tab:estr-principal} e a Figura~\ref{fig:estr-principal}
 apresentam as duas regras no quantil de 80\%. A comprada/neutra tem índice de
 Sharpe de $-0{,}25$ sem custos, $-0{,}35$ com 10 bps e $-0{,}55$ com 30 bps.
 Esse resultado é o que o Capítulo~\ref{chap:retornos_linear} antecipa: o coeficiente do
-retorno futuro sobre o BVRP previsto é negativo em todos os horizontes ($-0{,}045$
-em $h = 1$, com valor-$p$ de 0,043 no bootstrap, sem passar pelo limite de
-Bonferroni). Um BVRP previsto alto antecede retornos menores, e a regra que
+log-retorno sobre o BVRP previsto pelo Ridge é negativo nos seis horizontes
+($-0{,}042$ em $h = 1$, com valor-$p$ de 0,005 no bootstrap e 0,030 depois do
+ajuste de Holm, mas 0,074 na rotação depois do ajuste). Um BVRP previsto alto antecede retornos menores, e a regra que
 compra nesses dias perde.
 
 \input{tables/estrategias/tab_principal}
@@ -83,8 +84,8 @@ Sharpe e Sortino negativos na regra comprada indicam que a posição lucrativa
 seria a vendida, e a regra vendida/neutra verifica isso diretamente: Sharpe de
 0,25 sem custos e de 0,16 com 10 bps, e Sortino de 0,36 sem custos. Com 30 bps,
 o Sharpe cai para $-0{,}04$. O ganho da vendida tem a mesma fragilidade do
-coeficiente do Capítulo~\ref{chap:retornos_linear}, que não é significante
-depois das correções, e a Figura~\ref{fig:estr-principal} mostra que ele se
+coeficiente do Capítulo~\ref{chap:retornos_linear}, cuja evidência é fraca
+e frágil, e a Figura~\ref{fig:estr-principal} mostra que ele se
 concentra no fim da amostra: a vendida só termina acima do valor inicial com a
 queda do Bitcoin em janeiro e fevereiro de 2026.
 
@@ -207,9 +208,9 @@ quantil de referência, desaparece com custos de 30 bps. O que se mantém é o
 \textit{drawdown} menor, que vem de ficar fora do mercado em 59\% a 74\% dos
 dias, e não de informação sobre a direção dos retornos. O resultado é coerente
 com os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}:
-o coeficiente do retorno sobre o BVRP previsto pelo Ridge é negativo, mas não é
-significante depois das correções, e o modelo em árvore não encontra a
-relação; as regras herdam essa fragilidade.
+o coeficiente do retorno sobre o BVRP previsto pelo Ridge é negativo, com
+evidência fraca e frágil, restrita ao horizonte de um dia, e a floresta
+aleatória não supera a média histórica; as regras herdam essa fragilidade.
 
 A análise tem quatro limitações. Primeiro, a negociação com o Ridge cobre 735
 dias, e a comparação entre os índices de Sharpe não tem teste formal; o ganho

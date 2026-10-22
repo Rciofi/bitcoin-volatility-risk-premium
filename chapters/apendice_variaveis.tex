@@ -16,17 +16,17 @@ r_t = \ln\left(\frac{P_t}{P_{t-1}}\right),
 em que $P_t$ é o preço de fechamento, entra no cálculo das volatilidades
 realizada e histórica e, como variável explicativa, nos log-retornos de 1, 5 e 30 dias
 (colunas \texttt{ret} ou \texttt{ret\_1d}, \texttt{ret\_acum\_5d} e
-\texttt{ret\_acum\_30d}). O retorno futuro é o retorno simples
-acumulado em $h$ dias,
+\texttt{ret\_acum\_30d}). As colunas \texttt{ret\_fut\_1d} a
+\texttt{ret\_fut\_60d} guardam o retorno simples acumulado em $h$ dias,
 \[
-R_{t+h} = \frac{P_{t+h}}{P_t} - 1, \qquad h \in \{1, 5, 10, 20, 30, 60\},
+R_{t+h} = \frac{P_{t+h}}{P_t} - 1, \qquad h \in \{1, 5, 10, 20, 30, 60\}.
 \]
-nas colunas \texttt{ret\_fut\_1d} a \texttt{ret\_fut\_60d}. Ele é a variável
-dependente dos Capítulos~\ref{chap:retornos_linear}
-e~\ref{chap:retornos_nao_linear} e nunca entra como variável explicativa. Os
-dois tipos de retorno não se misturam: a volatilidade usa log-retornos, e os
-retornos futuros e as estratégias do Apêndice~\ref{app:estrategias}, retornos
-simples.
+A variável dependente dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear} é o log-retorno correspondente,
+$R^{\log}_{t,h} = 100\ln(1 + R_{t+h})$, em pontos percentuais, calculado pelos
+scripts; ele nunca entra como variável explicativa. As volatilidades e os
+retornos futuros usam log-retornos; as estratégias do
+Apêndice~\ref{app:estrategias}, retornos simples.
 
 \section{Volatilidades realizada e histórica}
 
