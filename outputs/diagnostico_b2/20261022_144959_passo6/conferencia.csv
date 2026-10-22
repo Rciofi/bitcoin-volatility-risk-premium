@@ -1,0 +1,17 @@
+item,dif,tol,bate
+"linhas: 987 por h nos dois arquivos, todas casadas",0.0,0.0,True
+mesma origem por data,0.0,0.0,True
+realizado_log = log1p(realizado_simples) (máx. |dif|),9.974659986866641e-17,1e-09,True
+"h = 1: simples = T11 (R², p CW, p DM; máx. |dif|)",2.55351295663786e-14,1e-09,True
+"h = 1: log = passo 4B (R², p CW, p DM; máx. |dif|)",1.1102230246251565e-16,1e-09,True
+"h = 5: simples = T11 (R², p CW, p DM; máx. |dif|)",6.439293542825908e-15,1e-09,True
+"h = 5: log = passo 4B (R², p CW, p DM; máx. |dif|)",8.326672684688674e-17,1e-09,True
+"h = 10: simples = T11 (R², p CW, p DM; máx. |dif|)",3.4416913763379853e-15,1e-09,True
+"h = 10: log = passo 4B (R², p CW, p DM; máx. |dif|)",2.7755575615628914e-17,1e-09,True
+"h = 20: simples = T11 (R², p CW, p DM; máx. |dif|)",1.3322676295501878e-15,1e-09,True
+"h = 20: log = passo 4B (R², p CW, p DM; máx. |dif|)",9.020562075079397e-17,1e-09,True
+"h = 30: simples = T11 (R², p CW, p DM; máx. |dif|)",4.440892098500626e-16,1e-09,True
+"h = 30: log = passo 4B (R², p CW, p DM; máx. |dif|)",3.469446951953614e-17,1e-09,True
+"h = 60: simples = T11 (R², p CW, p DM; máx. |dif|)",1.1102230246251565e-16,1e-09,True
+"h = 60: log = passo 4B (R², p CW, p DM; máx. |dif|)",6.938893903907228e-17,1e-09,True
+"hiperparâmetros: 33 origens por h, mesmos n_treino e treino_fim",0.0,0.0,True
