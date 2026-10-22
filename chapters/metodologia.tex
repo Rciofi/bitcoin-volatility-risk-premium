@@ -10,10 +10,11 @@ amostras e os modelos utilizados ao longo da dissertação.
 
 A estratégia empírica tem duas etapas. Na primeira, a dissertação prevê o RBVRP
 fora da amostra, apenas com informação disponível em $t$. Na segunda, testa se
-o BVRP previsto prevê os retornos futuros do Bitcoin, primeiro com um modelo
-linear e depois com um modelo não linear em árvore, capaz de capturar
-não linearidades, efeitos de regime e interações características do mercado de
-criptoativos. Este capítulo concentra-se na definição formal das amostras e das
+as variáveis disponíveis em $t$ preveem o log-retorno futuro do Bitcoin,
+primeiro com um modelo linear e depois com a floresta aleatória, capaz de
+capturar não linearidades, efeitos de regime e interações características do
+mercado de criptoativos; o BVRP previsto entra como fator único, de forma
+complementar. Este capítulo concentra-se na definição formal das amostras e das
 especificações empíricas; os capítulos seguintes apresentam os
 resultados.
 
@@ -30,13 +31,14 @@ Quatro questões guiam a análise empírica, cada uma tratada em um capítulo:
     \item \textbf{Previsão do prêmio}: a informação disponível em $t$ prevê o
           RBVRP fora da amostra melhor que a média histórica? O
           Capítulo~\ref{chap:previsao_bvrp} compara modelos lineares e em árvore.
-    \item \textbf{Previsibilidade linear dos retornos}: o BVRP previsto prevê
-          linearmente os retornos futuros do Bitcoin? O
-          Capítulo~\ref{chap:retornos_linear} estima regressões lineares em seis
-          horizontes.
-    \item \textbf{Previsibilidade não linear}: um modelo em árvore, que escolhe
-          sozinho os cortes nas volatilidades, encontra a relação que o modelo
-          linear não encontra? O Capítulo~\ref{chap:retornos_nao_linear} responde.
+    \item \textbf{Previsibilidade linear dos retornos}: as variáveis
+          disponíveis em $t$ preveem linearmente o log-retorno do Bitcoin nos
+          $h$ dias seguintes, e o BVRP previsto, como fator único, carrega essa
+          informação? O Capítulo~\ref{chap:retornos_linear} testa as duas
+          hipóteses em seis horizontes.
+    \item \textbf{Previsibilidade não linear}: a floresta aleatória, aplicada
+          diretamente ao retorno, encontra a relação que o modelo linear não
+          encontra? O Capítulo~\ref{chap:retornos_nao_linear} responde.
 \end{enumerate}
 
 As estratégias de negociação baseadas no prêmio ficam no
@@ -77,9 +79,10 @@ qualquer $h \le 60$, o treino da primeira origem contém a janela inteira, e o
 período fora da amostra é o mesmo em todos os horizontes. Com $h = 30$, o
 primeiro treino vai até $t - 30$ e tem 760 observações: as 730 da primeira
 janela e as 30 seguintes, cujos alvos já se realizaram. Esse período
-é o mesmo nos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}, porque o
-regressor dos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} é o BVRP
-previsto no Capítulo~\ref{chap:previsao_bvrp}.
+é o mesmo nos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}, o que
+permite usar o BVRP previsto do Capítulo~\ref{chap:previsao_bvrp} como fator
+único nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}
+e comparar as previsões do retorno nas mesmas datas.
 
 Na janela principal, expansiva, o treino acumula todas as datas desde o início
 da amostra de modelagem; como robustez, a janela móvel mantém os últimos 730
@@ -111,45 +114,53 @@ Os modelos de referência, com que as previsões são comparadas fora da
 amostra, são a média histórica dos alvos já conhecidos, o HBVRP e o prêmio
 realizado defasado, $\text{RBVRP}_{t-30}$.
 
-Na segunda etapa, o Capítulo~\ref{chap:retornos_linear} estima, para cada horizonte $h$, o modelo
-linear
+Na segunda etapa, o Capítulo~\ref{chap:retornos_linear} estima, para cada
+horizonte $h \in \{1, 5, 10, 20, 30, 60\}$, a regressão preditiva
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
+R^{\log}_{t,h} = \alpha_h + X_t'\beta_h + \varepsilon_{t+h},
+\label{eq:met-retorno-direto}
+\end{equation}
+em que $R^{\log}_{t,h}$ é o log-retorno do Bitcoin de $t$ a $t+h$
+(Seção~\ref{sec:dados-variaveis}) e $X_t$ reúne 16 das 17 variáveis
+explicativas: a volatilidade histórica de 30 dias sai porque é colinear com o
+HBVRP e a IV. O estimador é o MQO, na amostra de modelagem e nas 987 datas
+fora da amostra, e a hipótese nula é $\beta_h = 0$; a análise não impõe
+restrições \textit{a priori} sobre o sinal dos coeficientes. Fora da amostra,
+o MQO, o Ridge e o LASSO preveem $R^{\log}_{t,h}$ com as 16 variáveis, nas
+origens e com o embargo da Seção~\ref{sec:met-amostras}.
+
+De forma complementar, o BVRP previsto entra como fator único,
+\begin{equation}
+R^{\log}_{t,h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
 \label{eq:met-retorno-linear}
 \end{equation}
 em que $\widehat{\text{BVRP}}_t$ é o BVRP previsto para a data $t$ pelo modelo
-estimado na origem vigente, $\alpha_h$ é um intercepto específico ao horizonte
-de previsão, $\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$
-representa o termo de erro. O estimador é o MQO, aplicado às 987 datas fora da
-amostra. O $\widehat{\text{BVRP}}$ principal é o previsto pelo Ridge, e o da floresta aleatória serve de
-robustez --- escolha fixada antes de ver os resultados. A análise não impõe
-restrições \textit{a priori} sobre o sinal de $\beta_h$.
-
-Duas extensões complementam o modelo~\eqref{eq:met-retorno-linear}. A primeira
-substitui o prêmio por seus componentes:
+estimado na origem vigente, nas 987 datas fora da amostra. O
+$\widehat{\text{BVRP}}$ principal é o do Ridge; o da floresta aleatória, na
+forma $\hat f(X_t) - \text{IV}_t$, aparece ao lado. Duas extensões completam a
+análise. A primeira substitui as variáveis pelos dois componentes do HBVRP:
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_{1,h} \, \text{VH}_{t-29:t} + \beta_{2,h} \,
+R^{\log}_{t,h} = \alpha_h + \beta_{1,h} \, \text{VH}_{t-29:t} + \beta_{2,h} \,
 \text{IV}_t + \varepsilon_{t+h}.
 \label{eq:met-retorno-componentes}
 \end{equation}
-Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença $\text{VH} - \text{IV}$,
-isto é, o HBVRP, sintetiza o conteúdo informacional conjunto das duas medidas. A segunda
-acrescenta o regime de volatilidade:
+Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença $\text{VH} - \text{IV}$, isto
+é, o HBVRP, sintetiza o conteúdo informacional conjunto das duas medidas. A
+segunda acrescenta o regime de volatilidade ao fator único:
 \begin{equation}
-R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \delta_h \, D_t
+R^{\log}_{t,h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \delta_h \, D_t
 + \gamma_h \, D_t \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
 \label{eq:met-retorno-regime}
 \end{equation}
-em que $D_t = 1$ no regime de alta volatilidade
-(Seção~\ref{sec:met-regimes}).
+em que $D_t = 1$ no regime de alta volatilidade (Seção~\ref{sec:met-regimes}).
 
-No modelo em árvore, o Capítulo~\ref{chap:retornos_nao_linear} reestima o modelo~\eqref{eq:met-retorno-linear} com
-$\widehat{\text{BVRP}}_t = \hat{f}(X_t) - \text{IV}_t$, em que $\hat{f}$ é uma
-floresta aleatória que prevê $\text{RV}_{t+1:t+30}$ com as mesmas variáveis,
-origens e embargo. A floresta escolhe sozinha os cortes nas volatilidades, o
-que substitui os regimes construídos à mão por um único modelo em árvore. Como
-robustez, a floresta prevê o RBVRP diretamente, e o Ridge entra nas duas
-formas.
+No Capítulo~\ref{chap:retornos_nao_linear}, uma floresta aleatória prevê o
+log-retorno diretamente, $R^{\log}_{t,h} = g_h(X_t) + \varepsilon_{t+h}$, com
+as 17 variáveis em nível, as mesmas origens e o embargo de $h$ dias, e é
+comparada fora da amostra com a média histórica e com os modelos lineares. A
+floresta escolhe sozinha os cortes nas volatilidades, o que substitui os
+regimes construídos à mão por um único modelo. Análises complementares usam o
+BVRP previsto pela floresta.
 
 % =========================================================
 \section{Inferência estatística}
@@ -169,30 +180,39 @@ erro-padrão do estimador de MQO, não no estimador. Mesmo com ela, 987 datas co
 alvos de 30 dias sobrepostos equivalem a cerca de 33 observações
 independentes, e os testes têm pouco poder.
 
-Nos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}, o regressor é
-gerado: o BVRP previsto vem de um primeiro estágio estimado, e o erro-padrão de
-MQO do segundo estágio ignora a incerteza dessa estimação \citep{pagan1984}.
-Por isso, a inferência principal usa um bootstrap em blocos em dois níveis
-\citep{kunsch1989}. No primeiro nível, o bootstrap reestima o modelo de
-previsão, em cada origem, numa amostra reamostrada em blocos dentro da própria
-janela de treino, o que preserva o embargo. No segundo, reamostra em blocos os
-pares (previsão, retorno) das 987 datas e reestima $\beta_h$. O bootstrap em
-blocos tem validade assintótica sob condições sobre o tamanho do bloco, que
-cresce com a amostra, e pode trazer refinamentos em amostras finitas em alguns
-casos; ele não dispensa hipóteses assintóticas. O
-Capítulo~\ref{chap:retornos_linear} detalha o procedimento. Como a dissertação
-testa cada especificação em seis horizontes, ela reporta também quais
-coeficientes sobrevivem à correção de Bonferroni ($0{,}05/6 \approx 0{,}0083$).
-Como os seis horizontes são fortemente correlacionados entre si, a dissertação
-também testa conjuntamente a hipótese de que $\beta_h = 0$ em todos os
-horizontes, com a matriz de covariância dos coeficientes obtida no bootstrap;
-os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear} detalham o teste.
+Com 16 restrições e retornos sobrepostos, a distribuição $\chi^2$ aproxima mal
+a da estatística de Wald com erro-padrão HAC, e o teste rejeita a hipótese
+nula muito acima do nível nominal nas simulações do Apêndice~\ref{app:b2}. Por
+isso, os Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}
+avaliam a estatística de Wald, $W$, com dois testes de tamanho controlado. O
+primeiro é a rotação circular: $W$ é recalculado com $y$ deslocado em $k$ dias
+em relação às variáveis explicativas, $g_h \le k \le n - g_h$, com
+$g_h = \max(90, 3h)$, e o valor-$p$ é a posição de $W$ entre os das rotações.
+A rotação preserva a dependência de cada série e rompe só a relação entre
+elas. A rotação testa a independência entre $y$ e $X$, hipótese mais forte que
+$\beta = 0$, e pode ter tamanho distorcido sob mudanças de regime de
+volatilidade (Apêndice~\ref{app:b2}). Nas hipóteses sobre parte dos
+coeficientes, a rotação é a de \citet{freedman1983nonstochastic}: o resíduo do
+modelo restrito é deslocado e somado ao ajustado restrito. O segundo é o
+bootstrap de pares $(X_t, y_t)$ em blocos circulares \citep{politis1992circular}
+de $\max(30, 2h)$ dias, com 1.999 reamostragens e a estatística centrada na
+estimativa. Como a dissertação testa seis horizontes, os valores-$p$ são
+ajustados pelo procedimento de \citet{holm1979simple}, e o mínimo dos
+valores-$p$ da rotação entre os horizontes, com o mesmo deslocamento em todos
+eles, testa a hipótese nula nos seis de uma vez. Como sensibilidade, o HAC usa
+$2h+1$ defasagens.
+
+O BVRP previsto é um regressor gerado: vem de um primeiro estágio estimado, e
+os testes do fator único o tratam como dado \citep{pagan1984}. A
+Seção~\ref{sec:apb2-provisoria} traz os resultados da versão anterior, com o
+bootstrap em blocos em dois níveis \citep{kunsch1989}, que reestima o
+primeiro estágio em cada reamostragem.
 
 % =========================================================
 \section{Avaliação fora da amostra}
 \label{sec:met-avaliacao}
 
-O Capítulo~\ref{chap:previsao_bvrp} mede o desempenho das previsões pelo $R^2$
+Os Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear} medem o desempenho das previsões pelo $R^2$
 fora da amostra contra a média histórica \citep{campbell2008predicting},
 \[
 R^2_{\text{fora}} = 1 - \frac{\sum_t (y_t - \hat{y}_t)^2}{\sum_t (y_t - \bar{y}_t)^2},
@@ -215,8 +235,7 @@ menos $1-\alpha$, os modelos de menor perda esperada. Cada modelo recebe um
 valor-$p$ e pertence ao conjunto de nível $\alpha$ sempre que esse valor-$p$ é
 maior ou igual a $\alpha$. A dissertação usa a perda quadrática e a estatística
 $T_{\max}$, o maior desvio padronizado entre a perda média de um modelo e a do
-conjunto. A distribuição vem de um bootstrap com os mesmos blocos móveis de 60
-dias do segundo nível do bootstrap da Seção~\ref{sec:met-inferencia}, mais
+conjunto. A distribuição vem de um bootstrap com blocos móveis de 60 dias, mais
 longos que a sobreposição de 30 dias dos alvos, com 9.999 reamostragens; o
 nível principal é de 10\%. Como sensibilidade, a dissertação repete o
 procedimento com blocos de 30 e 90 dias, com a estatística $T_R$ (o maior

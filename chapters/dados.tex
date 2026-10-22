@@ -268,7 +268,7 @@ temporal e efeitos de regime nos capítulos subsequentes.
 Por fim, esta seção examina a relação exploratória entre o prêmio de risco de
 volatilidade do Bitcoin e os retornos futuros do ativo. A
 Figura~\ref{fig:dados-bvrp-retorno-30d} apresenta o gráfico de dispersão entre o
-HBVRP observado em $t$ e o retorno acumulado do Bitcoin
+HBVRP observado em $t$ e o log-retorno do Bitcoin
 nos 30 dias seguintes, juntamente com a reta de MQO. O horizonte de 30 dias
 coincide com o do prêmio. A figura usa o HBVRP, e não o RBVRP, porque o RBVRP
 de $t$ é calculado com os mesmos retornos de $t+1$ a $t+30$ que formam o
@@ -278,22 +278,22 @@ retorno futuro, e a relação entre os dois seria em parte mecânica.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{figs/dados/vrp_vs_return_30d.png}
-    \caption[HBVRP e retorno do Bitcoin nos 30 dias seguintes]{Relação exploratória entre o HBVRP em $t$ e o
-    retorno do Bitcoin nos 30 dias seguintes ($N = 1.806$). Reta de MQO, com
+    \caption[HBVRP e log-retorno do Bitcoin nos 30 dias seguintes]{Relação exploratória entre o HBVRP em $t$ e o
+    log-retorno do Bitcoin nos 30 dias seguintes ($N = 1.806$). Reta de MQO, com
     erro-padrão de Newey--West de 31 defasagens.}
     \label{fig:dados-bvrp-retorno-30d}
 \end{figure}
 }{}
 
 O gráfico não evidencia associação linear relevante entre o prêmio e os
-retornos futuros: o coeficiente da reta é de $0{,}088$ (erro-padrão HAC de
-$0{,}119$; valor-$p$ de $0{,}46$), o $R^2$ é de $0{,}004$ e a correlação, de
-$0{,}06$, e a nuvem de pontos dispersa-se amplamente em torno de uma reta quase
+retornos futuros: o coeficiente da reta é de $0{,}114$ (erro-padrão HAC de
+$0{,}115$; valor-$p$ de $0{,}32$), o $R^2$ é de $0{,}007$ e a correlação, de
+$0{,}08$, e a nuvem de pontos dispersa-se amplamente em torno de uma reta quase
 horizontal. Essa ausência de relação linear na análise exploratória antecipa,
-de forma preliminar, o resultado central do Capítulo~\ref{chap:retornos_linear},
-em que o regressor é o BVRP previsto, e não o HBVRP, e nenhum horizonte é
-significante depois das correções para o regressor gerado e para as
-comparações múltiplas. A dispersão
+de forma preliminar, o resultado central do Capítulo~\ref{chap:retornos_linear}:
+as 16 variáveis disponíveis em $t$ não preveem, em conjunto, o log-retorno em
+nenhum horizonte, e o BVRP previsto pelo Ridge tem só evidência fraca e
+frágil, no horizonte de um dia. A dispersão
 elevada indica que, se o prêmio de risco de volatilidade carrega conteúdo
 informacional sobre o desempenho futuro do Bitcoin, esse conteúdo não se
 manifesta em uma relação linear simples --- motivando as abordagens não
@@ -308,18 +308,20 @@ bem como os horizontes temporais considerados na análise. Todas as variáveis
 são construídas a partir das séries descritas neste capítulo.
 
 A variável dependente dos Capítulos~\ref{chap:retornos_linear}
-e~\ref{chap:retornos_nao_linear} é o retorno futuro do Bitcoin no mercado à vista, definido
-como o retorno simples acumulado ao longo de um horizonte de $h$ dias:
+e~\ref{chap:retornos_nao_linear} é o log-retorno do Bitcoin no mercado à
+vista, acumulado ao longo de um horizonte de $h$ dias, em pontos percentuais:
 \[
-R_{t+h} = \frac{P_{t+h}}{P_t} - 1,
+R^{\log}_{t,h} = 100 \, \ln\!\left(\frac{P_{t+h}}{P_t}\right),
 \]
 em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e
-$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão. O retorno
-simples corresponde ao retorno efetivo de uma posição no ativo. As
-volatilidades realizada e histórica, por sua vez, usam log-retornos diários, e
-essa escolha não é uma convenção: o log-retorno de um período é exatamente a
-soma dos log-retornos diários dentro dele, o que permite construir a variância
-do período somando os quadrados dos retornos diários.
+$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão. O
+log-retorno de $h$ dias é exatamente a soma dos log-retornos diários de $t+1$
+a $t+h$, o que torna os horizontes comparáveis entre si; é a mesma
+propriedade que permite construir a variância de um período somando os
+quadrados dos log-retornos diários, nas volatilidades realizada e histórica.
+O retorno simples, $P_{t+h}/P_t - 1$, é o retorno efetivo de uma posição no
+ativo; a versão anterior das análises o usava, e o Apêndice~\ref{app:b2}
+compara os dois.
 
 A variável-alvo do Capítulo~\ref{chap:previsao_bvrp} é o RBVRP,
 $\text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t$, definido na

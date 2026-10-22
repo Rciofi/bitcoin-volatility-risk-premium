@@ -4,7 +4,8 @@ plot_vrp_vs_return_T12.py — dispersão HBVRP x retorno futuro de 30 dias (T12)
 Substitui, para o Cap. 3, a figura de code/plot_vrp_vs_return.py com h = 20
 (figs/dados/vrp_vs_return_20d.png) por h = 30, alinhando o horizonte ao do BVRP
 (plano, T12). Figura descritiva: usa o HBVRP, coluna vrp_30d (conhecido em t) e a
-amostra descritiva (data/vrp_with_targets.csv, N = 1.806). A reta é de MQO, e
+amostra descritiva (data/vrp_with_targets.csv, N = 1.806). O retorno é o
+log-retorno de 30 dias, 100 · log1p(ret_fut_30d), como nos Caps. 6 e 7. A reta é de MQO, e
 a legenda traz b com erro-padrão de Newey–West com h+1 = 31 defasagens
 (hac_utils), no lugar da correlação simples da versão antiga.
 
@@ -48,7 +49,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     df = pd.read_csv(os.path.join(ROOT, "data", "vrp_with_targets.csv"), parse_dates=["date"]).sort_values("date")
-    x, y = df["vrp_30d"], 100 * df[f"ret_fut_{H}d"]
+    x, y = df["vrp_30d"], 100 * np.log1p(df[f"ret_fut_{H}d"])        # log-retorno de t a t+30, em %
     res = mqo_newey_west(y, x, h=H)
     a, b = res.params["const"], res.params["vrp_30d"]
     pd.DataFrame([{"h": H, "n": int(res.nobs), "inicio": df.date.min().date(), "fim": df.date.max().date(),
@@ -65,7 +66,7 @@ def main():
     ax.axhline(0, color="gray", linewidth=0.7, linestyle=":")
     ax.axvline(0, color="gray", linewidth=0.7, linestyle=":")
     ax.set_xlabel(r"HBVRP em $t$ (p.p.)")
-    ax.set_ylabel(f"Retorno futuro de {H} dias (%)")
+    ax.set_ylabel(f"Log-retorno futuro de {H} dias (%)")
     ax.legend(fontsize=8, loc="upper left")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
