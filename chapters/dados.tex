@@ -2,8 +2,9 @@
 \label{chap:dados}
 
 Este capítulo descreve as bases de dados utilizadas na dissertação, testa a
-existência do prêmio de risco de volatilidade do Bitcoin (H1) e apresenta uma
-análise exploratória das principais variáveis de interesse. O objetivo é
+existência do prêmio de risco de volatilidade do Bitcoin (H1), apresenta uma
+análise exploratória das principais variáveis de interesse e define as
+variáveis e os horizontes de previsão dos capítulos seguintes. O objetivo é
 caracterizar as propriedades estatísticas do prêmio, bem como sua relação
 preliminar com medidas de volatilidade e retornos do ativo, fornecendo
 motivação empírica para as análises econométricas e preditivas desenvolvidas
@@ -289,3 +290,57 @@ elevada indica que, se o prêmio de risco de volatilidade carrega conteúdo
 informacional sobre o desempenho futuro do Bitcoin, esse conteúdo não se
 manifesta em uma relação linear simples --- motivando as abordagens não
 lineares e condicionais desenvolvidas nos capítulos subsequentes.
+
+% =========================================================
+\section{Definição das variáveis e horizontes de previsão}
+\label{sec:dados-variaveis}
+
+Esta seção define formalmente as variáveis utilizadas nos modelos empíricos,
+bem como os horizontes temporais considerados na análise. Todas as variáveis
+são construídas a partir das séries descritas neste capítulo.
+
+A variável dependente dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear} é o retorno futuro do Bitcoin no mercado à vista, definido
+como o retorno simples acumulado ao longo de um horizonte de $h$ dias:
+\[
+R_{t+h} = \frac{P_{t+h}}{P_t} - 1,
+\]
+em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e
+$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão. O retorno
+simples corresponde ao retorno efetivo de uma posição no ativo. As
+volatilidades realizada e histórica, por sua vez, usam log-retornos diários, e
+essa escolha não é uma convenção: o log-retorno de um período é exatamente a
+soma dos log-retornos diários dentro dele, o que permite construir a variância
+do período somando os quadrados dos retornos diários.
+
+A variável-alvo do Capítulo~\ref{chap:previsao_bvrp} é o RBVRP,
+$\text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t$, definido na
+Seção~\ref{sec:refer-vrp-teorico}. Ele só é conhecido em $t+30$ e, por isso, nunca
+entra como variável explicativa. A estimativa do prêmio conhecida em $t$ é o
+HBVRP,
+\[
+\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t,
+\]
+que supõe um passeio aleatório sem deriva para a volatilidade: a melhor
+previsão da RV dos próximos 30 dias seria a VH dos últimos 30. A
+Seção~\ref{sec:refer-vrp-teorico} discute essa hipótese, sabidamente uma
+simplificação. Na amostra completa, a correlação entre o HBVRP e o RBVRP na
+mesma data é de $-0{,}02$: o HBVRP aproxima mal a realização do prêmio, o que
+motiva prevê-lo com um conjunto mais amplo de variáveis.
+
+As 17 variáveis explicativas, todas conhecidas em $t$, formam quatro grupos:
+(i) a volatilidade histórica de 1, 5, 30, 60 e 90 dias, em que as três
+primeiras seguem a estrutura diária, semanal e mensal do modelo HAR de
+\citet{corsi2009har}; (ii) a volatilidade implícita de 30 dias, suas variações
+em 1 e 5 dias e seus desvios em relação às médias móveis de 5 e 30 dias;
+(iii) o log-retorno diário, os log-retornos acumulados de 5 e 30 dias e o log
+do preço relativo à sua média móvel de 30 dias; e (iv) o HBVRP, sua variação
+diária e o prêmio realizado defasado,
+$\text{VH}_{t-29:t} - \text{IV}_{t-30}$, isto é, o $\text{RBVRP}_{t-30}$, que
+se realiza em $t$ (a RV de $t-30$ é a VH de $t$). O preço e as médias móveis
+da IV nunca entram sozinhos em nível: o preço entra só por log-retornos e pelo
+log da razão com a sua média móvel, e as médias móveis da IV, só pelo desvio
+da IV em relação a elas. As volatilidades, persistentes, entram em nível. Como
+$\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$ por construção, os modelos lineares excluem a VH de 30 dias para
+evitar colinearidade perfeita. O Capítulo~\ref{chap:previsao_bvrp} traz o dicionário
+completo das variáveis.

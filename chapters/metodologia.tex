@@ -6,15 +6,15 @@ existência e as propriedades do prêmio de risco de volatilidade no mercado de
 Bitcoin, bem como seu conteúdo informacional para a previsão de retornos futuros
 do ativo. Com base nas evidências descritivas apresentadas no
 Capítulo~\ref{chap:dados}, o capítulo define as questões de pesquisa, as
-variáveis, as amostras e os modelos utilizados ao longo da dissertação.
+amostras e os modelos utilizados ao longo da dissertação.
 
 A estratégia empírica tem duas etapas. Na primeira, a dissertação prevê o RBVRP
 fora da amostra, apenas com informação disponível em $t$. Na segunda, testa se
 o BVRP previsto prevê os retornos futuros do Bitcoin, primeiro com um modelo
 linear e depois com um modelo não linear em árvore, capaz de capturar
 não linearidades, efeitos de regime e interações características do mercado de
-criptoativos. Este capítulo concentra-se na definição formal das variáveis, das
-amostras e das especificações empíricas; os capítulos seguintes apresentam os
+criptoativos. Este capítulo concentra-se na definição formal das amostras e das
+especificações empíricas; os capítulos seguintes apresentam os
 resultados.
 
 % =========================================================
@@ -25,9 +25,8 @@ Quatro questões guiam a análise empírica, cada uma tratada em um capítulo:
 
 \begin{enumerate}
     \item \textbf{Existência do prêmio (H1)}: o BVRP é negativo em média? O
-          Capítulo~\ref{chap:dados} (Seção~\ref{sec:dados-h1}) responde com um teste
-          $t$ sobre a média do RBVRP, com erro-padrão de Newey--West de $h+1$
-          defasagens (Seção~\ref{sec:met-inferencia}).
+          Capítulo~\ref{chap:dados} (Seção~\ref{sec:dados-h1}) responde antes da
+          metodologia, porque o teste não depende dos modelos deste capítulo.
     \item \textbf{Previsão do prêmio}: a informação disponível em $t$ prevê o
           RBVRP fora da amostra melhor que a média histórica? O
           Capítulo~\ref{chap:previsao_bvrp} compara modelos lineares e em árvore.
@@ -42,60 +41,6 @@ Quatro questões guiam a análise empírica, cada uma tratada em um capítulo:
 
 As estratégias de negociação baseadas no prêmio ficam no
 Apêndice~\ref{app:estrategias}, como análise exploratória.
-
-% =========================================================
-\section{Definição das variáveis e horizontes de previsão}
-\label{sec:met-variaveis}
-
-Esta seção define formalmente as variáveis utilizadas nos modelos empíricos,
-bem como os horizontes temporais considerados na análise. Todas as variáveis
-são construídas a partir das séries descritas no Capítulo~\ref{chap:dados}.
-
-A variável dependente dos Capítulos~\ref{chap:retornos_linear}
-e~\ref{chap:retornos_nao_linear} é o retorno futuro do Bitcoin no mercado à vista, definido
-como o retorno simples acumulado ao longo de um horizonte de $h$ dias:
-\[
-R_{t+h} = \frac{P_{t+h}}{P_t} - 1,
-\]
-em que $P_t$ denota o preço de fechamento do Bitcoin no instante $t$ e
-$h \in \{1, 5, 10, 20, 30, 60\}$ representa o horizonte de previsão. O retorno
-simples corresponde ao retorno efetivo de uma posição no ativo. As
-volatilidades realizada e histórica, por sua vez, usam log-retornos diários, e
-essa escolha não é uma convenção: o log-retorno de um período é exatamente a
-soma dos log-retornos diários dentro dele, o que permite construir a variância
-do período somando os quadrados dos retornos diários.
-
-A variável-alvo do Capítulo~\ref{chap:previsao_bvrp} é o RBVRP,
-$\text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t$, definido na
-Seção~\ref{sec:refer-vrp-teorico}. Ele só é conhecido em $t+30$ e, por isso, nunca
-entra como variável explicativa. A estimativa do prêmio conhecida em $t$ é o
-HBVRP,
-\[
-\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t,
-\]
-que supõe um passeio aleatório sem deriva para a volatilidade: a melhor
-previsão da RV dos próximos 30 dias seria a VH dos últimos 30. A
-Seção~\ref{sec:refer-vrp-teorico} discute essa hipótese, sabidamente uma
-simplificação. Na amostra completa, a correlação entre o HBVRP e o RBVRP na
-mesma data é de $-0{,}02$: o HBVRP aproxima mal a realização do prêmio, o que
-motiva prevê-lo com um conjunto mais amplo de variáveis.
-
-As 17 variáveis explicativas, todas conhecidas em $t$, formam quatro grupos:
-(i) a volatilidade histórica de 1, 5, 30, 60 e 90 dias, em que as três
-primeiras seguem a estrutura diária, semanal e mensal do modelo HAR de
-\citet{corsi2009har}; (ii) a volatilidade implícita de 30 dias, suas variações
-em 1 e 5 dias e seus desvios em relação às médias móveis de 5 e 30 dias;
-(iii) o log-retorno diário, os log-retornos acumulados de 5 e 30 dias e o log
-do preço relativo à sua média móvel de 30 dias; e (iv) o HBVRP, sua variação
-diária e o prêmio realizado defasado,
-$\text{VH}_{t-29:t} - \text{IV}_{t-30}$, isto é, o $\text{RBVRP}_{t-30}$, que
-se realiza em $t$ (a RV de $t-30$ é a VH de $t$). O preço e as médias móveis
-da IV nunca entram sozinhos em nível: o preço entra só por log-retornos e pelo
-log da razão com a sua média móvel, e as médias móveis da IV, só pelo desvio
-da IV em relação a elas. As volatilidades, persistentes, entram em nível. Como
-$\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$ por construção, os modelos lineares excluem a VH de 30 dias para
-evitar colinearidade perfeita. O Capítulo~\ref{chap:previsao_bvrp} traz o dicionário
-completo das variáveis.
 
 % =========================================================
 \section{Amostras e janela de estimação}
@@ -150,15 +95,13 @@ e a validação cruzada é embargada porque aplica o mesmo embargo da previsão.
 \section{Modelos econométricos}
 \label{sec:met-modelos}
 
-\subsection{Previsão do prêmio}
-
-O Capítulo~\ref{chap:previsao_bvrp} modela o RBVRP como função das variáveis
+Na primeira etapa, o Capítulo~\ref{chap:previsao_bvrp} modela o RBVRP como função das variáveis
 explicativas,
 \begin{equation}
 \text{RBVRP}_t = f(X_t) + u_t,
 \label{eq:met-previsao-bvrp}
 \end{equation}
-em que $X_t$ reúne as 17 variáveis da Seção~\ref{sec:met-variaveis}. No
+em que $X_t$ reúne as 17 variáveis da Seção~\ref{sec:dados-variaveis}. No
 modelo linear, $f(X_t) = X_t'\gamma$, estimado por MQO, Ridge ou LASSO; nos
 modelos em árvore, $f$ é estimada por floresta aleatória ou por XGBoost.
 Como $\mathbb{E}(\text{RBVRP}_t \mid I_t) = \text{BVRP}_t$, a previsão
@@ -168,9 +111,7 @@ Os modelos de referência, com que as previsões são comparadas fora da
 amostra, são a média histórica dos alvos já conhecidos, o HBVRP e o prêmio
 realizado defasado, $\text{RBVRP}_{t-30}$.
 
-\subsection{Retornos e BVRP previsto: modelo linear}
-
-O Capítulo~\ref{chap:retornos_linear} estima, para cada horizonte $h$, o modelo
+Na segunda etapa, o Capítulo~\ref{chap:retornos_linear} estima, para cada horizonte $h$, o modelo
 linear
 \begin{equation}
 R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \varepsilon_{t+h},
@@ -202,9 +143,7 @@ R_{t+h} = \alpha_h + \beta_h \, \widehat{\text{BVRP}}_t + \delta_h \, D_t
 em que $D_t = 1$ no regime de alta volatilidade
 (Seção~\ref{sec:met-regimes}).
 
-\subsection{Retornos e BVRP previsto: modelo em árvore}
-
-O Capítulo~\ref{chap:retornos_nao_linear} reestima o modelo~\eqref{eq:met-retorno-linear} com
+No modelo em árvore, o Capítulo~\ref{chap:retornos_nao_linear} reestima o modelo~\eqref{eq:met-retorno-linear} com
 $\widehat{\text{BVRP}}_t = \hat{f}(X_t) - \text{IV}_t$, em que $\hat{f}$ é uma
 floresta aleatória que prevê $\text{RV}_{t+1:t+30}$ com as mesmas variáveis,
 origens e embargo. A floresta escolhe sozinha os cortes nas volatilidades, o
