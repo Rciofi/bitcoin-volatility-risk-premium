@@ -107,17 +107,22 @@ diárias de 24/03/2021 a 03/03/2026, serve à análise descritiva e ao teste de 
 23/04/2021 a 03/03/2026, serve aos Capítulos~\ref{chap:previsao_bvrp},
 \ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. Ela começa 30 dias depois porque
 o prêmio realizado defasado exige a IV de $t-30$, e o índice DVOL só existe a
-partir de 24/03/2021. As duas amostras terminam em 03/03/2026, o último dia
-com retorno de 60 dias à frente. O alvo do Capítulo~\ref{chap:previsao_bvrp} só
-precisa de 30 dias à frente, mas uma única amostra de modelagem torna os
-resultados dos três capítulos comparáveis.
+partir de 24/03/2021. As duas amostras terminam em 03/03/2026. A data é fixada
+pelo maior horizonte de retorno dos Capítulos~\ref{chap:retornos_linear}
+e~\ref{chap:retornos_nao_linear}, de 60 dias: os preços vão até 02/05/2026, e
+03/03/2026 é a última data com o retorno dos 60 dias seguintes observado. O
+RBVRP, alvo do Capítulo~\ref{chap:previsao_bvrp}, exigiria só 30 dias à
+frente, mas a dissertação usa a mesma amostra nos três capítulos para que os
+resultados sejam comparáveis.
 
 A dissertação estima os modelos de previsão numa subamostra e os avalia fora
 dela, em origens de previsão sucessivas. A primeira janela de estimação tem 730 dias,
 de 23/04/2021 a 22/04/2023. Em cada origem $t$, o modelo usa apenas
-as datas $s \le t - h$ --- o embargo: o alvo de $s$ olha $h$ dias à frente e só
-é conhecido em $s + h$ --- e prevê as datas de $t$ até a véspera da origem
-seguinte, sempre com as variáveis explicativas da própria data. No
+as datas $s \le t - h$ e prevê as datas de $t$ até a véspera da origem
+seguinte, sempre com as variáveis explicativas da própria data. Essa exclusão
+das $h$ datas anteriores à origem é o embargo: o alvo de $s$ olha $h$ dias à
+frente e só é conhecido em $s + h$, e, sem o embargo, o treino usaria
+informação posterior a $t$. No
 Capítulo~\ref{chap:previsao_bvrp}, $h = 30$, o horizonte do RBVRP. O modelo é
 reestimado a cada 30 dias. A primeira origem é 21/06/2023, e o período fora da
 amostra tem 987 datas (de 21/06/2023 a 03/03/2026), em 33 origens. A primeira
@@ -133,20 +138,17 @@ previsto no Capítulo~\ref{chap:previsao_bvrp}.
 
 Na janela principal, expansiva, o treino acumula todas as datas desde o início
 da amostra de modelagem; como robustez, a janela móvel mantém os últimos 730
-dias. Em cada reestimação, a validação cruzada embargada escolhe os
-hiperparâmetros dos modelos regularizados e em árvore: cinco dobras expansivas
-dentro do treino da origem, com o mesmo embargo --- numa dobra cuja validação
-começa em $v$, o treino da dobra usa $s \le v - h$.
+dias. Em cada reestimação, a validação cruzada escolhe os hiperparâmetros dos
+métodos regularizados e em árvore. O treino da origem é dividido em seis
+blocos consecutivos (o último bloco inclui as datas que sobram da divisão); na
+dobra $k$ ($k = 1, \ldots, 5$), a validação é o bloco $k+1$, e o treino da
+dobra reúne as datas $s \le v - h$, em que $v$ é a primeira data da validação.
+As dobras são expansivas porque o treino cresce de uma dobra para a seguinte,
+e a validação cruzada é embargada porque aplica o mesmo embargo da previsão.
 
 % =========================================================
 \section{Modelos econométricos}
 \label{sec:met-modelos}
-
-Um modelo é uma especificação com suas premissas; o método de mínimos
-quadrados ordinários (MQO) é um estimador. Nas especificações lineares desta
-seção, o MQO é o estimador padrão, adequado sob a condição de ortogonalidade
-$\mathbb{E}(\varepsilon \mid X) = 0$, em que $\varepsilon$ é o erro e $X$, o vetor de
-regressores.
 
 \subsection{Previsão do prêmio}
 
@@ -162,8 +164,9 @@ modelos em árvore, $f$ é estimada por floresta aleatória ou por XGBoost.
 Como $\mathbb{E}(\text{RBVRP}_t \mid I_t) = \text{BVRP}_t$, a previsão
 $\hat f(X_t)$ é uma estimativa do BVRP; o texto a denota
 $\widehat{\text{BVRP}}_t$ e a chama de BVRP previsto.
-As referências são a média histórica, o
-HBVRP e o prêmio realizado defasado.
+Os modelos de referência, com que as previsões são comparadas fora da
+amostra, são a média histórica dos alvos já conhecidos, o HBVRP e o prêmio
+realizado defasado, $\text{RBVRP}_{t-30}$.
 
 \subsection{Retornos e BVRP previsto: modelo linear}
 
@@ -177,7 +180,7 @@ em que $\widehat{\text{BVRP}}_t$ é o BVRP previsto para a data $t$ pelo modelo
 estimado na origem vigente, $\alpha_h$ é um intercepto específico ao horizonte
 de previsão, $\beta_h$ é o coeficiente de interesse e $\varepsilon_{t+h}$
 representa o termo de erro. O estimador é o MQO, aplicado às 987 datas fora da
-amostra. A previsão principal vem do Ridge, e a da floresta aleatória serve de
+amostra. O $\widehat{\text{BVRP}}$ principal é o previsto pelo Ridge, e o da floresta aleatória serve de
 robustez --- escolha fixada antes de ver os resultados. A análise não impõe
 restrições \textit{a priori} sobre o sinal de $\beta_h$.
 
@@ -222,8 +225,7 @@ a defasagem ---, tornando a inferência assintoticamente válida. A dissertaçã
 usa o núcleo de Bartlett com $h+1$ defasagens, sendo $h$ o horizonte de
 previsão, com pesos $1 - j/(h+2)$, $j = 0, \ldots, h+1$
 \citep{newey1987simple}: $h$ defasagens cobrem a sobreposição, e a defasagem
-adicional capta a autocorrelação remanescente. Não se aplica correção de
-amostra pequena, e o valor-$p$ vem da distribuição normal. A correção atua no
+adicional capta a autocorrelação remanescente. A correção atua no
 erro-padrão do estimador de MQO, não no estimador. Mesmo com ela, 987 datas com
 alvos de 30 dias sobrepostos equivalem a cerca de 33 observações
 independentes, e os testes têm pouco poder.

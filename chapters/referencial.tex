@@ -142,11 +142,11 @@ de previsão da variância. O Capítulo~\ref{chap:previsao_bvrp} estima o BVRP
 com um conjunto mais amplo de variáveis conhecidas em $t$, entre elas o
 próprio HBVRP.
 
-A literatura empírica sobre prêmios de risco de volatilidade tem documentado esse fato estilizado em múltiplos mercados e horizontes. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para o mercado de ações, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários --- achado replicado em diversos índices acionários internacionais \citep{bollerslev2014international}. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
+A literatura empírica sobre prêmios de risco de volatilidade tem documentado, em múltiplos mercados e horizontes, que a volatilidade implícita supera em média a realizada, isto é, que o prêmio é negativo em média. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para o mercado de ações, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários. \citet{bollerslev2014international} replicam esse achado em diversos índices acionários internacionais. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
 
 Esta dissertação adota a convenção da volatilidade física menos a implícita, seguindo essa literatura, no BVRP e nas suas duas estimativas, o RBVRP e o HBVRP. Sob esta convenção, valores negativos correspondem ao estado típico em que a volatilidade implícita supera a volatilidade física --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de RBVRP positivo ($\text{RV} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
 
-A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}. Por um lado, espera-se menos persistência no RBVRP do que nas medidas de volatilidade, porque boa parte dessa persistência é comum à volatilidade realizada e à implícita e se cancela na diferença. Por outro lado, como o RBVRP mede diariamente volatilidades realizadas de 30 dias, espera-se mais persistência do que na frequência mensal, por conta da sobreposição de 29 dias entre datas vizinhas. Essa persistência justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte, intervalos de confiança via reamostragem em blocos e janelas expansivas para qualquer cálculo de limiares estatísticos. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita, o que permite avaliar a inferência quando há o viés de \citet{stambaugh1999}: quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés.
+A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}. Por um lado, espera-se menos persistência no RBVRP do que nas medidas de volatilidade, porque boa parte dessa persistência é comum à volatilidade realizada e à implícita e se cancela na diferença. Por outro lado, como o RBVRP mede diariamente volatilidades realizadas de 30 dias, espera-se mais persistência do que na frequência mensal, por conta da sobreposição de 29 dias entre datas vizinhas. Essa persistência justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte e inferência por reamostragem. \citet{stambaugh1999} mostra que, quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita e permite avaliar a inferência nesse caso.
 
 Do ponto de vista teórico, a distinção entre medida neutra ao risco (associada a
 preços de opções) e medida física (associada a retornos observados) implica que
@@ -182,8 +182,9 @@ de 30 dias, cuja distribuição é bimodal na primeira parte da amostra. A
 dissertação estima o corte entre os regimes apenas com dados da primeira janela
 de estimação,
 sem informação posterior às datas classificadas
-(Capítulo~\ref{chap:metodologia}); no modelo em árvore do
-Capítulo~\ref{chap:retornos_nao_linear}, o próprio modelo escolhe os cortes.
+(Capítulo~\ref{chap:metodologia}). Como alternativa a um corte fixado de
+antemão, a floresta aleatória do Capítulo~\ref{chap:retornos_nao_linear}
+escolhe sozinha os pontos de corte nas volatilidades.
 
 A combinação destes fatores produz três características empíricas relevantes para
 a análise conduzida nesta dissertação: (i) o RBVRP do Bitcoin é negativo em média
@@ -257,8 +258,8 @@ mostram que modelos baseados em árvores, redes neurais e técnicas de regulariz
 são capazes de capturar relações não lineares e de alta dimensão entre
 variáveis explicativas e retornos de ativos.
 
-Esta dissertação emprega cinco modelos supervisionados, organizados em duas
-famílias: modelos lineares --- MQO, Ridge e LASSO, em que os dois
+Esta dissertação emprega cinco métodos supervisionados, organizados em duas
+famílias: métodos de estimação do modelo linear --- MQO, Ridge e LASSO, em que os dois
 últimos introduzem regularização sobre a versão não penalizada ---; e métodos
 baseados em árvores (floresta aleatória e XGBoost),
 utilizados pela capacidade de capturar não linearidades e interações entre
@@ -344,10 +345,10 @@ Entre suas características, estão:
           independente como a floresta aleatória.
 \end{itemize}
 
-A dissertação emprega os cinco modelos --- MQO, LASSO, Ridge, floresta
+A dissertação emprega os cinco métodos --- MQO, LASSO, Ridge, floresta
 aleatória e XGBoost --- para avaliar se o
 RBVRP é previsível fora da amostra a partir de variáveis de volatilidade, retorno
-e estado de mercado, comparando modelos lineares e não lineares contra
-modelos de referência. A floresta aleatória é também o modelo único em árvore
-do Capítulo~\ref{chap:retornos_nao_linear}, que gera o BVRP previsto usado para testar a
-relação não linear entre o prêmio e os retornos futuros.
+e estado de mercado, comparando métodos lineares e não lineares contra
+modelos de referência. No Capítulo~\ref{chap:retornos_nao_linear}, a floresta
+aleatória prevê diretamente o retorno futuro com as mesmas variáveis, o que
+permite relações não lineares entre elas e o retorno.

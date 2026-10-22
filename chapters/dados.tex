@@ -88,9 +88,9 @@ com erro-padrão de Newey--West: núcleo de Bartlett com $h+1 = 31$ defasagens
 alvos vizinhos. A média é de $-8{,}76$ p.p., com erro-padrão de $1{,}70$ e
 estatística $t$ de $-5{,}15$ (valor-$p$ de $2{,}6 \times 10^{-7}$): o prêmio é
 significativamente negativo. Dois testes de robustez confirmam o resultado.
-Primeiro, a estatística $t$ fica entre $-8{,}10$ e $-4{,}92$ quando o número de
+Primeiro, a estatística $t$ fica entre $-8{,}10$ e $-4{,}97$ quando o número de
 defasagens vai de 7 --- a regra automática de \citet{newey1994automatic},
-padrão do pacote utilizado --- a 90. Segundo, numa amostra sem sobreposição,
+padrão do pacote utilizado --- a 60, o dobro da sobreposição. Segundo, numa amostra sem sobreposição,
 com uma observação a cada 30 dias ($N = 61$), a média é de $-10{,}64$ p.p. e a
 estatística $t$ simples, de $-4{,}29$; nos 30 pontos de partida possíveis, ela
 fica entre $-4{,}55$ e $-3{,}26$. O HBVRP leva à mesma conclusão (média de
@@ -160,8 +160,7 @@ episódios de estresse agudo em que a volatilidade realizada supera
 inesperadamente a implícita. Esses episódios ocorrem durante choques abruptos
 de mercado, quando a magnitude das oscilações de preço supera as expectativas
 incorporadas nos prêmios de opções. Com dados diários, não é possível separar,
-nesses episódios, os movimentos contínuos dos descontínuos (saltos): essa
-decomposição exigiria dados intradiários, indisponíveis nesta dissertação.
+nesses episódios, os movimentos contínuos dos descontínuos (saltos).
 
 % =========================================================
 \section{Regimes de volatilidade e subperíodos}
@@ -170,7 +169,9 @@ decomposição exigiria dados intradiários, indisponíveis nesta dissertação.
 Ao contrário da distribuição do prêmio, a distribuição da volatilidade
 histórica de 30 dias é bimodal. A bimodalidade costuma ser evidência de dois
 regimes: as modas associam-se às médias dos regimes, e a antimoda separa os
-dois. A Figura~\ref{fig:dados-vh-bimodal} mostra o histograma da volatilidade
+dois.\footnote{Num modelo estocástico de equilíbrio, as modas da distribuição
+estacionária correspondem aos equilíbrios estáveis, e as antimodas, aos
+instáveis \citep{cobb1983estimation}.} A Figura~\ref{fig:dados-vh-bimodal} mostra o histograma da volatilidade
 histórica, em escala logarítmica, na primeira janela de estimação (23/04/2021 a
 22/04/2023), com uma mistura de duas normais ajustada aos dados. O componente
 de baixa volatilidade tem média de $31{,}2\%$ a.a. e peso de $0{,}08$; o de
@@ -181,8 +182,11 @@ volatilidade e o regime de alta volatilidade. Como o corte usa apenas a
 primeira janela, nenhuma data é classificada com informação posterior a ela
 no Capítulo~\ref{chap:metodologia}. A bimodalidade perde nitidez com a queda da
 volatilidade do Bitcoin a partir de 2025: reestimada em janela expansiva, a
-mistura troca de solução entre fevereiro e julho de 2025, e o corte passa a
-oscilar.
+mistura de duas normais deixa de ter um ajuste estável. Entre fevereiro e julho
+de 2025, a estimativa alterna entre uma solução com o componente de baixa
+volatilidade em torno de $31\%$ a.a. e peso perto de 0,1 e outra com esse
+componente em torno de $45\%$ a.a. e peso perto de 0,5, e o corte oscila entre
+$29\%$ e $52\%$ a.a.
 
 \IfFileExists{figs/dados/vh_bimodalidade.png}{
 \begin{figure}[H]
@@ -194,20 +198,19 @@ oscilar.
 }{}
 
 O prêmio difere entre os regimes, e a direção da diferença depende da estimativa.
-Como $\text{RBVRP} = \text{RV} - \text{IV}$ e $\text{HBVRP} = \text{VH} - \text{IV}$,
-prêmio maior corresponde a valores mais negativos; \citet{almeida2024cryptoVRP},
-que medem o prêmio pela variância neutra ao risco menos a física, usam o sinal
-oposto. No HBVRP, o prêmio é maior
-em magnitude no regime de baixa volatilidade: a média é de $-13{,}56$ p.p. nas 394 datas
-desse regime e de $-7{,}26$ p.p. nas 1.412 do regime de alta. A diferença, de
+No HBVRP, o prêmio é maior
+em magnitude no regime de baixa volatilidade: a média é de $-13{,}56$ p.p. nos 394 dias
+desse regime e de $-7{,}26$ p.p. nos 1.412 dias do regime de alta. A diferença, de
 $6{,}30$ p.p., é estimada por MQO do HBVRP numa variável indicadora do regime
 de alta, com erro-padrão de Newey--West de 31 defasagens ($2{,}10$;
 $p = 0{,}003$). É o padrão que \citet{almeida2024cryptoVRP} encontram com dois
 regimes obtidos de outra forma e com a variância realizada dos 27 dias
 anteriores, também retrospectiva. No RBVRP, a diferença se inverte: a média é de
 $+2{,}00$ p.p. no regime de baixa e de $-11{,}77$ p.p. no de alta (diferença de
-$-13{,}77$ p.p., com erro-padrão de $3{,}55$; $p < 0{,}001$). A inversão vem da
-diferença entre a volatilidade passada e a futura. No regime de baixa, a VH dos
+$-13{,}77$ p.p., com erro-padrão de $3{,}55$; $p < 0{,}001$). A inversão indica
+reversão à média da variância realizada: depois de um período calmo, a
+volatilidade dos 30 dias seguintes tende a subir em direção à média, e, depois
+de um período agitado, a cair. No regime de baixa, a VH dos
 30 dias anteriores tem média de $30{,}7\%$ a.a., a IV, de $44{,}2\%$, e a RV dos
 30 dias seguintes, de $46{,}2\%$: a IV supera a volatilidade recente, mas não a
 que se realiza em seguida. O HBVRP, que compara a IV com a VH passada, registra
@@ -230,7 +233,7 @@ distribuição do RBVRP e do HBVRP em cada subperíodo.
 }{}
 
 Os resultados indicam que o prêmio de risco de volatilidade não é homogêneo ao
-longo do tempo. Nos anos completos, a mediana do RBVRP é negativa em todos os
+longo do tempo. Até 2025, a mediana do RBVRP é negativa em todos os
 anos e atenua-se ao longo do período, passando de $-20{,}3$ p.p. em 2021 para
 cerca de $-9{,}5$ p.p. em 2024 e 2025; o HBVRP segue o mesmo padrão (de
 $-18{,}1$ para $-6{,}5$ p.p.). A dispersão, contudo, não acompanha essa
