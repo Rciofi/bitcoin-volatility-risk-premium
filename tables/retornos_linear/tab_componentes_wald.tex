@@ -1,0 +1,37 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Retorno de $h$ dias sobre a volatilidade histórica e a implícita, separadas.}
+\label{tab:retlin-componentes-wald}
+\begin{tabular}{rrrrrrrr}
+\toprule
+\multicolumn{8}{l}{\textit{Painel A: coeficientes (EP HAC) e $H_0$: $\beta_{1,h} + \beta_{2,h} = 0$}} \\
+$h$ & $\hat\alpha_h$ & $\hat\beta_{1,h}$ & $\hat\beta_{2,h}$ & $\hat\beta_{1,h} + \hat\beta_{2,h}$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\
+\midrule
+1 & $-$0{,}73 & $-$0{,}009 & 0{,}024 & 0{,}015 & 0{,}057 & 0{,}042 & 0{,}046 \\
+ & (0{,}40) & (0{,}008) & (0{,}011) & (0{,}008) & & & \\
+5 & $-$1{,}71 & $-$0{,}017 & 0{,}057 & 0{,}040 & 0{,}201 & 0{,}345 & 0{,}223 \\
+ & (1{,}63) & (0{,}028) & (0{,}042) & (0{,}031) & & & \\
+10 & $-$2{,}24 & $-$0{,}022 & 0{,}080 & 0{,}059 & 0{,}322 & 0{,}535 & 0{,}413 \\
+ & (3{,}15) & (0{,}056) & (0{,}088) & (0{,}059) & & & \\
+20 & $-$2{,}42 & $-$0{,}002 & 0{,}084 & 0{,}081 & 0{,}493 & 0{,}721 & 0{,}585 \\
+ & (6{,}37) & (0{,}109) & (0{,}165) & (0{,}119) & & & \\
+30 & $-$2{,}06 & 0{,}031 & 0{,}063 & 0{,}094 & 0{,}591 & 0{,}789 & 0{,}648 \\
+ & (9{,}49) & (0{,}158) & (0{,}234) & (0{,}175) & & & \\
+60 & $-$6{,}28 & 0{,}206 & 0{,}048 & 0{,}254 & 0{,}454 & 0{,}723 & 0{,}530 \\
+ & (18{,}67) & (0{,}236) & (0{,}443) & (0{,}339) & & & \\
+\midrule
+\multicolumn{8}{l}{\textit{Painel B: $H_0$: $\beta_{1,h} = \beta_{2,h} = 0$}} \\
+ & & & & & \multicolumn{3}{c}{Holm} \\ \cmidrule(lr){6-8}
+$h$ & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\
+1 & 4{,}88 & 0{,}087 & 0{,}116 & 0{,}056 & 0{,}522 & 0{,}697 & 0{,}336 \\
+5 & 1{,}97 & 0{,}374 & 0{,}624 & 0{,}399 & 1{,}000 & 1{,}000 & 1{,}000 \\
+10 & 1{,}04 & 0{,}596 & 0{,}810 & 0{,}696 & 1{,}000 & 1{,}000 & 1{,}000 \\
+20 & 0{,}47 & 0{,}790 & 0{,}900 & 0{,}857 & 1{,}000 & 1{,}000 & 1{,}000 \\
+30 & 0{,}33 & 0{,}850 & 0{,}941 & 0{,}902 & 1{,}000 & 1{,}000 & 1{,}000 \\
+60 & 1{,}58 & 0{,}454 & 0{,}706 & 0{,}562 & 1{,}000 & 1{,}000 & 1{,}000 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R^{\log}_{t,h} = \alpha_h + \beta_{1,h}\,\text{VH}_{t-29:t} + \beta_{2,h}\,\text{IV}_t + \varepsilon_{t+h}$, nas 987 datas fora da amostra; coeficientes em pontos percentuais de retorno por ponto percentual de volatilidade, EP HAC entre parênteses. Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença $\text{VH}_{t-29:t} - \text{IV}_t$, isto é, o HBVRP, resume o conteúdo das duas medidas. HAC de Newey--West com $h+1$ defasagens; $p_{\chi^2}$ pela $\chi^2(2)$ no painel B e pela $\chi^2(1)$ no A. Rotação: de $y$ no painel B; de Freedman--Lane (resíduo do modelo restrito deslocado circularmente) no A; $g_h = \max(90, 3h)$. Bootstrap de pares em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. Holm sobre os seis horizontes; em $\beta_{1,h} + \beta_{2,h} = 0$, o menor valor-$p$ ajustado é 0{,}342 ($\chi^2$), 0{,}252 (rotação) e 0{,}276 (bootstrap).}
+\end{table}

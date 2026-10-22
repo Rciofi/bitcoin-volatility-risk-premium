@@ -3,28 +3,36 @@
 \footnotesize
 \caption{Retorno de $h$ dias, $\widehat{\text{BVRP}}$ do Ridge e regime de volatilidade.}
 \label{tab:apb2-regime}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{llrrrrrr}
 \toprule
-$H_0$ & gl & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\
+\multicolumn{8}{l}{\textit{Painel A: coeficientes (EP HAC)}} \\
+Corte & $h$ & \% alta & $\hat\alpha$ & $\hat\beta$ & $\hat\delta$ & $\hat\gamma$ & $\hat\beta + \hat\gamma$ \\
 \midrule
-\multicolumn{6}{l}{\textit{Corte fixo, $h = 30$}: $\hat\beta$ = $-$2{,}70, $\hat\delta$ = 4{,}88, $\hat\gamma$ = 2{,}30; 68{,}6\% das datas no regime de alta} \\
-$\gamma = 0$ & 1 & 4{,}04 & 0{,}044 & 0{,}101 & 0{,}180 \\
-$\delta = \gamma = 0$ & 2 & 4{,}99 & 0{,}083 & 0{,}240 & 0{,}310 \\
-$\beta = \delta = \gamma = 0$ & 3 & 8{,}60 & 0{,}035 & 0{,}266 & 0{,}287 \\
-\multicolumn{6}{l}{\textit{Corte fixo, $h = 60$}: $\hat\beta$ = $-$4{,}60, $\hat\delta$ = 6{,}13, $\hat\gamma$ = 3{,}43; 68{,}6\% das datas no regime de alta} \\
-$\gamma = 0$ & 1 & 4{,}10 & 0{,}043 & 0{,}156 & 0{,}188 \\
-$\delta = \gamma = 0$ & 2 & 6{,}86 & 0{,}032 & 0{,}254 & 0{,}233 \\
-$\beta = \delta = \gamma = 0$ & 3 & 12{,}44 & 0{,}006 & 0{,}269 & 0{,}242 \\
-\multicolumn{6}{l}{\textit{Corte reestimado em cada origem, $h = 30$}: $\hat\beta$ = $-$1{,}88, $\hat\delta$ = 4{,}20, $\hat\gamma$ = 1{,}46; 74{,}9\% das datas no regime de alta} \\
-$\gamma = 0$ & 1 & 2{,}30 & 0{,}129 & 0{,}300 & 0{,}314 \\
-$\delta = \gamma = 0$ & 2 & 2{,}31 & 0{,}315 & 0{,}689 & 0{,}585 \\
-$\beta = \delta = \gamma = 0$ & 3 & 6{,}95 & 0{,}073 & 0{,}447 & 0{,}398 \\
-\multicolumn{6}{l}{\textit{Corte reestimado em cada origem, $h = 60$}: $\hat\beta$ = $-$3{,}90, $\hat\delta$ = 4{,}81, $\hat\gamma$ = 2{,}69; 74{,}9\% das datas no regime de alta} \\
-$\gamma = 0$ & 1 & 2{,}86 & 0{,}091 & 0{,}237 & 0{,}335 \\
-$\delta = \gamma = 0$ & 2 & 3{,}51 & 0{,}173 & 0{,}682 & 0{,}505 \\
-$\beta = \delta = \gamma = 0$ & 3 & 11{,}12 & 0{,}011 & 0{,}450 & 0{,}358 \\
+fixo & 30 & 68{,}6 & $-$5{,}50 & $-$2{,}70 & 4{,}88 & 2{,}30 & $-$0{,}39 \\
+ & & & (4{,}17) & (1{,}00) & (6{,}49) & (1{,}15) & (0{,}47) \\
+fixo & 60 & 68{,}6 & $-$9{,}92 & $-$4{,}60 & 6{,}13 & 3{,}43 & $-$1{,}18 \\
+ & & & (5{,}76) & (1{,}38) & (11{,}35) & (1{,}69) & (1{,}04) \\
+reestimado & 30 & 74{,}9 & $-$4{,}48 & $-$1{,}88 & 4{,}20 & 1{,}46 & $-$0{,}41 \\
+ & & & (3{,}24) & (0{,}91) & (5{,}46) & (0{,}97) & (0{,}50) \\
+reestimado & 60 & 74{,}9 & $-$8{,}51 & $-$3{,}90 & 4{,}81 & 2{,}69 & $-$1{,}21 \\
+ & & & (5{,}17) & (1{,}39) & (10{,}20) & (1{,}59) & (0{,}95) \\
+\midrule
+\multicolumn{8}{l}{\textit{Painel B: testes}} \\
+Corte & $h$ & $H_0$ & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap & \\
+fixo & 30 & $\beta = 0$ & 7{,}27 & 0{,}007 & 0{,}027 & 0{,}086 & \\
+fixo & 30 & $\beta + \gamma = 0$ & 0{,}70 & 0{,}403 & 0{,}546 & 0{,}530 & \\
+fixo & 30 & $\gamma = 0$ & 4{,}04 & 0{,}044 & 0{,}101 & 0{,}180 & \\
+fixo & 60 & $\beta = 0$ & 11{,}08 & $<$0{,}001 & 0{,}022 & 0{,}076 & \\
+fixo & 60 & $\beta + \gamma = 0$ & 1{,}28 & 0{,}258 & 0{,}526 & 0{,}433 & \\
+fixo & 60 & $\gamma = 0$ & 4{,}10 & 0{,}043 & 0{,}156 & 0{,}188 & \\
+reestimado & 30 & $\beta = 0$ & 4{,}24 & 0{,}039 & 0{,}185 & 0{,}227 & \\
+reestimado & 30 & $\beta + \gamma = 0$ & 0{,}68 & 0{,}409 & 0{,}540 & 0{,}506 & \\
+reestimado & 30 & $\gamma = 0$ & 2{,}30 & 0{,}129 & 0{,}300 & 0{,}314 & \\
+reestimado & 60 & $\beta = 0$ & 7{,}91 & 0{,}005 & 0{,}119 & 0{,}212 & \\
+reestimado & 60 & $\beta + \gamma = 0$ & 1{,}64 & 0{,}200 & 0{,}488 & 0{,}360 & \\
+reestimado & 60 & $\gamma = 0$ & 2{,}86 & 0{,}091 & 0{,}237 & 0{,}335 & \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R^{\log}_{t,h} = a + \beta\,\widehat{\text{BVRP}}_t + \delta D_t + \gamma D_t\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com o $\widehat{\text{BVRP}}$ do Ridge, nas 987 datas fora da amostra. $D_t = 1$ se $\text{VH}_{t-29:t}$ supera o corte de $37{,}3\%$ a.a. (fixo) ou o corte vigente na origem (reestimado). $W$ com HAC de $h+1$ defasagens. Rotação de Freedman--Lane: o resíduo do modelo restrito, sem as colunas da hipótese, é deslocado circularmente e somado ao ajustado restrito; em $\beta = \delta = \gamma = 0$ equivale à rotação de $y$. $g_h = \max(90, 3h)$. Bootstrap de pares em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. O $\widehat{\text{BVRP}}$ é tratado como dado.}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $R^{\log}_{t,h} = \alpha + \beta\,\widehat{\text{BVRP}}_t + \delta D_t + \gamma D_t\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com o $\widehat{\text{BVRP}}$ do Ridge, nas 987 datas fora da amostra. $D_t = 1$ se $\text{VH}_{t-29:t}$ supera o corte de $37{,}3\%$ a.a. (fixo) ou o corte vigente na origem (reestimado); \% alta: porcentagem das datas com $D_t = 1$. $\beta$ é a inclinação no regime de baixa volatilidade, e $\beta + \gamma$, no de alta. $\hat\beta$, $\hat\gamma$ e $\hat\beta + \hat\gamma$ em pontos percentuais de retorno por ponto percentual de $\widehat{\text{BVRP}}$; $\hat\alpha$ e $\hat\delta$ em pontos percentuais; EP HAC de $h+1$ defasagens entre parênteses. Painel B: valores-$p$ de $\beta = 0$ (inclinação no regime de baixa), $\beta + \gamma = 0$ (inclinação no de alta) e $\gamma = 0$ (diferença entre as inclinações), por HAC, rotação de Freedman--Lane e bootstrap, nos cortes fixo e reestimado. $W$ com o mesmo HAC; $p_{\chi^2}$ pela $\chi^2(1)$. Rotação de Freedman--Lane: o resíduo do modelo restrito pela hipótese é deslocado circularmente e somado ao ajustado restrito; $g_h = \max(90, 3h)$. Bootstrap de pares em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. O $\widehat{\text{BVRP}}$ é tratado como dado.}
 \end{table}

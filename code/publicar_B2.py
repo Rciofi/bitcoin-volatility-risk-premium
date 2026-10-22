@@ -6,8 +6,9 @@ Lê as cópias das saídas agregadas dos diagnósticos do B2 em outputs/B2/ e gr
   tables/retornos_linear/tab_um_fator.tex          BVRP previsto como fator único (Cap. 6)
   tables/retornos_linear/tab_oos_retorno.tex       MQO e Ridge fora da amostra (Cap. 6)
   tables/retornos_nao_linear/tab_oos_floresta.tex  floresta aleatória direto no retorno (Cap. 7)
+  tables/retornos_linear/tab_componentes_wald.tex  VH e IV separadas: Wald β1 = β2 = 0 e β1 + β2 = 0 (Cap. 6)
   tables/apendice_b2/tab_tamanho_poder.tex         tamanho e poder por simulação (apêndice)
-  tables/apendice_b2/tab_regime.tex                regime de volatilidade (apêndice)
+  tables/apendice_b2/tab_regime.tex                regime de volatilidade, com α, β, δ, γ e β + γ (apêndice)
   tables/apendice_b2/tab_corr_e_u.tex              corr(erro de previsão do RBVRP, inovação do retorno)
 Não toca nos .tex dos capítulos nem nas tabelas do publicar_cap6.py e do publicar_cap7.py.
 
@@ -22,11 +23,13 @@ Conferência (sai com erro na primeira falha):
      (wald_utils.holm); W do um fator = t²; EP = |β|/√W; p do min-p da linha
      sensibilidade_g* = o da variante; p da χ² do regime = chi2.sf(W, gl); corr(e, u) do
      passo 2 = a do passo 1; IC HAC = corr ± 1,96·EP; rejeições em [0, 1]; placebo da
-     floresta com mediana <= 0,01. Tolerância de 1e-9.
+     floresta com mediana <= 0,01; componentes e regime do passo 5: p da χ² = chi2.sf(W, gl), Holm
+     refeito e W de cada restrição de uma linha = (estimativa/EP)² dos coeficientes. Tolerância de 1e-9.
 Cada número impresso vem dos DataFrames já conferidos.
 
-Uso:  python code/publicar_B2.py [--raiz DIR]
+Uso:  python code/publicar_B2.py [--raiz DIR] [--b2 DIR]
       --raiz: onde gravar tables/ (padrão: a raiz do repositório)
+      --b2: pasta com as cópias e a procedência (padrão: outputs/B2)
 """
 import argparse
 import hashlib
@@ -129,7 +132,7 @@ def carregar_e_conferir_procedencia():
     dados = {}
     for _, r in proc.iterrows():
         checar(r.sha256_regra == "conteudo_lf", f"{r.arquivo}: regra do SHA")
-        copia = open(os.path.join(ROOT, r.arquivo), "rb").read()
+        copia = open(os.path.join(B2, os.path.basename(r.arquivo)), "rb").read()
         checar(sha_lf(copia) == r.sha256_conteudo_lf, f"{r.arquivo}: SHA-256 ≠ procedência")
         checar(copia.replace(b"\r\n", b"\n").count(b"\n") == int(r.linhas), f"{r.arquivo}: nº de linhas")
         origem = os.path.join(ROOT, r.origem)
@@ -142,7 +145,7 @@ def carregar_e_conferir_procedencia():
         checar(git("rev-parse", f"{r.commit_origem}:{r.script}").decode().strip() == r.git_blob_script,
                f"{r.script}: blob do script ≠ procedência")
         nome = os.path.basename(r.arquivo).removesuffix("_B2.csv")
-        d = pd.read_csv(os.path.join(ROOT, r.arquivo))
+        d = pd.read_csv(os.path.join(B2, os.path.basename(r.arquivo)))
         mesmo_df(d, pd.read_csv(origem), nome)
         dados[nome] = d
     print(f"Procedência: {len(proc)} arquivos; SHA-256 (LF), blobs e cópia × origem conferidos.")
@@ -191,7 +194,27 @@ def conferir_coerencia(d):
         for col in ("rejeicao_10pct", "rejeicao_5pct", "rejeicao_1pct"):
             checar(t[col].between(0, 1).all(), f"{nome}: {col} fora de [0, 1]")
     checar(d["placebo_floresta"].passa.all() & (d["placebo_floresta"]["median"] <= 0.01).all(), "placebo da floresta")
-    print("Coerência interna: χ², F, Holm, um fator, min-p, regime, corr(e, u), tamanho e placebo conferidos.")
+    for nome in ("componentes_testes", "regime_testes"):
+        c = d[nome][d[nome].teste == "chi2"]
+        checar(np.isclose(c.p, stats.chi2.sf(c.W, c.gl), rtol=0, atol=TOL), f"{nome}: p da χ²")
+    ch = d["componentes_holm"]
+    for _, g in ch.groupby(["hipotese", "L_regra", "teste"]):
+        g = g.sort_values("h")
+        checar(len(g) == len(HS) and np.isclose(g.p_holm, holm(g.p.to_numpy()), rtol=0, atol=TOL).all(),
+               "componentes: Holm")
+    # W de uma restrição de uma linha = (estimativa / EP)², com o mesmo L
+    pares_c = {"soma_zero": ("b1_mais_b2", "ep_b1_mais_b2")}
+    pares_r = {"beta_zero": ("beta", "ep_beta"), "gama_zero": ("gama", "ep_gama"),
+               "beta_mais_gama_zero": ("beta_mais_gama", "ep_beta_mais_gama")}
+    for nome_t, nome_c, chaves, pares in (("componentes_testes", "componentes_coeficientes", ["h", "L_regra"], pares_c),
+                                          ("regime_testes", "regime_coeficientes", ["corte", "h", "L_regra"], pares_r)):
+        t = d[nome_t][(d[nome_t].teste == "chi2")]
+        m = t.merge(d[nome_c], on=chaves)
+        for hip, (est, ep) in pares.items():
+            x = m[m.hipotese == hip]
+            checar(len(x) > 0 and np.allclose(x.W, (x[est] / x[ep]) ** 2, rtol=TOL, atol=0), f"{nome_t}: W de {hip} = (est/EP)²")
+    print("Coerência interna: χ², F, Holm, um fator, min-p, regime, corr(e, u), tamanho, placebo, componentes e "
+          "regime do passo 5 conferidos.")
 
 
 # ---------------------------------------------------------------------------
@@ -406,36 +429,95 @@ def tab_tamanho_poder(d, raiz):
                   cab, linhas, nota, tamanho=r"\scriptsize"))
 
 
-def tab_regime(d, raiz):
-    rg = d["regime"]
-    rg = rg[(rg.variante == "principal") & (rg.L_regra == "h+1")]
-    hips = (("interacao", r"$\gamma = 0$"), ("regime_e_interacao", r"$\delta = \gamma = 0$"),
-            ("todas", r"$\beta = \delta = \gamma = 0$"))
+def p5(t, filtro, hip, teste):
+    """p (e W) da variante principal com L = h+1 no passo 5."""
+    x = t[filtro & (t.hipotese == hip) & (t.teste == teste) & (t.variante == "principal") & (t.L_regra == "h+1")]
+    checar(len(x) == 1, f"passo 5: {hip} {teste}: linha ausente ou repetida")
+    return x.iloc[0]
+
+
+def tab_componentes(d, raiz):
+    t, c, hm = d["componentes_testes"], d["componentes_coeficientes"], d["componentes_holm"]
+    c = c[c.L_regra == "h+1"].set_index("h")
+    hm = hm[hm.L_regra == "h+1"]
+    cab = (r"\multicolumn{8}{l}{\textit{Painel A: coeficientes (EP HAC) e $H_0$: $\beta_{1,h} + \beta_{2,h} = 0$}} \\" "\n"
+           r"$h$ & $\hat\alpha_h$ & $\hat\beta_{1,h}$ & $\hat\beta_{2,h}$ & $\hat\beta_{1,h} + \hat\beta_{2,h}$ & "
+           r"$p_{\chi^2}$ & $p$ rotação & $p$ bootstrap")
     linhas = []
-    for corte, nome in (("fixo", "corte fixo"), ("expansivo", "corte reestimado em cada origem")):
+    for hh in HS:
+        r = c.loc[hh]
+        f = t.h == hh
+        linhas.append(rf"{hh} & {fmt(r.alfa, 2)} & {fmt(r.b1_vh, 3)} & {fmt(r.b2_iv, 3)} & {fmt(r.b1_mais_b2, 3)} & "
+                      rf"{fmt_p(p5(t, f, 'soma_zero', 'chi2').p)} & {fmt_p(p5(t, f, 'soma_zero', 'rotacao_freedman_lane').p)} & "
+                      rf"{fmt_p(p5(t, f, 'soma_zero', 'bootstrap').p)} \\")
+        linhas.append(rf" & ({fmt(r.ep_alfa, 2)}) & ({fmt(r.ep_b1_vh, 3)}) & ({fmt(r.ep_b2_iv, 3)}) & "
+                      rf"({fmt(r.ep_b1_mais_b2, 3)}) & & & \\")
+    linhas += [r"\midrule", r"\multicolumn{8}{l}{\textit{Painel B: $H_0$: $\beta_{1,h} = \beta_{2,h} = 0$}} \\",
+               r" & & & & & \multicolumn{3}{c}{Holm} \\ \cmidrule(lr){6-8}",
+               r"$h$ & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap \\"]
+    for hh in HS:
+        f = t.h == hh
+        hb = hm[(hm.h == hh) & (hm.hipotese == "b1_b2_zero")].set_index("teste").p_holm
+        linhas.append(rf"{hh} & {fmt(p5(t, f, 'b1_b2_zero', 'chi2').W, 2)} & {fmt_p(p5(t, f, 'b1_b2_zero', 'chi2').p)} & "
+                      rf"{fmt_p(p5(t, f, 'b1_b2_zero', 'rotacao').p)} & {fmt_p(p5(t, f, 'b1_b2_zero', 'bootstrap').p)} & "
+                      rf"{fmt_p(hb['chi2'])} & {fmt_p(hb['rotacao'])} & {fmt_p(hb['bootstrap'])} \\")
+    hs_soma = hm[hm.hipotese == "soma_zero"].groupby("teste").p_holm.min()
+    nota = (r"$R^{\log}_{t,h} = \alpha_h + \beta_{1,h}\,\text{VH}_{t-29:t} + \beta_{2,h}\,\text{IV}_t + \varepsilon_{t+h}$, "
+            r"nas 987 datas fora da amostra; coeficientes em pontos percentuais de retorno por ponto percentual de "
+            r"volatilidade, EP HAC entre parênteses. Se $\beta_{1,h} + \beta_{2,h} = 0$, a diferença "
+            r"$\text{VH}_{t-29:t} - \text{IV}_t$, isto é, o HBVRP, resume o conteúdo das duas medidas. HAC de "
+            r"Newey--West com $h+1$ defasagens; $p_{\chi^2}$ pela $\chi^2(2)$ no painel B e pela $\chi^2(1)$ no A. "
+            r"Rotação: de $y$ no painel B; de Freedman--Lane (resíduo do modelo restrito deslocado circularmente) no "
+            r"A; $g_h = \max(90, 3h)$. Bootstrap de pares em blocos circulares de $\max(30, 2h)$ dias, 1.999 "
+            r"reamostragens, centrado em $\hat\beta$. Holm sobre os seis horizontes; em $\beta_{1,h} + \beta_{2,h} = 0$, "
+            rf"o menor valor-$p$ ajustado é {fmt_p(hs_soma['chi2'])} ($\chi^2$), "
+            rf"{fmt_p(hs_soma['rotacao_freedman_lane'])} (rotação) e {fmt_p(hs_soma['bootstrap'])} (bootstrap).")
+    gravar(os.path.join(raiz, "tables", "retornos_linear", "tab_componentes_wald.tex"),
+           tabela("Retorno de $h$ dias sobre a volatilidade histórica e a implícita, separadas.",
+                  "tab:retlin-componentes-wald", "rrrrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
+
+
+def tab_regime(d, raiz):
+    t, c = d["regime_testes"], d["regime_coeficientes"]
+    c = c[c.L_regra == "h+1"]
+    cortes = (("fixo", "fixo"), ("expansivo", "reestimado"))
+    cab = (r"\multicolumn{8}{l}{\textit{Painel A: coeficientes (EP HAC)}} \\" "\n"
+           r"Corte & $h$ & \% alta & $\hat\alpha$ & $\hat\beta$ & $\hat\delta$ & $\hat\gamma$ & $\hat\beta + \hat\gamma$")
+    linhas = []
+    for corte, rot in cortes:
         for hh in (30, 60):
-            g = rg[(rg.corte == corte) & (rg.h == hh)]
-            r0 = g.iloc[0]
-            linhas.append(rf"\multicolumn{{6}}{{l}}{{\textit{{{nome.capitalize()}, $h = {hh}$}}: $\hat\beta$ = "
-                          rf"{fmt(r0.b_bvrp_previsto, 2)}, $\hat\delta$ = {fmt(r0.b_regime_alta, 2)}, $\hat\gamma$ = "
-                          rf"{fmt(r0.b_interacao, 2)}; {fmt(r0.pct_alta, 1)}\% das datas no regime de alta}} \\")
-            for hip, rot in hips:
-                x = g[g.hipotese == hip].set_index("teste")
-                linhas.append(rf"{rot} & {int(x.loc['chi2', 'gl'])} & {fmt(x.loc['chi2', 'W'], 2)} & "
-                              rf"{fmt_p(x.loc['chi2', 'p'])} & {fmt_p(x.loc['rotacao_freedman_lane', 'p'])} & "
-                              rf"{fmt_p(x.loc['bootstrap', 'p'])} \\")
-    cab = r"$H_0$ & gl & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap"
-    nota = (r"$R^{\log}_{t,h} = a + \beta\,\widehat{\text{BVRP}}_t + \delta D_t + \gamma D_t\,\widehat{\text{BVRP}}_t "
+            r = c[(c.corte == corte) & (c.h == hh)].iloc[0]
+            linhas.append(rf"{rot} & {hh} & {fmt(r.pct_alta, 1)} & {fmt(r.alfa, 2)} & {fmt(r.beta, 2)} & "
+                          rf"{fmt(r.delta, 2)} & {fmt(r.gama, 2)} & {fmt(r.beta_mais_gama, 2)} \\")
+            linhas.append(rf" & & & ({fmt(r.ep_alfa, 2)}) & ({fmt(r.ep_beta, 2)}) & ({fmt(r.ep_delta, 2)}) & "
+                          rf"({fmt(r.ep_gama, 2)}) & ({fmt(r.ep_beta_mais_gama, 2)}) \\")
+    hips = (("beta_zero", r"$\beta = 0$"), ("beta_mais_gama_zero", r"$\beta + \gamma = 0$"), ("gama_zero", r"$\gamma = 0$"))
+    linhas += [r"\midrule", r"\multicolumn{8}{l}{\textit{Painel B: testes}} \\",
+               r"Corte & $h$ & $H_0$ & $W$ & $p_{\chi^2}$ & $p$ rotação & $p$ bootstrap & \\"]
+    for corte, rot in cortes:
+        for hh in (30, 60):
+            f = (t.corte == corte) & (t.h == hh)
+            for hip, rot_h in hips:
+                linhas.append(rf"{rot} & {hh} & {rot_h} & {fmt(p5(t, f, hip, 'chi2').W, 2)} & "
+                              rf"{fmt_p(p5(t, f, hip, 'chi2').p)} & {fmt_p(p5(t, f, hip, 'rotacao_freedman_lane').p)} & "
+                              rf"{fmt_p(p5(t, f, hip, 'bootstrap').p)} & \\")
+    nota = (r"$R^{\log}_{t,h} = \alpha + \beta\,\widehat{\text{BVRP}}_t + \delta D_t + \gamma D_t\,\widehat{\text{BVRP}}_t "
             r"+ \varepsilon_{t+h}$, com o $\widehat{\text{BVRP}}$ do Ridge, nas 987 datas fora da amostra. $D_t = 1$ "
             r"se $\text{VH}_{t-29:t}$ supera o corte de $37{,}3\%$ a.a. (fixo) ou o corte vigente na origem "
-            r"(reestimado). $W$ com HAC de $h+1$ defasagens. Rotação de Freedman--Lane: o resíduo do modelo "
-            r"restrito, sem as colunas da hipótese, é deslocado circularmente e somado ao ajustado restrito; em "
-            r"$\beta = \delta = \gamma = 0$ equivale à rotação de $y$. $g_h = \max(90, 3h)$. Bootstrap de pares "
-            r"em blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. O "
+            r"(reestimado); \% alta: porcentagem das datas com $D_t = 1$. $\beta$ é a inclinação no regime de baixa "
+            r"volatilidade, e $\beta + \gamma$, no de alta. $\hat\beta$, $\hat\gamma$ e $\hat\beta + \hat\gamma$ em "
+            r"pontos percentuais de retorno por ponto percentual de $\widehat{\text{BVRP}}$; $\hat\alpha$ e "
+            r"$\hat\delta$ em pontos percentuais; EP HAC de $h+1$ defasagens entre parênteses. Painel B: valores-$p$ "
+            r"de $\beta = 0$ (inclinação no regime de baixa), $\beta + \gamma = 0$ (inclinação no de alta) e "
+            r"$\gamma = 0$ (diferença entre as inclinações), por HAC, rotação de Freedman--Lane e bootstrap, nos "
+            r"cortes fixo e reestimado. $W$ com o mesmo HAC; "
+            r"$p_{\chi^2}$ pela $\chi^2(1)$. Rotação de Freedman--Lane: o resíduo do modelo restrito pela hipótese é "
+            r"deslocado circularmente e somado ao ajustado restrito; $g_h = \max(90, 3h)$. Bootstrap de pares em "
+            r"blocos circulares de $\max(30, 2h)$ dias, 1.999 reamostragens, centrado em $\hat\beta$. O "
             r"$\widehat{\text{BVRP}}$ é tratado como dado.")
     gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_regime.tex"),
            tabela(r"Retorno de $h$ dias, $\widehat{\text{BVRP}}$ do Ridge e regime de volatilidade.",
-                  "tab:apb2-regime", "lrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
+                  "tab:apb2-regime", "llrrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
 
 
 def tab_corr_e_u(d, raiz):
@@ -473,13 +555,16 @@ def tab_corr_e_u(d, raiz):
 
 
 def main():
+    global B2
     ap = argparse.ArgumentParser()
     ap.add_argument("--raiz", default=ROOT)
+    ap.add_argument("--b2", default=B2, help="pasta com as cópias e o procedencia_B2.csv")
     args = ap.parse_args()
+    B2 = os.path.abspath(args.b2)
     d = carregar_e_conferir_procedencia()
     conferir_coerencia(d)
-    for f in (tab_wald_direto, tab_um_fator, tab_oos_retorno, tab_oos_floresta, tab_tamanho_poder, tab_regime,
-              tab_corr_e_u):
+    for f in (tab_wald_direto, tab_um_fator, tab_oos_retorno, tab_oos_floresta, tab_componentes, tab_tamanho_poder,
+              tab_regime, tab_corr_e_u):
         f(d, args.raiz)
         print(f"  {f.__name__}: ok")
     print(f"Tabelas gravadas em {os.path.join(args.raiz, 'tables')}")
