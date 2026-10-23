@@ -1,0 +1,67 @@
+origem,janela,modelo,n_treino,treino_fim,params,mse_cv,r2_dentro_amostra
+2023-06-21,movel,floresta_aleatoria,730,2023-05-22,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.2}",420.6552611421551,0.41947817786404207
+2023-06-21,movel,XGBoost,730,2023-05-22,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",426.76201753788473,0.3881576827265848
+2023-07-21,movel,floresta_aleatoria,730,2023-06-21,"{'max_depth': 3, 'min_samples_leaf': 20, 'max_features': 0.2}",403.91541046022957,0.47682034951391183
+2023-07-21,movel,XGBoost,730,2023-06-21,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",417.95170974593594,0.40537152420140854
+2023-08-20,movel,floresta_aleatoria,730,2023-07-21,"{'max_depth': 3, 'min_samples_leaf': 5, 'max_features': 0.2}",383.453054964554,0.46139656797164585
+2023-08-20,movel,XGBoost,730,2023-07-21,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",399.93571316525015,0.358832563284172
+2023-09-19,movel,floresta_aleatoria,730,2023-08-20,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",412.2642705180404,0.2999569166034708
+2023-09-19,movel,XGBoost,730,2023-08-20,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",400.6184372812721,0.3649982692613404
+2023-10-19,movel,floresta_aleatoria,730,2023-09-19,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",449.742095304098,0.3001031107380542
+2023-10-19,movel,XGBoost,730,2023-09-19,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",441.20072817227737,0.3603104225021223
+2023-11-18,movel,floresta_aleatoria,730,2023-10-19,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.2}",402.54406163627533,0.38237245507107787
+2023-11-18,movel,XGBoost,730,2023-10-19,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",401.52428440089705,0.35584100128589824
+2023-12-18,movel,floresta_aleatoria,730,2023-11-18,"{'max_depth': 3, 'min_samples_leaf': 20, 'max_features': 0.2}",355.43431645352166,0.419118744566471
+2023-12-18,movel,XGBoost,730,2023-11-18,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",349.96751111954916,0.35677189738453896
+2024-01-17,movel,floresta_aleatoria,730,2023-12-18,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",351.01164454185437,0.2666508611738643
+2024-01-17,movel,XGBoost,730,2023-12-18,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",354.05708465378336,0.35759676539182206
+2024-02-16,movel,floresta_aleatoria,730,2024-01-17,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",332.49853332347186,0.2506352083758977
+2024-02-16,movel,XGBoost,730,2024-01-17,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",346.6536263115287,0.35743512033595115
+2024-03-17,movel,floresta_aleatoria,730,2024-02-16,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.3333333333333333}",319.54966132433776,0.31182397026083297
+2024-03-17,movel,XGBoost,730,2024-02-16,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",325.9504704447696,0.38002467954633945
+2024-04-16,movel,floresta_aleatoria,730,2024-03-17,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",336.77091486344347,0.27619791813284833
+2024-04-16,movel,XGBoost,730,2024-03-17,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",343.37288283858163,0.3950136091151111
+2024-05-16,movel,floresta_aleatoria,730,2024-04-16,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",307.8374758646816,0.29505246264015283
+2024-05-16,movel,XGBoost,730,2024-04-16,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",351.8960791038588,0.38958826050688644
+2024-06-15,movel,floresta_aleatoria,730,2024-05-16,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.2}",281.0784208494518,0.3928695306171941
+2024-06-15,movel,XGBoost,730,2024-05-16,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",303.80183415402536,0.40430704414909513
+2024-07-15,movel,floresta_aleatoria,730,2024-06-15,"{'max_depth': 3, 'min_samples_leaf': 5, 'max_features': 0.2}",219.85011808727003,0.6067364915633415
+2024-07-15,movel,XGBoost,730,2024-06-15,"{'n_estimators': 50, 'learning_rate': 0.03, 'max_depth': 4, 'min_child_weight': 1}",217.3940166736189,0.7728372869856626
+2024-08-14,movel,floresta_aleatoria,730,2024-07-15,"{'max_depth': 3, 'min_samples_leaf': 5, 'max_features': 0.2}",186.86891547797234,0.5891887643691742
+2024-08-14,movel,XGBoost,730,2024-07-15,"{'n_estimators': 100, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",163.8380922925222,0.648890771411045
+2024-09-13,movel,floresta_aleatoria,730,2024-08-14,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.3333333333333333}",157.05318615830578,0.44616705601107765
+2024-09-13,movel,XGBoost,730,2024-08-14,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",160.441849668332,0.43817716873379475
+2024-10-13,movel,floresta_aleatoria,730,2024-09-13,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.3333333333333333}",179.43442977918662,0.4302148187601116
+2024-10-13,movel,XGBoost,730,2024-09-13,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",143.06177606325727,0.4441133163754958
+2024-11-12,movel,floresta_aleatoria,730,2024-10-13,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 1.0}",150.224318861508,0.39308286210358945
+2024-11-12,movel,XGBoost,730,2024-10-13,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",134.49260830879092,0.4229020290321861
+2024-12-12,movel,floresta_aleatoria,730,2024-11-12,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.3333333333333333}",111.74721726734981,0.49271268265322254
+2024-12-12,movel,XGBoost,730,2024-11-12,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",114.79660437731386,0.43191618300127776
+2025-01-11,movel,floresta_aleatoria,730,2024-12-12,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.3333333333333333}",134.05034265209744,0.4439276756007837
+2025-01-11,movel,XGBoost,730,2024-12-12,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",151.18920087131065,0.396187376148026
+2025-02-10,movel,floresta_aleatoria,730,2025-01-11,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.2}",125.01972881637884,0.38524200919848617
+2025-02-10,movel,XGBoost,730,2025-01-11,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",143.883742256184,0.40244264840052146
+2025-03-12,movel,floresta_aleatoria,730,2025-02-10,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",137.94640600615205,0.2933142932145374
+2025-03-12,movel,XGBoost,730,2025-02-10,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",150.59804230105905,0.3991767719289976
+2025-04-11,movel,floresta_aleatoria,730,2025-03-12,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.3333333333333333}",156.63076185611064,0.36880268549681217
+2025-04-11,movel,XGBoost,730,2025-03-12,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",160.2872485981594,0.41859937758148125
+2025-05-11,movel,floresta_aleatoria,730,2025-04-11,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",154.83222712334629,0.28357980666503
+2025-05-11,movel,XGBoost,730,2025-04-11,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",169.1778351967577,0.388734275578683
+2025-06-10,movel,floresta_aleatoria,730,2025-05-11,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",144.55585528229568,0.2882560574725238
+2025-06-10,movel,XGBoost,730,2025-05-11,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",155.71341247325412,0.3983753504736832
+2025-07-10,movel,floresta_aleatoria,730,2025-06-10,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",144.0031589213541,0.2601719089354456
+2025-07-10,movel,XGBoost,730,2025-06-10,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",154.84884088850438,0.3949650011631213
+2025-08-09,movel,floresta_aleatoria,730,2025-07-10,"{'max_depth': 3, 'min_samples_leaf': 50, 'max_features': 0.2}",135.38089198914435,0.3453809737917257
+2025-08-09,movel,XGBoost,730,2025-07-10,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 10}",150.46306400154484,0.36915843973983675
+2025-09-08,movel,floresta_aleatoria,730,2025-08-09,"{'max_depth': 3, 'min_samples_leaf': 200, 'max_features': 0.2}",144.15259474929812,0.1375765281067266
+2025-09-08,movel,XGBoost,730,2025-08-09,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",150.4428519030783,0.37767388388088174
+2025-10-08,movel,floresta_aleatoria,730,2025-09-08,"{'max_depth': 3, 'min_samples_leaf': 200, 'max_features': 0.2}",145.1767196716811,0.13172819318221596
+2025-10-08,movel,XGBoost,730,2025-09-08,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",148.85286852147516,0.37570809531532456
+2025-11-07,movel,floresta_aleatoria,730,2025-10-08,"{'max_depth': 3, 'min_samples_leaf': 100, 'max_features': 0.2}",142.41854365851708,0.24662013501227675
+2025-11-07,movel,XGBoost,730,2025-10-08,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",139.7029215991737,0.3743171709203421
+2025-12-07,movel,floresta_aleatoria,730,2025-11-07,"{'max_depth': 3, 'min_samples_leaf': 5, 'max_features': 0.2}",115.27717720607833,0.4604749986992176
+2025-12-07,movel,XGBoost,730,2025-11-07,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",108.80779091676331,0.37730961521349204
+2026-01-06,movel,floresta_aleatoria,730,2025-12-07,"{'max_depth': 3, 'min_samples_leaf': 200, 'max_features': 0.2}",122.02139972207938,0.14250601632830906
+2026-01-06,movel,XGBoost,730,2025-12-07,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",135.7676980773612,0.3733634834117795
+2026-02-05,movel,floresta_aleatoria,730,2026-01-06,"{'max_depth': 3, 'min_samples_leaf': 200, 'max_features': 0.2}",124.49519691471679,0.13694780819455343
+2026-02-05,movel,XGBoost,730,2026-01-06,"{'n_estimators': 50, 'learning_rate': 0.01, 'max_depth': 4, 'min_child_weight': 1}",133.88166754438384,0.378970298181487

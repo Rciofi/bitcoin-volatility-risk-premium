@@ -1,0 +1,6 @@
+janela,modelo,d,n_origens
+expansiva,XGBoost,4,33
+expansiva,floresta_aleatoria,3,25
+expansiva,floresta_aleatoria,6,8
+movel,XGBoost,4,33
+movel,floresta_aleatoria,3,33
