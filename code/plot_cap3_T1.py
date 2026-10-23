@@ -49,15 +49,13 @@ EVENTOS = [
 def fig_serie(df, out):
     fig, axes = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
 
-    ax = axes[0]
-    ax.plot(df["date"], df["rv_30d"], color=COR_RETRO, linewidth=0.8,
-            label="VH 30d (t−29 a t)")
+    ax = axes[0]   # sem a VH retrospectiva (#79): só a RV cobre a mesma janela que a IV de t
     ax.plot(df["date"], df["rv_30d_fut"], color=COR_PROSP, linewidth=0.8,
             label="RV 30d (t+1 a t+30)")
     ax.plot(df["date"], df["iv_30d"], color=COR_IV, linewidth=0.8, linestyle="--",
             label="IV 30d (DVOL Deribit)")
     ax.set_ylabel("Volatilidade (% a.a.)")
-    ax.set_title("(a) Volatilidades histórica, realizada e implícita",
+    ax.set_title("(a) Volatilidades realizada e implícita",
                  loc="left", fontsize=10)
     ax.legend(loc="upper right", fontsize=8)
     ax.grid(True, alpha=0.3)

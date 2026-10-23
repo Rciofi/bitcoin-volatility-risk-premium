@@ -193,7 +193,9 @@ def tab_3_1(df, out_dir, bvrp_cols):
         r"\bottomrule",
         r"\end{tabular}}",
         r"\par\smallskip",
-        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: RV 30d (volatilidade realizada) e VH 30d"
+        r"\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Média: média aritmética; D.P.: desvio-padrão"
+        r" amostral; Mín. e Máx.: menor e maior valor; p5, p25, p75 e p95: percentis de 5\%, 25\%, 75\% e"
+        r" 95\%; Assim.: coeficiente de assimetria; Curtose: excesso de curtose. RV 30d (volatilidade realizada) e VH 30d"
         r" (volatilidade histórica) calculadas como raiz da média"
         r" dos log-retornos diários quadráticos, anualizada ($\times\sqrt{365}$): a RV sobre os"
         r" retornos de $t+1$ a $t+30$; a VH sobre os retornos de $t-29$ a $t$."

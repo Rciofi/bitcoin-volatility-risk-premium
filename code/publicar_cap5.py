@@ -68,7 +68,7 @@ DICIONARIO = [
     ("Preço", "ret_1d", r"$r_t$", r"$\ln(P_t/P_{t-1})$"),
     ("", "ret_acum_5d", r"$r_{t-4:t}$", r"$\sum_{j=0}^{4} r_{t-j}$"),
     ("", "ret_acum_30d", r"$r_{t-29:t}$", r"$\sum_{j=0}^{29} r_{t-j}$"),
-    ("", "log_close_ma30d", r"$\ln(P_t/\overline{P}_{t-29:t})$", "preço relativo à média móvel de 30 dias"),
+    ("", "log_close_ma30d", r"$\ln(P_t/\overline{P}_{t-29:t})$", "log do preço relativo à média móvel de 30 dias"),
     ("Prêmio", "vrp_30d", r"$\text{HBVRP}_t$", r"$\text{VH}_{t-29:t} - \text{IV}_t$"),
     ("", "d_vrp_1d", r"$\Delta_1\text{HBVRP}_t$",
      r"$\text{HBVRP}_t - \text{HBVRP}_{t-1}$"),
@@ -78,7 +78,7 @@ TRATAMENTO = {"nível": "nível", "nível (longa memória)": "nível", "diferen�
               "desvio da média móvel (média em nível é I(1))": "desvio da média móvel",
               "log-diferença de close (I(1))": "log-diferença do preço",
               "soma de log-diferenças": "soma de log-diferenças",
-              "preço relativo à média móvel (close é I(1))": "razão com a média móvel"}
+              "preço relativo à média móvel (close é I(1))": "log da razão com a média móvel"}
 
 
 def fmt(v, d=3):
@@ -170,6 +170,20 @@ def main():
         for m in MODELOS + REFERENCIAS:
             conferir(int(mcs.loc[(j, m), "B"]) == MCS_B, f"MCS {j} {m}: B")
             conferir(abs(r.loc[m, "p_mcs"] - mcs.loc[(j, m), "p_mcs"]) < TOL, f"MCS {j} {m}")
+    # Previsões médias (#136): médias simples das previsões gravadas, sem reestimar; R² e CW com as funções
+    # conferidas acima contra metricas_T5.csv; não entram no MCS, que segue com os oito modelos
+    MEDIAS = {"Média (Ridge, floresta)": ["Ridge", "floresta_aleatoria"], "Média (5 métodos)": MODELOS}
+    medias = {}
+    for j, w in largo.items():
+        y = df.loc[w.index, ALVO].to_numpy()
+        for nome, cols in MEDIAS.items():
+            f = w[cols].mean(axis=1)
+            conferir(np.allclose(f.to_numpy(), w[cols].to_numpy().sum(axis=1) / len(cols), rtol=0, atol=TOL),
+                     f"média {j} {nome}")
+            medias[(j, nome)] = {"r2": r2_fora_da_amostra(y, f, w["media_historica"]),
+                                 "cw": clark_west(y, f, w["media_historica"], h=H)["cw_p_unilateral"],
+                                 "dm_media": diebold_mariano(y, f, w["media_historica"], h=H)["dm_p_bilateral"],
+                                 "dm_ridge": diebold_mariano(y, f, w["Ridge"], h=H)["dm_p_bilateral"]}
     w = largo["expansiva"]
     y = df.loc[w.index, ALVO]
     for (reg, mod), row in mi.iterrows():
@@ -274,6 +288,10 @@ def main():
                       rf"{p_mcs('expansiva', m)} & {p_mcs('movel', m)} & {fmt(e.r2_dentro_amostra_media)} \\")
         if m == "persistencia_viavel":
             linhas.append(r"\addlinespace")
+    linhas.append(r"\addlinespace")
+    for nome in MEDIAS:
+        e, mv = medias[("expansiva", nome)], medias[("movel", nome)]
+        linhas.append(rf"{nome} & {fmt(e['r2'])} & {fmt(mv['r2'])} & {fmt_p(e['cw'])} & {fmt_p(mv['cw'])} & -- & -- & -- \\")
     cab = (r" & \multicolumn{2}{c}{$R^2_{\text{fora}}$} & \multicolumn{2}{c}{Clark--West ($p$)} & "
            r"\multicolumn{2}{c}{MCS ($p$)} & $R^2$ dentro \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}"
            "\n"
@@ -285,7 +303,12 @@ def main():
             r"\textit{model confidence set} de \citet{hansen2011model}, com perda quadrática, estatística "
             r"$T_{\max}$ e bootstrap em blocos móveis de 60 dias (9.999 reamostragens), sobre os oito "
             r"modelos de cada janela; $^{\dagger}$: no conjunto a 10\%. $R^2$ dentro da amostra: média das "
-            r"33 reestimações.")
+            r"33 reestimações. Médias: média simples das previsões do Ridge e da floresta aleatória e dos cinco "
+            r"métodos (MQO, Ridge, LASSO, floresta aleatória e XGBoost), sem reestimação; as médias não entram no "
+            r"conjunto do MCS, que segue com os oito modelos originais (--).")
+    for (j, nome), v in medias.items():
+        print(f"{j} {nome}: R² {v['r2']:.4f}; p CW {v['cw']:.4f}; p DM × média {v['dm_media']:.4f}; "
+              f"p DM × Ridge {v['dm_ridge']:.4f}")
     with open(os.path.join(dir_tab, "tab_resultados.tex"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(tabela("Previsão do RBVRP fora da amostra.", "tab:prev-resultados", "lrrrrrrr", cab, linhas, nota,
                         tamanho=r"\small\setlength{\tabcolsep}{4pt}"))

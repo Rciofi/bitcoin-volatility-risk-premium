@@ -113,16 +113,15 @@ dinâmica da volatilidade e do prêmio de risco ao longo do tempo, bem como
 identificar episódios de persistência e mudanças de comportamento associados a
 eventos relevantes do mercado de criptoativos. A
 Figura~\ref{fig:dados-series} apresenta, em dois painéis com eixo temporal
-compartilhado, a evolução das volatilidades histórica (retrospectiva) e
-realizada (prospectiva) de 30 dias e da volatilidade implícita (painel
-superior) e das duas estimativas do prêmio de risco de volatilidade do Bitcoin
+compartilhado, a evolução da volatilidade realizada nos 30 dias seguintes e
+da volatilidade implícita (painel superior) e das duas estimativas do prêmio de risco de volatilidade do Bitcoin
 (painel inferior), com anotações dos principais eventos de mercado do período.
 
 \IfFileExists{figs/dados/vrp_timeseries.png}{
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figs/dados/vrp_timeseries.png}
-    \caption[Evolução da volatilidade e do prêmio de risco de volatilidade]{Evolução temporal das séries de volatilidade do Bitcoin. Painel (a): volatilidade histórica ($\text{VH}_{t-29:t}$) e realizada ($\text{RV}_{t+1:t+30}$) de 30 dias e volatilidade implícita (IV, índice DVOL da Deribit). Só a volatilidade realizada cobre a mesma janela que a IV de $t$; a histórica é a do HBVRP, conhecida em $t$, e sua comparação com a IV mistura janelas diferentes. Painel (b): RBVRP ($\text{RV}_{t+1:t+30} - \text{IV}_t$) e HBVRP ($\text{VH}_{t-29:t} - \text{IV}_t$). Anotações verticais: colapso do TerraUSD/LUNA (maio/2022), liquidação da Three Arrows Capital e suspensão de saques na Celsius (junho/2022), falência da FTX (novembro/2022), crise bancária dos Estados Unidos --- SVB e Signature (março/2023), e aprovação dos ETFs de Bitcoin à vista pela SEC (janeiro/2024).}
+    \caption[Evolução da volatilidade e do prêmio de risco de volatilidade]{Evolução temporal das séries de volatilidade do Bitcoin. Painel (a): volatilidade realizada de 30 dias ($\text{RV}_{t+1:t+30}$), que cobre a mesma janela que a IV de $t$, e volatilidade implícita (IV, índice DVOL da Deribit). Painel (b): RBVRP ($\text{RV}_{t+1:t+30} - \text{IV}_t$) e HBVRP ($\text{VH}_{t-29:t} - \text{IV}_t$). Anotações verticais: colapso do TerraUSD/LUNA (maio/2022), liquidação da Three Arrows Capital e suspensão de saques na Celsius (junho/2022), falência da FTX (novembro/2022), crise bancária dos Estados Unidos --- SVB e Signature (março/2023), e aprovação dos ETFs de Bitcoin à vista pela SEC (janeiro/2024).}
     \label{fig:dados-series}
 \end{figure}
 }{}

@@ -25,7 +25,7 @@ $\text{IV}_t - \overline{\text{IV}}_{t-29:t}$ & desvio da média móvel de 30 di
 $r_t$ & $\ln(P_t/P_{t-1})$ & \texttt{ret\_1d} & $<$0{,}001 & log-diferença do preço \\
 $r_{t-4:t}$ & $\sum_{j=0}^{4} r_{t-j}$ & \texttt{ret\_acum\_5d} & $<$0{,}001 & soma de log-diferenças \\
 $r_{t-29:t}$ & $\sum_{j=0}^{29} r_{t-j}$ & \texttt{ret\_acum\_30d} & $<$0{,}001 & soma de log-diferenças \\
-$\ln(P_t/\overline{P}_{t-29:t})$ & preço relativo à média móvel de 30 dias & \texttt{log\_close\_ma30d} & $<$0{,}001 & razão com a média móvel \\
+$\ln(P_t/\overline{P}_{t-29:t})$ & log do preço relativo à média móvel de 30 dias & \texttt{log\_close\_ma30d} & $<$0{,}001 & log da razão com a média móvel \\
 \addlinespace
 \multicolumn{5}{l}{\textit{Prêmio}} \\
 $\text{HBVRP}_t$ & $\text{VH}_{t-29:t} - \text{IV}_t$ & \texttt{vrp\_30d} & $<$0{,}001 & nível \\

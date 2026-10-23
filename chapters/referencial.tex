@@ -18,9 +18,10 @@ A volatilidade implícita (IV) representa a
 expectativa de mercado, no mundo neutro ao risco, sobre a variabilidade futura
 do preço do ativo subjacente. O índice DVOL da Deribit, como o VIX, é a raiz da
 variância esperada no mundo neutro ao risco:
-\[
+\begin{equation}
 \text{IV}_t^2 = \mathbb{E}^*(\text{RV}^2_{t+1:t+h} \mid I_t),
-\]
+\label{eq:refer-iv2}
+\end{equation}
 em que $\text{RV}^2_{t+1:t+h}$ é a variância realizada entre $t+1$ e $t+h$
 (Seção~\ref{sec:refer-rv}), o asterisco denota a expectativa no mundo neutro ao
 risco e $I_t$, a informação disponível em $t$. Nesta dissertação,
@@ -99,17 +100,17 @@ O prêmio de risco de volatilidade (VRP) pode ser interpretado como a
 compensação exigida pelos investidores para assumir risco de volatilidade.
 Formalmente, um prêmio de risco é a diferença entre a expectativa no mundo
 físico e a expectativa no mundo neutro ao risco. Em volatilidade, o lado
-neutro ao risco é a volatilidade implícita, e, para um horizonte de $h$ dias,
+neutro ao risco é a volatilidade implícita, a raiz da variância implícita da
+equação~\eqref{eq:refer-iv2}, e, para um horizonte de $h$ dias, o prêmio,
+medido em volatilidade, é
 
 \begin{equation}
 \text{VRP}_t = \mathbb{E}(\text{RV}_{t+1:t+h} \mid I_t) - \text{IV}_t,
 \label{eq:refer-vrp-def}
 \end{equation}
-em que $\mathbb{E}$ denota a expectativa no mundo físico. Como a IV é a raiz da
-variância esperada no mundo neutro ao risco, e não a volatilidade esperada, o
-prêmio medido em volatilidade inclui também a diferença, dada pela
-desigualdade de Jensen, entre a raiz da variância esperada e a volatilidade
-esperada.
+em que $\mathbb{E}$ denota a expectativa no mundo físico. A diferença entre a
+raiz da variância esperada e a volatilidade esperada é de segunda ordem e não
+é tratada aqui.
 
 O BVRP é o prêmio de risco de volatilidade do Bitcoin, com $h = 30$ dias e a
 IV dada pelo índice DVOL da Deribit:
