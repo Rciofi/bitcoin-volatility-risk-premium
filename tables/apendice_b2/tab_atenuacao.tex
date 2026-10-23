@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{BVRP previsto pelo Ridge como regressor gerado: atenuação, com o retorno real fixo.}
+\label{tab:apb2-atenuacao}
+\begin{tabular}{rrrrrrrrr}
+\toprule
+$h$ & $\hat\beta_h$ & $\beta^{\text{v}}_h$ & $\overline{\beta^*_h}$ & $\overline{\beta^*_h}/\hat\beta_h$ & $\rho^*/\rho^{\text{v}}$ & $\overline{\beta^*_h}/\beta^{\text{v}}_h$ & dp($\beta^*$) & EP robusto \\
+\midrule
+1 & $-$0{,}042 & $-$0{,}034 & $-$0{,}047 & 1{,}11 & 1{,}07 & 1{,}39 & 0{,}019 & 0{,}016 \\
+5 & $-$0{,}144 & $-$0{,}105 & $-$0{,}150 & 1{,}04 & 1{,}11 & 1{,}43 & 0{,}068 & 0{,}057 \\
+10 & $-$0{,}254 & $-$0{,}176 & $-$0{,}265 & 1{,}04 & 1{,}18 & 1{,}51 & 0{,}130 & 0{,}111 \\
+20 & $-$0{,}475 & $-$0{,}292 & $-$0{,}505 & 1{,}06 & 1{,}36 & 1{,}73 & 0{,}238 & 0{,}195 \\
+30 & $-$0{,}615 & $-$0{,}333 & $-$0{,}677 & 1{,}10 & 1{,}60 & 2{,}03 & 0{,}347 & 0{,}287 \\
+60 & $-$1{,}426 & $-$0{,}757 & $-$1{,}550 & 1{,}09 & 1{,}62 & 2{,}05 & 0{,}635 & 0{,}514 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Ridge, $R^{\log}_{t,h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$ nas 987 datas, com o retorno real fixo e o BVRP previsto regenerado em cada reamostragem (Seção~\ref{sec:apb2-regressor-gerado}); 1{.}999 reamostragens. $\hat\beta_h$: coeficiente na amostra real; $\beta^{\text{v}}_h$: coeficiente do retorno na verdade $\mu$ (o modelo ajustado nas 1.776 datas); $\overline{\beta^*_h}$: média dos coeficientes com o BVRP previsto simulado; $\rho^*/\rho^{\text{v}}$: média de corr($R^{\log}$, BVRP previsto simulado) sobre corr($R^{\log}$, $\mu$), livre de escala. $\overline{\beta^*_h}/\beta^{\text{v}}_h$ mistura a atenuação com a diferença de escala entre $\mu$ e a previsão original, cujo coeficiente é maior em módulo que o de $\mu$. EP robusto: intervalo interquartil dos $\beta^*$ dividido por 1,349. Razão $\overline{\beta^*_h}/\hat\beta_h$ com $p = 29$: 1{,}08 a 1{,}15; com $p = 60$: 1{,}05 a 1{,}12. Nesta variante (retorno fixo, inovações sorteadas entre as 1.776 datas), as previsões simuladas do BVRP têm, em média, 85\% do desvio-padrão da previsão original (mínimo de 36\%); trata-se da dispersão da previsão, e não do erro simulado da Tabela~\ref{tab:apb2-regressor-gerado}. A variante não é um teste limpo de erro de medida: o Ridge com o $\alpha$ fixo é reestimado sobre um alvo simulado a partir de uma previsão já encolhida e com as mesmas variáveis.}
+\end{table}

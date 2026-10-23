@@ -10,7 +10,11 @@ Lê as cópias das saídas agregadas dos diagnósticos do B2 em outputs/B2/ e gr
   tables/apendice_b2/tab_tamanho_poder.tex         tamanho e poder por simulação (apêndice)
   tables/apendice_b2/tab_regime.tex                regime de volatilidade, com α, β, δ, γ e β + γ (apêndice)
   tables/apendice_b2/tab_corr_e_u.tex              corr(erro de previsão do RBVRP, inovação do retorno)
-  tables/apendice_b2/tab_ponte_retorno_simples.tex floresta direto no retorno: simples × log (passo 6)
+  tables/apendice_b2/tab_ponte_retorno_simples.tex floresta direto no retorno e fator único do Ridge: simples × log
+                                                   (passos 6 e 7)
+  tables/apendice_b2/tab_atenuacao.tex             regressor gerado: atenuação com o retorno real fixo (passo 7)
+  tables/apendice_b2/tab_regressor_gerado.tex      regressor gerado: EP e valores-p, retorno e erro simulados (passo 7)
+  tables/apendice_b2/tab_ar.tex                    AR do erro de previsão e do retorno (passo 7)
 Não toca nos .tex dos capítulos nem nas tabelas do publicar_cap6.py e do publicar_cap7.py.
 
 Conferência (sai com erro na primeira falha):
@@ -79,11 +83,16 @@ def fmt_p(p):
     return r"$<$0{,}001" if p < 0.001 else fmt(p, 3)
 
 
-def tabela(legenda, rotulo, colunas, cabecalho, linhas, nota, tamanho=r"\small"):
-    corpo = [r"\begin{table}[H]", r"\centering", tamanho, rf"\caption{{{legenda}}}", rf"\label{{{rotulo}}}",
-             rf"\begin{{tabular}}{{{colunas}}}", r"\toprule", cabecalho + r" \\", r"\midrule"]
+def tabela(legenda, rotulo, colunas, cabecalho, linhas, nota, tamanho=r"\small", caber=False, colsep=None):
+    """caber: reduz a tabela só se ela passar da largura da linha; colsep: \\tabcolsep em pt."""
+    corpo = [r"\begin{table}[H]", r"\centering", tamanho, rf"\caption{{{legenda}}}", rf"\label{{{rotulo}}}"]
+    if colsep is not None:
+        corpo.append(rf"\setlength{{\tabcolsep}}{{{colsep}pt}}")
+    if caber:
+        corpo.append(r"\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%")
+    corpo += [rf"\begin{{tabular}}{{{colunas}}}", r"\toprule", cabecalho + r" \\", r"\midrule"]
     corpo += linhas
-    corpo += [r"\bottomrule", r"\end{tabular}", r"\par\smallskip",
+    corpo += [r"\bottomrule", r"\end{tabular}" + ("}" if caber else ""), r"\par\smallskip",
               rf"\parbox{{0.95\linewidth}}{{\footnotesize\textit{{Nota}}: {nota}}}", r"\end{table}", ""]
     return "\n".join(corpo)
 
@@ -227,8 +236,37 @@ def conferir_coerencia(d):
     mr = d["ponte_maiores_retornos_h60"]
     checar(np.isclose(mr.log_retorno_pct, 100 * np.log1p(mr.retorno_simples_pct / 100), rtol=0, atol=TOL),
            "ponte: log-retorno ≠ log1p do simples")
+    # passo 7: sanidade, β̂ e EP HAC = fator único do passo 4, ponte em log = Cap. 6, Holm
+    checar(d["regressor_gerado_sanidade"].bate.all(), "passo 7: sanidade")
+    uf = d["um_fator"][d["um_fator"].L_regra == "h+1"]
+    at = d["regressor_gerado_atenuacao"]
+    for modelo, des in (("ridge", "q1_ridge"), ("floresta", "q1_floresta")):
+        u = uf[uf.desenho == des].set_index("h").loc[HS]
+        for cel in at[at.modelo == modelo].celula.unique():
+            g = at[at.celula == cel].set_index("h").loc[HS]
+            checar(np.isclose(g.beta_hat, u.beta, rtol=0, atol=TOL), f"passo 7, {cel}: β̂ ≠ fator único")
+            if "ep_hac" in g and g.ep_hac.notna().all():
+                checar(np.isclose(g.ep_hac, u.ep_hac, rtol=0, atol=TOL), f"passo 7, {cel}: EP HAC ≠ fator único")
+    pl = d["ponte_ridge"][d["ponte_ridge"].retorno == "log"].set_index("h").loc[HS]
+    u = uf[uf.desenho == "q1_ridge"].set_index("h").loc[HS]
+    checar(np.isclose(pl.beta, u.beta, rtol=0, atol=TOL), "ponte Ridge: β do log ≠ fator único")
+    for teste, col in (("rotacao", "p_rotacao"), ("bootstrap", "p_bootstrap")):
+        ref = [p_de(d["holm"], "q1_ridge", hh, "h+1", teste) for hh in HS]
+        checar(np.isclose(pl[col].to_numpy(), ref, rtol=0, atol=TOL), f"ponte Ridge: p {teste} do log ≠ Cap. 6")
+    # passo 8 (#135): sanidade; as linhas originais reproduzem o T5 (R², CW, R² dentro e MCS)
+    checar((d["sens_profundidade_sanidade"].dif <= TOL).all(), "passo 8: sanidade")
+    met5 = pd.read_csv(os.path.join(ROOT, "outputs", "T5", "metricas_T5.csv")).set_index(["janela", "modelo"])
+    mcs5 = pd.read_csv(os.path.join(ROOT, "outputs", "MCS", "mcs_T5.csv"))
+    mcs5 = mcs5[(mcs5.bloco == 60) & (mcs5.estatistica == "T_max")].set_index(["janela", "modelo"])
+    for x in d["sens_profundidade_resultados"].query("versao == 'original'").itertuples():
+        checar(abs(x.mcs_p - mcs5.loc[(x.janela, x.modelo), "p_mcs"]) <= TOL, f"passo 8: MCS {x.janela} {x.modelo}")
+        if x.modelo != "media_historica":
+            checar(abs(x.r2_fora - met5.loc[(x.janela, x.modelo), "r2_oos_vs_media_historica"]) <= TOL
+                   and abs(x.p_cw - met5.loc[(x.janela, x.modelo), "cw_p_unilateral_vs_media_historica"]) <= TOL
+                   and abs(x.r2_dentro - met5.loc[(x.janela, x.modelo), "r2_dentro_amostra_media"]) <= TOL,
+                   f"passo 8: original {x.janela} {x.modelo} ≠ T5")
     print("Coerência interna: χ², F, Holm, um fator, min-p, regime, corr(e, u), tamanho, placebo, componentes, "
-          "regime do passo 5 e ponte do passo 6 conferidos.")
+          "regime do passo 5, ponte do passo 6, regressor gerado do passo 7 e profundidade do passo 8 conferidos.")
 
 
 # ---------------------------------------------------------------------------
@@ -405,18 +443,19 @@ def tab_tamanho_poder(d, raiz):
         checar(len(r) == 1, f"tamanho {caso} {proc} h = {h} {teste}")
         return float(r.rejeicao_5pct.iloc[0])
 
+    sigla = {"q16_completa": "P16-M", "q16_987": "P16-F", "q1_ridge": "FU-R", "q1_floresta": "FU-F"}
     linhas = [r"\multicolumn{11}{l}{\textit{Painel A: tamanho a 5\% ($\rho = 0$), $L = h+1$}} \\"]
     for caso in CASOS:
         for proc in ("S1", "S3"):
             v = [tam(caso, proc, hh, t) for hh in (1, 30, 60) for t in ("chi2", "rot", "boot")]
-            linhas.append(rf"{CASOS[caso]} & {proc} & " + " & ".join(fmt(x, 3) for x in v) + r" \\")
+            linhas.append(rf"{sigla[caso]} & {proc} & " + " & ".join(fmt(x, 3) for x in v) + r" \\")
     linhas += [r"\midrule", r"\multicolumn{11}{l}{\textit{Painel B: poder a 5\% em $h = 30$, ruído S1}} \\",
                r"Caso & Teste & $\rho = 0{,}5\%$ & 1\% & 2\% & 5\% & & & & & \\"]
     rhos = (0.005, 0.01, 0.02, 0.05)
-    for c, des, rot in (("q16_completa", "q16", CASOS["q16_completa"]), ("q16_987", "q16", CASOS["q16_987"]),
-                        ("q1_R_log", "um_fator", CASOS["q1_ridge"])):
-        for teste, col, rotulo in (("chi2", "poder_ajustado_5pct", r"$\chi^2$ ajustado ao tamanho"),
-                                   ("rot", "rejeicao_5pct", "rotação"), ("boot", "rejeicao_5pct", "bootstrap")):
+    for c, des, rot in (("q16_completa", "q16", sigla["q16_completa"]), ("q16_987", "q16", sigla["q16_987"]),
+                        ("q1_R_log", "um_fator", sigla["q1_ridge"])):
+        for teste, col, rotulo in (("chi2", "poder_ajustado_5pct", r"$\chi^2$ aj."),
+                                   ("rot", "rejeicao_5pct", "rot."), ("boot", "rejeicao_5pct", "boot.")):
             vals = []
             for rho in rhos:
                 r = t3[(t3.caso == c) & (t3.desenho == des) & (t3.processo == "S1") & np.isclose(t3.rho, rho)
@@ -426,8 +465,12 @@ def tab_tamanho_poder(d, raiz):
             linhas.append(rf"{rot} & {rotulo} & " + " & ".join(fmt(x, 3) for x in vals) + r" & & & & & \\")
     cab = (r" & & \multicolumn{3}{c}{$h = 1$} & \multicolumn{3}{c}{$h = 30$} & \multicolumn{3}{c}{$h = 60$} \\ "
            r"\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}" "\n"
-           r"Caso & Ruído & $\chi^2$ & rotação & bootstrap & $\chi^2$ & rotação & bootstrap & $\chi^2$ & rotação & bootstrap")
-    nota = (r"Simulação com as variáveis explicativas reais fixas e $y$ = constante + ruído (painel A) ou + sinal "
+           r"Caso & Ruído & $\chi^2$ & rot. & boot. & $\chi^2$ & rot. & boot. & $\chi^2$ & rot. & boot.")
+    nota = (r"Casos: P16-M, 16 previsores na amostra de modelagem (1.776 datas); P16-F, 16 previsores nas 987 "
+            r"datas fora da amostra; FU-R e FU-F, fator único com o $\widehat{\text{BVRP}}$ do Ridge e da "
+            r"floresta. rot.: rotação; boot.: bootstrap; $\chi^2$ aj.: $\chi^2$ com o valor crítico ajustado ao "
+            r"tamanho. "
+            r"Simulação com as variáveis explicativas reais fixas e $y$ = constante + ruído (painel A) ou + sinal "
             r"com $R^2$ populacional $\rho$ (painel B). Ruído: soma de $h$ log-retornos diários reais, S1 sorteados "
             r"com reposição, S3 em blocos circulares de $\max(60, 2h)$ dias. 1.000 réplicas com $\rho = 0$ e 500 "
             r"com $\rho > 0$. Testes como nas Tabelas~\ref{tab:retlin-wald-direto} e~\ref{tab:retlin-um-fator}; "
@@ -440,7 +483,7 @@ def tab_tamanho_poder(d, raiz):
             r"inovações futuras das variáveis explicativas.")
     gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_tamanho_poder.tex"),
            tabela("Tamanho e poder dos testes por simulação.", "tab:apb2-tamanho-poder", "llrrrrrrrrr",
-                  cab, linhas, nota, tamanho=r"\scriptsize"))
+                  cab, linhas, nota, tamanho=r"\footnotesize", caber=True))
 
 
 def p5(t, filtro, hip, teste):
@@ -540,10 +583,12 @@ def tab_corr_e_u(d, raiz):
     a2 = p1[p1.inovacao == "A2_resid_MQO_16_previsores"].set_index("modelo")
     icp = ic[ic.principal & (ic.versao == "u fixo")].set_index("modelo")
     principais = ["Ridge", "floresta_aleatoria", "Ridge_rv_menos_iv", "floresta_rv_menos_iv"]
+    curto = {**MODELOS, "floresta_aleatoria": "Floresta", "Ridge_rv_menos_iv": r"Ridge, $\hat f - \text{IV}$",
+             "floresta_rv_menos_iv": r"Floresta, $\hat f - \text{IV}$"}
     linhas = [r"\multicolumn{7}{l}{\textit{Painel A: inovação A2}} \\"]
     for m in principais:
         e, b = a2.loc[m], icp.loc[m]
-        linhas.append(rf"{MODELOS[m]} & {fmt(e['corr'])} & {fmt(e.ep_hac)} & {fmt_p(e.p_hac)} & "
+        linhas.append(rf"{curto[m]} & {fmt(e['corr'])} & {fmt(e.ep_hac)} & {fmt_p(e.p_hac)} & "
                       rf"[{fmt(b.ic_hac_inf)}; {fmt(b.ic_hac_sup)}] & [{fmt(b.ic_pct_inf)}; {fmt(b.ic_pct_sup)}] & "
                       rf"{fmt(e.corr_sem_sobrep_mediana)} [{fmt(e.corr_sem_sobrep_min)}; {fmt(e.corr_sem_sobrep_max)}] \\")
     inov = ["A1_resid_propria_previsao", "A2_resid_MQO_16_previsores", "A3_menos_media_historica_oos",
@@ -552,9 +597,11 @@ def tab_corr_e_u(d, raiz):
                r"Modelo & A1 & A2 & A3 & A4 & & \\"]
     w = p1.pivot(index="modelo", columns="inovacao", values="corr")
     for m in principais + ["MQO", "LASSO", "XGBoost", "media_historica", "proxy_retrospectiva", "persistencia_viavel"]:
-        linhas.append(rf"{MODELOS[m]} & " + " & ".join(fmt(w.loc[m, i]) for i in inov) + r" & & \\")
-    cab = r"Modelo & corr & EP HAC & $p$ HAC & IC 95\% HAC & IC 95\% bootstrap & Sem sobreposição"
-    nota = (r"$e_t = \text{RBVRP}_t - \widehat{\text{BVRP}}_t$, o erro de previsão do RBVRP de cada modelo, e "
+        linhas.append(rf"{curto[m]} & " + " & ".join(fmt(w.loc[m, i]) for i in inov) + r" & & \\")
+    cab = r"Modelo & corr & EP HAC & $p$ HAC & IC 95\% HAC & IC 95\% boot. & Sem sobrep."
+    nota = (r"$\hat f - \text{IV}$: forma $\hat f(X_t) - \text{IV}_t$; boot.: bootstrap; sem sobrep.: sem "
+            r"sobreposição. "
+            r"$e_t = \text{RBVRP}_t - \widehat{\text{BVRP}}_t$, o erro de previsão do RBVRP de cada modelo, e "
             r"$u_t$ a inovação de $R^{\log}_{t,30}$, nas 987 datas fora da amostra. A2 (principal): resíduo do MQO "
             r"de $R^{\log}_{t,30}$ nas 16 variáveis explicativas; A1: resíduo da regressão de $R^{\log}_{t,30}$ na "
             r"própria previsão; A3: $R^{\log}_{t,30}$ menos a média histórica fora da amostra; A4: $R^{\log}_{t,30}$ "
@@ -565,7 +612,7 @@ def tab_corr_e_u(d, raiz):
             r"Capítulo~\ref{chap:previsao_bvrp}.")
     gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_corr_e_u.tex"),
            tabela("Correlação entre o erro de previsão do RBVRP e a inovação do retorno de 30 dias.",
-                  "tab:apb2-corr-e-u", "lrrrccc", cab, linhas, nota, tamanho=r"\footnotesize"))
+                  "tab:apb2-corr-e-u", "lrrrccc", cab, linhas, nota, tamanho=r"\footnotesize", caber=True, colsep=4))
 
 
 def tab_ponte(d, raiz):
@@ -589,6 +636,17 @@ def tab_ponte(d, raiz):
         linhas.append(rf"\multicolumn{{4}}{{l}}{{{rot}}} & {fmt(r.r2_fora, 3)} & {fmt_p(r.p_cw)} & {fmt_p(r.p_dm)} \\")
     linhas.append(rf"\multicolumn{{4}}{{l}}{{Floresta no log-retorno $\times$ média do log (painel A)}} & "
                   rf"{fmt(l60.r2_fora, 3)} & {fmt_p(l60.p_cw)} & {fmt_p(l60.p_dm)} \\")
+    pr = d["ponte_ridge"].set_index(["retorno", "h"])
+    linhas += [r"\midrule", r"\multicolumn{7}{l}{\textit{Painel C: fator único do Ridge, $\widehat{\text{BVRP}}$ como regressor}} \\",
+               r"$h$ & \multicolumn{1}{c}{$\hat\beta_h$} & \multicolumn{1}{c}{EP HAC} & \multicolumn{1}{c}{$p_{\chi^2}$} & "
+               r"\multicolumn{1}{c}{$p$ rotação} & \multicolumn{1}{c}{$p$ bootstrap} & \multicolumn{1}{c}{$R^2$} \\",
+               r"\cmidrule(lr){2-7}"]
+    for ret, rot in (("simples", "Retorno simples"), ("log", "Log-retorno")):
+        linhas.append(rf"\multicolumn{{7}}{{l}}{{{rot}}} \\")
+        for hh in HS:
+            r = pr.loc[(ret, hh)]
+            linhas.append(rf"{hh} & {fmt(r.beta)} & {fmt(r.ep_hac)} & {fmt_p(r.p_hac)} & {fmt_p(r.p_rotacao)} & "
+                          rf"{fmt_p(r.p_bootstrap)} & {fmt(r.r2, 4)} \\")
     w = cv.loc["winsor_1_99"]
     datas = "; ".join(rf"{r.date[8:10]}/{r.date[5:7]}/{r.date[:4]}, {fmt(r.retorno_simples_pct, 1)}\%" for r in mr.itertuples())
     n = lambda ret, perda, c: int(cc.loc[(ret, perda), c])  # noqa: E731
@@ -598,7 +656,7 @@ def tab_ponte(d, raiz):
     nota = (r"Floresta aleatória direto no retorno de $h$ dias, nas 987 datas fora da amostra, com o mesmo "
             r"protocolo nos dois retornos (17 variáveis, mesma grade, 500 árvores, validação cruzada de cinco dobras "
             r"com embargo $h$, 33 origens, mesma semente); só o alvo muda. Retorno simples: as previsões da versão "
-            r"anterior do Capítulo~\ref{chap:retornos_nao_linear} (Tabela~\ref{tab:retnl-arvore-retorno}); "
+            r"anterior do Capítulo~\ref{chap:retornos_nao_linear}; "
             r"log-retorno: Tabela~\ref{tab:retnl-oos-floresta}. CW unilateral e DM bilateral contra a média "
             r"histórica, com HAC de $h+1$ defasagens. Painel B: a previsão do "
             r"log-retorno convertida para retorno simples. Com o realizado winsorizado a 1\% e 99\% e as "
@@ -612,10 +670,185 @@ def tab_ponte(d, raiz):
             rf"{int(hp.loc['log', 'max_depth_1'])} com o log-retorno, e árvores sem limite de profundidade em "
             rf"{int(hp.loc['simples', 'max_depth_None'])} e {int(hp.loc['log', 'max_depth_None'])}; o $R^2$ "
             rf"dentro da amostra, em média nas 33 origens, é {fmt(hp.loc['simples', 'r2_dentro_media'], 3)} e "
-            rf"{fmt(hp.loc['log', 'r2_dentro_media'], 3)}.")
+            rf"{fmt(hp.loc['log', 'r2_dentro_media'], 3)}. Painel C: $R_{{t,h}} = \alpha_h + \beta_h\,"
+            r"\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$, com o BVRP previsto pelo Ridge, nas 987 datas, com o "
+            r"retorno simples e com o log-retorno em pontos percentuais; HAC com $h+1$ defasagens, rotação e "
+            r"bootstrap de pares em blocos circulares como na Tabela~\ref{tab:retlin-um-fator}; no log-retorno, os "
+            r"números são os daquela tabela.")
     gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_ponte_retorno_simples.tex"),
-           tabela("Floresta direto no retorno: retorno simples e log-retorno.", "tab:apb2-ponte-retorno",
+           tabela("Floresta direto no retorno e fator único do Ridge: retorno simples e log-retorno.",
+                  "tab:apb2-ponte-retorno",
                   "rrrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
+
+
+def milhar(n):
+    """1999 -> '1{.}999' (separador de milhar no padrão do texto)."""
+    return f"{int(n):,}".replace(",", "{.}")
+
+
+def tab_atenuacao(d, raiz):
+    a = d["regressor_gerado_atenuacao"]
+    f = a[a.celula == "ridge_fixo_bic"].set_index("h")
+    sens = {c: a[a.celula == c].set_index("h").razao_beta_hat for c in ("ridge_fixo_p29", "ridge_fixo_p60")}
+    linhas = [rf"{hh} & {fmt(f.loc[hh, 'beta_hat'])} & {fmt(f.loc[hh, 'beta_v'])} & {fmt(f.loc[hh, 'media_bstar'])} & "
+              rf"{fmt(f.loc[hh, 'razao_beta_hat'], 2)} & {fmt(f.loc[hh, 'razao_corr'], 2)} & "
+              rf"{fmt(f.loc[hh, 'razao_beta_v'], 2)} & {fmt(f.loc[hh, 'dp_bstar'])} & {fmt(f.loc[hh, 'ep_robusto'])} \\"
+              for hh in HS]
+    cab = (r"$h$ & $\hat\beta_h$ & $\beta^{\text{v}}_h$ & $\overline{\beta^*_h}$ & $\overline{\beta^*_h}/\hat\beta_h$ & "
+           r"$\rho^*/\rho^{\text{v}}$ & $\overline{\beta^*_h}/\beta^{\text{v}}_h$ & dp($\beta^*$) & EP robusto")
+    r0 = f.iloc[0]
+    nota = (r"Ridge, $R^{\log}_{t,h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h}$ nas 987 datas, com o "
+            r"retorno real fixo e o BVRP previsto regenerado em cada reamostragem (Seção~\ref{sec:apb2-regressor-gerado}); "
+            rf"{milhar(r0.B)} reamostragens. "
+            r"$\hat\beta_h$: coeficiente na amostra real; $\beta^{\text{v}}_h$: coeficiente do retorno na verdade "
+            r"$\mu$ (o modelo ajustado nas 1.776 datas); $\overline{\beta^*_h}$: média dos coeficientes com o BVRP "
+            r"previsto simulado; $\rho^*/\rho^{\text{v}}$: média de corr($R^{\log}$, BVRP previsto simulado) sobre "
+            r"corr($R^{\log}$, $\mu$), livre de escala. $\overline{\beta^*_h}/\beta^{\text{v}}_h$ mistura a atenuação "
+            r"com a diferença de escala entre $\mu$ e a previsão original, cujo coeficiente é maior em módulo que o de "
+            r"$\mu$. EP robusto: intervalo interquartil dos $\beta^*$ dividido por 1,349. Razão "
+            rf"$\overline{{\beta^*_h}}/\hat\beta_h$ com $p = 29$: {fmt(sens['ridge_fixo_p29'].min(), 2)} a "
+            rf"{fmt(sens['ridge_fixo_p29'].max(), 2)}; com $p = 60$: {fmt(sens['ridge_fixo_p60'].min(), 2)} a "
+            rf"{fmt(sens['ridge_fixo_p60'].max(), 2)}. Nesta variante (retorno fixo, inovações sorteadas entre as "
+            rf"1.776 datas), as previsões simuladas do BVRP têm, em média, {fmt(100 * r0.razao_dp_f, 0)}\% do "
+            rf"desvio-padrão da previsão original (mínimo de {fmt(100 * r0.dp_f_min_sobre_dp_f, 0)}\%); trata-se da "
+            r"dispersão da previsão, e não do erro simulado da Tabela~\ref{tab:apb2-regressor-gerado}. A variante não é um teste limpo de erro de medida: o Ridge "
+            r"com o $\alpha$ fixo é reestimado sobre um alvo simulado a partir de uma previsão já encolhida e com as "
+            r"mesmas variáveis.")
+    gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_atenuacao.tex"),
+           tabela(r"BVRP previsto pelo Ridge como regressor gerado: atenuação, com o retorno real fixo.",
+                  "tab:apb2-atenuacao", "rrrrrrrrr", cab, linhas, nota, tamanho=r"\footnotesize"))
+
+
+def tab_regressor_gerado(d, raiz):
+    a = d["regressor_gerado_atenuacao"]
+    linhas = []
+    rot = {"ridge_conjunto_987": "Ridge, datas sorteadas entre as 987 (principal)",
+           "ridge_conjunto_1776": "Ridge, datas sorteadas entre as 1.776 (sensibilidade)",
+           "floresta_conjunto_987": r"Floresta, $\hat f(X_t) - \text{IV}_t$, datas sorteadas entre as 987"}
+    for k, (cel, nome) in enumerate(rot.items()):
+        g = a[a.celula == cel].set_index("h").loc[HS]
+        h1, h3 = holm(g.p_h0.to_numpy()), holm(g.p_h0_padronizado.to_numpy())
+        if k:
+            linhas.append(r"\midrule")
+        linhas.append(rf"\multicolumn{{10}}{{l}}{{\textit{{{nome}}}; B = {milhar(g.B.iloc[0])}}} \\")
+        for i, hh in enumerate(HS):
+            r = g.loc[hh]
+            linhas.append(rf"{hh} & {fmt(r.beta_hat)} & {fmt(r.dp_bstar)} & {fmt(r.ep_robusto)} & {fmt(r.ep_hac)} & "
+                          rf"{fmt_p(r.p_h0)} & {fmt_p(h1[i])} & {fmt_p(r.p_percentil)} & {fmt_p(r.p_h0_padronizado)} & "
+                          rf"{fmt_p(h3[i])} \\")
+    pv = d["regressor_gerado_previo"]
+    pr = pv[(pv.modelo == "ridge") & (pv.sorteio.astype(str) == "987")]
+    eh_erro = pr.h.astype(str) == "erro e"
+    checar(len(pr) == 7 and eh_erro.sum() == 1, "prévia (a): linhas do Ridge com sorteio nas 987 datas")
+    rr, re_ = pr[~eh_erro].razao.astype(float), float(pr[eh_erro].razao.iloc[0])
+    va = d["regressor_gerado_variancias"].set_index("modelo")
+    fr = {c: a[a.celula == c].iloc[0] for c in rot}
+    cab = (r" & & & & & \multicolumn{2}{c}{(i) sob $H_0$} & (ii) & \multicolumn{2}{c}{(iii) padronizado} \\ "
+           r"\cmidrule(lr){6-7}\cmidrule(lr){9-10}" "\n"
+           r"$h$ & $\hat\beta_h$ & dp($\beta^*$) & EP robusto & EP HAC & $p$ & Holm & $p$ percentil & $p$ & Holm")
+    nota = (r"Retorno e erro de previsão simulados juntos (Seção~\ref{sec:apb2-regressor-gerado}): em cada "
+            r"reamostragem, as datas sorteadas dão o par de inovações do erro de previsão e do retorno; o retorno "
+            r"simulado é $\alpha^{\text{v}}_h + \beta^{\text{v}}_h\mu_t + u^*_t$ e, sob $H_0$, $\alpha^{\text{v}}_h + u^*_t$. "
+            r"(i) fração de $|\beta^*_0| \ge |\hat\beta_h|$ sob $H_0$, o critério principal; (ii) $2\min\{P(\beta^* \le 0), "
+            r"P(\beta^* \ge 0)\}$; (iii) como (i), com o coeficiente padronizado $\beta^*\,\text{dp}(\widehat{\text{BVRP}}^*)$ "
+            r"contra $\hat\beta_h\,\text{dp}(\widehat{\text{BVRP}})$, livre do encolhimento do Ridge. Holm sobre os seis "
+            r"horizontes. EP robusto: intervalo interquartil dividido por 1,349. Desvio-padrão médio das previsões "
+            rf"simuladas sobre o da original: {fmt(fr['ridge_conjunto_987'].razao_dp_f, 2)} (mínimo "
+            rf"{fmt(fr['ridge_conjunto_987'].dp_f_min_sobre_dp_f, 2)}), {fmt(fr['ridge_conjunto_1776'].razao_dp_f, 2)} "
+            rf"e {fmt(fr['floresta_conjunto_987'].razao_dp_f, 2)}, nos três painéis. Com as datas sorteadas entre as "
+            rf"987 (painel principal), o retorno simulado tem de {fmt(rr.min(), 2)} a {fmt(rr.max(), 2)} vez o "
+            rf"desvio-padrão do real, e o erro de previsão simulado, $e^*$, {fmt(re_, 2)} vez o desvio-padrão do "
+            r"resíduo dentro da amostra; essa razão é a do erro, e não a da dispersão das previsões simuladas da "
+            r"Tabela~\ref{tab:apb2-atenuacao}, que coincide por acaso. Na floresta, a variância "
+            rf"do erro fora da amostra é {fmt(va.loc['floresta', 'razao_fora_dentro_987'], 2)} vez a do resíduo dentro "
+            rf"dela (no Ridge, {fmt(va.loc['ridge', 'razao_fora_dentro_987'], 2)}), e o erro simulado subestima o "
+            r"erro de previsão.")
+    gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_regressor_gerado.tex"),
+           tabela(r"Fator único com o BVRP previsto tratado como regressor gerado: erro-padrão e valores-$p$.",
+                  "tab:apb2-regressor-gerado", "rrrrrrrrrr", cab, linhas, nota, tamanho=r"\scriptsize"))
+
+
+def tab_ar(d, raiz):
+    ar = d["regressor_gerado_ar"]
+    nomes = {"erro (ridge_conjunto_987)": "Erro de previsão, Ridge", "erro (ridge_fixo_p29)": r"\quad $p = 29$ (sensibilidade)",
+             "erro (ridge_fixo_p60)": r"\quad $p = 60$ (sensibilidade)", "erro (floresta_conjunto_987)": "Erro de previsão, floresta"}
+    linhas = []
+    for serie, rotulo in nomes.items():
+        r = ar[ar.serie == serie].iloc[0]
+        linhas.append(rf"{rotulo} & {int(r.ordem)} & {r.criterio.replace('fixo', 'fixa')} & {fmt(r.modulo_raiz_max, 3)} & "
+                      rf"{fmt_p(r.lb_p30)} & {fmt_p(r.lb_p60)} & -- \\")
+    for modelo, nome in (("ridge", "Ridge"), ("floresta", "floresta")):
+        linhas.append(r"\addlinespace")
+        for hh in HS:
+            r = ar[(ar.modelo == modelo) & (ar.serie == f"retorno h = {hh}")].iloc[0]
+            linhas.append(rf"Retorno, {nome}, $h = {hh}$ & {int(r.ordem)} & {r.criterio} & {fmt(r.modulo_raiz_max, 3)} & "
+                          rf"{fmt_p(r.lb_p30)} & {fmt_p(r.lb_p60)} & {fmt(r.corr_inov_erro)} \\")
+    cab = r"Série & Ordem & Critério & Raiz máx. & LB $p$ (30) & LB $p$ (60) & corr$(\eta, \xi)$"
+    nota = (r"Processos autorregressivos do erro de previsão do BVRP, $e_t = \text{RBVRP}_t - \mu_t$, e do resíduo do "
+            r"retorno em $\mu$, $u_{t,h}$, nas 1.776 datas. Erro: ordem pelo BIC entre 29 e 60 (os alvos de 30 dias se "
+            r"sobrepõem em 29). Retorno: a menor ordem entre $\max(h-1, 1)$ e $h+59$ com Ljung--Box acima de 0,05 em "
+            r"30 e em 60 defasagens; em todos os horizontes uma ordem passou, e o BIC não foi usado. Raiz máx.: maior "
+            r"módulo das raízes do polinômio característico. corr$(\eta, \xi)$: correlação entre as inovações do erro e "
+            r"do retorno da mesma data, preservada no sorteio conjunto.")
+    gravar(os.path.join(raiz, "tables", "apendice_b2", "tab_ar.tex"),
+           tabela("Processos autorregressivos do erro de previsão e do retorno.", "tab:apb2-ar", "lrlrrrr",
+                  cab, linhas, nota, tamanho=r"\footnotesize"))
+
+
+def tab_profundidade(d, raiz):
+    """Apêndice F (#135): floresta e XGBoost com a grade do T5 restrita a profundidade >= 3."""
+    r = d["sens_profundidade_resultados"]
+    pr = d["sens_profundidade_profundidades"]
+    hip5 = pd.read_csv(os.path.join(ROOT, "outputs", "T5", "hiperparametros_T5.csv"))
+    hip5 = hip5[hip5.modelo.isin(["floresta_aleatoria", "XGBoost"])].assign(
+        d=lambda x: x.params.str.extract(r"'max_depth': (\w+)")[0])
+    nome = {"floresta_aleatoria": "Floresta", "XGBoost": "XGBoost"}
+    jan = {"expansiva": "expansiva", "movel": "móvel"}
+    linhas = [r"\multicolumn{7}{l}{\textit{Painel A: desempenho fora da amostra}} \\"]
+    for j, jn in jan.items():
+        linhas.append(rf"\multicolumn{{7}}{{l}}{{Janela {jn}}} \\")
+        for m in ("floresta_aleatoria", "XGBoost"):
+            for versao, rot in (("original", "original"), ("profundidade >= 3", r"prof.\ $\ge 3$")):
+                x = r[(r.janela == j) & (r.modelo == m) & (r.versao == versao)].iloc[0]
+                linhas.append(rf"\quad {nome[m]}, {rot} & {fmt(x.r2_fora)} & {fmt_p(x.p_cw)} & {fmt_p(x.p_dm_vs_media)} & "
+                              rf"{fmt_p(x.p_dm_vs_original) if versao != 'original' else '--'} & {fmt(x.r2_dentro)} & "
+                              rf"{fmt_p(x.mcs_p)} \\")
+    linhas += [r"\midrule", r"\multicolumn{7}{l}{\textit{Painel B: profundidade escolhida (nº de origens, de 33)}} \\",
+               r"Modelo, janela & \multicolumn{3}{l}{Grade completa} & \multicolumn{3}{l}{Profundidade $\ge 3$} \\"]
+
+    def contagem(g):
+        def chave(v):
+            return 99 if v == "None" else int(v)
+        return "; ".join(f"{('sem limite' if v == 'None' else v)}: {int(n)}" for v, n in sorted(g, key=lambda t: chave(t[0])))
+
+    for j, jn in jan.items():
+        for m in ("floresta_aleatoria", "XGBoost"):
+            orig = hip5[(hip5.janela == j) & (hip5.modelo == m)].groupby("d").size()
+            rest = pr[(pr.janela == j) & (pr.modelo == m)]
+            checar(orig.sum() == 33 and rest.n_origens.sum() == 33, f"profundidades {j} {m}")
+            linhas.append(rf"{nome[m]}, {jn} & \multicolumn{{3}}{{l}}{{{contagem(orig.items())}}} & "
+                          rf"\multicolumn{{3}}{{l}}{{{contagem(zip(rest.d.astype(str), rest.n_origens))}}} \\")
+    linhas += [r"\midrule", r"\multicolumn{7}{l}{\textit{Painel C: valor-$p$ do MCS dos demais modelos}} \\",
+               r"Janela & Ridge & MQO & LASSO & Média histórica & & \\"]
+    for j, jn in jan.items():
+        for versao, rot in (("original", "originais"), ("MCS com os restritos", r"com prof.\ $\ge 3$")):
+            vals = [r[(r.janela == j) & (r.modelo == m) & (r.versao == versao)].mcs_p.iloc[0]
+                    for m in ("Ridge", "MQO", "LASSO", "media_historica")]
+            linhas.append(rf"{jn}, {rot} & " + " & ".join(fmt_p(v) for v in vals) + r" & & \\")
+    orig_in = r[(r.versao == "original") & r.modelo.isin(["floresta_aleatoria", "XGBoost"])].r2_dentro
+    cab = (r"Modelo & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM, média & $p$ DM, original & $R^2$ dentro & $p$ MCS")
+    nota = (r"Floresta aleatória e XGBoost com a grade do Capítulo~\ref{chap:previsao_bvrp} restrita a profundidade "
+            r"$\ge 3$, no mesmo protocolo: 33 origens por janela, validação cruzada embargada de cinco dobras e a "
+            r"mesma semente. Floresta: profundidade 3, 6 ou sem limite, 45 das 75 combinações. XGBoost: a grade só "
+            r"tem a profundidade 4 acima de 3, 24 das 72 combinações. $R^2_{\text{fora}}$, Clark--West e "
+            r"Diebold--Mariano contra a média histórica, com HAC de 31 defasagens; DM, original: a versão restrita "
+            r"contra a original. $R^2$ dentro: média das 33 reestimações; nos originais, de "
+            rf"{fmt(orig_in.min(), 2)} a {fmt(orig_in.max(), 2)}. MCS: $T_{{\max}}$, blocos de 60 dias e 9.999 "
+            r"reamostragens, sobre os oito modelos do Capítulo~\ref{chap:previsao_bvrp}; nas linhas restritas e no "
+            r"painel C, com a floresta e o XGBoost originais trocados pelos restritos.")
+    gravar(os.path.join(raiz, "tables", "apendice_profundidade", "tab_profundidade.tex"),
+           tabela(r"Floresta aleatória e XGBoost com profundidade mínima de 3.", "tab:apf-profundidade", "lrrrrrr",
+                  cab, linhas, nota, tamanho=r"\footnotesize", caber=True))
 
 
 def main():
@@ -628,7 +861,7 @@ def main():
     d = carregar_e_conferir_procedencia()
     conferir_coerencia(d)
     for f in (tab_wald_direto, tab_um_fator, tab_oos_retorno, tab_oos_floresta, tab_componentes, tab_tamanho_poder,
-              tab_regime, tab_corr_e_u, tab_ponte):
+              tab_regime, tab_corr_e_u, tab_ponte, tab_atenuacao, tab_regressor_gerado, tab_ar, tab_profundidade):
         f(d, args.raiz)
         print(f"  {f.__name__}: ok")
     print(f"Tabelas gravadas em {os.path.join(args.raiz, 'tables')}")

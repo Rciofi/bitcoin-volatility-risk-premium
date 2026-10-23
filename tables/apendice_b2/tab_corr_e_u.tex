@@ -3,22 +3,24 @@
 \footnotesize
 \caption{Correlação entre o erro de previsão do RBVRP e a inovação do retorno de 30 dias.}
 \label{tab:apb2-corr-e-u}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
 \begin{tabular}{lrrrccc}
 \toprule
-Modelo & corr & EP HAC & $p$ HAC & IC 95\% HAC & IC 95\% bootstrap & Sem sobreposição \\
+Modelo & corr & EP HAC & $p$ HAC & IC 95\% HAC & IC 95\% boot. & Sem sobrep. \\
 \midrule
 \multicolumn{7}{l}{\textit{Painel A: inovação A2}} \\
 Ridge & $-$0{,}022 & 0{,}194 & 0{,}909 & [$-$0{,}402; 0{,}357] & [$-$0{,}397; 0{,}364] & $-$0{,}008 [$-$0{,}213; 0{,}088] \\
-Floresta aleatória & $-$0{,}053 & 0{,}195 & 0{,}784 & [$-$0{,}435; 0{,}328] & [$-$0{,}418; 0{,}361] & $-$0{,}046 [$-$0{,}253; 0{,}063] \\
-Ridge, $\hat f(X_t)-\text{IV}_t$ & $-$0{,}087 & 0{,}172 & 0{,}612 & [$-$0{,}425; 0{,}250] & [$-$0{,}427; 0{,}254] & $-$0{,}085 [$-$0{,}251; 0{,}000] \\
-Floresta, $\hat f(X_t)-\text{IV}_t$ & $-$0{,}091 & 0{,}174 & 0{,}600 & [$-$0{,}433; 0{,}250] & [$-$0{,}433; 0{,}265] & $-$0{,}099 [$-$0{,}241; 0{,}025] \\
+Floresta & $-$0{,}053 & 0{,}195 & 0{,}784 & [$-$0{,}435; 0{,}328] & [$-$0{,}418; 0{,}361] & $-$0{,}046 [$-$0{,}253; 0{,}063] \\
+Ridge, $\hat f - \text{IV}$ & $-$0{,}087 & 0{,}172 & 0{,}612 & [$-$0{,}425; 0{,}250] & [$-$0{,}427; 0{,}254] & $-$0{,}085 [$-$0{,}251; 0{,}000] \\
+Floresta, $\hat f - \text{IV}$ & $-$0{,}091 & 0{,}174 & 0{,}600 & [$-$0{,}433; 0{,}250] & [$-$0{,}433; 0{,}265] & $-$0{,}099 [$-$0{,}241; 0{,}025] \\
 \midrule
 \multicolumn{7}{l}{\textit{Painel B: correlação por inovação}} \\
 Modelo & A1 & A2 & A3 & A4 & & \\
 Ridge & $-$0{,}037 & $-$0{,}022 & $-$0{,}028 & $-$0{,}028 & & \\
-Floresta aleatória & $-$0{,}089 & $-$0{,}053 & $-$0{,}091 & $-$0{,}092 & & \\
-Ridge, $\hat f(X_t)-\text{IV}_t$ & $-$0{,}091 & $-$0{,}087 & $-$0{,}113 & $-$0{,}113 & & \\
-Floresta, $\hat f(X_t)-\text{IV}_t$ & $-$0{,}098 & $-$0{,}091 & $-$0{,}120 & $-$0{,}120 & & \\
+Floresta & $-$0{,}089 & $-$0{,}053 & $-$0{,}091 & $-$0{,}092 & & \\
+Ridge, $\hat f - \text{IV}$ & $-$0{,}091 & $-$0{,}087 & $-$0{,}113 & $-$0{,}113 & & \\
+Floresta, $\hat f - \text{IV}$ & $-$0{,}098 & $-$0{,}091 & $-$0{,}120 & $-$0{,}120 & & \\
 MQO & $-$0{,}066 & $-$0{,}038 & $-$0{,}021 & $-$0{,}021 & & \\
 LASSO & $-$0{,}037 & $-$0{,}008 & $-$0{,}033 & $-$0{,}033 & & \\
 XGBoost & $-$0{,}090 & $-$0{,}046 & $-$0{,}079 & $-$0{,}080 & & \\
@@ -26,7 +28,7 @@ Média histórica & $-$0{,}080 & $-$0{,}040 & $-$0{,}075 & $-$0{,}075 & & \\
 HBVRP & $-$0{,}072 & $-$0{,}044 & $-$0{,}082 & $-$0{,}083 & & \\
 RBVRP defasado & $-$0{,}067 & $-$0{,}038 & $-$0{,}054 & $-$0{,}056 & & \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \par\smallskip
-\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $e_t = \text{RBVRP}_t - \widehat{\text{BVRP}}_t$, o erro de previsão do RBVRP de cada modelo, e $u_t$ a inovação de $R^{\log}_{t,30}$, nas 987 datas fora da amostra. A2 (principal): resíduo do MQO de $R^{\log}_{t,30}$ nas 16 variáveis explicativas; A1: resíduo da regressão de $R^{\log}_{t,30}$ na própria previsão; A3: $R^{\log}_{t,30}$ menos a média histórica fora da amostra; A4: $R^{\log}_{t,30}$ menos a previsão do Ridge direto fora da amostra. EP HAC com 31 defasagens; IC HAC $=$ corr $\pm 1{,}96$ EP. IC bootstrap: percentis de 9.999 reamostragens em blocos circulares de 60 dias, com $u$ fixo. Sem sobreposição: mediana [mínimo; máximo] da correlação nas 30 subamostras de uma data a cada 30 dias. Média histórica, HBVRP e RBVRP defasado são os modelos de referência do Capítulo~\ref{chap:previsao_bvrp}.}
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: $\hat f - \text{IV}$: forma $\hat f(X_t) - \text{IV}_t$; boot.: bootstrap; sem sobrep.: sem sobreposição. $e_t = \text{RBVRP}_t - \widehat{\text{BVRP}}_t$, o erro de previsão do RBVRP de cada modelo, e $u_t$ a inovação de $R^{\log}_{t,30}$, nas 987 datas fora da amostra. A2 (principal): resíduo do MQO de $R^{\log}_{t,30}$ nas 16 variáveis explicativas; A1: resíduo da regressão de $R^{\log}_{t,30}$ na própria previsão; A3: $R^{\log}_{t,30}$ menos a média histórica fora da amostra; A4: $R^{\log}_{t,30}$ menos a previsão do Ridge direto fora da amostra. EP HAC com 31 defasagens; IC HAC $=$ corr $\pm 1{,}96$ EP. IC bootstrap: percentis de 9.999 reamostragens em blocos circulares de 60 dias, com $u$ fixo. Sem sobreposição: mediana [mínimo; máximo] da correlação nas 30 subamostras de uma data a cada 30 dias. Média histórica, HBVRP e RBVRP defasado são os modelos de referência do Capítulo~\ref{chap:previsao_bvrp}.}
 \end{table}

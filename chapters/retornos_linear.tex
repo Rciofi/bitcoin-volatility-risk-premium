@@ -150,8 +150,8 @@ Capítulo~\ref{chap:previsao_bvrp},
 R^{\log}_{t,h} = \alpha_h + \beta_h\,\widehat{\text{BVRP}}_t + \varepsilon_{t+h},
 \]
 nas 987 datas fora da amostra, com os mesmos testes. O BVRP previsto é um
-regressor gerado; os testes desta seção o tratam como dado, e o apêndice
-trata da estimação do primeiro estágio. A Tabela~\ref{tab:retlin-um-fator}
+regressor gerado; os testes desta seção o tratam como dado, e a
+Seção~\ref{sec:apb2-regressor-gerado} trata da estimação do primeiro estágio. A Tabela~\ref{tab:retlin-um-fator}
 reporta o BVRP previsto pelo Ridge, principal, e o da floresta aleatória na
 forma $\hat f(X_t) - \text{IV}_t$.
 
@@ -163,7 +163,13 @@ mais alto, isto é, um prêmio menor, antecede retornos menores, na direção de
 \citet{bollerslev2009expected}. A evidência é fraca e frágil. Só o horizonte
 de um dia fica abaixo de 5\% depois do ajuste de Holm, e só no bootstrap
 ($p = 0{,}005$; ajustado, 0,030); a rotação, com tamanho próximo do nominal,
-não rejeita depois do ajuste ($p = 0{,}012$; ajustado, 0,074). O bootstrap do
+não rejeita depois do ajuste ($p = 0{,}012$; ajustado, 0,074). Quando o BVRP
+previsto é tratado como regressor gerado, no bootstrap paramétrico da
+Seção~\ref{sec:apb2-regressor-gerado}, que dá um limite superior conservador
+para o erro-padrão, o horizonte de um dia deixa de ser significativo após o
+ajuste de Holm: o valor-$p$ é 0,072 (ajustado, 0,429) e, com o coeficiente
+padronizado, 0,024 (ajustado, 0,141), contra os valores ajustados de 0,074 na
+rotação e 0,030 no bootstrap. O bootstrap do
 fator único rejeita demais sob a hipótese nula: seu tamanho a 5\% vai de
 6,7\% a 8,2\% em $h = 1$ e de 7,3\% a 7,5\% em $h = 30$ com o Ridge, e de 8\%
 a 12\% em $h = 60$. O teste nos seis horizontes de uma vez dá $p = 0{,}073$

@@ -1,0 +1,32 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Processos autorregressivos do erro de previsão e do retorno.}
+\label{tab:apb2-ar}
+\begin{tabular}{lrlrrrr}
+\toprule
+Série & Ordem & Critério & Raiz máx. & LB $p$ (30) & LB $p$ (60) & corr$(\eta, \xi)$ \\
+\midrule
+Erro de previsão, Ridge & 32 & BIC & 0{,}976 & 1{,}000 & 0{,}749 & -- \\
+\quad $p = 29$ (sensibilidade) & 29 & fixa & 0{,}963 & $<$0{,}001 & $<$0{,}001 & -- \\
+\quad $p = 60$ (sensibilidade) & 60 & fixa & 0{,}985 & 1{,}000 & 1{,}000 & -- \\
+Erro de previsão, floresta & 31 & BIC & 0{,}971 & 1{,}000 & 0{,}741 & -- \\
+\addlinespace
+Retorno, Ridge, $h = 1$ & 7 & Ljung-Box & 0{,}607 & 0{,}056 & 0{,}060 & $-$0{,}043 \\
+Retorno, Ridge, $h = 5$ & 34 & Ljung-Box & 0{,}962 & 0{,}085 & 0{,}064 & $-$0{,}018 \\
+Retorno, Ridge, $h = 10$ & 47 & Ljung-Box & 0{,}978 & 0{,}982 & 0{,}084 & $-$0{,}012 \\
+Retorno, Ridge, $h = 20$ & 61 & Ljung-Box & 0{,}986 & 1{,}000 & 0{,}721 & $-$0{,}006 \\
+Retorno, Ridge, $h = 30$ & 61 & Ljung-Box & 0{,}989 & 0{,}980 & 0{,}290 & $-$0{,}031 \\
+Retorno, Ridge, $h = 60$ & 61 & Ljung-Box & 0{,}992 & 0{,}999 & 0{,}964 & 0{,}087 \\
+\addlinespace
+Retorno, floresta, $h = 1$ & 4 & Ljung-Box & 0{,}471 & 0{,}057 & 0{,}053 & $-$0{,}037 \\
+Retorno, floresta, $h = 5$ & 32 & Ljung-Box & 0{,}958 & 0{,}062 & 0{,}059 & $-$0{,}017 \\
+Retorno, floresta, $h = 10$ & 47 & Ljung-Box & 0{,}978 & 0{,}970 & 0{,}071 & $-$0{,}036 \\
+Retorno, floresta, $h = 20$ & 61 & Ljung-Box & 0{,}986 & 1{,}000 & 0{,}504 & $-$0{,}060 \\
+Retorno, floresta, $h = 30$ & 61 & Ljung-Box & 0{,}989 & 0{,}943 & 0{,}109 & $-$0{,}083 \\
+Retorno, floresta, $h = 60$ & 61 & Ljung-Box & 0{,}991 & 0{,}993 & 0{,}823 & $-$0{,}069 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Processos autorregressivos do erro de previsão do BVRP, $e_t = \text{RBVRP}_t - \mu_t$, e do resíduo do retorno em $\mu$, $u_{t,h}$, nas 1.776 datas. Erro: ordem pelo BIC entre 29 e 60 (os alvos de 30 dias se sobrepõem em 29). Retorno: a menor ordem entre $\max(h-1, 1)$ e $h+59$ com Ljung--Box acima de 0,05 em 30 e em 60 defasagens; em todos os horizontes uma ordem passou, e o BIC não foi usado. Raiz máx.: maior módulo das raízes do polinômio característico. corr$(\eta, \xi)$: correlação entre as inovações do erro e do retorno da mesma data, preservada no sorteio conjunto.}
+\end{table}

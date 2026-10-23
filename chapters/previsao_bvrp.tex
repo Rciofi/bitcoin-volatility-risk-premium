@@ -79,13 +79,16 @@ LASSO zera todos os coeficientes em 12 das 33 origens; nelas, prevê
 exatamente a média histórica do treino. As árvores ficam no extremo de menor
 capacidade: a floresta usa árvores de profundidade 1 em todas as origens, e o
 XGBoost usa a menor taxa de aprendizado em todas, profundidade 1 em 28 e o
-menor número de árvores em 22. Esse limite não é uma deficiência da grade.
-Árvores de um único corte, com aprendizagem lenta, já produzem previsões
-próximas da média histórica: o desvio-padrão das previsões fora da amostra é de
-2,3 p.p. na floresta e de 2,0 p.p. no XGBoost, contra 4,5 p.p. no Ridge.
-Ampliar a grade nessa direção só aproximaria mais as previsões da média. A
-validação cruzada prefere, assim, as configurações menos flexíveis da grade,
-sinal de que a estrutura não linear que as árvores conseguem extrair é fraca.
+menor número de árvores em 22. Isso não decorre da grade. Restringir a
+profundidade a pelo menos 3 (Apêndice~\ref{app:profundidade}) leva a validação
+cruzada à menor profundidade permitida em quase todas as origens (3 na
+floresta, em 58 de 66) e eleva o $R^2$ dentro da amostra de 0,16--0,27 para
+0,29--0,41, mas o $R^2_{\text{fora}}$ muda pouco, entre $-0{,}012$ e
+$+0{,}011$, e o Diebold--Mariano não distingue as duas versões
+($p \ge 0{,}53$). Os dados não sustentam árvores mais flexíveis, o que é
+coerente com a falta de previsibilidade que os resultados indicam. O
+desvio-padrão das previsões fora da amostra é de 2,3 p.p. na floresta e de 2,0
+no XGBoost, contra 4,5 no Ridge.
 
 \input{tables/previsao_bvrp/tab_hiperparametros}
 
@@ -137,6 +140,14 @@ no MQO). O Clark--West rejeita a 5\% para todos os modelos menos o LASSO
 ($p = 0{,}061$), e o MCS mantém os cinco modelos e a média histórica no
 conjunto em todas as combinações de bloco, estatística e nível. Descartar as
 observações mais antigas piora a previsão, o que favorece a janela expansiva.
+
+As duas previsões médias da Tabela~\ref{tab:prev-resultados}, a média do Ridge
+e da floresta e a média dos cinco métodos, não superam o Ridge. Na janela
+expansiva, têm $R^2_{\text{fora}}$ de 0,196 e 0,186, contra 0,223 do Ridge, e o
+Diebold--Mariano não as distingue dele ($p \ge 0{,}19$), embora as distinga da
+média histórica ($p = 0{,}025$ e $0{,}031$). Na janela móvel, têm 0,098 e
+0,092, contra 0,095, e o Diebold--Mariano não as distingue nem do Ridge
+($p \ge 0{,}91$) nem da média histórica ($p = 0{,}14$ e $0{,}15$).
 
 A Figura~\ref{fig:prev-previsoes} mostra o RBVRP e as previsões do Ridge, da
 floresta e das duas referências ingênuas. As previsões dos modelos ficam
@@ -236,8 +247,9 @@ As variáveis disponíveis em $t$ contêm informação sobre o RBVRP dos 30 dias
 seguintes: os cinco modelos têm erro fora da amostra menor que o da média
 histórica, e o Clark--West rejeita a 5\% para todos na janela expansiva. A
 previsibilidade é modesta: o MCS exclui as referências ingênuas, mas não separa
-os modelos da média histórica, e as previsões ficam próximas dela. O Ridge tem
-o menor erro, por encolher a previsão quando o sinal é fraco. Os capítulos
+os modelos da média histórica, e as previsões ficam próximas dela. Na janela
+expansiva, o Ridge tem o menor erro, por encolher a previsão quando o sinal é
+fraco. Os capítulos
 seguintes usam duas previsões que estão no conjunto, a do Ridge e a da
 floresta aleatória, como fator único na análise complementar dos
 Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}. A não linearidade encontrada dentro da

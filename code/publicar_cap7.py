@@ -70,8 +70,8 @@ SIMBOLO = {"vh_1d": r"$\mathrm{VH}_{t:t}$", "vh_5d": r"$\mathrm{VH}_{t-4:t}$", "
            "iv_menos_ma5d": r"$\mathrm{IV}_t-\overline{\mathrm{IV}}_{t-4:t}$",
            "iv_menos_ma30d": r"$\mathrm{IV}_t-\overline{\mathrm{IV}}_{t-29:t}$", "ret_1d": r"$r_t$",
            "ret_acum_5d": r"$r_{t-4:t}$", "ret_acum_30d": r"$r_{t-29:t}$",
-           "log_close_ma30d": r"$\ln(P_t/\overline{P}_{t-29:t})$", "vrp_30d": r"$\mathrm{BVRP}^{\mathrm{proxy}}_t$",
-           "d_vrp_1d": r"$\Delta_1\mathrm{BVRP}^{\mathrm{proxy}}_t$", "bvrp_realizado_defasado": r"$\mathrm{BVRP}_{t-30}$"}
+           "log_close_ma30d": r"$\ln(P_t/\overline{P}_{t-29:t})$", "vrp_30d": r"$\mathrm{HBVRP}_t$",
+           "d_vrp_1d": r"$\Delta_1\mathrm{HBVRP}_t$", "bvrp_realizado_defasado": r"$\mathrm{RBVRP}_{t-30}$"}
 fmt_eixo = plt.FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",").replace("-", "−"))
 
 

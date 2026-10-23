@@ -31,6 +31,7 @@ bitcoin-volatility-risk-premium/
 ├── tables/                    # tabelas usadas no texto, por tema
 │   └── dados/ previsao_bvrp/ retornos_linear/
 │       retornos_nao_linear/ estrategias/ apendice_b2/
+│       apendice_profundidade/
 ├── chapters/                  # capítulos, nota metodológica e apêndices
 ├── frontmatter/               # documento principal, preâmbulo e .bib
 ├── docs/                      # registro das decisões metodológicas
@@ -43,7 +44,8 @@ As pastas \arq{figs/} e \arq{tables/} têm os mesmos cinco temas: dados
 (Capítulo~\ref{chap:retornos_linear}) e com a floresta aleatória
 (Capítulo~\ref{chap:retornos_nao_linear}) e estratégias
 (Apêndice~\ref{app:estrategias}); \arq{tables/} tem também
-\arq{apendice_b2/} (Apêndice~\ref{app:b2}). Os demais scripts de \arq{code/} e
+\arq{apendice_b2/} (Apêndice~\ref{app:b2}) e \arq{apendice_profundidade/}
+(Apêndice~\ref{app:profundidade}). Os demais scripts de \arq{code/} e
 \arq{scripts/} não produzem resultados usados no texto.
 
 \section{Ordem de execução}
@@ -68,21 +70,24 @@ As pastas \arq{figs/} e \arq{tables/} têm os mesmos cinco temas: dados
     \item \textbf{Previsão do RBVRP}: \arq{previsao_bvrp_T5.py} e
           \arq{interacao_regime_T9.py}; depois, \arq{mcs_previsao_T5.py} e
           \arq{publicar_cap5.py}.
-    \item \textbf{Retornos}: \arq{retorno_bvrp_T10.py},
-          \arq{retorno_bvrp_T11.py} e \arq{descritivas_C7.py}; depois,
-          \arq{publicar_cap6.py} e \arq{publicar_cap7.py}. O
-          \arq{retorno_bvrp_T11.py} vem antes do
-          \arq{publicar_cap6.py} porque calcula também o teste conjunto
-          do modelo linear da versão anterior. Em seguida, os diagnósticos
+    \item \textbf{Retornos}: \arq{retorno_bvrp_T11.py} e
+          \arq{descritivas_C7.py}; depois, \arq{publicar_cap7.py}. O
+          \arq{retorno_bvrp_T10.py} e o \arq{publicar_cap6.py} são da versão
+          anterior e não entram no texto; o \arq{retorno_bvrp_T11.py} lê as
+          saídas do \arq{retorno_bvrp_T10.py} na etapa do teste conjunto,
+          que também não entra no texto. Em seguida, os diagnósticos
           do B2, em \arq{code/diagnostico_b2/}: \arq{diagnostico_b2.py},
           \arq{bootstrap_wald_b2.py}, \arq{mc_rotacao_poder_b2.py},
           \arq{passo4_horizontes_b2.py}, \arq{passo4_floresta_b2.py},
-          \arq{passo4b_tamanho_b2.py}, \arq{passo5_componentes_regime_b2.py}
-          e \arq{passo6_ponte_retorno_b2.py}. As saídas agregadas são
+          \arq{passo4b_tamanho_b2.py}, \arq{passo5_componentes_regime_b2.py},
+          \arq{passo6_ponte_retorno_b2.py},
+          \arq{passo7_regressor_gerado_b2.py} e
+          \arq{passo8_profundidade_arvores_b2.py}. As saídas agregadas são
           copiadas para \arq{outputs/B2/}, com a procedência em
           \arq{procedencia_B2.csv}, e \arq{publicar_B2.py} grava as tabelas
           dos Capítulos~\ref{chap:retornos_linear}
-          e~\ref{chap:retornos_nao_linear} e do Apêndice~\ref{app:b2}.
+          e~\ref{chap:retornos_nao_linear} e dos Apêndices~\ref{app:b2}
+          e~\ref{app:profundidade}.
     \item \textbf{Estratégias}: \arq{estrategias_A1.py}; depois,
           \arq{publicar_apendice.py}.
     \item \textbf{Conferência}: os testes \arq{code/test_*.py} e
@@ -96,8 +101,8 @@ do repositório, com \texttt{python code/<script>.py}.
 \section{Reprodutibilidade}
 
 Os modelos com componente aleatório usam semente fixa: 42 nas árvores e nas
-permutações do placebo; 20261001 nas reamostragens do bootstrap em dois
-níveis da versão anterior e nas do \textit{model confidence set}; e 20261020
-nas do bootstrap de pares e nas simulações do Apêndice~\ref{app:b2}. As
+permutações do placebo; 20261001 nas reamostragens do \textit{model
+confidence set}; e 20261020 nas do bootstrap de pares, nas do bootstrap
+paramétrico do regressor gerado e nas simulações do Apêndice~\ref{app:b2}. As
 tabelas e as figuras do texto são gravadas pelos scripts, sem edição manual.
 A Nota Metodológica resume as escolhas de implementação.

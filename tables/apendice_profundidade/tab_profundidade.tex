@@ -1,0 +1,40 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Floresta aleatória e XGBoost com profundidade mínima de 3.}
+\label{tab:apf-profundidade}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+Modelo & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM, média & $p$ DM, original & $R^2$ dentro & $p$ MCS \\
+\midrule
+\multicolumn{7}{l}{\textit{Painel A: desempenho fora da amostra}} \\
+\multicolumn{7}{l}{Janela expansiva} \\
+\quad Floresta, original & 0{,}143 & $<$0{,}001 & 0{,}050 & -- & 0{,}194 & 0{,}707 \\
+\quad Floresta, prof.\ $\ge 3$ & 0{,}150 & $<$0{,}001 & 0{,}176 & 0{,}861 & 0{,}291 & 0{,}693 \\
+\quad XGBoost, original & 0{,}100 & 0{,}003 & 0{,}064 & -- & 0{,}156 & 0{,}652 \\
+\quad XGBoost, prof.\ $\ge 3$ & 0{,}107 & 0{,}008 & 0{,}118 & 0{,}779 & 0{,}306 & 0{,}693 \\
+\multicolumn{7}{l}{Janela móvel} \\
+\quad Floresta, original & 0{,}073 & 0{,}008 & 0{,}342 & -- & 0{,}269 & 0{,}687 \\
+\quad Floresta, prof.\ $\ge 3$ & 0{,}084 & 0{,}002 & 0{,}354 & 0{,}762 & 0{,}347 & 0{,}793 \\
+\quad XGBoost, original & 0{,}066 & 0{,}009 & 0{,}221 & -- & 0{,}253 & 0{,}647 \\
+\quad XGBoost, prof.\ $\ge 3$ & 0{,}054 & 0{,}008 & 0{,}264 & 0{,}527 & 0{,}408 & 0{,}603 \\
+\midrule
+\multicolumn{7}{l}{\textit{Painel B: profundidade escolhida (nº de origens, de 33)}} \\
+Modelo, janela & \multicolumn{3}{l}{Grade completa} & \multicolumn{3}{l}{Profundidade $\ge 3$} \\
+Floresta, expansiva & \multicolumn{3}{l}{1: 33} & \multicolumn{3}{l}{3: 25; 6: 8} \\
+XGBoost, expansiva & \multicolumn{3}{l}{1: 28; 2: 5} & \multicolumn{3}{l}{4: 33} \\
+Floresta, móvel & \multicolumn{3}{l}{1: 25; 2: 8} & \multicolumn{3}{l}{3: 33} \\
+XGBoost, móvel & \multicolumn{3}{l}{1: 20; 2: 9; 4: 4} & \multicolumn{3}{l}{4: 33} \\
+\midrule
+\multicolumn{7}{l}{\textit{Painel C: valor-$p$ do MCS dos demais modelos}} \\
+Janela & Ridge & MQO & LASSO & Média histórica & & \\
+expansiva, originais & 1{,}000 & 0{,}707 & 0{,}707 & 0{,}184 & & \\
+expansiva, com prof.\ $\ge 3$ & 1{,}000 & 0{,}693 & 0{,}693 & 0{,}268 & & \\
+móvel, originais & 1{,}000 & 0{,}647 & 0{,}647 & 0{,}647 & & \\
+móvel, com prof.\ $\ge 3$ & 1{,}000 & 0{,}603 & 0{,}603 & 0{,}603 & & \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Floresta aleatória e XGBoost com a grade do Capítulo~\ref{chap:previsao_bvrp} restrita a profundidade $\ge 3$, no mesmo protocolo: 33 origens por janela, validação cruzada embargada de cinco dobras e a mesma semente. Floresta: profundidade 3, 6 ou sem limite, 45 das 75 combinações. XGBoost: a grade só tem a profundidade 4 acima de 3, 24 das 72 combinações. $R^2_{\text{fora}}$, Clark--West e Diebold--Mariano contra a média histórica, com HAC de 31 defasagens; DM, original: a versão restrita contra a original. $R^2$ dentro: média das 33 reestimações; nos originais, de 0{,}16 a 0{,}27. MCS: $T_{\max}$, blocos de 60 dias e 9.999 reamostragens, sobre os oito modelos do Capítulo~\ref{chap:previsao_bvrp}; nas linhas restritas e no painel C, com a floresta e o XGBoost originais trocados pelos restritos.}
+\end{table}

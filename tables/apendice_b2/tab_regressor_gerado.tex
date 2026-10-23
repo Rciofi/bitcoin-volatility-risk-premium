@@ -1,0 +1,38 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Fator único com o BVRP previsto tratado como regressor gerado: erro-padrão e valores-$p$.}
+\label{tab:apb2-regressor-gerado}
+\begin{tabular}{rrrrrrrrrr}
+\toprule
+ & & & & & \multicolumn{2}{c}{(i) sob $H_0$} & (ii) & \multicolumn{2}{c}{(iii) padronizado} \\ \cmidrule(lr){6-7}\cmidrule(lr){9-10}
+$h$ & $\hat\beta_h$ & dp($\beta^*$) & EP robusto & EP HAC & $p$ & Holm & $p$ percentil & $p$ & Holm \\
+\midrule
+\multicolumn{10}{l}{\textit{Ridge, datas sorteadas entre as 987 (principal)}; B = 1{.}999} \\
+1 & $-$0{,}042 & 0{,}025 & 0{,}023 & 0{,}018 & 0{,}072 & 0{,}429 & 0{,}126 & 0{,}024 & 0{,}141 \\
+5 & $-$0{,}144 & 0{,}125 & 0{,}117 & 0{,}065 & 0{,}220 & 1{,}000 & 0{,}343 & 0{,}119 & 0{,}593 \\
+10 & $-$0{,}254 & 0{,}236 & 0{,}227 & 0{,}115 & 0{,}265 & 1{,}000 & 0{,}425 & 0{,}151 & 0{,}604 \\
+20 & $-$0{,}475 & 0{,}467 & 0{,}428 & 0{,}234 & 0{,}277 & 1{,}000 & 0{,}496 & 0{,}175 & 0{,}604 \\
+30 & $-$0{,}615 & 0{,}676 & 0{,}626 & 0{,}350 & 0{,}341 & 1{,}000 & 0{,}577 & 0{,}232 & 0{,}604 \\
+60 & $-$1{,}426 & 1{,}295 & 1{,}206 & 0{,}618 & 0{,}243 & 1{,}000 & 0{,}480 & 0{,}154 & 0{,}604 \\
+\midrule
+\multicolumn{10}{l}{\textit{Ridge, datas sorteadas entre as 1.776 (sensibilidade)}; B = 1{.}999} \\
+1 & $-$0{,}042 & 0{,}028 & 0{,}026 & 0{,}018 & 0{,}111 & 0{,}666 & 0{,}234 & 0{,}042 & 0{,}249 \\
+5 & $-$0{,}144 & 0{,}134 & 0{,}125 & 0{,}065 & 0{,}251 & 1{,}000 & 0{,}435 & 0{,}168 & 0{,}840 \\
+10 & $-$0{,}254 & 0{,}263 & 0{,}252 & 0{,}115 & 0{,}305 & 1{,}000 & 0{,}499 & 0{,}214 & 0{,}840 \\
+20 & $-$0{,}475 & 0{,}503 & 0{,}477 & 0{,}234 & 0{,}322 & 1{,}000 & 0{,}555 & 0{,}232 & 0{,}840 \\
+30 & $-$0{,}615 & 0{,}714 & 0{,}674 & 0{,}350 & 0{,}370 & 1{,}000 & 0{,}679 & 0{,}293 & 0{,}840 \\
+60 & $-$1{,}426 & 1{,}435 & 1{,}361 & 0{,}618 & 0{,}285 & 1{,}000 & 0{,}603 & 0{,}199 & 0{,}840 \\
+\midrule
+\multicolumn{10}{l}{\textit{Floresta, $\hat f(X_t) - \text{IV}_t$, datas sorteadas entre as 987}; B = 499} \\
+1 & $-$0{,}004 & 0{,}010 & 0{,}010 & 0{,}010 & 0{,}699 & 1{,}000 & 0{,}297 & 0{,}709 & 1{,}000 \\
+5 & $-$0{,}004 & 0{,}054 & 0{,}054 & 0{,}038 & 0{,}958 & 1{,}000 & 0{,}565 & 0{,}958 & 1{,}000 \\
+10 & 0{,}007 & 0{,}099 & 0{,}097 & 0{,}065 & 0{,}952 & 1{,}000 & 0{,}685 & 0{,}952 & 1{,}000 \\
+20 & 0{,}027 & 0{,}191 & 0{,}182 & 0{,}131 & 0{,}888 & 1{,}000 & 0{,}725 & 0{,}894 & 1{,}000 \\
+30 & 0{,}049 & 0{,}287 & 0{,}306 & 0{,}195 & 0{,}904 & 1{,}000 & 0{,}794 & 0{,}898 & 1{,}000 \\
+60 & $-$0{,}106 & 0{,}526 & 0{,}538 & 0{,}323 & 0{,}838 & 1{,}000 & 0{,}669 & 0{,}842 & 1{,}000 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.95\linewidth}{\footnotesize\textit{Nota}: Retorno e erro de previsão simulados juntos (Seção~\ref{sec:apb2-regressor-gerado}): em cada reamostragem, as datas sorteadas dão o par de inovações do erro de previsão e do retorno; o retorno simulado é $\alpha^{\text{v}}_h + \beta^{\text{v}}_h\mu_t + u^*_t$ e, sob $H_0$, $\alpha^{\text{v}}_h + u^*_t$. (i) fração de $|\beta^*_0| \ge |\hat\beta_h|$ sob $H_0$, o critério principal; (ii) $2\min\{P(\beta^* \le 0), P(\beta^* \ge 0)\}$; (iii) como (i), com o coeficiente padronizado $\beta^*\,\text{dp}(\widehat{\text{BVRP}}^*)$ contra $\hat\beta_h\,\text{dp}(\widehat{\text{BVRP}})$, livre do encolhimento do Ridge. Holm sobre os seis horizontes. EP robusto: intervalo interquartil dividido por 1,349. Desvio-padrão médio das previsões simuladas sobre o da original: 0{,}81 (mínimo 0{,}34), 0{,}85 e 1{,}00, nos três painéis. Com as datas sorteadas entre as 987 (painel principal), o retorno simulado tem de 0{,}95 a 1{,}05 vez o desvio-padrão do real, e o erro de previsão simulado, $e^*$, 0{,}85 vez o desvio-padrão do resíduo dentro da amostra; essa razão é a do erro, e não a da dispersão das previsões simuladas da Tabela~\ref{tab:apb2-atenuacao}, que coincide por acaso. Na floresta, a variância do erro fora da amostra é 1{,}90 vez a do resíduo dentro dela (no Ridge, 1{,}03), e o erro simulado subestima o erro de previsão.}
+\end{table}

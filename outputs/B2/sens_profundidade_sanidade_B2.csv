@@ -1,0 +1,5 @@
+item,dif,segundos
+floresta_aleatoria: previsões da 1ª origem = T5 (máx. |dif|),1.7763568394002505e-15,37.92052640000111
+floresta_aleatoria: hiperparâmetros da 1ª origem = T5,0.0,37.92052640000111
+XGBoost: previsões da 1ª origem = T5 (máx. |dif|),0.0,37.92052640000111
+XGBoost: hiperparâmetros da 1ª origem = T5,0.0,37.92052640000111

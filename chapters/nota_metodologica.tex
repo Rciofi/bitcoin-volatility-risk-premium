@@ -43,18 +43,24 @@ correção de amostra pequena e com valor-$p$ pela distribuição normal. Os
 testes dos Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}
 usam a rotação circular e o bootstrap de pares em blocos circulares de
 $\max(30, 2h)$ dias, com 1.999 reamostragens (Seção~\ref{sec:met-inferencia});
-o bootstrap em dois níveis da versão anterior, com 999 reamostragens e blocos
-de 60 dias, fica no Apêndice~\ref{app:b2}.
+o bootstrap paramétrico do regressor gerado (Apêndice~\ref{app:b2}) usa
+1.999 reamostragens com o Ridge e 499 com a floresta.
 O \textit{model confidence set} do Capítulo~\ref{chap:previsao_bvrp} usa 9.999
 reamostragens em blocos de 60 dias, com 30 e 90 dias como sensibilidade
 (Seção~\ref{sec:met-avaliacao}).
 
 \section*{Reprodutibilidade}
 
-As sementes são fixas: 42 nos modelos em árvore e nas permutações do placebo,
-20261001 nas reamostragens do bootstrap em dois níveis e do \textit{model
-confidence set}, e 20261020 nas do bootstrap de pares e nas simulações do
-Apêndice~\ref{app:b2}. As
+As sementes são fixas: 42 nos modelos em árvore, inclusive na floresta
+aplicada ao retorno, e nas permutações do placebo; 20261001 no
+\textit{model confidence set}; e 20261020 no bootstrap de pares dos
+Capítulos~\ref{chap:retornos_linear} e~\ref{chap:retornos_nao_linear}, no
+bootstrap paramétrico do regressor gerado e nas simulações do
+Apêndice~\ref{app:b2},
+com o gerador \texttt{default\_rng([20261020, etapa, \ldots])}, em que o
+segundo elemento identifica a etapa e os seguintes, o caso, o horizonte e a
+reamostragem. A rotação circular e a ponte com o retorno simples não fazem
+sorteio. As
 tabelas e as figuras do texto
 são gravadas pelos scripts, sem edição manual; os geradores recalculam as
 estatísticas reportadas a partir das saídas gravadas e interrompem a execução

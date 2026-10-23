@@ -59,22 +59,29 @@ ele grava as saídas, dentro de \arq{outputs/}.
           \arq{code/retorno_bvrp_T11.py} (floresta para o RBVRP nas duas
           formas e quebras), \arq{code/descritivas_C7.py} (retorno por regime
           e sinal do retorno) e \arq{code/retorno_bvrp_T10.py} (versão
-          anterior: retorno simples e bootstrap em dois níveis,
-          Apêndice~\ref{app:b2}).
+          anterior, não entra no texto).
     \item[Apêndice~\ref{app:estrategias}.] \arq{code/estrategias_A1.py}.
     \item[Apêndice~\ref{app:b2}.]
           \arq{code/diagnostico_b2/mc_rotacao_poder_b2.py} e
           \arq{code/diagnostico_b2/passo4b_tamanho_b2.py} (tamanho e poder),
           \arq{code/diagnostico_b2/diagnostico_b2.py} e
           \arq{code/diagnostico_b2/bootstrap_wald_b2.py} (correlação entre o
-          erro de previsão e a inovação do retorno).
+          erro de previsão e a inovação do retorno) e
+          \arq{code/diagnostico_b2/passo7_regressor_gerado_b2.py} (BVRP
+          previsto como regressor gerado).
+    \item[Apêndice~\ref{app:profundidade}.]
+          \arq{code/diagnostico_b2/passo8_profundidade_arvores_b2.py}
+          (floresta e XGBoost com profundidade mínima de 3; o ajuste final
+          das árvores usa paralelismo, e as saídas se reproduzem a $10^{-9}$,
+          não byte a byte).
     \item[Geradores.] \arq{code/publicar_cap5.py},
-          \arq{code/publicar_cap6.py}, \arq{code/publicar_cap7.py},
-          \arq{code/publicar_B2.py} e \arq{code/publicar_apendice.py} gravam
+          \arq{code/publicar_cap7.py}, \arq{code/publicar_B2.py} e
+          \arq{code/publicar_apendice.py} gravam
           as tabelas e as figuras dos
           Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
-          e dos Apêndices~\ref{app:estrategias} e~\ref{app:b2} a partir das saídas gravadas, sem
-          reestimar modelos.
+          e dos Apêndices~\ref{app:estrategias}, \ref{app:b2} e~\ref{app:profundidade} a partir das saídas gravadas, sem
+          reestimar modelos; \arq{code/publicar_cap6.py} é da versão
+          anterior e não entra no texto.
 \end{description}
 
 \section{Volatilidade histórica e prêmio}
