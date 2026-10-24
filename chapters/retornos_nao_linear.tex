@@ -128,8 +128,8 @@ sem ela, $p = 0{,}005$).
 
 \input{tables/retornos_nao_linear/tab_previsao_formas}
 
-A forma $\hat f(X_t) - \text{IV}_t$ prevê o RBVRP pior, e o BVRP previsto por
-ela também não prevê o retorno (Seção~\ref{sec:retnl-fator}).
+A forma $\hat f(X_t) - \text{IV}_t$ prevê o RBVRP pior, e não encontramos evidência
+de que o BVRP previsto por ela preveja o retorno (Seção~\ref{sec:retnl-fator}).
 
 \subsection{BVRP previsto da floresta como fator único}
 \label{sec:retnl-fator}
@@ -139,8 +139,8 @@ previsto pela floresta na forma $\hat f(X_t) - \text{IV}_t$, com os testes
 do Capítulo~\ref{chap:retornos_linear}. O coeficiente fica perto de zero e
 troca de sinal entre os horizontes, de $-0{,}106$ a $0{,}049$, e nenhum teste
 rejeita ($p \ge 0{,}64$; nos seis horizontes de uma vez, $p = 0{,}89$). Ao
-contrário do BVRP previsto pelo Ridge, o da floresta não tem relação com o
-retorno em nenhum horizonte. A Seção~\ref{sec:apb2-regressor-gerado} trata o
+contrário do que ocorre com o BVRP previsto pelo Ridge, não encontramos
+relação entre o da floresta e o retorno em nenhum horizonte. A Seção~\ref{sec:apb2-regressor-gerado} trata o
 BVRP previsto da floresta como regressor gerado, e nenhum valor-$p$ fica
 abaixo de 0,29.
 
@@ -285,8 +285,8 @@ não encontrou. Aplicada diretamente ao log-retorno, ela não supera a média
 histórica em nenhum horizonte depois do ajuste de Holm, nem se distingue dos
 modelos lineares do Capítulo~\ref{chap:retornos_linear}; o $R^2$ dentro da
 amostra de 2\% a 18\%, com $R^2_{\text{fora}}$ negativo em 30 e 60 dias,
-indica que a floresta se ajusta ao ruído dos alvos sobrepostos. O BVRP
-previsto pela floresta não tem relação com o retorno. As árvores que preveem
+indica que a floresta se ajusta ao ruído dos alvos sobrepostos. Não
+encontramos relação entre o BVRP previsto pela floresta e o retorno. As árvores que preveem
 o RBVRP cortam a VH de 30 dias, com mediana ponderada em cada origem entre
 45\% e 58\% a.a., acima do corte de $37{,}3\%$ entre os regimes, e, na forma
 $\hat f(X_t) - \text{IV}_t$, preferem as volatilidades de 60 e de 90 dias;
