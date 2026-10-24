@@ -655,8 +655,8 @@ def tab_ponte(d, raiz):
            r"$h$ & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM & $R^2_{\text{fora}}$ & $p$ CW & $p$ DM")
     nota = (r"Floresta aleatória direto no retorno de $h$ dias, nas 987 datas fora da amostra, com o mesmo "
             r"protocolo nos dois retornos (17 variáveis, mesma grade, 500 árvores, validação cruzada de cinco dobras "
-            r"com embargo $h$, 33 origens, mesma semente); só o alvo muda. Retorno simples: as previsões da versão "
-            r"anterior do Capítulo~\ref{chap:retornos_nao_linear}; "
+            r"com embargo $h$, 33 origens, mesma semente); só o alvo muda. Retorno simples: as previsões da floresta "
+            r"no retorno simples; "
             r"log-retorno: Tabela~\ref{tab:retnl-oos-floresta}. CW unilateral e DM bilateral contra a média "
             r"histórica, com HAC de $h+1$ defasagens. Painel B: a previsão do "
             r"log-retorno convertida para retorno simples. Com o realizado winsorizado a 1\% e 99\% e as "

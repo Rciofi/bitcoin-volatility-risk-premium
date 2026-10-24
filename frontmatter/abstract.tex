@@ -8,9 +8,9 @@ the implied volatility of Deribit's DVOL, using daily data from March
 on average ($-8.76$ percentage points): implied volatility typically exceeds
 subsequent realized volatility.
 Linear and machine learning models have lower out-of-sample errors than the
-historical mean, but the model confidence set does not separate them from it.
-The variables available at $t$ do not predict Bitcoin log returns over 1 to 60
-days, either with a linear model or with a random forest. The Ridge-forecast
+historical mean in the expanding window, but the model confidence set does not
+separate them from it. We find no evidence that the variables available at $t$
+predict Bitcoin log returns over 1 to 60 days, either with a linear model or with a random forest. The Ridge-forecast
 BVRP precedes lower returns, but the evidence is weak and fragile, limited to
 the one-day horizon. With few independent observations, the lack of rejection
 is absence of evidence, not evidence of absence of predictability.
