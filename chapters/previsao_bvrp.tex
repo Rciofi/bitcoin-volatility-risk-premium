@@ -59,7 +59,7 @@ usam as 17 variáveis.
 \section{Modelos e hiperparâmetros}
 \label{sec:prev-modelos}
 
-A dissertação estima $f$ na equação~\eqref{eq:met-previsao-bvrp} por cinco
+Estimamos $f$ na equação~\eqref{eq:met-previsao-bvrp} por cinco
 métodos: no modelo linear, $f(X_t) = X_t'\gamma$, por MQO, Ridge
 \citep{hoerl1970ridge} e LASSO \citep{tibshirani1996lasso}, os dois últimos com
 penalidade sobre os coeficientes; em árvore, por floresta aleatória
@@ -208,7 +208,7 @@ A distribuição da volatilidade histórica de 30 dias é bimodal, e o corte de
 $37{,}3\%$ a.a., estimado só na primeira janela, separa um regime de baixa e
 um de alta volatilidade (Seção~\ref{sec:dados-regimes}). Se a relação entre as
 variáveis e o prêmio muda entre os regimes, um modelo linear único é mal
-especificado. Para testar essa hipótese, a dissertação estima o MQO com as 16
+especificado. Para testar essa hipótese, estimamos o MQO com as 16
 variáveis, a variável indicadora do regime de alta volatilidade, $D_t$, e as 16
 interações $D_t X_t$, na amostra de modelagem inteira, com erro-padrão HAC de
 31 defasagens. A Tabela~\ref{tab:prev-regime} reporta os resultados. As

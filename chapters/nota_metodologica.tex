@@ -12,7 +12,7 @@ estão na Seção~\ref{sec:concl-limitacoes}.
 
 Os preços de fechamento diários do Bitcoin (par BTCUSDT) vêm da API pública da
 Binance, e o índice DVOL, da API pública da Deribit. A série de preços não
-tinha os dias de 1º a 31 de março de 2023, que a dissertação completa com as
+tinha os dias de 1º a 31 de março de 2023, que completamos com as
 velas diárias da mesma fonte; o pipeline interrompe a execução se faltar
 qualquer data. A amostra completa tem 1.806 observações, de 24/03/2021 a
 03/03/2026, e serve à análise descritiva e ao teste de H1; a amostra de
@@ -24,7 +24,7 @@ Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}
 
 As variáveis explicativas de cada data são conhecidas no fim do próprio dia.
 O RBVRP de $t$ só é conhecido em $t+30$ e nunca entra como variável
-explicativa. A dissertação reestima os modelos a cada 30 dias, em 33 origens,
+explicativa. Reestimamos os modelos a cada 30 dias, em 33 origens,
 e o treino de cada origem $t$ usa apenas as datas $s \le t - h$; a validação
 cruzada, com cinco dobras expansivas, aplica o mesmo embargo dentro do treino.
 O corte principal entre os regimes usa só a primeira janela de estimação. Um
@@ -72,4 +72,4 @@ bibliotecas.
 
 \section*{Disponibilidade}
 
-O código e os dados estão disponíveis mediante solicitação ao autor.
+O código e os dados estão disponíveis mediante solicitação.

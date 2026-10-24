@@ -6,10 +6,10 @@ existência e as propriedades do prêmio de risco de volatilidade no mercado de
 Bitcoin, bem como seu conteúdo informacional para a previsão de retornos futuros
 do ativo. Com base nas evidências descritivas apresentadas no
 Capítulo~\ref{chap:dados}, o capítulo define as questões de pesquisa, as
-amostras e os modelos utilizados ao longo da dissertação.
+amostras e os modelos que utilizamos.
 
-A estratégia empírica tem duas etapas. Na primeira, a dissertação prevê o RBVRP
-fora da amostra, apenas com informação disponível em $t$. Na segunda, testa se
+A estratégia empírica tem duas etapas. Na primeira, prevemos o RBVRP
+fora da amostra, apenas com informação disponível em $t$. Na segunda, testamos se
 as variáveis disponíveis em $t$ preveem o log-retorno futuro do Bitcoin,
 primeiro com um modelo linear e depois com a floresta aleatória, capaz de
 capturar não linearidades, efeitos de regime e interações características do
@@ -48,7 +48,7 @@ Apêndice~\ref{app:estrategias}, como análise exploratória.
 \section{Amostras e janela de estimação}
 \label{sec:met-amostras}
 
-A dissertação usa duas amostras. A amostra completa, com 1.806 observações
+Usamos duas amostras. A amostra completa, com 1.806 observações
 diárias de 24/03/2021 a 03/03/2026, serve à análise descritiva e ao teste de H1
 (Capítulo~\ref{chap:dados}). A amostra de modelagem, com 1.776 observações de
 23/04/2021 a 03/03/2026, serve aos Capítulos~\ref{chap:previsao_bvrp},
@@ -59,10 +59,10 @@ pelo maior horizonte de retorno dos Capítulos~\ref{chap:retornos_linear}
 e~\ref{chap:retornos_nao_linear}, de 60 dias: os preços vão até 02/05/2026, e
 03/03/2026 é a última data com o retorno dos 60 dias seguintes observado. O
 RBVRP, alvo do Capítulo~\ref{chap:previsao_bvrp}, exigiria só 30 dias à
-frente, mas a dissertação usa a mesma amostra nos três capítulos para que os
+frente, mas usamos a mesma amostra nos três capítulos para que os
 resultados sejam comparáveis.
 
-A dissertação estima os modelos de previsão numa subamostra e os avalia fora
+Estimamos os modelos de previsão numa subamostra e os avaliamos fora
 dela, em origens de previsão sucessivas. A primeira janela de estimação tem 730 dias,
 de 23/04/2021 a 22/04/2023. Em cada origem $t$, o modelo usa apenas
 as datas $s \le t - h$ e prevê as datas de $t$ até a véspera da origem
@@ -171,8 +171,8 @@ e os alvos de 30 dias compartilham até 29. A sobreposição permanece nos dados
 induz autocorrelação nos erros, que não reflete necessariamente dependência
 econômica. O erro-padrão HAC de Newey--West não elimina esse problema: ele o
 contorna, sob certas condições --- estacionariedade e dependência que decai com
-a defasagem ---, tornando a inferência assintoticamente válida. A dissertação
-usa o núcleo de Bartlett com $h+1$ defasagens, sendo $h$ o horizonte de
+a defasagem ---, tornando a inferência assintoticamente válida. Usamos
+o núcleo de Bartlett com $h+1$ defasagens, sendo $h$ o horizonte de
 previsão, com pesos $1 - j/(h+2)$, $j = 0, \ldots, h+1$
 \citep{newey1987simple}: $h$ defasagens cobrem a sobreposição, e a defasagem
 adicional capta a autocorrelação remanescente. A correção atua no
@@ -196,7 +196,7 @@ coeficientes, a rotação é a de \citet{freedman1983nonstochastic}: o resíduo 
 modelo restrito é deslocado e somado ao ajustado restrito. O segundo é o
 bootstrap de pares $(X_t, y_t)$ em blocos circulares \citep{politis1992circular}
 de $\max(30, 2h)$ dias, com 1.999 reamostragens e a estatística centrada na
-estimativa. Como a dissertação testa seis horizontes, os valores-$p$ são
+estimativa. Como testamos seis horizontes, os valores-$p$ são
 ajustados pelo procedimento de \citet{holm1979simple}, e o mínimo dos
 valores-$p$ da rotação entre os horizontes, com o mesmo deslocamento em todos
 eles, testa a hipótese nula nos seis de uma vez. Como sensibilidade, o HAC usa
@@ -234,11 +234,11 @@ elimina o modelo de pior desempenho relativo e repete o teste com os que
 restam. O conjunto final contém, assintoticamente e com probabilidade de pelo
 menos $1-\alpha$, os modelos de menor perda esperada. Cada modelo recebe um
 valor-$p$ e pertence ao conjunto de nível $\alpha$ sempre que esse valor-$p$ é
-maior ou igual a $\alpha$. A dissertação usa a perda quadrática e a estatística
+maior ou igual a $\alpha$. Usamos a perda quadrática e a estatística
 $T_{\max}$, o maior desvio padronizado entre a perda média de um modelo e a do
 conjunto. A distribuição vem de um bootstrap com blocos móveis de 60 dias, mais
 longos que a sobreposição de 30 dias dos alvos, com 9.999 reamostragens; o
-nível principal é de 10\%. Como sensibilidade, a dissertação repete o
+nível principal é de 10\%. Como sensibilidade, repetimos o
 procedimento com blocos de 30 e 90 dias, com a estatística $T_R$ (o maior
 desvio padronizado entre dois modelos) e com o nível de 25\%. O conjunto inicial reúne os cinco modelos e três
 modelos de referência: a média histórica, o HBVRP e o prêmio realizado
@@ -254,7 +254,7 @@ O regime de alta volatilidade é definido por $D_t = 1$ se
 $\text{VH}_{t-29:t} > 37{,}3\%$ a.a. O corte vem da mistura de duas normais
 estimada apenas na primeira janela de estimação (Seção~\ref{sec:dados-regimes}), de
 modo que nenhuma data é classificada com informação posterior a ela. Como
-robustez, a dissertação reestima o corte em cada origem, só com os dados
+robustez, reestimamos o corte em cada origem, só com os dados
 disponíveis até ela (janela expansiva). No modelo em árvore do
 Capítulo~\ref{chap:retornos_nao_linear}, a própria floresta escolhe os cortes, que o capítulo
 compara com o de $37{,}3\%$ a.a.

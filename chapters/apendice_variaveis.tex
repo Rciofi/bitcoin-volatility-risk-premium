@@ -55,8 +55,8 @@ sempre retrospectivas (\texttt{vh\_1d}, \texttt{vh\_5d}, \texttt{vh\_60d} e \tex
 
 A volatilidade implícita de 30 dias, $\text{IV}_t$, é o fechamento diário do
 índice DVOL da Deribit, em \% a.a. (coluna \texttt{iv\_30d}). O DVOL já tem
-horizonte de 30 dias (Seção~\ref{sec:refer-dvol}), e a dissertação não
-interpola vencimentos.
+horizonte de 30 dias (Seção~\ref{sec:refer-dvol}), e não
+interpolamos vencimentos.
 
 \section{Prêmio de risco de volatilidade}
 
@@ -108,7 +108,7 @@ No corte principal, $c = 37{,}3\%$ a.a. é o ponto em que a probabilidade a
 posteriori do componente de alta volatilidade passa de 1/2 numa mistura de
 duas normais ajustada ao logaritmo da VH de 30 dias, estimada só na primeira
 janela de estimação, de 23/04/2021 a 22/04/2023
-(Seção~\ref{sec:dados-regimes}). Como robustez, a dissertação reestima o corte
+(Seção~\ref{sec:dados-regimes}). Como robustez, reestimamos o corte
 pelo mesmo método em cada origem de previsão, só com os dados até ela
 (Seção~\ref{sec:met-regimes}); as datas anteriores à primeira origem usam o
 corte fixo. O arquivo \texttt{data/regimes\_T9.csv} traz,

@@ -17,7 +17,7 @@ evidência de ausência de previsibilidade.
 \section{Especificação}
 \label{sec:retlin-especificacao}
 
-Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$ dias, a dissertação estima
+Para cada horizonte $h \in \{1, 5, 10, 20, 30, 60\}$ dias, estimamos
 por MQO
 \[
 R^{\log}_{t,h} = \alpha_h + X_t'\beta_h + \varepsilon_{t+h},
@@ -72,7 +72,7 @@ dias, com 1.999 reamostragens e $W^*$ centrado em $\hat\beta_h$, que não
 rejeita demais: seu tamanho fica perto do nominal em $h = 1$, de 4,1\% a 4,5\%
 nos 16 previsores, e é conservador em $h = 30$ e $h = 60$, de 0,2\% a 2,1\%.
 
-Como a dissertação testa seis horizontes, os valores-$p$ são ajustados pelo
+Como testamos seis horizontes, os valores-$p$ são ajustados pelo
 procedimento de Holm \citep{holm1979simple}, e o mínimo dos valores-$p$ da rotação entre os
 horizontes, com o mesmo deslocamento $k$ em todos eles, testa a hipótese nula
 nos seis de uma vez. O poder dos testes é baixo. Em $h = 30$, com ruído S1 e
@@ -116,8 +116,8 @@ ausência de evidência, e não evidência de ausência de previsibilidade.
 \section{Ganho de erro quadrático fora da amostra}
 \label{sec:retlin-oos}
 
-Um coeficiente pode ser significante sem que o modelo preveja melhor. A
-dissertação compara, por isso, o erro quadrático fora da amostra da previsão
+Um coeficiente pode ser significante sem que o modelo preveja melhor.
+Comparamos, por isso, o erro quadrático fora da amostra da previsão
 de $R^{\log}_{t,h}$ com o do modelo de referência, a média histórica dos
 alvos conhecidos na origem, nas 33 origens da janela expansiva do
 Capítulo~\ref{chap:previsao_bvrp}, com o embargo $s \le t-h$ no treino e na

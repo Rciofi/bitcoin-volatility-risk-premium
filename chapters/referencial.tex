@@ -2,7 +2,7 @@
 \label{chap:referencial}
 
 Este capítulo apresenta o conjunto de conceitos fundamentais necessários para
-compreender a análise conduzida nesta dissertação. O capítulo discute: (i) a
+compreender a análise que conduzimos. O capítulo discute: (i) a
 formação da volatilidade implícita em mercados de opções; (ii) a mensuração da
 volatilidade realizada e da histórica; (iii) a definição, as interpretações e as propriedades
 do prêmio de risco de volatilidade (VRP) e do prêmio do Bitcoin (BVRP),
@@ -24,7 +24,7 @@ variância esperada no mundo neutro ao risco:
 \end{equation}
 em que $\text{RV}^2_{t+1:t+h}$ é a variância realizada entre $t+1$ e $t+h$
 (Seção~\ref{sec:refer-rv}), o asterisco denota a expectativa no mundo neutro ao
-risco e $I_t$, a informação disponível em $t$. Nesta dissertação,
+risco e $I_t$, a informação disponível em $t$. Aqui,
 a IV não vem da inversão de um modelo de precificação, como o de Black--Scholes:
 o índice DVOL da Deribit, assim como o VIX, é uma estimativa livre de modelo,
 extraída diretamente dos preços de opções fora do dinheiro
@@ -84,7 +84,7 @@ mesma unidade da IV. A mesma fórmula, aplicada aos $h$ dias que terminam em
 $t$, dá a volatilidade histórica, $\text{VH}_{t-h+1:t}$, conhecida em $t$: R
 indica a janela futura, e H, a passada.
 
-Esta dissertação usa $h = 30$ dias corridos no prêmio, o mesmo horizonte da
+Usamos $h = 30$ dias corridos no prêmio, o mesmo horizonte da
 volatilidade implícita; janelas de 1, 5, 60 e 90 dias aparecem apenas como
 variáveis explicativas nos capítulos de previsão.
 
@@ -115,7 +115,7 @@ raiz da variância esperada e a volatilidade esperada é de segunda ordem e não
 O BVRP é o prêmio de risco de volatilidade do Bitcoin, com $h = 30$ dias e a
 IV dada pelo índice DVOL da Deribit:
 $\text{BVRP}_t = \mathbb{E}(\text{RV}_{t+1:t+30} \mid I_t) - \text{IV}_t$. Como a
-expectativa física não é observável, a dissertação mede o prêmio pela sua
+expectativa física não é observável, medimos o prêmio pela sua
 realização,
 \[
 \text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t,
@@ -143,9 +143,9 @@ de previsão da variância. O Capítulo~\ref{chap:previsao_bvrp} estima o BVRP
 com um conjunto mais amplo de variáveis conhecidas em $t$, entre elas o
 próprio HBVRP.
 
-A literatura empírica sobre prêmios de risco de volatilidade tem documentado, em múltiplos mercados e horizontes, que a volatilidade implícita supera em média a realizada, isto é, que o prêmio é negativo em média. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para o mercado de ações, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários. \citet{bollerslev2014international} replicam esse achado em diversos índices acionários internacionais. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que esta dissertação acrescenta a eles.
+A literatura empírica sobre prêmios de risco de volatilidade tem documentado, em múltiplos mercados e horizontes, que a volatilidade implícita supera em média a realizada, isto é, que o prêmio é negativo em média. \citet{carr2009variance} formalizam a decomposição do retorno de variância em prêmio de risco e variação esperada, fornecendo o arcabouço metodológico que define o VRP como diferença entre medidas neutra ao risco e física. Para o mercado de ações, \citet{bollerslev2009expected} documentam, no contexto do S\&P~500, que o VRP é sistematicamente negativo e exibe poder preditivo para retornos de mercado em horizontes intermediários. \citet{bollerslev2014international} replicam esse achado em diversos índices acionários internacionais. \citet{bali2009volatilitypremium} mostram, no corte transversal de ações individuais, uma relação negativa e significante entre o retorno esperado e o \textit{spread} entre a volatilidade realizada e a implícita. Os dois trabalhos que estudam o prêmio de volatilidade do Bitcoin com dados da Deribit \citep{alexanderImeraj2019, almeida2024cryptoVRP} e um trabalho relacionado \citep{han2026price} são discutidos na introdução (Capítulo~\ref{chap:introducao}), junto com o que acrescentamos a eles.
 
-Esta dissertação adota a convenção da volatilidade física menos a implícita, seguindo essa literatura, no BVRP e nas suas duas estimativas, o RBVRP e o HBVRP. Sob esta convenção, valores negativos correspondem ao estado típico em que a volatilidade implícita supera a volatilidade física --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de RBVRP positivo ($\text{RV} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
+Adotamos a convenção da volatilidade física menos a implícita, seguindo essa literatura, no BVRP e nas suas duas estimativas, o RBVRP e o HBVRP. Sob esta convenção, valores negativos correspondem ao estado típico em que a volatilidade implícita supera a volatilidade física --- interpretação consistente com um prêmio pago pelos compradores de opções como proteção contra choques de variância. Quanto mais negativo o BVRP, maior o prêmio de seguro embutido nos preços de opções. Episódios de RBVRP positivo ($\text{RV} > \text{IV}$) representam situações em que a volatilidade dos 30 dias seguintes supera a antecipada pelo mercado, tipicamente associadas a choques exógenos, liquidações em cascata ou movimentos abruptos não precificados.
 
 A literatura também documenta que a volatilidade exibe persistência temporal elevada, com memória longa \citep{corsi2009har}. Por um lado, espera-se menos persistência no RBVRP do que nas medidas de volatilidade, porque boa parte dessa persistência é comum à volatilidade realizada e à implícita e se cancela na diferença. Por outro lado, como o RBVRP mede diariamente volatilidades realizadas de 30 dias, espera-se mais persistência do que na frequência mensal, por conta da sobreposição de 29 dias entre datas vizinhas. Essa persistência justifica os procedimentos econométricos adotados nos capítulos seguintes: erros-padrão de Newey--West calibrados ao horizonte e inferência por reamostragem. \citet{stambaugh1999} mostra que, quando o regressor de uma regressão preditiva é persistente e suas inovações se correlacionam com as do retorno, o estimador de MQO do coeficiente é viesado em amostras finitas, e o erro-padrão convencional não capta esse viés. A reamostragem em blocos aproxima a distribuição do estimador em amostra finita e permite avaliar a inferência nesse caso.
 
@@ -179,8 +179,8 @@ fatores frequentemente associados a essa instabilidade, estão:
 Esses fatores pesam sobretudo em episódios de volatilidade elevada, o que
 motiva separar a amostra em regimes de volatilidade. A análise usa dois
 regimes, de baixa e de alta volatilidade, definidos pela volatilidade histórica
-de 30 dias, cuja distribuição é bimodal na primeira parte da amostra. A
-dissertação estima o corte entre os regimes apenas com dados da primeira janela
+de 30 dias, cuja distribuição é bimodal na primeira parte da amostra.
+Estimamos o corte entre os regimes apenas com dados da primeira janela
 de estimação,
 sem informação posterior às datas classificadas
 (Capítulo~\ref{chap:metodologia}). Como alternativa a um corte fixado de
@@ -188,7 +188,7 @@ antemão, a floresta aleatória do Capítulo~\ref{chap:retornos_nao_linear}
 escolhe sozinha os pontos de corte nas volatilidades.
 
 A combinação destes fatores produz três características empíricas relevantes para
-a análise conduzida nesta dissertação: (i) o RBVRP do Bitcoin é negativo em média
+a nossa análise: (i) o RBVRP do Bitcoin é negativo em média
 mas exibe distribuição assimétrica, com cauda direita mais pesada que no mercado de ações;
 (ii) o sinal do prêmio é instável em horizontes curtos, com episódios
 significativos de inversão; e (iii) os limiares estatísticos do RBVRP variam
@@ -226,10 +226,10 @@ A formação da IV no Bitcoin é sensível a fatores microestruturais, tais como
 
 Três características microestruturais merecem destaque adicional pelo impacto que exercem sobre a formação de preços de opções na Deribit. Primeiro, os contratos de opções são liquidados em Bitcoin, não em dólares --- propriedade conhecida como \textit{inverse settlement} --- o que introduz convexidade adicional no \textit{payoff} efetivo do detentor de opção quando expresso em moeda fiat. Segundo, a Deribit emprega mecanismo de \textit{auto-deleveraging} (ADL) como instrumento de gestão de risco: em situações de movimentos extremos em que o fundo de garantia da bolsa é insuficiente para cobrir as posições inadimplentes, a bolsa desfaz automaticamente contratos de contrapartes lucrativas. Esse mecanismo difere fundamentalmente dos \textit{circuit breakers} de bolsas tradicionais reguladas e introduz risco de contraparte sistemático que pode se refletir em prêmios elevados de volatilidade implícita em momentos de estresse. Terceiro, o mercado opera ininterruptamente, sem fechamentos noturnos ou de fim de semana, o que elimina o ``gap'' temporal entre informação e preço típico de mercados tradicionais, mas também concentra liquidez em horários de sobreposição com mercados asiáticos e norte-americanos.
 
-A microestrutura aqui descrita passou por transformação institucional relevante durante o período amostral desta dissertação. Em 10 de janeiro de 2024, a \textit{Securities and Exchange Commission} (SEC) dos Estados Unidos aprovou a listagem de fundos negociados em bolsa (ETFs) que detêm Bitcoin à vista como ativo subjacente, contemplando onze produtos simultaneamente --- entre os quais o iShares Bitcoin Trust (IBIT, BlackRock), o Fidelity Wise Origin Bitcoin Fund (FBTC) e o ARK 21Shares Bitcoin ETF (ARKB). A aprovação marcou o ingresso pleno de canais institucionais regulados ao mercado de Bitcoin nos Estados Unidos. A implicação para o mercado de opções da Deribit é indireta mas substantiva: o aumento de fluxo institucional ao mercado à vista tende a comprimir a volatilidade histórica estrutural e a alterar a composição da demanda por proteção via opções, com potencial impacto sobre o nível e a persistência do BVRP --- canal cujo efeito a dissertação não testa e registra entre as limitações (Seção~\ref{sec:concl-limitacoes}).
+A microestrutura aqui descrita passou por transformação institucional relevante durante o período amostral. Em 10 de janeiro de 2024, a \textit{Securities and Exchange Commission} (SEC) dos Estados Unidos aprovou a listagem de fundos negociados em bolsa (ETFs) que detêm Bitcoin à vista como ativo subjacente, contemplando onze produtos simultaneamente --- entre os quais o iShares Bitcoin Trust (IBIT, BlackRock), o Fidelity Wise Origin Bitcoin Fund (FBTC) e o ARK 21Shares Bitcoin ETF (ARKB). A aprovação marcou o ingresso pleno de canais institucionais regulados ao mercado de Bitcoin nos Estados Unidos. A implicação para o mercado de opções da Deribit é indireta mas substantiva: o aumento de fluxo institucional ao mercado à vista tende a comprimir a volatilidade histórica estrutural e a alterar a composição da demanda por proteção via opções, com potencial impacto sobre o nível e a persistência do BVRP --- canal cujo efeito não testamos, mas registramos entre as limitações (Seção~\ref{sec:concl-limitacoes}).
 
 Essas características tornam o BVRP um objeto empírico mais rico, porém mais
-volátil, do que em mercados tradicionais. Na leitura desta dissertação, a
+volátil, do que em mercados tradicionais. A
 liquidez, a assimetria dos fluxos e a microestrutura também podem afetar a
 formação da curva de IV no Bitcoin, um mercado menos maduro e mais fragmentado que os
 tradicionais; sobre superfícies de volatilidade em geral, ver
@@ -259,7 +259,7 @@ mostram que modelos baseados em árvores, redes neurais e técnicas de regulariz
 são capazes de capturar relações não lineares e de alta dimensão entre
 variáveis explicativas e retornos de ativos.
 
-Esta dissertação emprega cinco métodos supervisionados, organizados em duas
+Empregamos cinco métodos supervisionados, organizados em duas
 famílias: métodos de estimação do modelo linear --- MQO, Ridge e LASSO, em que os dois
 últimos introduzem regularização sobre a versão não penalizada ---; e métodos
 baseados em árvores (floresta aleatória e XGBoost),
@@ -296,7 +296,7 @@ O Ridge utiliza penalidade $\ell_2$:
 \]
 Diferentemente do LASSO, o Ridge retém todos os preditores, mas encolhe seus
 coeficientes em direção a zero, sendo especialmente útil na presença de
-multicolinearidade. Nesta dissertação, ambos os modelos funcionam como
+multicolinearidade. Aqui, ambos os modelos funcionam como
 modelos lineares de referência, intermediários entre a regressão por MQO
 irrestrita e as abordagens baseadas em árvores.
 
@@ -330,7 +330,7 @@ independentes, o \textit{gradient boosting} realiza otimização sequencial sobr
 uma função de perda, resultando em maior sensibilidade a padrões sutis e
 relações não lineares.
 
-O modelo usado nesta dissertação é o XGBoost \citep{chen2016xgboost}, uma
+O modelo que usamos é o XGBoost \citep{chen2016xgboost}, uma
 implementação de \textit{gradient boosting}. A validação cruzada embargada
 escolhe os hiperparâmetros --- número de árvores, taxa de aprendizado,
 profundidade e peso mínimo por folha --- a cada reestimação, como nos demais
@@ -346,7 +346,7 @@ Entre suas características, estão:
           independente como a floresta aleatória.
 \end{itemize}
 
-A dissertação emprega os cinco métodos --- MQO, LASSO, Ridge, floresta
+Empregamos os cinco métodos --- MQO, LASSO, Ridge, floresta
 aleatória e XGBoost --- para avaliar se o
 RBVRP é previsível fora da amostra a partir de variáveis de volatilidade, retorno
 e estado de mercado, comparando métodos lineares e não lineares contra

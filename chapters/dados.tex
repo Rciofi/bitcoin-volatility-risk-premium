@@ -1,7 +1,7 @@
 \chapter{Dados e existência do prêmio}
 \label{chap:dados}
 
-Este capítulo descreve as bases de dados utilizadas na dissertação, testa a
+Este capítulo descreve as bases de dados que utilizamos, testa a
 existência do prêmio de risco de volatilidade do Bitcoin (H1), apresenta uma
 análise exploratória das principais variáveis de interesse e define as
 variáveis e os horizontes de previsão dos capítulos seguintes. O objetivo é
@@ -17,7 +17,7 @@ distribuição estatística e a heterogeneidade do prêmio de risco de volatilid
 ao longo da amostra, estabelecendo o pano de fundo empírico para os modelos
 apresentados nos Capítulos~\ref{chap:previsao_bvrp} a~\ref{chap:retornos_nao_linear}.
 
-A amostra cobre 1.806 observações diárias, de 24 de março de 2021 a 3 de março de 2026.\footnote{A amostra termina em 3 de março de 2026 por construção: o horizonte máximo de previsão avaliado no Capítulo~\ref{chap:retornos_linear} é de 60 dias, e as últimas 60 observações da série não dispõem de retorno futuro válido nesse horizonte. Embora as análises descritivas deste capítulo e a caracterização por regimes do Capítulo~\ref{chap:retornos_nao_linear} não dependam do alvo de 60 dias, a dissertação adota a mesma amostra em todos os capítulos para assegurar comparabilidade entre os resultados.} Os preços diários do Bitcoin vêm da API pública da Binance (par BTCUSDT), e a volatilidade implícita, do índice DVOL da Deribit. A base de preços original não tinha os dias de 1º a 31 de março de 2023; esta dissertação completa o intervalo com as velas diárias da mesma fonte. Sem essa correção, o retorno registrado em 1º de abril de 2023 acumularia 32 dias e inflaria a volatilidade histórica e o prêmio de abril de 2023. O período inclui a aprovação dos ETFs de Bitcoin à vista pela \textit{Securities and Exchange Commission} (SEC), em janeiro de 2024 --- evento institucional cujo potencial efeito estrutural sobre a dinâmica do BVRP o Capítulo~\ref{chap:retornos_nao_linear} discute como limitação.
+A amostra cobre 1.806 observações diárias, de 24 de março de 2021 a 3 de março de 2026.\footnote{A amostra termina em 3 de março de 2026 por construção: o horizonte máximo de previsão avaliado no Capítulo~\ref{chap:retornos_linear} é de 60 dias, e as últimas 60 observações da série não dispõem de retorno futuro válido nesse horizonte. Embora as análises descritivas deste capítulo e a caracterização por regimes do Capítulo~\ref{chap:retornos_nao_linear} não dependam do alvo de 60 dias, adotamos a mesma amostra em todos os capítulos para assegurar comparabilidade entre os resultados.} Os preços diários do Bitcoin vêm da API pública da Binance (par BTCUSDT), e a volatilidade implícita, do índice DVOL da Deribit. A base de preços original não tinha os dias de 1º a 31 de março de 2023; completamos o intervalo com as velas diárias da mesma fonte. Sem essa correção, o retorno registrado em 1º de abril de 2023 acumularia 32 dias e inflaria a volatilidade histórica e o prêmio de abril de 2023. O período inclui a aprovação dos ETFs de Bitcoin à vista pela \textit{Securities and Exchange Commission} (SEC), em janeiro de 2024 --- evento institucional cujo potencial efeito estrutural sobre a dinâmica do BVRP o Capítulo~\ref{chap:retornos_nao_linear} discute como limitação.
 
 % =========================================================
 \section{Descrição das variáveis e estatísticas descritivas}
@@ -57,7 +57,7 @@ $17{,}3$ contra $11{,}9$ p.p.), com mínimo de $-75{,}8$ p.p., em novembro de
 \IfFileExists{tables/dados/desc_stats.tex}{
   \input{tables/dados/desc_stats.tex}
 }{}
-Os testes formais de estacionariedade confirmam que o preço de fechamento do Bitcoin é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (RV e VH de 30 dias e IV 30d) e as duas estimativas do prêmio apresentam resultados inconclusivos --- o KPSS rejeita a estacionariedade (no RBVRP, com valor-$p$ de $0{,}015$), e o ADF rejeita a raiz unitária a 5\%, exceto na IV, que fica na fronteira (valor-$p$ de $0{,}071$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os fins desta dissertação, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. A dissertação mantém essas séries em nível (Tabela~\ref{tab:dados-adf-kpss}).
+Os testes formais de estacionariedade confirmam que o preço de fechamento do Bitcoin é integrado de primeira ordem I(1), enquanto os log-retornos diários são estacionários I(0). As medidas de volatilidade (RV e VH de 30 dias e IV 30d) e as duas estimativas do prêmio apresentam resultados inconclusivos --- o KPSS rejeita a estacionariedade (no RBVRP, com valor-$p$ de $0{,}015$), e o ADF rejeita a raiz unitária a 5\%, exceto na IV, que fica na fronteira (valor-$p$ de $0{,}071$) ---, padrão compatível com processos altamente persistentes, seja por longa memória, seja por uma raiz próxima da unitária. Os testes disponíveis não distinguem entre essas alternativas; para os nossos fins, o que importa é a elevada persistência dessas séries, que motiva tanto o tratamento em nível nas especificações econométricas quanto a atenção ao viés de Stambaugh na inferência do Capítulo~\ref{chap:retornos_linear}. Mantemos essas séries em nível (Tabela~\ref{tab:dados-adf-kpss}).
 
 \IfFileExists{tables/dados/adf_kpss_table.tex}{
   \input{tables/dados/adf_kpss_table.tex}
@@ -85,7 +85,7 @@ antecipado na Seção~\ref{sec:refer-vrp-teorico}.
 \section{Existência do prêmio}
 \label{sec:dados-h1}
 
-A primeira hipótese da dissertação (H1) é que o prêmio é negativo em média,
+A hipótese formal que testamos (H1) é que o prêmio é negativo em média,
 $\mathbb{E}(\text{BVRP}_t) < 0$. Como
 $\mathbb{E}(\text{RBVRP}_t \mid I_t) = \text{BVRP}_t$, a lei das expectativas
 iteradas dá $\mathbb{E}(\text{RBVRP}_t) = \mathbb{E}(\text{BVRP}_t)$: H1

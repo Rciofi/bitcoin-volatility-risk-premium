@@ -19,36 +19,36 @@ A volatilidade implícita nas opções não é só uma previsão da volatilidade
 futura: ela embute um prêmio. Em ações, a volatilidade implícita supera, em
 média, a volatilidade realizada: os compradores de opções pagam um prêmio para
 se proteger do risco de volatilidade, e esse prêmio ajuda a prever os retornos
-futuros do índice \citep{bollerslev2009expected}. Esta dissertação estuda o
+futuros do índice \citep{bollerslev2009expected}. Estudamos o
 prêmio de risco de volatilidade do Bitcoin (BVRP), a diferença entre a
 volatilidade esperada para os 30 dias seguintes e a volatilidade implícita (IV)
-de 30 dias dada pelo DVOL. Como a expectativa não é observável, a dissertação
-mede o prêmio pela sua realização,
+de 30 dias dada pelo DVOL. Como a expectativa não é observável,
+medimos o prêmio pela sua realização,
 $\text{RBVRP}_t = \text{RV}_{t+1:t+30} - \text{IV}_t$, em que
 $\text{RV}_{t+1:t+30}$ é a volatilidade realizada nos 30 dias seguintes (R de
 realizado no futuro). Com essa convenção, um prêmio maior corresponde a um
-BVRP mais negativo. A dissertação responde a quatro perguntas: o prêmio existe? Ele pode ser previsto com a informação
+BVRP mais negativo. Respondemos a quatro perguntas: o prêmio existe? Ele pode ser previsto com a informação
 disponível em $t$? O prêmio previsto prevê linearmente os retornos do Bitcoin?
 Um modelo não linear encontra a relação que o linear não encontra?
 
 \section*{Roteiro e resultados}
 \label{sec:intro-roteiro}
 
-\noindent\textbf{Existência do prêmio.} A dissertação mede o prêmio com a RV dos 30 dias
+\noindent\textbf{Existência do prêmio.} Medimos o prêmio com a RV dos 30 dias
 seguintes, e não com a volatilidade histórica (VH) dos 30 anteriores, porque a
 IV de $t$ precifica a volatilidade de $t+1$ a $t+30$: só a janela prospectiva
 cobre o mesmo período. A versão com a VH passada,
 $\text{HBVRP}_t = \text{VH}_{t-29:t} - \text{IV}_t$ (H de histórico), é
 conhecida em $t$, mas supõe que a volatilidade siga um passeio aleatório.
 
-Com o prêmio medido pelo RBVRP, a dissertação testa sua única hipótese formal
+Com o prêmio medido pelo RBVRP, testamos a única hipótese formal
 (H1): o prêmio é negativo em média. O teste compara a média do RBVRP com zero,
 com erro-padrão de Newey--West de 31 defasagens, que cobre a sobreposição entre
 alvos vizinhos.
 Nas 1.806 datas da amostra, a média é de $-8{,}76$ p.p. ($t = -5{,}15$), e a IV
 supera a RV dos 30 dias seguintes em 72\% das datas: o prêmio existe. A
 distribuição da VH de 30 dias é bimodal, o que indica dois regimes de
-volatilidade; a dissertação estima o corte entre eles, de $37{,}3\%$ a.a., só
+volatilidade; estimamos o corte entre eles, de $37{,}3\%$ a.a., só
 com os dois primeiros anos da amostra, para que nenhuma data seja classificada
 com informação posterior a ela. No regime de baixa volatilidade, a IV supera a VH
 dos 30 dias anteriores, mas não a RV dos 30 seguintes: o HBVRP indica um
@@ -62,10 +62,10 @@ por isso, não pode ser usado como informação disponível em $t$. O HBVRP pode
 entrar como variável explicativa, como em qualquer regressão preditiva, mas é
 uma estimativa ruidosa do prêmio: a correlação entre o HBVRP e o RBVRP na
 mesma data é de $-0{,}02$. Por isso, antes de relacionar o prêmio aos retornos,
-a dissertação prevê o RBVRP fora da amostra, com 17 variáveis conhecidas em
+prevemos o RBVRP fora da amostra, com 17 variáveis conhecidas em
 $t$ --- volatilidades históricas de 1 a 90 dias, a IV e suas variações,
 retornos passados e o HBVRP --- e cinco modelos: MQO,
-Ridge, LASSO, floresta aleatória e XGBoost. A dissertação reestima os modelos a
+Ridge, LASSO, floresta aleatória e XGBoost. Reestimamos os modelos a
 cada 30 dias em janela expansiva, e o treino de cada origem exclui os alvos que
 ainda não se realizaram. Na janela expansiva, todos têm erro quadrático fora
 da amostra menor que o da média histórica (o Ridge reduz o da média em 22\%), e
@@ -78,7 +78,7 @@ entre as variáveis e o prêmio muda entre os regimes dentro da amostra, mas ess
 mudança não melhora a previsão fora dela.
 
 \noindent\textbf{Previsibilidade linear dos retornos.} Como em
-\citet{bollerslev2009expected}, a dissertação estima regressões preditivas do
+\citet{bollerslev2009expected}, estimamos regressões preditivas do
 log-retorno do Bitcoin nos $h$ dias seguintes, com $h$ de 1 a 60 dias. A
 análise principal regride o retorno diretamente nas 16 variáveis disponíveis
 em $t$. Com retornos sobrepostos, o teste de Wald com erro-padrão HAC rejeita
@@ -99,15 +99,18 @@ teste nos seis horizontes dá $p = 0{,}073$. A
 diferença entre os regimes depende da posição do corte.
 
 \noindent\textbf{Previsibilidade não linear.} Como a diferença entre os regimes depende
-de um corte fixado de antemão, a dissertação aplica uma floresta aleatória
+de um corte fixado de antemão, aplicamos uma floresta aleatória
 diretamente ao retorno, que escolhe sozinha os cortes nas volatilidades. Ela
 não supera a média histórica em nenhum horizonte depois do ajuste de Holm
 (floresta: Clark--West de $p = 0{,}050$ em $h = 20$; ajustado, 0,300), e o
 $R^2$ dentro da amostra, de 2\% a 18\%, contra o de fora negativo nos
 horizontes longos, indica sobreajuste. O BVRP previsto pela floresta não tem
-relação com o retorno, e as árvores que preveem o RBVRP cortam a VH de 30 dias
-entre 45\% e 58\% a.a., e não em $37{,}3\%$. O
-Apêndice~\ref{app:estrategias} traduz o prêmio previsto em regras de negociação: nenhuma supera o compra e manutenção
+relação com o retorno, e as árvores que preveem o RBVRP cortam a VH de 30 dias,
+com mediana ponderada em cada origem entre 45\% e 58\% a.a., acima do corte
+de $37{,}3\%$. O
+Apêndice~\ref{app:estrategias} traduz o prêmio previsto em regras de negociação: com exceção da posição
+vendida no regime de baixa volatilidade, cujo resultado reflete a queda do
+Bitcoin nesse regime, nenhuma supera o compra e manutenção
 em índice de Sharpe, e a perda máxima menor vem de ficar fora do mercado na
 maior parte dos dias.
 
@@ -132,28 +135,28 @@ da vida do contrato --- uma definição prospectiva. Eles descrevem o prêmio em
 vencimentos de 7 a 90 dias, quase sempre negativo a partir de julho de 2019, e
 sua correlação com o prêmio de outros ativos, próxima de zero antes da pandemia
 e mais alta depois, com ações e ouro. Eles não preveem o prêmio nem regridem
-nele o retorno do Bitcoin. Esta dissertação também mede o prêmio pela sua
+nele o retorno do Bitcoin. Também medimos o prêmio pela sua
 realização prospectiva, o RBVRP, mas em volatilidade, e não em variância, e com
 o DVOL, publicado pela própria Deribit, em vez de um índice próprio. A amostra,
 de cinco anos de dados diários (março de 2021 a março de 2026), é mais longa que
-a deles. E, em vez de apenas descrever o prêmio, a dissertação o prevê fora da
-amostra e testa se a informação usada na previsão antecipa o retorno, como em
+a deles. E, em vez de apenas descrever o prêmio, o prevemos fora da
+amostra e testamos se a informação usada na previsão antecipa o retorno, como em
 \citet{bollerslev2009expected}.
 
 \citet{almeida2024cryptoVRP} usam opções da Deribit de julho de 2017 a dezembro
 de 2022 e medem o prêmio pela variância neutra ao risco menos a física, com a
 variância realizada dos 27 dias anteriores --- uma medida retrospectiva, como o
-HBVRP. Na convenção deles, um prêmio maior é um valor mais positivo; nesta
-dissertação, que subtrai a volatilidade implícita da física, um prêmio maior é
+HBVRP. Na convenção deles, um prêmio maior é um valor mais positivo; na
+nossa, que subtrai a volatilidade implícita da física, um prêmio maior é
 um BVRP mais negativo. O prêmio médio, de 0,14 em variância anualizada, é muito
 maior que o do S\&P~500. Com dois regimes obtidos pelo agrupamento das
 densidades neutras ao risco na amostra inteira, eles encontram prêmio maior no
 regime de baixa volatilidade. Como \citet{alexanderImeraj2019}, eles não
-preveem o prêmio nem regridem nele o retorno do Bitcoin. A amostra desta
-dissertação é mais recente que a deles: cobre 2023 a 2026 e a aprovação dos
+preveem o prêmio nem regridem nele o retorno do Bitcoin. A nossa amostra
+é mais recente que a deles: cobre 2023 a 2026 e a aprovação dos
 ETFs de Bitcoin à vista, em janeiro de 2024. O prêmio é medido pela realização
 prospectiva, o RBVRP; o HBVRP, retrospectivo como a medida deles, não é usado
-como medida do prêmio. A dissertação também usa dois regimes
+como medida do prêmio. Também usamos dois regimes
 de volatilidade, mas definidos por um corte na VH de 30 dias estimado só com os
 dois primeiros anos da amostra, sem informação posterior às datas
 classificadas, em vez do agrupamento na amostra inteira. Com o HBVRP, o prêmio
@@ -164,7 +167,7 @@ a diferença se inverte.
 Em trabalho relacionado, \citet{han2026price} mostra que as inovações do DVOL
 semanal formam um fator de risco de volatilidade apreçado no corte transversal
 de criptoativos, de dezembro de 2021 a julho de 2024. Ele não mede o prêmio de
-volatilidade. Esta dissertação usa o mesmo índice, o DVOL, mas para medir o
+volatilidade. Usamos o mesmo índice, o DVOL, mas para medir o
 prêmio, pela diferença entre a volatilidade realizada nos 30 dias seguintes e o
 DVOL, e para estudar a previsibilidade do retorno do próprio Bitcoin ao longo
 do tempo, e não o corte transversal dos retornos de criptoativos.

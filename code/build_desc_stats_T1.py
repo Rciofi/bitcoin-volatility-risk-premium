@@ -243,7 +243,7 @@ def tab_3_2(df, out_dir, bvrp_cols):
         r"\begin{table}[H]",
         r"\centering",
         r"\small",
-        r"\caption[Testes de estacionariedade ADF e KPSS]{Testes de estacionariedade ADF e KPSS --- variáveis principais da dissertação."
+        r"\caption[Testes de estacionariedade ADF e KPSS]{Testes de estacionariedade ADF e KPSS --- variáveis principais."
         r" Hipótese nula do ADF: presença de raiz unitária; hipótese nula do KPSS: estacionariedade."
         f" Período: {periodo} ($N = {fmt_n(n)}$ observações diárias).}}",
         r"\label{tab:dados-adf-kpss}",
